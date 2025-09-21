@@ -58,7 +58,7 @@
 .dark {
   --primary-theme-foreground: oklch(60.674% 0.11024 57.827);
   --secondary-theme-foreground: oklch(73.448% 0.13515 99.402);
-  --background: oklch(26.862% 0.00003 271.152 / 0.70);
+  --background: oklch(26.862% 0.00003 271.152);
   --foreground: oklch(0.81 0.01 93.53);
   --card: oklch(26.862% 0.00003 271.152);
   --card-foreground: oklch(0.98 0.01 93.48);
@@ -81,7 +81,7 @@
   --chart-3: oklch(0.21 0.01 88.79);
   --chart-4: oklch(0.31 0.05 289.74);
   --chart-5: oklch(0.56 0.13 41.94);
-  --sidebar: oklch(23.929% 0.00003 271.152 / 0.7);
+  --sidebar: oklch(23.929% 0.00003 271.152);
   --sidebar-foreground: oklch(0.81 0.01 93.53);
   --sidebar-primary: oklch(0.33 0 0);
   --sidebar-primary-foreground: oklch(0.99 0 0);

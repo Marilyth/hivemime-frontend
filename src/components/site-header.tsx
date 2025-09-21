@@ -25,7 +25,7 @@ export function SiteHeader() {
 
         <Separator orientation="vertical" className="mr-2 h-4" />
         <div className="flex justify-center flex-1">
-          <SearchForm className="w-128" />
+          <SearchForm className="max-w-128 w-full" />
         </div>
         <UserOptions user={{name: "test", email: "test@example.com", avatar: "/avatars/test.jpg"}} />
       </div>

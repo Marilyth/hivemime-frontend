@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "postbuild": "touch docs/.nojekyll",
+    "postbuild": "touch docs/.nojekyll && echo 'hivemime.mayiscoding.com' > docs/CNAME",
     "start": "next start",
     "lint": "eslint"
   },

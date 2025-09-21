@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 
       >
-        <div className="fixed inset-0 -z-10 bg-background/80 backdrop-blur bg-pattern" />
+        <div className="fixed inset-0 -z-10 bg-background/80 backdrop-blur" />
         <SidebarProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
