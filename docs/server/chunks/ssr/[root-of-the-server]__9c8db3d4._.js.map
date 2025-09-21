@@ -1,1 +1,0 @@
-{"version":3,"sources":["turbopack:///[project]/src/app/about/page.tsx"],"sourcesContent":["export default function Page() {\n  return (\n    <div>\n      Hello about.\n    </div>\n  );\n}\n"],"names":[],"mappings":"iRAAe,SAAS,IACtB,MACE,CAAA,EAAA,EAAA,GAAA,EAAC,MAAA,UAAI,gBAIT"}
