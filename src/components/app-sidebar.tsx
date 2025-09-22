@@ -68,9 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarContent>
         <SidebarHeader>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col gap-4 items-center">
           <div className="relative h-24 w-24">
-            <Image src="/HiveMimeIcon.png" alt="HiveMime Logo" fill style={{ objectFit: "contain" }} />
+            <img src="/HiveMimeIcon.png" alt="HiveMime Logo" style={{ objectFit: "contain" }} />
           </div>
           <div className="flex text-2xl font-bold">
             <span className="text-honey-brown">Hive</span>

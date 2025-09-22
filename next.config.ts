@@ -6,10 +6,4 @@ const nextConfig: NextConfig = {
   distDir: "docs"
 };
 
-module.exports = {
-    images: {
-        unoptimized: true
-    }
-}
-
 export default nextConfig;
