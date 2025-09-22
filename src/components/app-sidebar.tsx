@@ -14,6 +14,7 @@ import { NavTags } from "@/components/nav-tags"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar"
 
@@ -68,12 +69,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarHeader>
         <div className="flex flex-col items-center">
-          <div className="relative h-24 w-24 mt-4">
+          <div className="relative h-24 w-24">
             <Image src="/HiveMimeIcon.png" alt="HiveMime Logo" fill style={{ objectFit: "contain" }} />
           </div>
           <div className="flex text-2xl font-bold">
-            <span className="text-orange-300" style={{ color: "var(--primary-theme-foreground)" }}>Hive</span>
-            <span className="text-yellow-200" style={{ color: "var(--secondary-theme-foreground)" }}>Mime</span>
+            <span className="text-honey-brown">Hive</span>
+            <span className="text-honey-yellow">Mime</span>
           </div>
         </div>
         </SidebarHeader>

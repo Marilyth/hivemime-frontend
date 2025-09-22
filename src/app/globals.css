@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --primary-theme-foreground: oklch(60.674% 0.11024 57.827);
-  --secondary-theme-foreground: oklch(73.448% 0.13515 99.402);
+  --honey-brown: oklch(60.674% 0.11024 57.827);
+  --honey-yellow: oklch(73.448% 0.13515 99.402);
   --background: oklch(0.98 0.01 93.48);
   --foreground: oklch(0.34 0.03 94.42);
   --card: oklch(0.98 0.01 93.48);
@@ -56,8 +56,8 @@
 }
 
 .dark {
-  --primary-theme-foreground: oklch(60.674% 0.11024 57.827);
-  --secondary-theme-foreground: oklch(73.448% 0.13515 99.402);
+  --honey-brown: oklch(60.674% 0.11024 57.827);
+  --honey-yellow: oklch(73.448% 0.13515 99.402);
   --background: oklch(26.862% 0.00003 271.152);
   --foreground: oklch(0.81 0.01 93.53);
   --card: oklch(26.862% 0.00003 271.152);
@@ -101,8 +101,8 @@
 }
 
 @theme inline {
-  --primary-theme-foreground: var(--primary-theme-foreground);
-  --secondary-theme-foreground: var(--secondary-theme-foreground);
+  --color-honey-brown: var(--honey-brown);
+  --color-honey-yellow: var(--honey-yellow);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -167,10 +167,4 @@
   background-image: url('/patterntransparent.svg');
   background-repeat: repeat;
   background-size: auto;
-
-  /* Add the blur effect */
-  filter: blur(4px);
-
-  /* Full height */
-  height: 100%;
 }

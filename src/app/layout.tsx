@@ -37,9 +37,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-
       >
-        <div className="fixed inset-0 -z-10 bg-background/80 backdrop-blur" />
         <SidebarProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
@@ -49,7 +47,7 @@ export default function RootLayout({
                 <div className="flex flex-1">
                   <AppSidebar />
                   <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 p-4 ">
+                    <div className="flex flex-1 flex-col gap-4 p-4 bg-pattern">
                       {children}
                     </div>
                     <Toaster />
