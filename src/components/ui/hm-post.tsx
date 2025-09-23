@@ -4,19 +4,25 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { MessageSquare, ArrowDownWideNarrow, User } from "lucide-react"
 import { Badge } from "./badge";
 import HiveMimePoll from "./hm-poll";
+import { Post } from "@/models/post";
+import { observer } from "mobx-react-lite";
+import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "./hm-embedded-tabs";
 
-export default function HiveMimePost() {
+export interface HiveMimePostProps {
+  post: Post;
+}
 
+export const HiveMimePost = observer(({ post }: HiveMimePostProps) => {
   return (
-    <Card>
+    <Card className="py-4">
       <CardHeader>
         <CardTitle>
           <div className="flex flex-row">
             <div className="flex flex-col gap-1">
               <div className="flex flex-row gap-2">
-                <span className="text-gray-500 text-sm">Username needs to know</span>
+                <span className="text-gray-500 text-sm">{post.userName} needs to know</span>
               </div>
-              <span className="font-bold text-honey-brown">What is your favourite fruit?</span>
+              <span className="font-bold text-honey-brown">{post.title}</span>
             </div>
             <ArrowDownWideNarrow className="ml-auto text-gray-500"/>
           </div>
@@ -24,11 +30,26 @@ export default function HiveMimePost() {
       </CardHeader>
       <CardContent>
         <span>
-          I was thinking about fruit a lot lately. It is great food. But what is the BEST fruit? Please help a drone out, hivemind!
+          {post.content}
         </span>
-        <div className="mt-4">
-          <HiveMimePoll />
-        </div>
+        <EmbeddedTabs defaultValue="Main">
+          <EmbeddedTabsList className="mt-4">
+            <EmbeddedTabsTrigger value="Main">1</EmbeddedTabsTrigger>
+            <EmbeddedTabsTrigger value="Sub1">2</EmbeddedTabsTrigger>
+            <EmbeddedTabsTrigger value="Sub2">3</EmbeddedTabsTrigger>
+          </EmbeddedTabsList>
+          <EmbeddedTabsContent value="Main">
+            <HiveMimePoll />
+          </EmbeddedTabsContent>
+          <EmbeddedTabsContent value="Sub1">
+            How old are you?
+            <HiveMimePoll />
+          </EmbeddedTabsContent>
+          <EmbeddedTabsContent value="Sub2">
+            What is your favorite color?
+            <HiveMimePoll />
+          </EmbeddedTabsContent>
+        </EmbeddedTabs>
       </CardContent>
       <CardFooter>
         <div className="flex flex-row gap-4">
@@ -44,4 +65,4 @@ export default function HiveMimePost() {
       </CardFooter>
     </Card>
   );
-}
+});

@@ -63,7 +63,6 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >
       <SidebarContent>
@@ -78,8 +77,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </div>
         </SidebarHeader>
-        <NavTags tags={data.navMain} title="Feed" />
-        <NavTags tags={data.tags} title="Followed tags" />
+        <NavTags tags={data.navMain} title="Browse" />
+        <NavTags tags={data.tags} title="Followed hives" />
       </SidebarContent>
     </Sidebar>
   )

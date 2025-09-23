@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -9,6 +11,8 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { HiveMimeService } from "@/lib/hivemime-service";
+import { createContext } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,44 +24,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "HiveMime",
-  description: "Demographics made simple.",
-};
+export const HiveMimeServiceContext = createContext<HiveMimeService | null>(null);
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hiveMimeService = new HiveMimeService();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/HiveMimeIcon.png" />
+        <title>HiveMime</title>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
-              <SidebarProvider className="flex flex-col">
+        <HiveMimeServiceContext.Provider value={hiveMimeService}>
+          <SidebarProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
+                <SidebarProvider className="flex flex-col">
 
-                <SiteHeader />
-                <div className="flex flex-1">
-                  <AppSidebar />
-                  <SidebarInset>
-                    <div className="flex flex-1 flex-col gap-4 p-4 bg-pattern">
-                      {children}
-                    </div>
-                    <Toaster />
-                  </SidebarInset>
-                </div>
+                  <div className="flex flex-1">
+                    <AppSidebar />
+                    <SidebarInset>
+                      <SiteHeader />
+                      <div className="flex flex-1 flex-col gap-4 p-4 bg-pattern">
+                        {children}
+                      </div>
+                      <Toaster />
+                    </SidebarInset>
+                  </div>
 
-              </SidebarProvider>
-            </div>
-          </ThemeProvider>
-        </SidebarProvider>
+                </SidebarProvider>
+              </div>
+            </ThemeProvider>
+          </SidebarProvider>
+        </HiveMimeServiceContext.Provider>
       </body>
     </html>
   );
