@@ -1,20 +1,19 @@
 "use client";
 
-import { HiveMimePost } from "@/components/ui/hm-post";
+import { HiveMimeListPost } from "@/components/ui/hm-list-post";
 import { useContext, useEffect, useState } from "react";
-import { HiveMimeServiceContext } from "../layout";
-import { HiveMimeService } from "@/lib/hivemime-service";
-import { Post } from "@/models/post";
+import { HiveMimeApiContext } from "../layout";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Api, ListPostDto } from "@/lib/Api";
 
 export default function Page() {
-  const hiveMimeService: HiveMimeService = useContext(HiveMimeServiceContext)!;
-  const [posts, setPosts] = useState<Post[]>([]);
+  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [posts, setPosts] = useState<ListPostDto[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState<boolean>(false);
 
   async function fetchPostsAsync() {
     setIsLoadingPosts(true);
-    setPosts(await hiveMimeService.browsePostsAsync());
+    setPosts((await hiveMimeService.api.postBrowseList()).data);
     setIsLoadingPosts(false);
   }
 
@@ -26,7 +25,7 @@ export default function Page() {
     <div className="flex justify-center">
       <div className="w-full max-w-183 flex flex-col gap-4">
         {posts.map((post, index) => (
-          <HiveMimePost key={index} post={post} />
+          <HiveMimeListPost key={index} post={post} />
         ))}
 
         {isLoadingPosts && (

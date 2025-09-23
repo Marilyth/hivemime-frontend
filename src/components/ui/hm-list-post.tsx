@@ -3,16 +3,15 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, ArrowDownWideNarrow, User } from "lucide-react"
 import { Badge } from "./badge";
-import HiveMimePoll from "./hm-poll";
-import { Post } from "@/models/post";
-import { observer } from "mobx-react-lite";
+import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "./hm-embedded-tabs";
+import { ListPostDto } from "@/lib/Api";
 
 export interface HiveMimePostProps {
-  post: Post;
+  post: ListPostDto;
 }
 
-export const HiveMimePost = observer(({ post }: HiveMimePostProps) => {
+export function HiveMimeListPost({ post }: HiveMimePostProps) {
   return (
     <Card className="py-4">
       <CardHeader>
@@ -20,7 +19,7 @@ export const HiveMimePost = observer(({ post }: HiveMimePostProps) => {
           <div className="flex flex-row">
             <div className="flex flex-col gap-1">
               <div className="flex flex-row gap-2">
-                <span className="text-gray-500 text-sm">{post.userName} needs to know</span>
+                <span className="text-gray-500 text-sm">User needs to know</span>
               </div>
               <span className="font-bold text-honey-brown">{post.title}</span>
             </div>
@@ -29,26 +28,20 @@ export const HiveMimePost = observer(({ post }: HiveMimePostProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <span>
-          {post.content}
+        <span className="text-muted-foreground">
+          {post.description}
         </span>
-        <EmbeddedTabs defaultValue="Main">
+        <EmbeddedTabs defaultValue="Question1">
           <EmbeddedTabsList className="mt-4">
-            <EmbeddedTabsTrigger value="Main">1</EmbeddedTabsTrigger>
-            <EmbeddedTabsTrigger value="Sub1">2</EmbeddedTabsTrigger>
-            <EmbeddedTabsTrigger value="Sub2">3</EmbeddedTabsTrigger>
+            {post.polls!.map((subPost, index) => (
+              <EmbeddedTabsTrigger key={subPost.id} value={`Question${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
+            ))}
           </EmbeddedTabsList>
-          <EmbeddedTabsContent value="Main">
-            <HiveMimePoll />
-          </EmbeddedTabsContent>
-          <EmbeddedTabsContent value="Sub1">
-            How old are you?
-            <HiveMimePoll />
-          </EmbeddedTabsContent>
-          <EmbeddedTabsContent value="Sub2">
-            What is your favorite color?
-            <HiveMimePoll />
-          </EmbeddedTabsContent>
+          {post.polls!.map((poll, index) => (
+            <EmbeddedTabsContent key={poll.id} value={`Question${index + 1}`}>
+              <HiveMimeListPoll poll={poll} />
+            </EmbeddedTabsContent>
+          ))}
         </EmbeddedTabs>
       </CardContent>
       <CardFooter>
@@ -65,4 +58,4 @@ export const HiveMimePost = observer(({ post }: HiveMimePostProps) => {
       </CardFooter>
     </Card>
   );
-});
+}

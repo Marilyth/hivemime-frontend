@@ -11,8 +11,8 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { HiveMimeService } from "@/lib/hivemime-service";
 import { createContext } from "react";
+import { Api } from "@/lib/Api";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,14 +24,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const HiveMimeServiceContext = createContext<HiveMimeService | null>(null);
+export const HiveMimeApiContext = createContext<Api<unknown> | null>(null);
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hiveMimeService = new HiveMimeService();
+  const api = new Api({ baseUrl: "http://api.mayiscoding.com/hivemime" });
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -42,7 +42,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HiveMimeServiceContext.Provider value={hiveMimeService}>
+        <HiveMimeApiContext.Provider value={api}>
           <SidebarProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
@@ -63,7 +63,7 @@ export default function RootLayout({
               </div>
             </ThemeProvider>
           </SidebarProvider>
-        </HiveMimeServiceContext.Provider>
+        </HiveMimeApiContext.Provider>
       </body>
     </html>
   );
