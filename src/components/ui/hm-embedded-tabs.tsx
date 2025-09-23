@@ -25,7 +25,7 @@ function EmbeddedTabsList({
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
-    <ScrollArea className="rounded-t-lg whitespace-nowrap -mb-[1px] mx-3">
+    <ScrollArea className="rounded-t-lg whitespace-nowrap -mb-[2px] mx-3">
       <TabsPrimitive.List
         data-slot="tabs-list"
         className={cn(
