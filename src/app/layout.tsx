@@ -31,7 +31,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const api = new Api({ baseUrl: "http://api.mayiscoding.com/hivemime" });
+  const api = new Api({ baseUrl: "https://api.mayiscoding.com" });
 
   return (
     <html lang="en" suppressHydrationWarning>
