@@ -27,17 +27,17 @@ const data = {
   navMain: [
     {
       name: "Popular",
-      url: "#",
+      url: "home",
       icon: TrendingUp,
     },
     {
       name: "New",
-      url: "#",
+      url: "home",
       icon: Calendar,
     },
     {
       name: "History",
-      url: "#",
+      url: "home",
       icon: History,
     },
   ],

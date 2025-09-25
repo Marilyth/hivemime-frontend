@@ -1,12 +1,14 @@
 "use client"
 
-import { SidebarIcon } from "lucide-react"
+import { SidebarIcon, Plus } from "lucide-react"
 
 import { SearchForm } from "@/components/search-form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserOptions } from "./user-options"
+import { Tooltip } from "@radix-ui/react-tooltip"
+import { redirect } from "next/navigation"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
@@ -27,6 +29,10 @@ export function SiteHeader() {
         <div className="flex justify-center flex-1">
           <SearchForm className="max-w-128 w-full" />
         </div>
+        <Button variant="outline" onClick={() => redirect("/create")}>
+            <Plus />
+            New post
+        </Button>
         <UserOptions user={{name: "test", email: "test@example.com", avatar: "/avatars/test.jpg"}} />
       </div>
     </header>

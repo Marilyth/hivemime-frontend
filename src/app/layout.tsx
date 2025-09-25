@@ -11,7 +11,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 import { Api } from "@/lib/Api";
 
 const geistSans = Geist({
@@ -31,7 +31,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const api = new Api({ baseUrl: "https://api.mayiscoding.com" });
+  const api = new Api({
+    baseUrl: "https://api.mayiscoding.com",
+    securityWorker: (securityData) =>
+      securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
+  });
+
+  async function loginAsync(){
+    const response = (await api.api.authLoginList()).data;
+    api.setSecurityData(response.token);
+  }
+
+  useEffect(() => {
+    loginAsync();
+  }, []);
 
   return (
     <html lang="en" suppressHydrationWarning>
