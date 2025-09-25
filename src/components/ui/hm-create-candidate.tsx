@@ -9,7 +9,7 @@ interface PostProps {
   option: PollOptionDto;
 }
 
-export const HiveMimeCreatePickOption = observer(({ label, option }: PostProps) => {
+export const HiveMimeCreateCandidate = observer(({ label, option }: PostProps) => {
   return (
     <div className="flex flex-row hover:border-honey-brown transition-colors border rounded-md px-2 py-1 items-center">
       <span className="w-8 text-gray-500">{label}</span>

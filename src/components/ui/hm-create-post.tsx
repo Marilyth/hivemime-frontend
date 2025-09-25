@@ -13,6 +13,7 @@ import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
+import { Separator } from "./separator";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
@@ -46,7 +47,9 @@ export const HiveMimeCreatePost = observer(() => {
             onChange={(e) => post.title = e.target.value} />
           <InputWithLabel label="Description" placeholder="My description" value={post.description!}
             onChange={(e) => post.description = e.target.value} />
-          <Label className="mt-8">Polls</Label>
+
+          <Separator className="mt-8" orientation="horizontal" />
+          <Label>Polls</Label>
           <EmbeddedTabs value={selectedQuestion} onValueChange={setSelectedQuestion}>
             <EmbeddedTabsList actionComponent={
                 <Button variant="outline" className="rounded-b-none border-b-0" onClick={addQuestion}>

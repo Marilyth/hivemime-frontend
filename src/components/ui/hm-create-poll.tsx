@@ -6,7 +6,9 @@ import { CreatePollDto } from "@/lib/Api";
 import { InputWithLabel } from "./labelled-input";
 import { observer } from "mobx-react-lite";
 import { Label } from "@radix-ui/react-label";
-import { HiveMimeCreatePickOption } from "./hm-create-pick-option";
+import { HiveMimeCreateCandidate } from "./hm-create-candidate";
+import { Separator } from "./separator";
+import { Slider } from "./slider";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -23,10 +25,11 @@ export const HiveMimeCreatePoll = observer(({ poll }: HiveMimeCreatePollProps) =
         onChange={(e) => poll.title = e.target.value} />
       <InputWithLabel label="Description" placeholder="My poll's description" value={poll.description!}
         onChange={(e) => poll.description = e.target.value} />
-
-        <Label className="mt-8">Candidates</Label>
+        
+        <Separator className="mt-8" />
+        <Label>Candidates</Label>
         {poll.options!.map((option, index) => (
-          <HiveMimeCreatePickOption key={index} option={option} label={`${index + 1}`} />
+          <HiveMimeCreateCandidate key={index} option={option} label={`${index + 1}`} />
         ))}
 
         <Button variant="outline" onClick={addOption}>
