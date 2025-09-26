@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, ArrowDownWideNarrow, User } from "lucide-react"
-import { Badge } from "./badge";
+import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
-import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "./hm-embedded-tabs";
+import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
 import { ListPostDto } from "@/lib/Api";
 
 export interface HiveMimePostProps {
@@ -16,14 +16,11 @@ export function HiveMimeListPost({ post }: HiveMimePostProps) {
     <Card className="py-4">
       <CardHeader>
         <CardTitle>
-          <div className="flex flex-row">
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-row gap-2">
-                <span className="text-gray-500 text-sm">User needs to know</span>
-              </div>
-              <span className="font-bold text-honey-brown">{post.title}</span>
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-row gap-2">
+              <span className="text-gray-500 text-sm">User needs to know</span>
             </div>
-            <ArrowDownWideNarrow className="ml-auto text-gray-500"/>
+            <span className="font-bold text-honey-brown">{post.title}</span>
           </div>
         </CardTitle>
       </CardHeader>

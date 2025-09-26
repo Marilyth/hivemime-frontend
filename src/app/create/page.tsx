@@ -1,6 +1,6 @@
 "use client";
 
-import { HiveMimeCreatePost } from "@/components/ui/hm-create-post";
+import { HiveMimeCreatePost } from "@/components/ui/custom/poll-create/hm-create-post";
 
 export default function Page() {
   return (

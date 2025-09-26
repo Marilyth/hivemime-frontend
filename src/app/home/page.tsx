@@ -1,6 +1,6 @@
 "use client";
 
-import { HiveMimeListPost } from "@/components/ui/hm-list-post";
+import { HiveMimeListPost } from "@/components/ui/custom/poll-pick/hm-list-post";
 import { useContext, useEffect, useState } from "react";
 import { HiveMimeApiContext } from "../layout";
 import { Skeleton } from "@/components/ui/skeleton";

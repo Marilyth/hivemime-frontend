@@ -57,7 +57,7 @@ export default function RootLayout({
       >
         <HiveMimeApiContext.Provider value={api}>
           <SidebarProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
               <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
                 <SidebarProvider className="flex flex-col">
 

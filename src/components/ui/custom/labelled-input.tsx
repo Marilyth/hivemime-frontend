@@ -1,5 +1,5 @@
-import { Label } from "./label";
-import { Input } from "./input";
+import { Label } from "../label";
+import { Input } from "../input";
 import { ComponentProps } from "react";
 
 type InputWithLabelProps = ComponentProps<typeof Input> & {

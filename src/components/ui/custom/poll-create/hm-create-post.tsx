@@ -2,10 +2,10 @@
 
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
-import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "./hm-embedded-tabs";
+import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
 import { Api, CreatePostDto } from "@/lib/Api";
-import { InputWithLabel } from "./labelled-input";
-import { Button } from "./button";
+import { InputWithLabel } from "../labelled-input";
+import { Button } from "../../button";
 import { useContext, useRef, useState } from "react";
 import { HiveMimeApiContext } from "@/app/layout";
 import { createObservable } from "@/lib/utils";
@@ -13,7 +13,7 @@ import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Separator } from "./separator";
+import { Separator } from "../../separator";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
