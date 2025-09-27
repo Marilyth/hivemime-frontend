@@ -11,19 +11,20 @@
  */
 
 /** @format int32 */
-export enum PollAnswerType {
-  SingleChoice = 0,
-  MultipleChoice = 1,
-  Ranking = 2,
-  Categorization = 3,
+export enum PollType {
+  Value0 = 0,
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
 }
 
 export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
   allowCustomAnswer?: boolean;
-  answerType?: PollAnswerType;
-  options?: PollOptionDto[] | null;
+  pollType?: PollType;
+  candidates?: PollCandidateDto[] | null;
 }
 
 export interface CreatePostDto {
@@ -37,8 +38,8 @@ export interface ListPollDto {
   id?: number;
   title?: string | null;
   description?: string | null;
-  pollType?: PollAnswerType;
-  options?: PollOptionDto[] | null;
+  pollType?: PollType;
+  candidates?: PollCandidateDto[] | null;
 }
 
 export interface ListPostDto {
@@ -54,14 +55,18 @@ export interface LoginDto {
   token?: string | null;
 }
 
-export interface PollOptionDto {
+export interface PollCandidateDto {
+  /** @format int32 */
+  id?: number;
   name?: string | null;
   description?: string | null;
 }
 
-export interface PollOptionResultDto {
+export interface PollCandidateResultDto {
   name?: string | null;
   description?: string | null;
+  /** @format int32 */
+  id?: number;
   /** @format int32 */
   voterAmount?: number;
   /** @format int32 */
@@ -71,15 +76,27 @@ export interface PollOptionResultDto {
 export interface PollResultsDto {
   title?: string | null;
   description?: string | null;
-  pollType?: PollAnswerType;
-  pollOption?: PollOptionResultDto[] | null;
+  pollType?: PollType;
+  candidates?: PollCandidateResultDto[] | null;
+}
+
+export interface UpsertVoteToCandidateDto {
+  /** @format int32 */
+  candidateId?: number;
+  /** @format int32 */
+  value?: number | null;
 }
 
 export interface UpsertVoteToPollDto {
   /** @format int32 */
-  pollOptionId?: number;
+  pollId?: number;
+  candidates?: UpsertVoteToCandidateDto[] | null;
+}
+
+export interface UpsertVoteToPostDto {
   /** @format int32 */
-  value?: number;
+  postId?: number;
+  polls?: UpsertVoteToPollDto[] | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -389,7 +406,7 @@ export class Api<
      */
     pollVoteCreate: (
       pollId: string,
-      data: UpsertVoteToPollDto[],
+      data: UpsertVoteToPostDto,
       params: RequestParams = {},
     ) =>
       this.request<void, any>({

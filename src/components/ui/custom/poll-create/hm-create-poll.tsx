@@ -1,8 +1,7 @@
 "use client";
 
-import { Edit3 } from "lucide-react"
 import { Button } from "../../button";
-import { CreatePollDto, PollAnswerType } from "@/lib/Api";
+import { CreatePollDto, PollType } from "@/lib/Api";
 import { InputWithLabel } from "../labelled-input";
 import { observer } from "mobx-react-lite";
 import { Separator } from "../../separator";
@@ -16,16 +15,17 @@ export interface HiveMimeCreatePollProps {
 }
 
 export const HiveMimeCreatePoll = observer(({ poll }: HiveMimeCreatePollProps) => {
-  const pollMapping: { [key in PollAnswerType]: ReactNode } = {
-    [PollAnswerType.SingleChoice]: <HiveMimeCreateSingleChoicePoll poll={poll} />,
-    [PollAnswerType.MultipleChoice]: <span>ToDo</span>,
-    [PollAnswerType.Ranking]: <span>ToDo</span>,
-    [PollAnswerType.Categorization]: <span>ToDo</span>,
+  const pollMapping: { [key in PollType]: ReactNode } = {
+    [PollType.Value0]: <HiveMimeCreateSingleChoicePoll poll={poll} />,
+    [PollType.Value1]: <span>ToDo</span>,
+    [PollType.Value2]: <span>ToDo</span>,
+    [PollType.Value3]: <span>ToDo</span>,
+    [PollType.Value4]: <span>ToDo</span>
   };
 
   return (
     <div>
-      { poll.answerType == undefined &&
+      { poll.pollType == undefined &&
         <HiveMimeCreatePollTypePicker poll={poll} /> ||
         <div className="flex flex-col gap-2">
 
@@ -36,17 +36,17 @@ export const HiveMimeCreatePoll = observer(({ poll }: HiveMimeCreatePollProps) =
 
           <InputWithLabel label="Description" placeholder="My poll's description" value={poll.description!}
             onChange={(e) => poll.description = e.target.value} />
-          
+
           <div className="flex flex-row items-center mt-8">
             <Separator className="flex-1" />
-            <Button variant="link" className="border-1 cursor-pointer text-honey-brown" onClick={() => poll.answerType = undefined}>
-              <HiveMimePollTypeIcon answerType={poll.answerType!} />
-              {PollAnswerType[poll.answerType!]}
+            <Button variant="link" className="border-1 cursor-pointer text-honey-brown" onClick={() => poll.pollType = undefined}>
+              <HiveMimePollTypeIcon answerType={poll.pollType!} />
+              {PollType[poll.pollType!]}
             </Button>
             <Separator className="flex-1" />
           </div>
 
-          {pollMapping[poll.answerType!]}
+          {pollMapping[poll.pollType!]}
         </div>
       }
     </div>

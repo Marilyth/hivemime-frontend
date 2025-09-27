@@ -1,20 +1,25 @@
 "use client";
 
-import { ListPollDto, PollAnswerType } from "@/lib/Api";
+import { ListPollDto, PollType, UpsertVoteToPollDto, UpsertVoteToPostDto } from "@/lib/Api";
 import { HiveMimePickSingleChoicePoll } from "./hm-pick-single-choice-poll";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
+import { Button } from "../../button";
+import { Send } from "lucide-react";
+import { observer } from "mobx-react-lite";
 
 export type HiveMimeListPollProps =   {
   poll: ListPollDto;
+  pollVote: UpsertVoteToPollDto;
 }
 
-export function HiveMimeListPoll({ poll }: HiveMimeListPollProps) {
-  const pollMapping: { [key in PollAnswerType]: ReactNode } = {
-      [PollAnswerType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} />,
-      [PollAnswerType.MultipleChoice]: <span>ToDo</span>,
-      [PollAnswerType.Ranking]: <span>ToDo</span>,
-      [PollAnswerType.Categorization]: <span>ToDo</span>,
+export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
+  const pollMapping: { [key in PollType]: ReactNode } = {
+      [PollType.Value0]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
+      [PollType.Value1]: <span>ToDo</span>,
+      [PollType.Value2]: <span>ToDo</span>,
+      [PollType.Value3]: <span>ToDo</span>,
+      [PollType.Value4]: <span>ToDo</span>
     };
 
   return (
@@ -26,8 +31,13 @@ export function HiveMimeListPoll({ poll }: HiveMimeListPollProps) {
         </div>
         <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-gray-500" />
       </div>
-        
+
       {pollMapping[poll.pollType!]}
+
+      <Button className="w-full" variant={"outline"} disabled >
+        <Send />
+        Submit
+      </Button>
     </div>
   );
-}
+});

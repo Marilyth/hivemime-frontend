@@ -13,29 +13,29 @@ export interface HiveMimeCreatePollProps {
 
 export const HiveMimeCreateSingleChoicePoll = observer(({ poll }: HiveMimeCreatePollProps) => {
   function removeOption(index: number) {
-    if (poll.options!.length > 2) {
-      poll.options!.splice(index, 1);
+    if (poll.candidates!.length > 2) {
+      poll.candidates!.splice(index, 1);
     }
   }
 
   function addOption() {
-    poll.options?.push({ name: `Candidate ${poll.options!.length + 1}`, description: "" });
+    poll.candidates?.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
   }
 
   return (
     <div className="flex flex-col gap-2">
       <Label>Candidates</Label>
-      {poll.options!.map((option, index) => (
-        <div key={index} className="flex flex-row items-center">
-          <div className="flex-1">
-            <HiveMimeCreateCandidate option={option} label={`${index + 1}`} />
+      {poll.candidates!.map((option, index) => (
+          <div className="flex flex-row items-center" key={index}>
+            <div className="flex-1">
+              <HiveMimeCreateCandidate option={option} index={index} />
+            </div>
+              <Button disabled={poll.candidates!.length <= 2} variant="ghost"
+                className="ml-2 text-muted-foreground hover:text-red-400"
+                onClick={() => removeOption(index)}>
+                  <Trash2 />
+              </Button>
           </div>
-            <Button disabled={poll.options!.length <= 2} variant="ghost"
-              className="ml-2 text-muted-foreground hover:text-red-400"
-              onClick={() => removeOption(index)}>
-                <Trash2 />
-            </Button>
-        </div>
       ))}
 
       <Button variant="outline" onClick={addOption}>

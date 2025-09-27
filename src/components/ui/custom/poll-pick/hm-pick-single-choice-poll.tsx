@@ -3,27 +3,42 @@
 import { Send } from "lucide-react"
 import { Button } from "../../button";
 import { observer } from "mobx-react-lite";
-import { ListPollDto } from "@/lib/Api";
-import HiveMimePickSingleChoiceCandidate from "./hm-pick-single-choice-candidate";
+import { ListPollDto, UpsertVoteToPollDto } from "@/lib/Api";
+import { HiveMimePickChoiceCandidate } from "./hm-pick-single-choice-candidate";
 
 export interface HiveMimePickSingleChoicePollProps {
   poll: ListPollDto;
+  pollVotes: UpsertVoteToPollDto;
 }
 
-export const HiveMimePickSingleChoicePoll = observer(({ poll }: HiveMimePickSingleChoicePollProps) => {
+export const HiveMimePickSingleChoicePoll = observer(({ poll, pollVotes }: HiveMimePickSingleChoicePollProps) => {
   return (
     <div className="flex flex-col gap-2">
       <span className="text-gray-500 text-sm">Please pick 1 option</span>
-        {poll.options!.map((option, index) => (
-          <HiveMimePickSingleChoiceCandidate key={index} value={(index + 1).toString()} name={option.name!} />
-        ))}
+        {poll.candidates!.map((candidate, index) => (
+          <HiveMimePickChoiceCandidate key={index} vote={pollVotes.candidates![index]} candidate={candidate}
+            onClick={() => {
+              const currentVote = pollVotes.candidates![index];
+              const currentValue = currentVote?.value;
 
-        <div className="flex flex-row mt-2">
-          <Button className="w-full" variant={"outline"} disabled >
-              <Send />
-              Submit
-          </Button>
-        </div>
+              // Flip the vote state.
+              currentVote!.value = ((currentValue ?? 0) + 1) % 2;
+
+              if (currentVote!.value === 0)
+                return;
+
+              // If the value is set to 1, set all other votes to 0.
+              // Since this is a single-choice poll.
+              for (let i = 0; i < pollVotes.candidates!.length; i++) {
+                if (i !== index) {
+                  pollVotes.candidates![i].value = 0;
+                }
+              }
+
+              console.log(pollVotes);
+            }}
+          />
+        ))}
     </div>
   );
 });

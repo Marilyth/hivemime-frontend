@@ -26,7 +26,7 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   function addQuestion() {
-    post.polls?.push({ title: "", description: "", options: [] });
+    post.polls?.push({ title: "", description: "", candidates: [] });
     setSelectedQuestion(`${post.polls!.length}`);
   }
 
@@ -68,7 +68,7 @@ export const HiveMimeCreatePost = observer(() => {
           </EmbeddedTabs>
         </div>
       </CardContent>
-      
+
       <CardFooter>
         <Button onClick={submitPost}>Submit</Button>
       </CardFooter>

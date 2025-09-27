@@ -1,17 +1,37 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, ArrowDownWideNarrow, User } from "lucide-react"
+import { MessageSquare, User } from "lucide-react"
 import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { ListPostDto } from "@/lib/Api";
+import { UpsertVoteToPostDto, UpsertVoteToPollDto, UpsertVoteToCandidateDto, ListPostDto, Api } from "@/lib/Api";
+import { useContext, useEffect, useState } from "react";
+import { observable } from "mobx";
+import { HiveMimeApiContext } from "@/app/layout";
 
 export interface HiveMimePostProps {
   post: ListPostDto;
 }
 
 export function HiveMimeListPost({ post }: HiveMimePostProps) {
+  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [postVote, setPostVote] = useState<UpsertVoteToPostDto>(() => (observable({
+    postId: post.id!,
+    polls: (post.polls || []).map(poll => ({
+      pollId: poll.id!,
+      candidates: (poll.candidates || []).map(candidate => ({
+        candidateId: candidate.id!,
+        value: null,
+      })),
+    })),
+  })));
+
+  async function submitVote()
+  {
+    await hiveMimeService.api.pollVoteCreate(post.id!.toString(), postVote);
+  }
+
   return (
     <Card className="py-4">
       <CardHeader>
@@ -36,7 +56,7 @@ export function HiveMimeListPost({ post }: HiveMimePostProps) {
           </EmbeddedTabsList>
           {post.polls!.map((poll, index) => (
             <EmbeddedTabsContent key={poll.id} value={`Question${index + 1}`}>
-              <HiveMimeListPoll poll={poll} />
+              <HiveMimeListPoll poll={poll} pollVote={postVote.polls![index]} />
             </EmbeddedTabsContent>
           ))}
         </EmbeddedTabs>

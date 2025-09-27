@@ -9,12 +9,10 @@ import {
   Calendar,
   TrendingUp,
 } from "lucide-react"
-import Image from "next/image"
 import { NavTags } from "@/components/nav-tags"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar"
 
