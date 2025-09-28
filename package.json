@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "scaffold": "sh scaffold-api.sh",
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "postbuild": "touch docs/.nojekyll && echo 'hivemime.mayiscoding.com' > docs/CNAME",
