@@ -22,12 +22,34 @@ export const HiveMimeCreatePost = observer(() => {
   const post = postRef.current;
 
   if (post.polls!.length === 0) {
-    addQuestion();
+    addPoll();
   }
 
-  function addQuestion() {
+  function addPoll() {
     post.polls?.push({ title: "", description: "", candidates: [] });
     setSelectedQuestion(`${post.polls!.length}`);
+  }
+
+  function removePoll(index: number) {
+    post.polls?.splice(index, 1);
+
+    // If the removed poll was the last one, select the previous one.
+    // (The value is 1-based, the index is 0-based)
+    if (index >= post.polls!.length)
+      setSelectedQuestion(`${index}`);
+  }
+
+  function canSubmitPost() {
+    // A post must have a title.
+    if (post.title == undefined || post.title.trim() === "")
+      return false;
+
+    // A poll must have candidates and a type.
+    if (post.polls?.some(poll => poll.pollType == undefined ||
+                                 poll.candidates?.length == 0))
+      return false;
+
+    return true;
   }
 
   async function submitPost() {
@@ -52,7 +74,7 @@ export const HiveMimeCreatePost = observer(() => {
           <Label>Polls</Label>
           <EmbeddedTabs value={selectedQuestion} onValueChange={setSelectedQuestion}>
             <EmbeddedTabsList actionComponent={
-                <Button variant="outline" className="rounded-b-none border-b-0" onClick={addQuestion}>
+                <Button variant="outline" className="rounded-b-none border-b-0" onClick={addPoll}>
                   <Plus />Add
                 </Button>
             }>
@@ -62,7 +84,7 @@ export const HiveMimeCreatePost = observer(() => {
             </EmbeddedTabsList>
             {post.polls!.map((poll, index) => (
               <EmbeddedTabsContent key={index} value={`${index + 1}`}>
-                <HiveMimeCreatePoll poll={poll} />
+                <HiveMimeCreatePoll poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
               </EmbeddedTabsContent>
             ))}
           </EmbeddedTabs>
@@ -70,7 +92,7 @@ export const HiveMimeCreatePost = observer(() => {
       </CardContent>
 
       <CardFooter>
-        <Button onClick={submitPost}>Submit</Button>
+        <Button disabled={!canSubmitPost()} onClick={submitPost}>Submit</Button>
       </CardFooter>
     </Card>
   );

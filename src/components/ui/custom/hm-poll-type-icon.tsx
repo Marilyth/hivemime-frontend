@@ -2,6 +2,7 @@
 
 import { PollType } from "@/lib/Api";
 import { ArrowDownWideNarrow, BadgeQuestionMark, CopyCheck, SquareCheck, Tag, SlidersHorizontal } from "lucide-react";
+import { FaRankingStar } from "react-icons/fa6";
 import { observer } from "mobx-react-lite";
 
 type HiveMimePollTypeIconProps = React.ComponentProps<typeof ArrowDownWideNarrow> & {
@@ -17,7 +18,7 @@ export const HiveMimePollTypeIcon = observer(({ answerType, ...props }: HiveMime
       case PollType.Value2:
         return <SlidersHorizontal {...props} className={props.className} />;
       case PollType.Value3:
-        return <ArrowDownWideNarrow {...props} className={props.className} />;
+        return <FaRankingStar {...props} className={props.className} />;
       case PollType.Value4:
         return <Tag {...props} className={props.className} />;
       default:

@@ -19,7 +19,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
   const options: HiveMimeCreatePollTypePickerOption[] = [
     { name: "Single choice", description: "The user has to pick one out of several candidates." },
     { name: "Multiple choice", description: "The user has to pick one or more out of several candidates." },
-    { name: "Rating", description: "The user has assign each candidate a value within a specified range." },
+    { name: "Scoring", description: "The user has to assign each candidate a numerical value within a specified range." },
     { name: "Ranking", description: "The user has to rank the candidates in order of preference. (E.g. top 10 lists)" },
     { name: "Categorization", description: "The user has to assign a category to each candidate. (E.g. tier lists)" },
   ];
@@ -29,7 +29,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
       <div className="text-sm text-muted-foreground">Choose the type of poll you wish to create.</div>
         {options.map((option, index) => (
           <HiveMimeHoverCard key={index} className="flex flex-row cursor-pointer hover:text-honey-brown" onClick={() => poll.pollType = index}>
-            <HiveMimePollTypeIcon answerType={index} className="mr-2 text-gray-500" />
+            <HiveMimePollTypeIcon answerType={index} className="mr-2 text-gray-500 w-8" />
             <div className="flex-1 flex flex-col">
               <span>{option.name}</span>
               <span className="text-sm text-muted-foreground">{option.description}</span>
