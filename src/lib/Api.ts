@@ -10,13 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-/** @format int32 */
 export enum PollType {
-  Value0 = 0,
-  Value1 = 1,
-  Value2 = 2,
-  Value3 = 3,
-  Value4 = 4,
+  SingleChoice = "SingleChoice",
+  MultipleChoice = "MultipleChoice",
+  Rating = "Rating",
+  Ranking = "Ranking",
+  Categorization = "Categorization",
 }
 
 export interface CreatePollDto {

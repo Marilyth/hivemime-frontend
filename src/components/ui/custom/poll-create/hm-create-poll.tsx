@@ -19,11 +19,11 @@ export interface HiveMimeCreatePollProps {
 
 export const HiveMimeCreatePoll = observer(({ poll, canDelete, onDeleteRequested }: HiveMimeCreatePollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } = {
-    [PollType.Value0]: <HiveMimeCreateSingleChoicePoll poll={poll} />,
-    [PollType.Value1]: <span>ToDo</span>,
-    [PollType.Value2]: <span>ToDo</span>,
-    [PollType.Value3]: <span>ToDo</span>,
-    [PollType.Value4]: <span>ToDo</span>
+    [PollType.SingleChoice]: <HiveMimeCreateSingleChoicePoll poll={poll} />,
+    [PollType.MultipleChoice]: <span>ToDo</span>,
+    [PollType.Rating]: <span>ToDo</span>,
+    [PollType.Ranking]: <span>ToDo</span>,
+    [PollType.Categorization]: <span>ToDo</span>
   };
 
   return (

@@ -11,15 +11,15 @@ type HiveMimePollTypeIconProps = React.ComponentProps<typeof ArrowDownWideNarrow
 
 export const HiveMimePollTypeIcon = observer(({ answerType, ...props }: HiveMimePollTypeIconProps) => {
     switch (answerType) {
-      case PollType.Value0:
+      case PollType.SingleChoice:
         return <SquareCheck {...props} className={props.className} />;
-      case PollType.Value1:
+      case PollType.MultipleChoice:
         return <CopyCheck {...props} className={props.className} />;
-      case PollType.Value2:
+      case PollType.Rating:
         return <SlidersHorizontal {...props} className={props.className} />;
-      case PollType.Value3:
+      case PollType.Ranking:
         return <FaRankingStar {...props} className={props.className} />;
-      case PollType.Value4:
+      case PollType.Categorization:
         return <Tag {...props} className={props.className} />;
       default:
         return <BadgeQuestionMark {...props} className={props.className} />;

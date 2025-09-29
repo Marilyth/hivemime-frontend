@@ -15,11 +15,11 @@ export type HiveMimeListPollProps =   {
 
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } = {
-      [PollType.Value0]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Value1]: <span>ToDo</span>,
-      [PollType.Value2]: <span>ToDo</span>,
-      [PollType.Value3]: <span>ToDo</span>,
-      [PollType.Value4]: <span>ToDo</span>
+      [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
+      [PollType.MultipleChoice]: <span>ToDo</span>,
+      [PollType.Rating]: <span>ToDo</span>,
+      [PollType.Ranking]: <span>ToDo</span>,
+      [PollType.Categorization]: <span>ToDo</span>
     };
 
   return (
