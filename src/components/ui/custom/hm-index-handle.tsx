@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { HiveMimeEmbeddedInput } from "./hm-embedded-input";
 import { useState } from "react";
 
@@ -20,8 +19,8 @@ export function HiveMimeIndexHandle({ index, onIndexChange }: HiveMimeIndexHandl
     };
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            <HiveMimeEmbeddedInput type="number" className="p-0 w-8 text-gray-500" value={currentIndex} onChange={(e) => handleIndexChange(Number(e.target.value))} />
-        </div>
+    <div className="flex flex-row items-center justify-center">
+        <HiveMimeEmbeddedInput className="p-0 w-6 h-auto text-gray-500" value={currentIndex} onChange={(e) => handleIndexChange(Number(e.target.value))} />
+    </div>
     );
 }

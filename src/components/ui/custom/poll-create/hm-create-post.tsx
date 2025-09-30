@@ -4,21 +4,25 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { HiveMimeCreatePoll } from "./hm-create-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
 import { Api, CreatePostDto } from "@/lib/Api";
-import { InputWithLabel } from "../labelled-input";
+import { InputWithLabel, TextAreaWithLabel } from "../labelled-input";
 import { Button } from "../../button";
 import { useContext, useRef, useState } from "react";
 import { HiveMimeApiContext } from "@/app/layout";
-import { createObservable } from "@/lib/utils";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Separator } from "../../separator";
+import { PollCreationValidation } from "@/models/PollCreationValidation";
+import { observable } from "mobx";
+import { toast } from "sonner";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [selectedQuestion, setSelectedQuestion] = useState<string>("1");
-  const postRef = useRef<CreatePostDto>(createObservable({ title: "", description: "", polls: [] }));
+  const validationsRef = useRef<PollCreationValidation[]>(observable([]));
+  const validations = validationsRef.current;
+  const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
   const post = postRef.current;
 
   if (post.polls!.length === 0) {
@@ -26,12 +30,14 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   function addPoll() {
+    validations.push({ isValid: false, errors: [] });
     post.polls?.push({ title: "", description: "", candidates: [] });
     setSelectedQuestion(`${post.polls!.length}`);
   }
 
   function removePoll(index: number) {
     post.polls?.splice(index, 1);
+    validations.splice(index, 1);
 
     // If the removed poll was the last one, select the previous one.
     // (The value is 1-based, the index is 0-based)
@@ -40,25 +46,39 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   function canSubmitPost() {
+    const errors: string[] = [];
+
     // A post must have a title.
     if (post.title == undefined || post.title.trim() === "")
-      return false;
+      errors.push("A post must have a title.");
 
-    // A poll must have candidates and a type.
-    if (post.polls?.some(poll => poll.pollType == undefined ||
-                                 poll.candidates?.length == 0))
-      return false;
+    for (let i = 0; i < validations.length; i++) {
+      if (!validations[i].isValid) {
+        errors.push(`Poll ${i + 1}: ${validations[i].errors.join(", ")}`);
+      }
+    }
 
-    return true;
+    if (errors.length > 0) {
+      for (let i = 0; i < errors.length; i++) {
+        toast.error(errors[i]);
+      }
+    }
+
+    return errors.length === 0;
   }
 
   async function submitPost() {
+    if (!canSubmitPost())
+      return;
+
     await hiveMimeService.api.postCreateCreate(post);
+
+    toast.success("Post created successfully!");
     redirect("/home");
   }
 
   return (
-    <Card className="py-4">
+    <Card className="py-4 text-foreground">
       <CardHeader>
         <h2 className="text-2xl font-bold">Create new post</h2>
       </CardHeader>
@@ -67,7 +87,7 @@ export const HiveMimeCreatePost = observer(() => {
         <div className="flex flex-col gap-2">
           <InputWithLabel isRequired label="Title" placeholder="My title" value={post.title!}
             onChange={(e) => post.title = e.target.value} />
-          <InputWithLabel label="Description" placeholder="My description" value={post.description!}
+          <TextAreaWithLabel label="Description" placeholder="My description" value={post.description!}
             onChange={(e) => post.description = e.target.value} />
 
           <Separator className="mt-8" orientation="horizontal" />
@@ -79,12 +99,14 @@ export const HiveMimeCreatePost = observer(() => {
                 </Button>
             }>
               {post.polls!.map((subPoll, index) => (
-                <EmbeddedTabsTrigger key={index} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
+                <EmbeddedTabsTrigger
+                  className={`${validations[index].isValid ? '' : 'text-red-500'}`}
+                  key={index} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
               ))}
             </EmbeddedTabsList>
             {post.polls!.map((poll, index) => (
               <EmbeddedTabsContent key={index} value={`${index + 1}`}>
-                <HiveMimeCreatePoll poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
+                <HiveMimeCreatePoll validation={validations[index]} poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
               </EmbeddedTabsContent>
             ))}
           </EmbeddedTabs>
@@ -92,7 +114,7 @@ export const HiveMimeCreatePost = observer(() => {
       </CardContent>
 
       <CardFooter>
-        <Button disabled={!canSubmitPost()} onClick={submitPost}>Submit</Button>
+        <Button onClick={submitPost}>Submit</Button>
       </CardFooter>
     </Card>
   );

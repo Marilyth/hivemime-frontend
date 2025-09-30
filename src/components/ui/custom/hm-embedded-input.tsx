@@ -8,3 +8,9 @@ export const HiveMimeEmbeddedInput = observer(({ className, ...props }: React.Co
     <Input className={`!bg-transparent !ring-offset-transparent border-0 shadow-none focus-visible:ring-0 p-0 ${className}`} {...props} />
   );
 });
+
+export const HiveMimeInlineInput = observer(({ className, ...props }: React.ComponentProps<"input">) => {
+  return (
+    <Input className={`!bg-transparent !ring-offset-transparent border-0 shadow-none focus-visible:ring-0 p-0 mx-1.5 text-center rounded-none border-b-1 border-honey-brown p-0 h-auto w-auto ${className}`} {...props} />
+  );
+});
