@@ -16,12 +16,12 @@ export const HiveMimeCreateCategorizationPoll = observer((props: HiveMimeCreateP
       props.validation!.errors.push("A categorization poll must have at least one candidate.");
     }
 
-    // if (!props.poll.categories || props.poll.categories.length < 2) {
-    //   props.validation!.isValid = false;
-    //   props.validation!.errors.push("A categorization poll must have at least two categories.");
-    // }
+    if (!props.poll.categories || props.poll.categories.length < 2) {
+       props.validation!.isValid = false;
+       props.validation!.errors.push("A categorization poll must have at least two categories.");
+    }
   }
-  
+
   useEffect(() => {
     validatePoll();
   }, [props.poll.candidates?.length]);

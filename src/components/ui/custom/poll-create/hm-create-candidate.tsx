@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollCandidateDto } from "@/lib/Api";
+import { CreatePollDto, PollCandidateDto, PollType } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../hm-embedded-input";
@@ -31,10 +31,18 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 
   function removeCandidate(index: number) {
     poll.candidates!.splice(index, 1);
+
+    if(poll.pollType != PollType.Rating && poll.candidates!.length + 1 == poll.maxValue)
+      poll.maxValue!--;
   }
 
   function addCandidate() {
-    poll.candidates?.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
+    poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
+
+    if(poll.pollType != PollType.Rating && poll.candidates!.length - 1 == poll.maxValue)
+      poll.maxValue! = poll.candidates!.length;
+
+    console.log(poll.maxValue);
   }
 
   return (

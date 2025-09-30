@@ -22,8 +22,19 @@ export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
   allowCustomAnswer?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
   pollType?: PollType;
   candidates?: PollCandidateDto[] | null;
+  categories?: PollCategoryDto[] | null;
 }
 
 export interface CreatePostDto {
@@ -37,8 +48,19 @@ export interface ListPollDto {
   id?: number;
   title?: string | null;
   description?: string | null;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
   pollType?: PollType;
   candidates?: PollCandidateDto[] | null;
+  categories?: PollCategoryDto[] | null;
 }
 
 export interface ListPostDto {
@@ -62,19 +84,24 @@ export interface PollCandidateDto {
 }
 
 export interface PollCandidateResultDto {
-  name?: string | null;
-  description?: string | null;
   /** @format int32 */
   id?: number;
+  name?: string | null;
+  description?: string | null;
   /** @format int32 */
   voterAmount?: number;
   /** @format int32 */
   score?: number;
 }
 
-export interface PollResultsDto {
-  title?: string | null;
+export interface PollCategoryDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
   description?: string | null;
+}
+
+export interface PollResultsDto {
   pollType?: PollType;
   candidates?: PollCandidateResultDto[] | null;
 }

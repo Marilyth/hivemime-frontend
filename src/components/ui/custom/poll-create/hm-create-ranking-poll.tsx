@@ -25,7 +25,8 @@ export const HiveMimeCreateRankingPoll = observer((props: HiveMimeCreatePollProp
     <div className="flex flex-col gap-4">
       <div className="items-center text-muted-foreground">
         The user has to rank at least
-        <HiveMimeInlineInput min={1} defaultValue={1} className="w-5" />
+        <HiveMimeInlineInput min={1} value={props.poll.minVotes} className="w-5"
+          onChange={(e) => props.poll.minVotes = Number(e.target.value)} />
         candidates.
       </div>
 

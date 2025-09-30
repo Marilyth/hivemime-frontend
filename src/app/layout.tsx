@@ -65,7 +65,7 @@ export default function RootLayout({
                     <AppSidebar />
                     <SidebarInset>
                       <SiteHeader />
-                      <div className="flex flex-1 flex-col gap-4 p-4 bg-pattern">
+                      <div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
                         {children}
                       </div>
                       <Toaster position="top-center" richColors />

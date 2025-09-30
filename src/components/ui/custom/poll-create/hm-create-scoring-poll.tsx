@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { Label } from "../../label";
 
 export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProps) => {
-  const [sliderValue, setSliderValue] = useState([1, 10, 1]);
   const [sliderSelection, setSliderSelection] = useState(1);
 
   function validatePoll() {
@@ -25,20 +24,20 @@ export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProp
   useEffect(() => {
     validatePoll();
   }, [props.poll.candidates?.length]);
-    
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <div className="items-center text-muted-foreground">
           The user has to score candidates from
-          <HiveMimeInlineInput min={1} defaultValue={1} className="w-5"
-            onChange={(value) => setSliderValue([Number.parseInt(value.target.value), sliderValue[1], sliderValue[2]])} />
+          <HiveMimeInlineInput min={1} value={props.poll.minValue} className="w-5"
+            onChange={(value) => props.poll.minValue = Number(value.target.value)} />
           to
-          <HiveMimeInlineInput min={1} defaultValue={10} className="w-5"
-            onChange={(value) => setSliderValue([sliderValue[0], Number.parseInt(value.target.value), sliderValue[2]])} />
+          <HiveMimeInlineInput min={1} value={props.poll.maxValue} className="w-5"
+            onChange={(value) => props.poll.maxValue = Number(value.target.value)} />
           in steps of
-          <HiveMimeInlineInput min={1} defaultValue={1} className="w-5"
-            onChange={(value) => setSliderValue([sliderValue[0], sliderValue[1], Number.parseInt(value.target.value)])} />
+          <HiveMimeInlineInput min={1} value={props.poll.stepValue} className="w-5"
+            onChange={(value) => props.poll.stepValue = Number(value.target.value)} />
           .
         </div>
 
@@ -46,7 +45,7 @@ export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProp
           <Label className="flex-1 text-gray-500 text-sm">Example</Label>
           <Label className="text-gray-500 text-sm">{sliderSelection}</Label>
         </div>
-        <Slider min={sliderValue[0]} max={sliderValue[1]} step={sliderValue[2]} onValueChange={(value) => setSliderSelection(value[0])} />
+        <Slider min={props.poll.minValue} max={props.poll.maxValue} step={props.poll.stepValue} onValueChange={(value) => setSliderSelection(value[0])} />
       </div>
 
       <HiveMimeCreateCandidates poll={props.poll} />
