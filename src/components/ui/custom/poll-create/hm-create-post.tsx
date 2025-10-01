@@ -13,15 +13,13 @@ import { observer } from "mobx-react-lite";
 import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 import { Separator } from "../../separator";
-import { PollCreationValidation } from "@/models/PollCreationValidation";
 import { observable } from "mobx";
 import { toast } from "sonner";
+import { validatePostTitle as validatePost } from "@/lib/validation";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [selectedQuestion, setSelectedQuestion] = useState<string>("1");
-  const validationsRef = useRef<PollCreationValidation[]>(observable([]));
-  const validations = validationsRef.current;
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
   const post = postRef.current;
 
@@ -30,7 +28,6 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   function addPoll() {
-    validations.push({ isValid: false, errors: [] });
     post.polls?.push({ title: "", description: "", candidates: [], categories: [],
                        minValue: 0, maxValue: undefined, minVotes: 1, maxVotes: undefined, stepValue: 1,
                        pollType: undefined });
@@ -39,7 +36,6 @@ export const HiveMimeCreatePost = observer(() => {
 
   function removePoll(index: number) {
     post.polls?.splice(index, 1);
-    validations.splice(index, 1);
 
     // If the removed poll was the last one, select the previous one.
     // (The value is 1-based, the index is 0-based)
@@ -48,22 +44,10 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   function canSubmitPost() {
-    const errors: string[] = [];
+    const errors: string[] = validatePost(post);
 
-    // A post must have a title.
-    if (post.title == undefined || post.title.trim() === "")
-      errors.push("A post must have a title.");
-
-    for (let i = 0; i < validations.length; i++) {
-      if (!validations[i].isValid) {
-        errors.push(`Poll ${i + 1}: ${validations[i].errors.join(", ")}`);
-      }
-    }
-
-    if (errors.length > 0) {
-      for (let i = 0; i < errors.length; i++) {
-        toast.error(errors[i]);
-      }
+    for(const error of errors) {
+      toast.error(error);
     }
 
     return errors.length === 0;
@@ -102,13 +86,12 @@ export const HiveMimeCreatePost = observer(() => {
             }>
               {post.polls!.map((subPoll, index) => (
                 <EmbeddedTabsTrigger
-                  className={`${validations[index].isValid ? '' : 'text-red-500'}`}
                   key={index} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
               ))}
             </EmbeddedTabsList>
             {post.polls!.map((poll, index) => (
               <EmbeddedTabsContent key={index} value={`${index + 1}`}>
-                <HiveMimeCreatePoll validation={validations[index]} poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
+                <HiveMimeCreatePoll poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
               </EmbeddedTabsContent>
             ))}
           </EmbeddedTabs>

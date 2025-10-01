@@ -4,30 +4,25 @@ import { observer } from "mobx-react-lite";
 import { HiveMimeCreatePollProps } from "./hm-create-single-choice-poll";
 import { HiveMimeCreateCategories } from "./hm-create-category";
 import { HiveMimeCreateCandidates } from "./hm-create-candidate";
-import { useEffect } from "react";
+import { Label } from "../../label";
+import { HiveMimeCreateShuffleRule } from "./hm-create-shuffle-rule";
+
+const HiveMimeCreateCategorizationRules = observer((props: HiveMimeCreatePollProps) =>  {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>Rules</Label>
+
+      <div className="text-muted-foreground">
+        <HiveMimeCreateShuffleRule poll={props.poll} />
+      </div>
+    </div>
+  );
+});
 
 export const HiveMimeCreateCategorizationPoll = observer((props: HiveMimeCreatePollProps) => {
-  function validatePoll() {
-    props.validation!.isValid = true;
-    props.validation!.errors = [];
-
-    if (!props.poll.candidates || props.poll.candidates.length < 1) {
-      props.validation!.isValid = false;
-      props.validation!.errors.push("A categorization poll must have at least one candidate.");
-    }
-
-    if (!props.poll.categories || props.poll.categories.length < 2) {
-       props.validation!.isValid = false;
-       props.validation!.errors.push("A categorization poll must have at least two categories.");
-    }
-  }
-
-  useEffect(() => {
-    validatePoll();
-  }, [props.poll.candidates?.length]);
-
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8">
+      <HiveMimeCreateCategorizationRules poll={props.poll} />
       <HiveMimeCreateCategories poll={props.poll} />
       <HiveMimeCreateCandidates poll={props.poll} />
     </div>

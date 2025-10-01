@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollCandidateDto, PollType } from "@/lib/Api";
+import { CreatePollDto, PollCandidateDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../hm-embedded-input";
@@ -8,8 +8,6 @@ import { HiveMimeIndexHandle } from "../hm-index-handle";
 import { Label } from "../../label";
 import { Button } from "../../button";
 import { Plus, Trash2 } from "lucide-react";
-import { Switch } from "../../switch";
-import { HiveMimeInlineSelectTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../select";
 
 interface HiveMimeCreateCandidateProps {
   index: number;
@@ -42,21 +40,6 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
   return (
     <div className="flex flex-col gap-2">
       <Label>Candidates</Label>
-      <div className="text-muted-foreground">
-        The candidates
-        <Select
-          value={poll.allowCustomAnswer ? "true" : "false"}
-          onValueChange={(value) => poll.allowCustomAnswer = value === "true"}>
-          <HiveMimeInlineSelectTrigger>
-            <SelectValue className="" />
-          </HiveMimeInlineSelectTrigger>
-          <SelectContent>
-            <SelectItem value="true">are</SelectItem>
-            <SelectItem value="false">are not</SelectItem>
-          </SelectContent>
-        </Select>
-        shuffled for the user.
-      </div>
       <div className="flex flex-col gap-0.5">
         {poll.candidates!.map((option, index) => (
           <div className="flex flex-row items-center" key={index}>

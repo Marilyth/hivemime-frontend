@@ -5,35 +5,37 @@ import { HiveMimeCreateCandidates } from "./hm-create-candidate";
 import { HiveMimeCreatePollProps } from "./hm-create-single-choice-poll";
 import { HiveMimeInlineInput } from "../hm-embedded-input";
 import { useEffect } from "react";
+import { HiveMimeBulletItem } from "../hm-bullet-item";
+import { Label } from "../../label";
+import { HiveMimeCreateShuffleRule } from "./hm-create-shuffle-rule";
+
+const HiveMimeCreateMultipleChoiceRules = observer((props: HiveMimeCreatePollProps) =>  {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>Rules</Label>
+
+      <div className="text-muted-foreground">
+        <HiveMimeBulletItem>
+          The user can pick up to
+          <HiveMimeInlineInput max={props.poll.candidates?.length} min={1}
+            value={props.poll.maxVotes ?? props.poll.candidates?.length} className="w-5" onChange={(e) => props.poll.maxVotes = Number(e.target.value)} />
+          candidates.
+        </HiveMimeBulletItem>
+
+        <HiveMimeCreateShuffleRule poll={props.poll} />
+      </div>
+    </div>
+  );
+});
 
 export const HiveMimeCreateMultipleChoicePoll = observer((props: HiveMimeCreatePollProps) => {
-  function validatePoll() {
-    props.validation!.isValid = true;
-    props.validation!.errors = [];
-
-    if (!props.poll.candidates || props.poll.candidates.length < 2) {
-      props.validation!.isValid = false;
-      props.validation!.errors.push("A choice poll must have at least two candidates.");
-    }
-  }
-
   useEffect(() => {
     props.poll.maxVotes = undefined;
   }, []);
 
-  useEffect(() => {
-    validatePoll();
-  }, [props.poll.candidates?.length]);
-
   return (
-    <div className="flex flex-col gap-4">
-      <div className="items-center text-muted-foreground">
-        The user can pick up to
-        <HiveMimeInlineInput max={props.poll.candidates?.length} min={1}
-          value={props.poll.maxVotes ?? props.poll.candidates?.length} className="w-5" onChange={(e) => props.poll.maxVotes = Number(e.target.value)} />
-        candidates.
-      </div>
-
+    <div className="flex flex-col gap-8">
+      <HiveMimeCreateMultipleChoiceRules poll={props.poll} />
       <HiveMimeCreateCandidates poll={props.poll} />
     </div>
   );

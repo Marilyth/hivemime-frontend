@@ -7,35 +7,17 @@ import { HiveMimeInlineInput } from "../hm-embedded-input";
 import { Slider } from "../../slider";
 import { useEffect, useState } from "react";
 import { Label } from "../../label";
+import { HiveMimeCreateShuffleRule } from "./hm-create-shuffle-rule";
+import { HiveMimeBulletItem } from "../hm-bullet-item";
 
-export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProps) => {
-  const [sliderSelection, setSliderSelection] = useState(1);
 
-  function validatePoll() {
-    props.validation!.isValid = true;
-    props.validation!.errors = [];
-
-    if (!props.poll.candidates || props.poll.candidates.length < 1) {
-      props.validation!.isValid = false;
-      props.validation!.errors.push("A scoring poll must have at least one candidate.");
-    }
-  }
-
-  useEffect(() => {
-    // Set default values for scoring poll.
-    props.poll.minValue = 1;
-    props.poll.stepValue = 1;
-    props.poll.maxValue = 100;
-  }, []);
-
-  useEffect(() => {
-    validatePoll();
-  }, [props.poll.candidates?.length]);
-
+const HiveMimeCreateScoringRules = observer((props: HiveMimeCreatePollProps) =>  {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <div className="items-center text-muted-foreground">
+    <div className="flex flex-col gap-2">
+      <Label>Rules</Label>
+
+      <div className="text-muted-foreground">
+        <HiveMimeBulletItem>
           The user has to score candidates from
           <HiveMimeInlineInput min={1} value={props.poll.minValue} className="w-5"
             onChange={(value) => props.poll.minValue = Number(value.target.value)} />
@@ -44,17 +26,27 @@ export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProp
             onChange={(value) => props.poll.maxValue = Number(value.target.value)} />
           in steps of
           <HiveMimeInlineInput min={1} value={props.poll.stepValue} className="w-5"
-            onChange={(value) => props.poll.stepValue = Number(value.target.value)} />
-          .
-        </div>
+            onChange={(value) => props.poll.stepValue = Number(value.target.value)} />.
+        </HiveMimeBulletItem>
 
-        <div className="flex flex-row items-center">
-          <Label className="flex-1 text-gray-500 text-sm">Example</Label>
-          <Label className="text-gray-500 text-sm">{sliderSelection}</Label>
-        </div>
-        <Slider min={props.poll.minValue} max={props.poll.maxValue} step={props.poll.stepValue} onValueChange={(value) => setSliderSelection(value[0])} />
+        <HiveMimeCreateShuffleRule poll={props.poll} />
       </div>
+    </div>
+  );
+});
 
+export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProps) => {
+
+  useEffect(() => {
+    // Set default values for scoring poll.
+    props.poll.minValue = 1;
+    props.poll.stepValue = 1;
+    props.poll.maxValue = 100;
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <HiveMimeCreateScoringRules poll={props.poll} />
       <HiveMimeCreateCandidates poll={props.poll} />
     </div>
   );

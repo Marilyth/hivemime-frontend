@@ -14,36 +14,20 @@ import { HiveMimeCreateMultipleChoicePoll } from "./hm-create-multiple-choice-po
 import { HiveMimeCreateRankingPoll } from "./hm-create-ranking-poll";
 import { HiveMimeCreateScoringPoll } from "./hm-create-scoring-poll";
 import { HiveMimeCreateCategorizationPoll } from "./hm-create-categorization-poll";
-import { PollCreationValidation } from "@/models/PollCreationValidation";
 
 export interface HiveMimeCreatePollProps {
-  validation: PollCreationValidation;
   poll: CreatePollDto;
   canDelete: boolean;
   onDeleteRequested?: () => void;
 }
 
 export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
-  function validatePoll() {
-    props.validation!.isValid = true;
-    props.validation!.errors = [];
-    
-    if (props.poll.pollType === undefined) {
-      props.validation!.isValid = false;
-      props.validation!.errors = ["A poll type must be selected."];
-    }
-  }
-
-  useEffect(() => {
-    validatePoll();
-  }, [props.poll.pollType]);
-
   const pollMapping: { [key in PollType]: ReactNode } = {
-    [PollType.SingleChoice]: <HiveMimeCreateSingleChoicePoll validation={props.validation} poll={props.poll} />,
-    [PollType.MultipleChoice]: <HiveMimeCreateMultipleChoicePoll validation={props.validation} poll={props.poll} />,
-    [PollType.Rating]: <HiveMimeCreateScoringPoll validation={props.validation} poll={props.poll} />,
-    [PollType.Ranking]: <HiveMimeCreateRankingPoll validation={props.validation} poll={props.poll} />,
-    [PollType.Categorization]: <HiveMimeCreateCategorizationPoll validation={props.validation} poll={props.poll} />,
+    [PollType.SingleChoice]: <HiveMimeCreateSingleChoicePoll poll={props.poll} />,
+    [PollType.MultipleChoice]: <HiveMimeCreateMultipleChoicePoll poll={props.poll} />,
+    [PollType.Rating]: <HiveMimeCreateScoringPoll poll={props.poll} />,
+    [PollType.Ranking]: <HiveMimeCreateRankingPoll poll={props.poll} />,
+    [PollType.Categorization]: <HiveMimeCreateCategorizationPoll poll={props.poll} />,
   };
 
   return (
