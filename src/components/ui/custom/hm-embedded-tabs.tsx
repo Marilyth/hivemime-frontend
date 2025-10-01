@@ -26,10 +26,12 @@ function EmbeddedTabsList({
 }: React.ComponentProps<typeof TabsPrimitive.List> & { actionComponent?: React.ReactNode }) {
   return (
     <div className="relative top-[1px] mx-3 flex">
-      <ScrollArea className="min-w-0 rounded-t-lg whitespace-nowrap">
-        <TabsPrimitive.List {...props} className={cn("inline-flex h-9 w-fit rounded-lg text-muted-foreground", className)} />
-        <ScrollBar orientation="horizontal" className="-mb-[9px]" />
-      </ScrollArea>
+      {(React.Children.count(props.children) > 1 || actionComponent) && 
+        <ScrollArea className="min-w-0 rounded-t-lg whitespace-nowrap">
+          <TabsPrimitive.List {...props} className={cn("inline-flex h-9 w-fit rounded-lg text-muted-foreground", className)} />
+          <ScrollBar orientation="horizontal" className="-mb-[9px]" />
+        </ScrollArea>
+      }
       {actionComponent && <div className="ml-2">{actionComponent}</div>}
     </div>
   )

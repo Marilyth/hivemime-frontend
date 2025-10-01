@@ -18,16 +18,19 @@ export const HiveMimeCreateMultipleChoicePoll = observer((props: HiveMimeCreateP
   }
 
   useEffect(() => {
+    props.poll.maxVotes = undefined;
+  }, []);
+
+  useEffect(() => {
     validatePoll();
-    console.log(props.poll.maxVotes);
-  }, [props.poll.candidates?.length, props.poll.maxVotes]);
+  }, [props.poll.candidates?.length]);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="items-center text-muted-foreground">
         The user can pick up to
         <HiveMimeInlineInput max={props.poll.candidates?.length} min={1}
-          value={props.poll.maxVotes} className="w-5" onChange={(e) => props.poll.maxVotes = Number(e.target.value)} />
+          value={props.poll.maxVotes ?? props.poll.candidates?.length} className="w-5" onChange={(e) => props.poll.maxVotes = Number(e.target.value)} />
         candidates.
       </div>
 

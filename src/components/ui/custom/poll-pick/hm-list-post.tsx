@@ -38,7 +38,9 @@ export function HiveMimeListPost({ post }: HiveMimePostProps) {
         <CardTitle>
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-2">
-              <span className="text-gray-500 text-sm">User needs to know</span>
+              <span className="text-gray-500 text-sm">
+                User has {post.polls?.length} question{post.polls?.length === 1 ? "" : "s"} for you
+              </span>
             </div>
             <span className="font-bold text-honey-brown">{post.title}</span>
           </div>

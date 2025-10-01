@@ -8,6 +8,8 @@ import { HiveMimeIndexHandle } from "../hm-index-handle";
 import { Label } from "../../label";
 import { Button } from "../../button";
 import { Plus, Trash2 } from "lucide-react";
+import { Switch } from "../../switch";
+import { HiveMimeInlineSelectTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../select";
 
 interface HiveMimeCreateCandidateProps {
   index: number;
@@ -31,23 +33,30 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 
   function removeCandidate(index: number) {
     poll.candidates!.splice(index, 1);
-
-    if(poll.pollType != PollType.Rating && poll.candidates!.length + 1 == poll.maxValue)
-      poll.maxValue!--;
   }
 
   function addCandidate() {
     poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
-
-    if(poll.pollType != PollType.Rating && poll.candidates!.length - 1 == poll.maxValue)
-      poll.maxValue! = poll.candidates!.length;
-
-    console.log(poll.maxValue);
   }
 
   return (
     <div className="flex flex-col gap-2">
       <Label>Candidates</Label>
+      <div className="text-muted-foreground">
+        The candidates
+        <Select
+          value={poll.allowCustomAnswer ? "true" : "false"}
+          onValueChange={(value) => poll.allowCustomAnswer = value === "true"}>
+          <HiveMimeInlineSelectTrigger>
+            <SelectValue className="" />
+          </HiveMimeInlineSelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">are</SelectItem>
+            <SelectItem value="false">are not</SelectItem>
+          </SelectContent>
+        </Select>
+        shuffled for the user.
+      </div>
       <div className="flex flex-col gap-0.5">
         {poll.candidates!.map((option, index) => (
           <div className="flex flex-row items-center" key={index}>

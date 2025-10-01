@@ -32,7 +32,7 @@ export const HiveMimeCreatePost = observer(() => {
   function addPoll() {
     validations.push({ isValid: false, errors: [] });
     post.polls?.push({ title: "", description: "", candidates: [], categories: [],
-                       minValue: 1, maxValue: 1, minVotes: 1, maxVotes: 1, stepValue: 1,
+                       minValue: 0, maxValue: undefined, minVotes: 1, maxVotes: undefined, stepValue: 1,
                        pollType: undefined });
     setSelectedQuestion(`${post.polls!.length}`);
   }

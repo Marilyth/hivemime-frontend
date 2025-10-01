@@ -22,6 +22,13 @@ export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProp
   }
 
   useEffect(() => {
+    // Set default values for scoring poll.
+    props.poll.minValue = 1;
+    props.poll.stepValue = 1;
+    props.poll.maxValue = 100;
+  }, []);
+
+  useEffect(() => {
     validatePoll();
   }, [props.poll.candidates?.length]);
 
@@ -33,7 +40,7 @@ export const HiveMimeCreateScoringPoll = observer((props: HiveMimeCreatePollProp
           <HiveMimeInlineInput min={1} value={props.poll.minValue} className="w-5"
             onChange={(value) => props.poll.minValue = Number(value.target.value)} />
           to
-          <HiveMimeInlineInput min={1} value={props.poll.maxValue} className="w-5"
+          <HiveMimeInlineInput min={1} value={props.poll.maxValue} className="w-7"
             onChange={(value) => props.poll.maxValue = Number(value.target.value)} />
           in steps of
           <HiveMimeInlineInput min={1} value={props.poll.stepValue} className="w-5"

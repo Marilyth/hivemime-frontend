@@ -18,6 +18,11 @@ export const HiveMimeCreateRankingPoll = observer((props: HiveMimeCreatePollProp
   }
 
   useEffect(() => {
+    // Set default values for ranking poll.
+    props.poll.minVotes = 1;
+  }, []);
+
+  useEffect(() => {
     validatePoll();
   }, [props.poll.candidates?.length]);
 
