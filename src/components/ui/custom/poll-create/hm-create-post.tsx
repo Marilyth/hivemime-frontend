@@ -16,6 +16,8 @@ import { Separator } from "../../separator";
 import { observable } from "mobx";
 import { toast } from "sonner";
 import { validatePostTitle as validatePost } from "@/lib/validation";
+import { motion, AnimatePresence } from "framer-motion";
+import { getReferenceId } from "@/lib/utils";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
@@ -80,13 +82,13 @@ export const HiveMimeCreatePost = observer(() => {
           <Label>Polls</Label>
           <EmbeddedTabs value={selectedQuestion} onValueChange={setSelectedQuestion}>
             <EmbeddedTabsList actionComponent={
-                <Button variant="outline" className="rounded-b-none border-b-0" onClick={addPoll}>
-                  <Plus />Add
-                </Button>
+              <Button variant="outline" className="rounded-b-none border-b-0" onClick={addPoll}>
+                <Plus />Add
+              </Button>
             }>
               {post.polls!.map((subPoll, index) => (
                 <EmbeddedTabsTrigger
-                  key={index} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
+                  key={getReferenceId(subPoll)} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
               ))}
             </EmbeddedTabsList>
             {post.polls!.map((poll, index) => (

@@ -14,6 +14,7 @@ import { HiveMimeCreateMultipleChoicePoll } from "./hm-create-multiple-choice-po
 import { HiveMimeCreateRankingPoll } from "./hm-create-ranking-poll";
 import { HiveMimeCreateScoringPoll } from "./hm-create-scoring-poll";
 import { HiveMimeCreateCategorizationPoll } from "./hm-create-categorization-poll";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -32,10 +33,19 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
 
   return (
     <div>
-      { props.poll.pollType == undefined &&
-        <HiveMimeCreatePollTypePicker poll={props.poll} /> ||
-        <div className="flex flex-col gap-2">
+      { props.poll.pollType == undefined ?
+        <motion.div key="pollPicker" 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}>
+          <HiveMimeCreatePollTypePicker poll={props.poll} />
+        </motion.div> :
 
+        <motion.div key="pollEditor"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+          className="flex flex-col gap-2">
           <div className="flex flex-row gap-2 items-end">
             <InputWithLabel label="Question" placeholder="My poll's title" value={props.poll.title!}
               onChange={(e) => props.poll.title = e.target.value} />
@@ -57,7 +67,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </div>
 
           {pollMapping[props.poll.pollType!]}
-        </div>
+        </motion.div>
       }
     </div>
   );

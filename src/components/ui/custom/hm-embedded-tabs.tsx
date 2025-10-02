@@ -5,6 +5,7 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 import { ScrollArea, ScrollBar } from "../scroll-area"
+import { AnimatePresence, motion } from "framer-motion"
 
 function EmbeddedTabs({
   className,
@@ -22,17 +23,26 @@ function EmbeddedTabs({
 function EmbeddedTabsList({
   actionComponent,
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> & { actionComponent?: React.ReactNode }) {
   return (
     <div className="relative top-[1px] mx-3 flex">
-      {(React.Children.count(props.children) > 1 || actionComponent) && 
+      {(React.Children.count(children) > 1 || actionComponent) && 
         <ScrollArea className="min-w-0 rounded-t-lg whitespace-nowrap">
-          <TabsPrimitive.List {...props} className={cn("inline-flex h-9 w-fit rounded-lg text-muted-foreground", className)} />
+          <TabsPrimitive.List {...props} className={cn("inline-flex h-9 w-fit rounded-lg text-muted-foreground", className)}>
+            <AnimatePresence initial={false}>
+              {children}
+            </AnimatePresence>
+          </TabsPrimitive.List>
           <ScrollBar orientation="horizontal" className="-mb-[9px]" />
         </ScrollArea>
       }
-      {actionComponent && <div className="ml-2">{actionComponent}</div>}
+      {actionComponent &&
+        <motion.div layout className="ml-2">
+          {actionComponent}
+        </motion.div>
+      }
     </div>
   )
 }
@@ -42,14 +52,21 @@ function EmbeddedTabsTrigger({
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
-    <TabsPrimitive.Trigger
-      data-slot="tabs-trigger"
-      className={cn(
-        "hover:border-honey-brown hover:border-b-transparent focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring items-center justify-center rounded-t-md border border-transparent px-2 text-sm font-medium whitespace-nowrap disabled:opacity-50 transition-colors duration-200 data-[state=active]:bg-background data-[state=active]:text-honey-brown data-[state=active]:border-border data-[state=active]:border-b-background",
-        className
-      )}
-      {...props}
-    />
+    <motion.div layout
+      className="flex"
+      key={props.key}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10, width: 0 }}>
+        <TabsPrimitive.Trigger
+          data-slot="tabs-trigger"
+          className={cn(
+            "hover:border-honey-brown hover:border-b-transparent focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring items-center justify-center rounded-t-md border border-transparent px-2 text-sm font-medium whitespace-nowrap disabled:opacity-50 transition-colors duration-200 data-[state=active]:bg-background data-[state=active]:text-honey-brown data-[state=active]:border-border data-[state=active]:border-b-background",
+            className
+          )}
+          {...props}
+      />
+    </motion.div>
   )
 }
 
