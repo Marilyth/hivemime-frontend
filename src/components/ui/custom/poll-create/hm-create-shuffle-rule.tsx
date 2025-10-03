@@ -10,8 +10,8 @@ export const HiveMimeCreateShuffleRule = observer((props: HiveMimeCreatePollProp
     <HiveMimeBulletItem>
         The candidates
         <Select
-        value={props.poll.allowCustomAnswer ? "true" : "false"}
-        onValueChange={(value) => props.poll.allowCustomAnswer = value === "true"}>
+        value={props.poll.isShuffled ? "true" : "false"}
+        onValueChange={(value) => props.poll.isShuffled = value === "true"}>
         <HiveMimeInlineSelectTrigger>
             <SelectValue />
         </HiveMimeInlineSelectTrigger>

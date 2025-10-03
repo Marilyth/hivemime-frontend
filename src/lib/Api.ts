@@ -13,7 +13,7 @@
 export enum PollType {
   SingleChoice = "SingleChoice",
   MultipleChoice = "MultipleChoice",
-  Rating = "Rating",
+  Scoring = "Scoring",
   Ranking = "Ranking",
   Categorization = "Categorization",
 }
@@ -22,6 +22,7 @@ export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
   allowCustomAnswer?: boolean;
+  isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -48,6 +49,8 @@ export interface ListPollDto {
   id?: number;
   title?: string | null;
   description?: string | null;
+  allowCustomAnswer?: boolean;
+  isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */

@@ -7,6 +7,9 @@ import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { Button } from "../../button";
 import { Send } from "lucide-react";
 import { observer } from "mobx-react-lite";
+import { HiveMimePickMultipleChoiceCandidate } from "./hm-pick-multiple-choice-candidate";
+import { HiveMimePickMultipleChoicePoll } from "./hm-pick-multiple-choice-poll";
+import { HiveMimeScoringPoll } from "./hm-pick-scoring-poll";
 
 export type HiveMimeListPollProps =   {
   poll: ListPollDto;
@@ -16,8 +19,8 @@ export type HiveMimeListPollProps =   {
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } = {
       [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
-      [PollType.MultipleChoice]: <span>ToDo</span>,
-      [PollType.Rating]: <span>ToDo</span>,
+      [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
+      [PollType.Scoring]: <HiveMimeScoringPoll poll={poll} pollVotes={pollVote} />,
       [PollType.Ranking]: <span>ToDo</span>,
       [PollType.Categorization]: <span>ToDo</span>
     };

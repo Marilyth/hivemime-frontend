@@ -26,7 +26,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } = {
     [PollType.SingleChoice]: <HiveMimeCreateSingleChoicePoll poll={props.poll} />,
     [PollType.MultipleChoice]: <HiveMimeCreateMultipleChoicePoll poll={props.poll} />,
-    [PollType.Rating]: <HiveMimeCreateScoringPoll poll={props.poll} />,
+    [PollType.Scoring]: <HiveMimeCreateScoringPoll poll={props.poll} />,
     [PollType.Ranking]: <HiveMimeCreateRankingPoll poll={props.poll} />,
     [PollType.Categorization]: <HiveMimeCreateCategorizationPoll poll={props.poll} />,
   };
@@ -34,7 +34,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
   return (
     <div>
       { props.poll.pollType == undefined ?
-        <motion.div key="pollPicker" 
+        <motion.div key="pollPicker"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15 }}>

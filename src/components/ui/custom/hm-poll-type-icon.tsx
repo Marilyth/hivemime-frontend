@@ -15,7 +15,7 @@ export const HiveMimePollTypeIcon = observer(({ answerType, ...props }: HiveMime
         return <SquareCheck {...props} className={props.className} />;
       case PollType.MultipleChoice:
         return <CopyCheck {...props} className={props.className} />;
-      case PollType.Rating:
+      case PollType.Scoring:
         return <SlidersHorizontal {...props} className={props.className} />;
       case PollType.Ranking:
         return <FaRankingStar {...props} className={props.className} />;

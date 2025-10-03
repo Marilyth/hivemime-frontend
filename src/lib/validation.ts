@@ -24,8 +24,8 @@ export function validatePoll(poll: CreatePollDto): string[] {
             return validateSingleChoicePoll(poll);
         case PollType.MultipleChoice:
             return validateMultipleChoicePoll(poll);
-        case PollType.Rating:
-            return validateRatingPoll(poll);
+        case PollType.Scoring:
+            return validateScoringPoll(poll);
         case PollType.Ranking:
             return validateRankingPoll(poll);
         case PollType.Categorization:
@@ -49,7 +49,7 @@ export function validateMultipleChoicePoll(poll: CreatePollDto): string[] {
     return validateSingleChoicePoll(poll);
 }
 
-export function validateRatingPoll(poll: CreatePollDto): string[] {
+export function validateScoringPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (!poll.candidates || poll.candidates.length < 1) {

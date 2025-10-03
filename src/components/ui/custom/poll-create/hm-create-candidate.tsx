@@ -51,7 +51,7 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex flex-row">
+                className="flex flex-row items-center">
                 <div className="flex-1">
                   <HiveMimeCreateCandidate option={option} index={index} onIndexChange={(newIndex) => moveCandidate(index, newIndex)} />
                 </div>

@@ -19,7 +19,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
   const options: HiveMimeCreatePollTypePickerOption[] = [
     { value: PollType.SingleChoice, description: "The user has to pick one out of several candidates." },
     { value: PollType.MultipleChoice, description: "The user has to pick one or more out of several candidates." },
-    { value: PollType.Rating, description: "The user has to assign each candidate a numerical value within a specified range." },
+    { value: PollType.Scoring, description: "The user has to assign each candidate a numerical value within a specified range." },
     { value: PollType.Ranking, description: "The user has to rank the candidates in order of preference. (E.g. top 10 lists)" },
     { value: PollType.Categorization, description: "The user has to assign a category to each candidate. (E.g. tier lists)" },
   ];
