@@ -7,6 +7,7 @@ import { useState } from "react";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { LayoutGroup, motion, AnimatePresence } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
+import { set } from "mobx";
 
 export interface HiveMimePickRankingPollProps {
   poll: ListPollDto;
@@ -20,6 +21,14 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
       vote: pollVotes.candidates![index]
     }));
   });
+
+  function hasRankedCandidates() {
+    return combinedCandidates.some(c => c.vote.value != null);
+  }
+
+  function hasUnrankedCandidates() {
+    return combinedCandidates.some(c => c.vote.value == null);
+  }
 
   function getRankedCandidates() {
     const candidates = combinedCandidates.filter(c => c.vote.value != null);
@@ -78,15 +87,17 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
               </motion.div>
             ))}
 
-          <AnimatePresence>
-            <motion.div
-              layout
-              animate={{ opacity: getUnrankedCandidates().length === 0 ? 0 : 1 }}
-              className="text-muted-foreground text-center border-1 border-dashed border-muted-foreground/20 rounded-md text-sm p-1"
-            >
-                <span>Please select your {getRankedCandidates().length + 1}. candidate</span>
-            </motion.div>
-        </AnimatePresence>
+
+          <motion.div
+            layout
+            className={`text-muted-foreground text-center border-1 border-dashed ${hasUnrankedCandidates() ? "border-muted-foreground/20" : "border-transparent"} rounded-md text-sm p-1`}
+          >
+            {hasUnrankedCandidates() ? (
+              <span>Please select a candidate for rank {getRankedCandidates().length + 1}</span>
+            ) : (
+              <span>All candidates ranked</span>
+            )}
+          </motion.div>
 
         </motion.div>
           <motion.div layout
