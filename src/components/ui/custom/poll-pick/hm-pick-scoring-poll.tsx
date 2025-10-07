@@ -4,12 +4,12 @@ import { observer } from "mobx-react-lite";
 import { ListPollDto, UpsertVoteToPollDto } from "@/lib/Api";
 import { HiveMimePickScoringCandidate } from "./hm-pick-scoring-candidate";
 
-export interface HiveMimeScoringPollProps {
+export interface HiveMimePickScoringPollProps {
   poll: ListPollDto;
   pollVotes: UpsertVoteToPollDto;
 }
 
-export const HiveMimeScoringPoll = observer(({ poll, pollVotes }: HiveMimeScoringPollProps) => {
+export const HiveMimePickScoringPoll = observer(({ poll, pollVotes }: HiveMimePickScoringPollProps) => {
   return (
     <div className="flex flex-col gap-2">
       <span className="text-gray-500 text-sm">Please score the candidates between {poll.minValue} and {poll.maxValue}.</span>

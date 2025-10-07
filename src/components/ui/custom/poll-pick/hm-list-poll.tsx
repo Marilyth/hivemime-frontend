@@ -2,14 +2,14 @@
 
 import { ListPollDto, PollType, UpsertVoteToPollDto, UpsertVoteToPostDto } from "@/lib/Api";
 import { HiveMimePickSingleChoicePoll } from "./hm-pick-single-choice-poll";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { Button } from "../../button";
 import { Send } from "lucide-react";
 import { observer } from "mobx-react-lite";
-import { HiveMimePickMultipleChoiceCandidate } from "./hm-pick-multiple-choice-candidate";
 import { HiveMimePickMultipleChoicePoll } from "./hm-pick-multiple-choice-poll";
-import { HiveMimeScoringPoll } from "./hm-pick-scoring-poll";
+import { HiveMimePickScoringPoll } from "./hm-pick-scoring-poll";
+import { HiveMimePickRankingPoll } from "./hm-pick-ranking-poll";
 
 export type HiveMimeListPollProps =   {
   poll: ListPollDto;
@@ -20,8 +20,8 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
   const pollMapping: { [key in PollType]: ReactNode } = {
       [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
       [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Scoring]: <HiveMimeScoringPoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Ranking]: <span>ToDo</span>,
+      [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
+      [PollType.Ranking]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
       [PollType.Categorization]: <span>ToDo</span>
     };
 

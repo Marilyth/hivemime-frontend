@@ -28,7 +28,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
     <div className="flex flex-col gap-2">
       <div className="text-sm text-muted-foreground">Choose the type of poll you wish to create.</div>
         {options.map((option, index) => (
-          <HiveMimeHoverCard key={index} className="flex flex-row cursor-pointer hover:text-honey-brown" onClick={() => poll.pollType = option.value}>
+          <HiveMimeHoverCard key={index} className="flex flex-row cursor-pointer hover:text-honey-brown items-center" onClick={() => poll.pollType = option.value}>
             <HiveMimePollTypeIcon answerType={option.value} className="mr-2 text-gray-500 w-8" />
             <div className="flex-1 flex flex-col">
               <span>{option.value}</span>

@@ -3,10 +3,6 @@ import { CreatePollDto, CreatePostDto, PollType } from "./Api";
 export function validatePostTitle(post: CreatePostDto): string[] {
     const errors: string[] = [];
 
-    // A post must have a title.
-    if (post.title == undefined || post.title.trim() === "")
-      errors.push("A post must have a title.");
-
     if (!post.polls)
         return errors;
 
@@ -19,20 +15,32 @@ export function validatePostTitle(post: CreatePostDto): string[] {
 }
 
 export function validatePoll(poll: CreatePollDto): string[] {
+    const errors: string[] = [];
+
     switch (poll.pollType) {
         case PollType.SingleChoice:
-            return validateSingleChoicePoll(poll);
+            errors.push(...validateSingleChoicePoll(poll));
+            break;
         case PollType.MultipleChoice:
-            return validateMultipleChoicePoll(poll);
+            errors.push(...validateMultipleChoicePoll(poll));
+            break;
         case PollType.Scoring:
-            return validateScoringPoll(poll);
+            errors.push(...validateScoringPoll(poll));
+            break;
         case PollType.Ranking:
-            return validateRankingPoll(poll);
+            errors.push(...validateRankingPoll(poll));
+            break;
         case PollType.Categorization:
-            return validateCategorizationPoll(poll);
+            errors.push(...validateCategorizationPoll(poll));
+            break;
         default:
-            return ["No poll type was selected."];
+            errors.push("No poll type was selected.");
     }
+
+    if (poll.title == undefined || poll.title == null || poll.title!.trim() === "")
+        errors.push("A poll must have a title.");
+
+    return errors;
 }
 
 export function validateSingleChoicePoll(poll: CreatePollDto): string[] {

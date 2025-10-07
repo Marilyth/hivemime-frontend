@@ -14,7 +14,7 @@ import { HiveMimeCreateMultipleChoicePoll } from "./hm-create-multiple-choice-po
 import { HiveMimeCreateRankingPoll } from "./hm-create-ranking-poll";
 import { HiveMimeCreateScoringPoll } from "./hm-create-scoring-poll";
 import { HiveMimeCreateCategorizationPoll } from "./hm-create-categorization-poll";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -32,7 +32,18 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-row gap-2 items-end">
+        <InputWithLabel isRequired label="Poll title" placeholder="Give your poll a title." value={props.poll.title!}
+          onChange={(e) => props.poll.title = e.target.value} />
+        <Button disabled={!props.canDelete} variant="ghost" className="text-muted-foreground hover:text-red-400" onClick={props.onDeleteRequested}>
+          <Trash2 />
+        </Button>
+      </div>
+
+      <TextAreaWithLabel className="mb-8" label="Description" placeholder="Optionally, add a description." value={props.poll.description!}
+        onChange={(e) => props.poll.description = e.target.value} />
+
       { props.poll.pollType == undefined ?
         <motion.div key="pollPicker"
           initial={{ opacity: 0 }}
@@ -46,18 +57,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15 }}
           className="flex flex-col gap-2">
-          <div className="flex flex-row gap-2 items-end">
-            <InputWithLabel label="Question" placeholder="My poll's title" value={props.poll.title!}
-              onChange={(e) => props.poll.title = e.target.value} />
-            <Button disabled={!props.canDelete} variant="ghost" className="text-muted-foreground hover:text-red-400" onClick={props.onDeleteRequested}>
-              <Trash2 />
-            </Button>
-          </div>
-
-          <TextAreaWithLabel label="Description" placeholder="My poll's description" value={props.poll.description!}
-            onChange={(e) => props.poll.description = e.target.value} />
-
-          <div className="flex flex-row items-center mt-8">
+          <div className="flex flex-row items-center">
             <Separator className="flex-1" />
             <Button variant="link" className="border-1 cursor-pointer text-honey-brown" onClick={() => props.poll.pollType = undefined}>
               <HiveMimePollTypeIcon answerType={props.poll.pollType!} />

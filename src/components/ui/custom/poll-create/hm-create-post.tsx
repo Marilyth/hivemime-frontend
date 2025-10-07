@@ -16,11 +16,14 @@ import { Separator } from "../../separator";
 import { observable } from "mobx";
 import { toast } from "sonner";
 import { validatePostTitle as validatePost } from "@/lib/validation";
-import { motion, AnimatePresence } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectValue } from "../../select";
+import { HiveMimeInlineSelectTrigger } from "../hm-inline-select";
+import { HiveMimeBulletItem } from "../hm-bullet-item";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [hasTitle, setHasTitle] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("1");
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
   const post = postRef.current;
@@ -73,12 +76,31 @@ export const HiveMimeCreatePost = observer(() => {
 
       <CardContent>
         <div className="flex flex-col gap-2">
-          <InputWithLabel isRequired label="Title" placeholder="My title" value={post.title!}
-            onChange={(e) => post.title = e.target.value} />
-          <TextAreaWithLabel label="Description" placeholder="My description" value={post.description!}
-            onChange={(e) => post.description = e.target.value} />
+          <div>
+              This post
+              <Select
+                value={hasTitle ? "true" : "false"}
+                onValueChange={(value) => setHasTitle(value === "true")}>
+                <HiveMimeInlineSelectTrigger>
+                    <SelectValue />
+                </HiveMimeInlineSelectTrigger>
+                <SelectContent>
+                    <SelectItem value="true">does</SelectItem>
+                    <SelectItem value="false">does not</SelectItem>
+                </SelectContent>
+              </Select>
+              have a title.
+          </div>
+          {hasTitle &&
+            <>
+              <InputWithLabel label="Title" placeholder="Optionally, give your post a title." value={post.title!}
+                onChange={(e) => post.title = e.target.value} />
+              <TextAreaWithLabel label="Description" placeholder="Optionally, add a description." value={post.description!}
+                onChange={(e) => post.description = e.target.value} />
 
-          <Separator className="mt-8" orientation="horizontal" />
+              <Separator className="mt-8" orientation="horizontal" />
+            </>
+          }
           <Label>Polls</Label>
           <EmbeddedTabs value={selectedQuestion} onValueChange={setSelectedQuestion}>
             <EmbeddedTabsList actionComponent={
