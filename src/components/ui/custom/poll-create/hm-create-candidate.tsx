@@ -10,6 +10,7 @@ import { Button } from "../../button";
 import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
+import { HiveMimeDraggable } from "../hm-draggable";
 
 interface HiveMimeCreateCandidateProps {
   index: number;
@@ -45,22 +46,25 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
       <div className="flex flex-col gap-0.5">
         <AnimatePresence>
           {poll.candidates!.map((option, index) => (
-              <motion.div layout
-                key={getReferenceId(option)}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-row items-center">
-                <div className="flex-1">
-                  <HiveMimeCreateCandidate option={option} index={index} onIndexChange={(newIndex) => moveCandidate(index, newIndex)} />
-                </div>
-                  <Button variant="ghost"
-                    className="ml-2 text-muted-foreground hover:text-red-400"
-                    onClick={() => removeCandidate(index)}>
-                      <Trash2 />
-                  </Button>
-              </motion.div>
+            <motion.div layout
+              key={getReferenceId(option)}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}>
+                <HiveMimeDraggable isDraggable isDroppable isSticky data={option} dataList={poll.candidates!} allowedEdges={['top', 'bottom']}>
+                  <div className="flex flex-row items-center">
+                    <div className="flex-1">
+                      <HiveMimeCreateCandidate option={option} index={index} onIndexChange={(newIndex) => moveCandidate(index, newIndex)} />
+                    </div>
+                      <Button variant="ghost"
+                        className="ml-2 text-muted-foreground hover:text-red-400"
+                        onClick={() => removeCandidate(index)}>
+                          <Trash2 />
+                      </Button>
+                    </div>
+                </HiveMimeDraggable>
+            </motion.div>
           ))}
         </AnimatePresence>
       </div>

@@ -32,7 +32,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
             <span className="text-honey-brown">{poll.title}</span>
             <span className="text-muted-foreground">{poll.description}</span>
         </div>
-        <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-gray-500" />
+        <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-gray-500 w-6 h-6 self-start" />
       </div>
 
       {pollMapping[poll.pollType!]}
