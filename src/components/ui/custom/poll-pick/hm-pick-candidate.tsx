@@ -11,7 +11,7 @@ type HiveMimePickCandidateProps = React.ComponentProps<"div"> & {
 
 export const HiveMimePickCandidate = observer(({ candidate, className, labelComponent, ...props }: HiveMimePickCandidateProps) => {
   return (
-    <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer hover:text-honey-brown ${className}`} {...props}>
+    <HiveMimeHoverCard className={`flex flex-row gap-2 items-center cursor-pointer hover:text-honey-brown ${className}`} {...props}>
       {labelComponent}
       <span>{candidate.candidate.name}</span>
     </HiveMimeHoverCard>

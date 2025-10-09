@@ -6,17 +6,17 @@ import { extractClosestEdge, attachClosestEdge, Edge } from "@atlaskit/pragmatic
 import { GripVertical } from "lucide-react";
 import { FaCircle } from "react-icons/fa6";
 
-type HiveMimeDraggableProps<T extends object> = React.ComponentProps<"div"> & {
-    data?: T;
-    
+type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
+    data?: unknown;
+
     /**
      * If provided, moves draggable items when they are dropped inside the list.
      */
-    dataList?: T[];
+    dataList?: unknown[];
 
-    canDrop?: (draggableData: T) => boolean;
+    canDrop?: (draggableData: unknown) => boolean;
     isDroppable?: boolean;
-    onDropped?: ({draggableData, droppableData, edge}: {draggableData: T, droppableData: T | undefined, edge: Edge | null}) => void;
+    onDropped?: ({draggableData, droppableData, edge}: {draggableData: unknown, droppableData: unknown | undefined, edge: Edge | null}) => void;
 
     canDrag?: () => boolean;
     isDraggable?: boolean;
@@ -25,16 +25,17 @@ type HiveMimeDraggableProps<T extends object> = React.ComponentProps<"div"> & {
     hasHandle?: boolean;
 
     allowedEdges?: Edge[];
+    droppableGroups?: Key[] | null;
 
     /**
-     * If set, draggables and droppables can only interact with each other if they share the same group.
+     * If set, draggables can only be dropped on droppables whose droppableGroup matches.
      */
-    draggableGroup?: Key | null;
+    droppableOn?: Key[] | null;
 }
 
-export function HiveMimeDraggable<T extends object>({
+export function HiveMimeDraggable({
     className, data, dataList, onDropped, isSticky = false, hasHandle = false,
-    canDrop, canDrag, isDroppable = false, isDraggable = false, allowedEdges = [], draggableGroup, ...props }: HiveMimeDraggableProps<T>) {
+    canDrop, canDrag, isDroppable = false, isDraggable = false, allowedEdges = [], droppableGroups, droppableOn, ...props }: HiveMimeDraggableProps) {
   const ref = useRef(null);
   const handleRef = useRef(null);
   const [isDropping, setDropping] = useState<boolean>(false);
@@ -43,16 +44,16 @@ export function HiveMimeDraggable<T extends object>({
 
   function moveToList(draggable: Record<string, unknown>, edge: Edge | null)
   {
-    const draggableList = draggable["inputDataList"] as T[];
+    const draggableList = draggable["inputDataList"] as unknown[];
 
     // If the target list is different, remove the item from the old list.
     if (draggableList != dataList)
-      draggableList?.splice(draggableList.indexOf(draggable["inputData"] as T), 1);
+      draggableList?.splice(draggableList.indexOf(draggable["inputData"]), 1);
 
     // If we have a target list, add the item to the list.
     if (dataList)
     {
-      const oldIndex = dataList.indexOf(draggable["inputData"] as T);
+      const oldIndex = dataList.indexOf(draggable["inputData"]);
 
       // Remove the item from the old index if it exists.
       if (oldIndex != -1)
@@ -62,18 +63,18 @@ export function HiveMimeDraggable<T extends object>({
 
       // Insert the item at the new index.
       if (newIndex == -1)
-        dataList.push(draggable["inputData"] as T);
+        dataList.push(draggable["inputData"]);
       else
-        dataList.splice(newIndex, 0, draggable["inputData"] as T);
+        dataList.splice(newIndex, 0, draggable["inputData"]);
     }
   }
 
   useEffect(() => {
     const element = ref.current!;
-    
+
     const dragCleanup = draggable({
       element,
-      getInitialData: () => { return { "inputData": data, "inputDataList": dataList, "draggableGroup": draggableGroup } },
+      getInitialData: () => { return { "inputData": data, "inputDataList": dataList, "droppableOn": droppableOn } },
       onDragStart: () => setDragging(true),
       onDrop: () => setDragging(false),
       canDrag: () => isDraggable && (canDrag ? canDrag() : true),
@@ -92,7 +93,7 @@ export function HiveMimeDraggable<T extends object>({
       },
       onDrag: ({location}) => {
         const targetData = location.current.dropTargets[0].data;
-        
+
         // Don't propagate if we aren't the top target.
         if (targetData.inputData !== data) {
           setDropping(false);
@@ -115,7 +116,7 @@ export function HiveMimeDraggable<T extends object>({
 
         const sourceData = source.data;
         const targetData = target.data;
-        
+
         // Don't propagate if we aren't the top target.
         if (targetData.inputData !== data) {
           return;
@@ -125,15 +126,15 @@ export function HiveMimeDraggable<T extends object>({
         moveToList(sourceData, edge);
 
         if (onDropped) {
-          onDropped({draggableData: sourceData.inputData as T, droppableData: data, edge});
+          onDropped({draggableData: sourceData.inputData, droppableData: data, edge});
         }
       },
       getIsSticky: () => isSticky,
       canDrop: (args) => {
         return isDroppable &&
-          args.source.data.draggableGroup === draggableGroup &&
+          (!args.source.data.droppableOn || (args.source.data.droppableOn as Key[]).some(k => droppableGroups?.includes(k))) &&
           args.source.element !== element &&
-          (canDrop ? canDrop(args.source.data.inputData as T) : true);
+          (canDrop ? canDrop(args.source.data.inputData) : true);
       }
     });
 

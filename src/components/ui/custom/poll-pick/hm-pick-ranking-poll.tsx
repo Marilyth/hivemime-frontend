@@ -43,15 +43,17 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
     return combinedCandidates.filter(c => c.vote.value == null);
   }
 
-  function rankCandidate(candidate: CombinedPollCandidate, rank: number | null) {
+  function rankCandidate(candidate: CombinedPollCandidate | unknown, rank: number | null) {
     if (rank == -1){
       rank = getRankedCandidates().length;
     }
 
+    const convertedCandidate = candidate as CombinedPollCandidate;
+
     // Move all candidates lower than the candidate up one rank.
-    if (candidate.vote.value != null) {
+    if (convertedCandidate.vote.value != null) {
       for (const c of getRankedCandidates()) {
-        if (c.vote.value! > candidate.vote.value!) {
+        if (c.vote.value! > convertedCandidate.vote.value!) {
           c.vote.value! -= 1;
         }
       }
@@ -66,7 +68,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
       }
     }
 
-    candidate.vote.value = rank;
+    convertedCandidate.vote.value = rank;
   }
 
   return (
@@ -74,40 +76,49 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
       <span className="text-gray-500 text-sm">Please rank the candidates in order of preference.</span>
 
       <LayoutGroup>
-        
-        <HiveMimeDraggable<CombinedPollCandidate> draggableGroup={getReferenceId(poll)} isDroppable onDropped={({draggableData}) => rankCandidate(draggableData, -1)} canDrop={(data) => data.vote.value == null}>
+
+        <HiveMimeDraggable
+          className="mb-4"
+          droppableGroups={getReferenceId(poll)}
+          isDroppable
+          onDropped={({draggableData}) => rankCandidate(draggableData, -1)}
+          canDrop={(data) => (data as CombinedPollCandidate).vote.value == null}>
           <motion.div layout className="flex flex-col bg-honey-brown/20 p-2 rounded-md border-2 border-honey-brown/30 gap-2">
-          <motion.div layout="position" className="text-sm text-center mb-2">
-            Ranked candidates
+            <motion.div layout="position" className="text-sm text-center mb-2">
+              Ranked candidates
+            </motion.div>
+
+              {getRankedCandidates().map((candidate) => (
+                <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
+                  <HiveMimeDraggable droppableGroups={getReferenceId(poll)} droppableOn={[getReferenceId(poll)]} isDraggable isDroppable isSticky data={candidate}
+                    onDropped={(args) => rankCandidate(args.draggableData, candidate.vote.value! + (args.edge === "bottom" ? 1 : 0))}
+                    allowedEdges={['top', 'bottom']}>
+                    <HiveMimePickRankingCandidate combined={candidate}
+                      onClick={() => rankCandidate(candidate, null)}
+                    />
+                  </HiveMimeDraggable>
+                </motion.div>
+              ))}
+
+            <motion.div
+              layout
+              className={`text-muted-foreground text-center border-1 border-dashed ${hasUnrankedCandidates() ? "border-muted-foreground/20" : "border-transparent"} rounded-md text-sm p-1`}
+            >
+              {hasUnrankedCandidates() ? (
+                <span>Please select a candidate for rank {getRankedCandidates().length + 1}</span>
+              ) : (
+                <span>All candidates ranked</span>
+              )}
+            </motion.div>
+
           </motion.div>
-
-            {getRankedCandidates().map((candidate) => (
-              <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-                <HiveMimeDraggable draggableGroup={getReferenceId(poll)} isDraggable isDroppable isSticky data={candidate}
-                  onDropped={(args) => rankCandidate(args.draggableData, candidate.vote.value! + (args.edge === "bottom" ? 1 : 0))}
-                  allowedEdges={['top', 'bottom']}>
-                  <HiveMimePickRankingCandidate combined={candidate}
-                    onClick={() => rankCandidate(candidate, null)}
-                  />
-                </HiveMimeDraggable>
-              </motion.div>
-            ))}
-
-          <motion.div
-            layout
-            className={`text-muted-foreground text-center border-1 border-dashed ${hasUnrankedCandidates() ? "border-muted-foreground/20" : "border-transparent"} rounded-md text-sm p-1`}
-          >
-            {hasUnrankedCandidates() ? (
-              <span>Please select a candidate for rank {getRankedCandidates().length + 1}</span>
-            ) : (
-              <span>All candidates ranked</span>
-            )}
-          </motion.div>
-
-        </motion.div>
         </HiveMimeDraggable>
 
-        <HiveMimeDraggable<CombinedPollCandidate> draggableGroup={getReferenceId(poll)} isDroppable onDropped={(args) => {rankCandidate(args.draggableData, null)}} canDrop={(data) => data.vote.value != null}>
+        <HiveMimeDraggable
+        droppableGroups={getReferenceId(poll)}
+        isDroppable
+        onDropped={(args) => {rankCandidate(args.draggableData, null)}}
+        canDrop={(data) => (data as CombinedPollCandidate).vote.value != null}>
           <motion.div layout
             className="flex flex-col gap-2 bg-muted-foreground/5 p-2 rounded-md border-2 border-muted-foreground/10">
             <motion.div layout="position" className="text-sm text-center mb-2">
@@ -116,7 +127,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
 
             {getUnrankedCandidates().map((candidate) => (
               <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-                <HiveMimeDraggable draggableGroup={getReferenceId(poll)} isDraggable data={candidate}>
+                <HiveMimeDraggable droppableOn={[getReferenceId(poll)]} isDraggable data={candidate}>
                   <HiveMimePickRankingCandidate combined={candidate}
                     onClick={() => rankCandidate(candidate, -1)}
                   />
