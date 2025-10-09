@@ -10,6 +10,7 @@ import { Button } from "../../button";
 import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
+import { HiveMimeDraggable } from "../hm-draggable";
 
 interface HiveMimeCreateCategoryProps {
   index: number;
@@ -46,20 +47,23 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
         <AnimatePresence>
           {poll.categories!.map((category, index) => (
             <motion.div layout
-              className="flex flex-row items-center"
               key={getReferenceId(category)}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}>
-              <div className="flex-1">
-                <HiveMimeCreateCategory category={category} index={index} onIndexChange={(newIndex) => moveCategory(index, newIndex)} />
-              </div>
-                <Button variant="ghost"
-                  className="ml-2 text-muted-foreground hover:text-red-400"
-                  onClick={() => removeCategory(index)}>
-                    <Trash2 />
-                </Button>
+                <HiveMimeDraggable isDraggable isDroppable isSticky data={category} dataList={poll.categories!} allowedEdges={['top', 'bottom']}>
+                  <div className="flex flex-row items-center">
+                    <div className="flex-1">
+                      <HiveMimeCreateCategory category={category} index={index} onIndexChange={(newIndex) => moveCategory(index, newIndex)} />
+                    </div>
+                      <Button variant="ghost"
+                        className="ml-2 text-muted-foreground hover:text-red-400"
+                        onClick={() => removeCategory(index)}>
+                          <Trash2 />
+                      </Button>
+                    </div>
+                </HiveMimeDraggable>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -73,11 +77,11 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
 });
 
 
-export const HiveMimeCreateCategory = observer(({ index, category: option, onIndexChange }: HiveMimeCreateCategoryProps) => {
+export const HiveMimeCreateCategory = observer(({ index, category, onIndexChange }: HiveMimeCreateCategoryProps) => {
   return (
     <HiveMimeHoverCard className="flex flex-row gap-2">
       <HiveMimeIndexHandle index={index} onIndexChange={(newIndex) => onIndexChange?.(newIndex)} />
-      <HiveMimeEmbeddedInput className="h-auto" value={option.name!} onChange={(e) => option.name = e.target.value} />
+      <HiveMimeEmbeddedInput className="h-auto" value={category.name!} onChange={(e) => category.name = e.target.value} />
     </HiveMimeHoverCard>
   );
 });

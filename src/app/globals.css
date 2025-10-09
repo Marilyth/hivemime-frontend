@@ -101,6 +101,17 @@
 }
 
 @theme inline {
+  --color-muted-rose: rgb(184, 98, 115);
+  --color-muted-purple: rgb(150, 115, 165);
+  --color-muted-green: rgb(150, 210, 148);
+  --color-muted-orange: rgb(235, 156, 92);
+  --color-muted-gray: rgb(169, 169, 169);
+  --color-muted-blue: rgb(131, 161, 205);
+  --color-muted-brown: rgb(153, 120, 100);
+  --color-muted-pink: rgb(228, 173, 196);
+  --color-muted-yellow: rgb(224, 210, 104);
+  --color-muted-sky-blue: rgb(133, 176, 193);
+  --color-muted-red: rgb(203, 76, 78);
   --color-honey-brown: var(--honey-brown);
   --color-honey-yellow: var(--honey-yellow);
   --color-background: var(--background);

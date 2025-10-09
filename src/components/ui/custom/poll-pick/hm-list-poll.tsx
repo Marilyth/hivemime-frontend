@@ -10,6 +10,7 @@ import { observer } from "mobx-react-lite";
 import { HiveMimePickMultipleChoicePoll } from "./hm-pick-multiple-choice-poll";
 import { HiveMimePickScoringPoll } from "./hm-pick-scoring-poll";
 import { HiveMimePickRankingPoll } from "./hm-pick-ranking-poll";
+import { HiveMimePickCategorizationPoll } from "./hm-pick-categorization-poll";
 
 export type HiveMimeListPollProps =   {
   poll: ListPollDto;
@@ -22,7 +23,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
       [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
       [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
       [PollType.Ranking]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Categorization]: <span>ToDo</span>
+      [PollType.Categorization]: <HiveMimePickCategorizationPoll poll={poll} pollVotes={pollVote} />,
     };
 
   return (
