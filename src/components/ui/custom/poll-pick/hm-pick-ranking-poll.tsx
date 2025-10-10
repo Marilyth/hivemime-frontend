@@ -79,7 +79,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
 
         <HiveMimeDraggable
           className="mb-4"
-          droppableGroups={getReferenceId(poll)}
+          droppableFor={getReferenceId(poll)}
           isDroppable
           onDropped={({draggableData}) => rankCandidate(draggableData, -1)}
           canDrop={(data) => (data as CombinedPollCandidate).vote.value == null}>
@@ -90,7 +90,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
 
               {getRankedCandidates().map((candidate) => (
                 <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-                  <HiveMimeDraggable droppableGroups={getReferenceId(poll)} droppableOn={[getReferenceId(poll)]} isDraggable isDroppable isSticky data={candidate}
+                  <HiveMimeDraggable droppableFor={getReferenceId(poll)} draggableOn={[getReferenceId(poll)]} isDraggable isDroppable isSticky data={candidate}
                     onDropped={(args) => rankCandidate(args.draggableData, candidate.vote.value! + (args.edge === "bottom" ? 1 : 0))}
                     allowedEdges={['top', 'bottom']}>
                     <HiveMimePickRankingCandidate combined={candidate}
@@ -115,7 +115,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
         </HiveMimeDraggable>
 
         <HiveMimeDraggable
-        droppableGroups={getReferenceId(poll)}
+        droppableFor={getReferenceId(poll)}
         isDroppable
         onDropped={(args) => {rankCandidate(args.draggableData, null)}}
         canDrop={(data) => (data as CombinedPollCandidate).vote.value != null}>
@@ -127,7 +127,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
 
             {getUnrankedCandidates().map((candidate) => (
               <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-                <HiveMimeDraggable droppableOn={[getReferenceId(poll)]} isDraggable data={candidate}>
+                <HiveMimeDraggable draggableOn={[getReferenceId(poll)]} isDraggable data={candidate}>
                   <HiveMimePickRankingCandidate combined={candidate}
                     onClick={() => rankCandidate(candidate, -1)}
                   />

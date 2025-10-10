@@ -25,17 +25,17 @@ type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
     hasHandle?: boolean;
 
     allowedEdges?: Edge[];
-    droppableGroups?: Key[] | null;
+    droppableFor?: Key[] | null;
 
     /**
-     * If set, draggables can only be dropped on droppables whose droppableGroup matches.
+     * If set, draggables can only be dropped on droppables whose droppableFor matches.
      */
-    droppableOn?: Key[] | null;
+    draggableOn?: Key[] | null;
 }
 
 export function HiveMimeDraggable({
     className, data, dataList, onDropped, isSticky = false, hasHandle = false,
-    canDrop, canDrag, isDroppable = false, isDraggable = false, allowedEdges = [], droppableGroups, droppableOn, ...props }: HiveMimeDraggableProps) {
+    canDrop, canDrag, isDroppable = false, isDraggable = false, allowedEdges = [], droppableFor: droppableGroups, draggableOn: droppableOn, ...props }: HiveMimeDraggableProps) {
   const ref = useRef(null);
   const handleRef = useRef(null);
   const [isDropping, setDropping] = useState<boolean>(false);
@@ -147,8 +147,8 @@ export function HiveMimeDraggable({
   return (
   <div
     ref={ref}
+    className={`relative rounded-lg ${isDragging ? "opacity-20" : ""} ${(isDropping && allowedEdges.length == 0) ? "bg-honey-yellow/5" : ""}`}
     {...props}
-    className={`relative rounded-lg ${isDragging ? "opacity-20" : ""} ${(isDropping && allowedEdges.length == 0) ? "bg-honey-yellow/5" : ""} ${className}`}
   >
     {currentEdge && (
       <div>
@@ -174,7 +174,7 @@ export function HiveMimeDraggable({
     )}
       <div className="flex w-full items-center gap-1">
         {hasHandle && (<GripVertical className="h-4 w-4 text-honey-brown cursor-grab " ref={handleRef} />)}
-        <div className="flex-1">
+        <div className={`flex-1 ${className}`}>
           {props.children}
         </div>
       </div>
