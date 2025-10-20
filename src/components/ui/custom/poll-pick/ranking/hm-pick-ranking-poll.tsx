@@ -7,7 +7,7 @@ import { useState } from "react";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
-import { HiveMimeDraggable } from "../hm-draggable";
+import { HiveMimeDraggable } from "../../hm-draggable";
 
 export interface HiveMimePickRankingPollProps {
   poll: ListPollDto;
@@ -78,7 +78,6 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
       <LayoutGroup>
 
         <HiveMimeDraggable
-          className="mb-4"
           droppableFor={getReferenceId(poll)}
           isDroppable
           onDropped={({draggableData}) => rankCandidate(draggableData, -1)}

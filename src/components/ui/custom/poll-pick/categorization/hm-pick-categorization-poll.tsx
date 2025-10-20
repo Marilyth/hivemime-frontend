@@ -5,10 +5,10 @@ import { ListPollDto, UpsertVoteToPollDto } from "@/lib/Api";
 import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
 import { LayoutGroup } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
-import { HiveMimeDraggable } from "../hm-draggable";
+import { HiveMimeDraggable } from "../../hm-draggable";
 import { useState } from "react";
 import { HiveMimePickCategorizationPollCandidateDialog, HiveMimePickCategorizationPollCategoryDialog } from "./hm-pick-categorization-poll-dialog";
-import { HiveMimeTagItem } from "../hm-tag-item";
+import { HiveMimeTagItem } from "../../hm-tag-item";
 import { HiveMimePickCategorizationCategoryPanel } from "./hm-pick-categorization-category-panel";
 
 export interface HiveMimePickCategorizationPollProps {
@@ -49,7 +49,7 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
     <LayoutGroup>
       <div className="flex flex-col gap-2">
         <HiveMimePickCategorizationPollCandidateDialog
-          categories={poll.categories!}
+          categories={combinedCategories!}
           candidate={openedCandidate}
           onClose={() => setOpenedCandidate(null)} />
 
@@ -60,7 +60,7 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
 
         <span className="text-gray-500 text-sm">Please add categories to the candidates.</span>
 
-        <div className="flex flex-wrap gap-2 pb-4">
+        <div className="flex flex-wrap gap-2">
           {combinedCategories?.map((category, index) => (
             <HiveMimeDraggable
               key={getReferenceId(category)}
@@ -90,6 +90,7 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
               candidates={getCandidatesForCategory(category.value)}
               candidateClicked={setOpenedCandidate} />
         ))}
+        
       </div>
     </LayoutGroup>
   );

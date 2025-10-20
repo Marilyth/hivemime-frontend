@@ -1,4 +1,4 @@
-import { CreatePollDto, CreatePostDto, PollType } from "./Api";
+import { CreatePollDto, CreatePostDto, ListPollDto, PollType, UpsertVoteToPollDto } from "./Api";
 
 export function validatePostTitle(post: CreatePostDto): string[] {
     const errors: string[] = [];
@@ -7,31 +7,31 @@ export function validatePostTitle(post: CreatePostDto): string[] {
         return errors;
 
     for (let i = 0; i < post.polls!.length; i++) {
-        const pollErrors = validatePoll(post.polls![i]);
+        const pollErrors = validateCreatePoll(post.polls![i]);
         errors.push(...pollErrors.map(e => `Poll ${i + 1}: ${e}`));
     }
 
     return errors;
 }
 
-export function validatePoll(poll: CreatePollDto): string[] {
+export function validateCreatePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     switch (poll.pollType) {
         case PollType.SingleChoice:
-            errors.push(...validateSingleChoicePoll(poll));
+            errors.push(...validateCreateSingleChoicePoll(poll));
             break;
         case PollType.MultipleChoice:
-            errors.push(...validateMultipleChoicePoll(poll));
+            errors.push(...validateCreateMultipleChoicePoll(poll));
             break;
         case PollType.Scoring:
             errors.push(...validateScoringPoll(poll));
             break;
         case PollType.Ranking:
-            errors.push(...validateRankingPoll(poll));
+            errors.push(...validateCreateRankingPoll(poll));
             break;
         case PollType.Categorization:
-            errors.push(...validateCategorizationPoll(poll));
+            errors.push(...validateCreateCategorizationPoll(poll));
             break;
         default:
             errors.push("No poll type was selected.");
@@ -43,7 +43,7 @@ export function validatePoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-export function validateSingleChoicePoll(poll: CreatePollDto): string[] {
+export function validateCreateSingleChoicePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (!poll.candidates || poll.candidates.length < 2) {
@@ -53,8 +53,8 @@ export function validateSingleChoicePoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-export function validateMultipleChoicePoll(poll: CreatePollDto): string[] {
-    return validateSingleChoicePoll(poll);
+export function validateCreateMultipleChoicePoll(poll: CreatePollDto): string[] {
+    return validateCreateSingleChoicePoll(poll);
 }
 
 export function validateScoringPoll(poll: CreatePollDto): string[] {
@@ -67,7 +67,7 @@ export function validateScoringPoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-export function validateRankingPoll(poll: CreatePollDto): string[] {
+export function validateCreateRankingPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (!poll.candidates || poll.candidates.length < 2) {
@@ -77,7 +77,7 @@ export function validateRankingPoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-export function validateCategorizationPoll(poll: CreatePollDto): string[] {
+export function validateCreateCategorizationPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (!poll.candidates || poll.candidates.length < 1) {

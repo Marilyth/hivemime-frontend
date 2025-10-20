@@ -1,6 +1,6 @@
 "use client";
 
-import { HiveMimeHoverCard } from "../hm-hover-card";
+import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { CombinedPollCandidate } from "@/lib/view-models";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Crown } from "lucide-react";
-import { HiveMimeHoverCard } from "../hm-hover-card";
+import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { PollCandidateDto, UpsertVoteToCandidateDto } from "@/lib/Api";
 

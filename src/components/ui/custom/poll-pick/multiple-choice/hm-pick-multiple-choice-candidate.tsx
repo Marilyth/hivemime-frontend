@@ -1,7 +1,7 @@
 "use client";
 
 import { IoMdCheckboxOutline } from "react-icons/io";
-import { HiveMimeHoverCard } from "../hm-hover-card";
+import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { PollCandidateDto, UpsertVoteToCandidateDto } from "@/lib/Api";
 

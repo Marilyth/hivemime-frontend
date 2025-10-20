@@ -1,30 +1,29 @@
 "use client";
 
-import { ListPollDto, PollType, UpsertVoteToPollDto, UpsertVoteToPostDto } from "@/lib/Api";
-import { HiveMimePickSingleChoicePoll } from "./hm-pick-single-choice-poll";
+import { ListPollDto, PollType, UpsertVoteToPollDto } from "@/lib/Api";
+import { HiveMimePickSingleChoicePoll } from "./single-choice/hm-pick-single-choice-poll";
 import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
-import { Button } from "../../button";
-import { Send } from "lucide-react";
 import { observer } from "mobx-react-lite";
-import { HiveMimePickMultipleChoicePoll } from "./hm-pick-multiple-choice-poll";
-import { HiveMimePickScoringPoll } from "./hm-pick-scoring-poll";
-import { HiveMimePickRankingPoll } from "./hm-pick-ranking-poll";
-import { HiveMimePickCategorizationPoll } from "./hm-pick-categorization-poll";
+import { HiveMimePickMultipleChoicePoll } from "./multiple-choice/hm-pick-multiple-choice-poll";
+import { HiveMimePickScoringPoll } from "./scoring/hm-pick-scoring-poll";
+import { HiveMimePickRankingPoll } from "./ranking/hm-pick-ranking-poll";
+import { HiveMimePickCategorizationPoll } from "./categorization/hm-pick-categorization-poll";
 
 export type HiveMimeListPollProps =   {
   poll: ListPollDto;
   pollVote: UpsertVoteToPollDto;
+  footer: ReactNode;
 }
 
-export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
+export const HiveMimeListPoll = observer(({ poll, pollVote, footer }: HiveMimeListPollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } = {
-      [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
-      [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Ranking]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
-      [PollType.Categorization]: <HiveMimePickCategorizationPoll poll={poll} pollVotes={pollVote} />,
-    };
+    [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
+    [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Ranking]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Categorization]: <HiveMimePickCategorizationPoll poll={poll} pollVotes={pollVote} />,
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -38,10 +37,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
       {pollMapping[poll.pollType!]}
 
-      <Button className="w-full" variant={"outline"} disabled >
-        <Send />
-        Submit
-      </Button>
+      {footer}
     </div>
   );
 });

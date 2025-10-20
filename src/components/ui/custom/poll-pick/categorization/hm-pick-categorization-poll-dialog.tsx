@@ -2,14 +2,14 @@
 
 import { observer } from "mobx-react-lite";
 import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../dialog";
-import { HiveMimeHoverCard } from "../hm-hover-card";
-import { PollCategoryDto } from "@/lib/Api";
-import { HiveMimeTagItem } from "../hm-tag-item";
-import { Button } from "../../button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../dialog";
+import { HiveMimeHoverCard } from "../../hm-hover-card";
+import { HiveMimeTagItem } from "../../hm-tag-item";
+import { Button } from "../../../button";
+import { getReferenceId } from "@/lib/utils";
 
 export interface HiveMimePickCategorizationPollCandidateDialogProps {
-  categories: PollCategoryDto[];
+  categories: CombinedPollCategory[];
   candidate: CombinedPollCandidate | null;
   onClose: () => void;
 }
@@ -17,7 +17,7 @@ export interface HiveMimePickCategorizationPollCandidateDialogProps {
 export const HiveMimePickCategorizationPollCandidateDialog = observer(({ categories, candidate, onClose }: HiveMimePickCategorizationPollCandidateDialogProps) => {
   return (
     <Dialog open={candidate != null} onOpenChange={() => onClose()}>
-      <DialogContent>
+      <DialogContent className="gap-2">
         <DialogHeader>
           <DialogTitle>Pick a category for <span className="text-honey-brown">{candidate?.candidate.name}</span></DialogTitle>
           <DialogDescription>
@@ -25,26 +25,16 @@ export const HiveMimePickCategorizationPollCandidateDialog = observer(({ categor
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {categories?.map((category, index) => (
-            <HiveMimeTagItem key={index}
-              onClick={() => {console.log("test"); candidate!.vote.value = index; onClose();}}
-              className="cursor-pointer bg-honey-brown/20 border-honey-brown/30 text-honey-brown hover:bg-honey-brown/30">
+        <div className="flex flex-wrap gap-2">
+          {categories?.map((category) => (
+            <HiveMimeTagItem key={getReferenceId(category)}
+              onClick={() => {candidate!.vote.value = category.value; onClose();}}
+              className={`cursor-pointer ${category.value == null ? "" : "bg-honey-brown/20 border-honey-brown/30 text-honey-brown hover:bg-honey-brown/30"}`}>
               <div className="text-muted-foreground">
-                {category.name}
+                {category.category?.name}
               </div>
             </HiveMimeTagItem>
           ))}
-        </div>
-
-        <div className="flex">
-          <Button variant={"destructive"}
-            onClick={() => {candidate!.vote.value = null; onClose();}}
-            className="cursor-pointer">
-            <div className="text-muted-foreground">
-              Uncategorize
-            </div>
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -61,7 +51,7 @@ export interface HiveMimePickCategorizationPollCategoryDialogProps {
 export const HiveMimePickCategorizationPollCategoryDialog = observer(({ candidates, category, onClose }: HiveMimePickCategorizationPollCategoryDialogProps) => {
   return (
     <Dialog open={category != null} onOpenChange={() => onClose()}>
-      <DialogContent>
+      <DialogContent className="gap-2">
         <DialogHeader>
           <DialogTitle>Pick a candidate for <span className="text-honey-brown">{category?.category.name}</span></DialogTitle>
           <DialogDescription>
@@ -72,10 +62,8 @@ export const HiveMimePickCategorizationPollCategoryDialog = observer(({ candidat
         {candidates?.map((candidate, index) => (
           <HiveMimeHoverCard key={index}
             onClick={() => {candidate!.vote.value = category?.value; onClose();}}
-            className="cursor-pointer hover:text-honey-brown flex flex-col p-2 rounded-md border-1 gap-2 text-center">
-            <div className="text-sm mb-2">
+            className="cursor-pointer hover:text-honey-brown flex flex-col p-2 rounded-md border-1 gap-2">
               {candidate.candidate.name}
-            </div>
           </HiveMimeHoverCard>
         ))}
       </DialogContent>

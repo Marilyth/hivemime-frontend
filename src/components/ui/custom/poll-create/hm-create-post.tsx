@@ -15,7 +15,7 @@ import { redirect } from "next/navigation";
 import { Separator } from "../../separator";
 import { observable } from "mobx";
 import { toast } from "sonner";
-import { validatePostTitle as validatePost } from "@/lib/validation";
+import { validatePostTitle as validatePost } from "@/lib/validate-create";
 import { getReferenceId } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectValue } from "../../select";
 import { HiveMimeInlineSelectTrigger } from "../hm-inline-select";
