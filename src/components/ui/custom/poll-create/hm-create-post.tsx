@@ -19,7 +19,6 @@ import { validatePostTitle as validatePost } from "@/lib/validate-create";
 import { getReferenceId } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectValue } from "../../select";
 import { HiveMimeInlineSelectTrigger } from "../hm-inline-select";
-import { HiveMimeBulletItem } from "../hm-bullet-item";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;

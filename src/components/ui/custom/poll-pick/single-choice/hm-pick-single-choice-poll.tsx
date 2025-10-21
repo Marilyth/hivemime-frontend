@@ -17,16 +17,16 @@ export const HiveMimePickSingleChoicePoll = observer(({ poll, pollVotes }: HiveM
     const currentValue = currentVote?.value;
 
     // Flip the vote state.
-    currentVote!.value = ((currentValue ?? 0) + 1) % 2;
-
-    if (currentVote!.value === 0)
-      return;
+    if (currentValue == 1)
+      currentVote!.value = null;
+    else
+      currentVote!.value = 1;
 
     // If the value is set to 1, set all other votes to 0.
     // Since this is a single-choice poll.
     for (let i = 0; i < pollVotes.candidates!.length; i++) {
       if (i !== index) {
-        pollVotes.candidates![i].value = 0;
+        pollVotes.candidates![i].value = null;
       }
     }
   }

@@ -22,10 +22,6 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
     }));
   });
 
-  function hasRankedCandidates() {
-    return combinedCandidates.some(c => c.vote.value != null);
-  }
-
   function hasUnrankedCandidates() {
     return combinedCandidates.some(c => c.vote.value == null);
   }
@@ -45,7 +41,7 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
 
   function rankCandidate(candidate: CombinedPollCandidate | unknown, rank: number | null) {
     if (rank == -1){
-      rank = getRankedCandidates().length;
+      rank = getRankedCandidates().length + 1;
     }
 
     const convertedCandidate = candidate as CombinedPollCandidate;
@@ -76,7 +72,6 @@ export const HiveMimePickRankingPoll = observer(({ poll, pollVotes }: HiveMimePi
       <span className="text-gray-500 text-sm">Please rank the candidates in order of preference.</span>
 
       <LayoutGroup>
-
         <HiveMimeDraggable
           droppableFor={getReferenceId(poll)}
           isDroppable

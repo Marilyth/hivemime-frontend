@@ -17,7 +17,7 @@ const HiveMimeCreateRankingRules = observer((props: HiveMimeCreatePollProps) => 
       <div className="text-muted-foreground">
         <HiveMimeBulletItem>
           The user has to rank at least
-          <HiveMimeInlineInput min={1} value={props.poll.minVotes} className="w-5"
+          <HiveMimeInlineInput min={1} value={props.poll.minVotes ?? 1} className="w-5"
             onChange={(e) => props.poll.minVotes = Number(e.target.value)} />
           candidates.
         </HiveMimeBulletItem>

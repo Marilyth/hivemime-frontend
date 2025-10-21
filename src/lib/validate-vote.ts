@@ -1,3 +1,4 @@
+import { error } from "console";
 import { ListPollDto, UpsertVoteToPollDto, UpsertVoteToPostDto } from "./Api";
 
 export function validatePickPost(postPolls: ListPollDto[], postVotes: UpsertVoteToPostDto): string[] {
@@ -17,25 +18,22 @@ export function validatePickPoll(poll: ListPollDto, vote: UpsertVoteToPollDto): 
     const voteValues = vote.candidates!.map(c => c.value);
     const voteCount = voteValues!.filter(c => c != null).length;
 
-    if (poll.minVotes != undefined)
-    {
-        if (voteCount < poll.minVotes!) {
-            errors.push(`You must vote for at least ${poll.minVotes} candidates.`);
-        }
+    if (voteCount == 0 && !poll.isOptional){
+        errors.push("You must vote for this poll.");
+        return errors;
     }
 
-    if (poll.maxVotes != undefined && poll.maxVotes > 0)
-    {
-        if (voteCount > poll.maxVotes!) {
-            errors.push(`You must vote for no more than ${poll.maxVotes} candidates.`);
-        }
-    }
+    if (voteCount < poll.minVotes!)
+        errors.push(`You must vote for at least ${poll.minVotes} candidates.`);
+
+    if (voteCount > poll.maxVotes!)
+        errors.push(`You must vote for no more than ${poll.maxVotes} candidates.`);
 
     for (const value of voteValues) {
         if (value != null) {
-            if (poll.minValue != undefined && value < poll.minValue!)
+            if (value < poll.minValue!)
                 errors.push(`Your candidate's value can not be smaller than ${poll.minValue}.`);
-            if (poll.maxValue != undefined && value > poll.maxValue!)
+            if (value > poll.maxValue!)
                 errors.push(`Your candidate's value can not be larger than ${poll.maxValue}.`);
         }
     }

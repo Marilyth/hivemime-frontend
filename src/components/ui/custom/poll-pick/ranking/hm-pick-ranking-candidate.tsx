@@ -3,6 +3,7 @@
 import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { CombinedPollCandidate } from "@/lib/view-models";
+import { motion } from "framer-motion";
 
 interface HiveMimePickRankingCandidateProps {
   onClick?: () => void;
@@ -16,8 +17,8 @@ export const HiveMimePickRankingCandidate = observer(({ combined, onClick }: Hiv
 
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isRanked() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
-      <span className="w-8 font-light text-gray-500">{isRanked() ? (combined.vote.value! + 1) : combined.candidate.id}</span>
-      <span>{combined.candidate.name}</span>
+      {isRanked() && <span className="w-6 font-light text-gray-500">{combined.vote.value}</span>}
+      <motion.div layout>{combined.candidate.name}</motion.div>
     </HiveMimeHoverCard>
   );
 });

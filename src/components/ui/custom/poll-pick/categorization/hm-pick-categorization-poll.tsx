@@ -8,8 +8,8 @@ import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../hm-draggable";
 import { useState } from "react";
 import { HiveMimePickCategorizationPollCandidateDialog, HiveMimePickCategorizationPollCategoryDialog } from "./hm-pick-categorization-poll-dialog";
-import { HiveMimeTagItem } from "../../hm-tag-item";
-import { HiveMimePickCategorizationCategoryPanel } from "./hm-pick-categorization-category-panel";
+import { HiveMimeCategoryTagBox, HiveMimePickCategorizationCategoryPanel } from "./hm-pick-categorization-category-panel";
+import { mutedColors, colorHexToNumber } from "@/lib/colors";
 
 export interface HiveMimePickCategorizationPollProps {
   poll: ListPollDto;
@@ -28,11 +28,11 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
   });
 
   const [combinedCategories, setCombinedCategories] = useState<CombinedPollCategory[]>(() => {
-    const pollCategories = poll.categories!.map((category, index) => ({
+    const pollCategories: CombinedPollCategory[] = poll.categories!.map((category, index) => ({
       category: category,
-      value: index
+      value: index + 1
     }));
-    pollCategories.push({ category: { name: "Uncategorized" }, value: null });
+    pollCategories.push({ category: { name: "Uncategorized", color: colorHexToNumber(mutedColors.gray) }, value: null });
 
     return pollCategories;
   });
@@ -60,7 +60,7 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
 
         <span className="text-gray-500 text-sm">Please add categories to the candidates.</span>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           {combinedCategories?.map((category, index) => (
             <HiveMimeDraggable
               key={getReferenceId(category)}
@@ -71,12 +71,8 @@ export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: Hiv
               isDraggable
               onClick={() => setOpenedCategory(category)}
               onDropped={data => assignCandidateToCategory(data.draggableData as CombinedPollCandidate, category as CombinedPollCategory)}
-              canDrop={data => (data as CombinedPollCandidate).vote.value != index}>
-              <HiveMimeTagItem className={`cursor-pointer ${category.value == null ? "" : "bg-honey-brown/20 border-honey-brown/30 text-honey-brown hover:bg-honey-brown/30"}`}>
-                <div className="text-muted-foreground">
-                  {category.category.name}
-                </div>
-              </HiveMimeTagItem>
+              canDrop={data => (data as CombinedPollCandidate).vote.value != category.value}>
+              <HiveMimeCategoryTagBox category={category} />
             </HiveMimeDraggable>
           ))}
         </div>

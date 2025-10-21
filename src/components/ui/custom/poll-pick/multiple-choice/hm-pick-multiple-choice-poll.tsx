@@ -15,7 +15,10 @@ export const HiveMimePickMultipleChoicePoll = observer(({ poll, pollVotes }: Hiv
     const currentValue = currentVote?.value;
 
     // Flip the vote state.
-    currentVote!.value = ((currentValue ?? 0) + 1) % 2;
+    if (currentValue == 1)
+      currentVote!.value = null;
+    else
+      currentVote!.value = 1;
   }
 
   return (

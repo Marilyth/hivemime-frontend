@@ -23,7 +23,7 @@ export const HiveMimePickScoringCandidate = observer(({ poll, vote, candidate }:
         onValueChange={(value) => vote.value = value[0]}
         min={poll.minValue}
         max={poll.maxValue}
-        step={poll.stepValue}
+        step={poll.stepValue!}
       />
     </HiveMimeHoverCard>
   );

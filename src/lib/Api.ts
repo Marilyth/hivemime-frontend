@@ -23,16 +23,17 @@ export interface CreatePollDto {
   description?: string | null;
   allowCustomAnswer?: boolean;
   isShuffled?: boolean;
+  isOptional?: boolean;
   /** @format int32 */
-  minValue?: number;
+  minValue?: number | null;
   /** @format int32 */
-  maxValue?: number;
+  maxValue?: number | null;
   /** @format double */
-  stepValue?: number;
+  stepValue?: number | null;
   /** @format int32 */
-  minVotes?: number;
+  minVotes?: number | null;
   /** @format int32 */
-  maxVotes?: number;
+  maxVotes?: number | null;
   pollType?: PollType;
   candidates?: PollCandidateDto[] | null;
   categories?: PollCategoryDto[] | null;
@@ -45,18 +46,17 @@ export interface CreatePostDto {
 }
 
 export interface ListPollDto {
-  /** @format int32 */
-  id?: number;
   title?: string | null;
   description?: string | null;
   allowCustomAnswer?: boolean;
   isShuffled?: boolean;
+  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
   /** @format double */
-  stepValue?: number;
+  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -80,15 +80,11 @@ export interface LoginDto {
 }
 
 export interface PollCandidateDto {
-  /** @format int32 */
-  id?: number;
   name?: string | null;
   description?: string | null;
 }
 
 export interface PollCandidateResultDto {
-  /** @format int32 */
-  id?: number;
   name?: string | null;
   description?: string | null;
   /** @format int32 */
@@ -98,10 +94,10 @@ export interface PollCandidateResultDto {
 }
 
 export interface PollCategoryDto {
-  /** @format int32 */
-  id?: number;
   name?: string | null;
   description?: string | null;
+  /** @format int32 */
+  color?: number;
 }
 
 export interface PollResultsDto {
@@ -111,14 +107,10 @@ export interface PollResultsDto {
 
 export interface UpsertVoteToCandidateDto {
   /** @format int32 */
-  candidateId?: number;
-  /** @format int32 */
   value?: number | null;
 }
 
 export interface UpsertVoteToPollDto {
-  /** @format int32 */
-  pollId?: number;
   candidates?: UpsertVoteToCandidateDto[] | null;
 }
 

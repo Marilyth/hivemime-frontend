@@ -5,8 +5,8 @@ import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../dialog";
 import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { HiveMimeTagItem } from "../../hm-tag-item";
-import { Button } from "../../../button";
 import { getReferenceId } from "@/lib/utils";
+import { HiveMimeCategoryTagBox } from "./hm-pick-categorization-category-panel";
 
 export interface HiveMimePickCategorizationPollCandidateDialogProps {
   categories: CombinedPollCategory[];
@@ -27,20 +27,16 @@ export const HiveMimePickCategorizationPollCandidateDialog = observer(({ categor
 
         <div className="flex flex-wrap gap-2">
           {categories?.map((category) => (
-            <HiveMimeTagItem key={getReferenceId(category)}
-              onClick={() => {candidate!.vote.value = category.value; onClose();}}
-              className={`cursor-pointer ${category.value == null ? "" : "bg-honey-brown/20 border-honey-brown/30 text-honey-brown hover:bg-honey-brown/30"}`}>
-              <div className="text-muted-foreground">
-                {category.category?.name}
-              </div>
-            </HiveMimeTagItem>
+            <HiveMimeCategoryTagBox key={getReferenceId(category)}
+              category={category}
+              onClick={() => { candidate!.vote.value = category.value; onClose(); }}
+            />
           ))}
         </div>
       </DialogContent>
     </Dialog>
   );
 });
-
 
 export interface HiveMimePickCategorizationPollCategoryDialogProps {
   candidates: CombinedPollCandidate[];
