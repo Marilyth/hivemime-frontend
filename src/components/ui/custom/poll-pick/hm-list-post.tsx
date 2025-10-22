@@ -5,7 +5,7 @@ import { MessageSquare, Send, User, AlertCircleIcon, CircleCheck, CircleX, Arrow
 import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { UpsertVoteToPostDto, ListPostDto, Api } from "@/lib/Api";
+import { UpsertVoteToPostDto, ListPostDto, Api, PostResultsDto } from "@/lib/Api";
 import { useContext, useEffect, useState } from "react";
 import { observable } from "mobx";
 import { HiveMimeApiContext } from "@/app/layout";
@@ -15,12 +15,15 @@ import { toast } from "sonner";
 import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { HiveMimeBulletItem } from "../hm-bullet-item";
+import { HiveMimeListPollResult } from "./hm-list-poll-result";
 
 export interface HiveMimePostProps {
   post: ListPostDto;
 }
 
 export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
+  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [results, setResults] = useState<PostResultsDto | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
   const [postVote, setPostVote] = useState<UpsertVoteToPostDto>(() => (observable({
     postId: post.id!,
@@ -30,6 +33,12 @@ export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
       })),
     })),
   })));
+
+  async function fetchResults()
+  {
+    const response = await hiveMimeService.api.postDetail(post.id!);
+    setResults(response.data);
+  }
 
   return (
     <Card className="py-4">
@@ -58,14 +67,17 @@ export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
           </EmbeddedTabsList>
           {post.polls!.map((poll, index) => (
             <EmbeddedTabsContent key={getReferenceId(poll)} value={`${index}`}>
-              <HiveMimeListPoll poll={poll} pollVote={postVote.polls![index]} footer={
-                <Button className="w-full flex-1 text-honey-brown" variant="outline" onClick={() => setSelectedQuestion(`${index + 1}`)}
-                        disabled={validatePickPoll(poll, postVote.polls![index]).length > 0}
-                >
-                  Next
+              {results == null ?
+                <HiveMimeListPoll poll={poll} pollVote={postVote.polls![index]} footer={
+                  <Button className="w-full flex-1 text-honey-brown" variant="outline" onClick={() => setSelectedQuestion(`${index + 1}`)}
+                          disabled={validatePickPoll(poll, postVote.polls![index]).length > 0}
+                  >
+                    Next
                   <ArrowRight />
                 </Button>
-              } />
+                } />
+              :
+              <HiveMimeListPollResult poll={poll} pollResult={results!.polls![index]} /> }
             </EmbeddedTabsContent>
           ))}
           <EmbeddedTabsContent key={"overview"} value={`${post.polls!.length}`}>
@@ -79,7 +91,7 @@ export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
             <User  />
             128
           </Badge>
-          <Badge variant={"outline"}>
+          <Badge variant={"outline"} onClick={fetchResults}>
             <MessageSquare height={241} />
             64
           </Badge>
@@ -119,7 +131,7 @@ export const HiveMimeVoteOverview = observer(({ post, vote }: HiveMimeVoteOvervi
 
   async function submitVote()
   {
-    await hiveMimeService.api.pollVoteCreate(post.id!.toString(), vote);
+    await hiveMimeService.api.postVoteCreate(post.id!.toString(), vote);
     toast.success("Your vote has been submitted.");
   }
 

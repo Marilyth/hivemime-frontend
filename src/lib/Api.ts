@@ -105,6 +105,10 @@ export interface PollResultsDto {
   candidates?: PollCandidateResultDto[] | null;
 }
 
+export interface PostResultsDto {
+  polls?: PollResultsDto[] | null;
+}
+
 export interface UpsertVoteToCandidateDto {
   /** @format int32 */
   value?: number | null;
@@ -403,45 +407,6 @@ export class Api<
     /**
      * No description
      *
-     * @tags PollDetail
-     * @name PollDetail
-     * @request GET:/api/poll/{pollId}
-     * @secure
-     */
-    pollDetail: (pollId: number, params: RequestParams = {}) =>
-      this.request<PollResultsDto, any>({
-        path: `/api/poll/${pollId}`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags PollDetail
-     * @name PollVoteCreate
-     * @request POST:/api/poll/{pollId}/vote
-     * @secure
-     */
-    pollVoteCreate: (
-      pollId: string,
-      data: UpsertVoteToPostDto,
-      params: RequestParams = {},
-    ) =>
-      this.request<void, any>({
-        path: `/api/poll/${pollId}/vote`,
-        method: "POST",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
      * @tags Post
      * @name PostBrowseList
      * @request GET:/api/post/browse
@@ -487,6 +452,45 @@ export class Api<
         path: `/api/User`,
         method: "GET",
         secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Vote
+     * @name PostDetail
+     * @request GET:/api/post/{postId}
+     * @secure
+     */
+    postDetail: (postId: number, params: RequestParams = {}) =>
+      this.request<PostResultsDto, any>({
+        path: `/api/post/${postId}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Vote
+     * @name PostVoteCreate
+     * @request POST:/api/post/{postId}/vote
+     * @secure
+     */
+    postVoteCreate: (
+      postId: string,
+      data: UpsertVoteToPostDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/post/${postId}/vote`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
   };

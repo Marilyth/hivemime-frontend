@@ -17,7 +17,8 @@ export type HiveMimeListPollProps =   {
 }
 
 export const HiveMimeListPoll = observer(({ poll, pollVote, footer }: HiveMimeListPollProps) => {
-  const pollMapping: { [key in PollType]: ReactNode } = {
+  const pollMapping: { [key in PollType]: ReactNode } =
+  {
     [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
     [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
     [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
