@@ -5,6 +5,8 @@ import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
 import { HiveMimePickSingleChoicePollResults } from "./single-choice/hm-pick-single-choice-poll-results";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "../../item";
+import { User } from "lucide-react";
 
 export type HiveMimeListPollResultProps =   {
   poll: ListPollDto;
@@ -30,7 +32,21 @@ export const HiveMimeListPollResult = observer(({ poll, pollResult }: HiveMimeLi
         </div>
         <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-gray-500 w-6 h-6 self-start" />
       </div>
-
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Item variant="outline" size="sm">
+          <ItemContent>
+            <ItemTitle>Voters</ItemTitle>
+            <ItemDescription>
+              100 votes were submitted</ItemDescription>
+          </ItemContent>
+        </Item>
+        <Item variant="outline" size="sm">
+          <ItemContent>
+            <ItemTitle>Country</ItemTitle>
+            <ItemDescription>Most voters came from Germany</ItemDescription>
+          </ItemContent>
+        </Item>
+      </div>
       {pollMapping[poll.pollType!]}
     </div>
   );

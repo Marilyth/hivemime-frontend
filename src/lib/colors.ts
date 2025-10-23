@@ -1,3 +1,14 @@
+import tailwindColors from 'tailwindcss/colors';
+
+export { tailwindColors };
+
+export function getComputedColor(colorName: string): string {
+  const root = getComputedStyle(document.documentElement);
+  const rgb = root.getPropertyValue(`--color-${colorName}`).trim();
+  
+  return rgb;
+}
+
 export const mutedColors = {
   cream: '#FBFAE6',
   offWhite: '#F9F5EC',

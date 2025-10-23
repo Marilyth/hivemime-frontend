@@ -11,17 +11,16 @@ export interface CombinedPollCategory {
 }
 
 export enum ChartType {
-  Bar,
-  Column,
-  Pie,
-  Doughnut,
-  HalfDoughnut,
-  Nightingale,
-  Line,
-  SmoothLine,
-  Area,
-  Scatter,
-  Geographics
+  Bar = "Bar",
+  Column = "Column",
+  Pie = "Pie",
+  Doughnut = "Doughnut",
+  HalfDoughnut = "HalfDoughnut",
+  Line = "Line",
+  SmoothLine = "SmoothLine",
+  Area = "Area",
+  Scatter = "Scatter",
+  Geographics = "Geographics"
 }
 
 export interface ChartDataPoints {
