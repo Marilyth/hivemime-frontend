@@ -167,7 +167,7 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
       ...props.options
     };
   }
-  
+
   function getSmoothLineOption() : EChartsOption {
     const lineOption = getLineOption();
     const lineSeries = lineOption.series as LineSeriesOption;
@@ -176,7 +176,7 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
 
     return lineOption;
   }
-  
+
   function getAreaOption() : EChartsOption {
     const lineOption = getLineOption();
     const lineSeries = lineOption.series as LineSeriesOption;
@@ -282,6 +282,11 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
     const dataPoints = data.dataPoints.map(dp => ({name: dp.label, value: dp.value}));
 
     return {
+      visualMap: {
+        show: false,
+        calculable: true
+      },
+
       tooltip: {
         trigger: 'item'
       },
@@ -377,14 +382,15 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
         option = {};
     }
 
-    (option.series as SeriesOption).universalTransition = true;
+    (option.series as SeriesOption).universalTransition = false;
+    (option.series as SeriesOption).animation = true;
 
     return option;
   }
 
   return (
     <div>
-      <ReactECharts style={{minHeight: getChartHeight(), minWidth: getChartWidth()}} option={getOption()} notMerge {...props} />
+      <ReactECharts style={{minHeight: getChartHeight(), minWidth: getChartWidth()}} notMerge option={getOption()} {...props} />
 
       {canChangeType && (
         <Select

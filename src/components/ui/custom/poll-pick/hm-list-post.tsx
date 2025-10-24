@@ -1,11 +1,11 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Send, User, AlertCircleIcon, CircleCheck, CircleX, ArrowRight } from "lucide-react"
+import { MessageSquare, Send, User, AlertCircleIcon, CircleCheck, CircleX, ArrowRight, ChartBar } from "lucide-react"
 import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { UpsertVoteToPostDto, ListPostDto, Api, PostResultsDto } from "@/lib/Api";
+import { UpsertVoteToPostDto, ListPostDto, Api, PostResultsDto, ListPollDto, PollType } from "@/lib/Api";
 import { useContext, useEffect, useState } from "react";
 import { observable } from "mobx";
 import { HiveMimeApiContext } from "@/app/layout";
@@ -16,12 +16,29 @@ import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { HiveMimeBulletItem } from "../hm-bullet-item";
 import { HiveMimeListPollResult } from "./hm-list-poll-result";
+import { ChartType } from "@/lib/view-models";
 
 export interface HiveMimePostProps {
   post: ListPostDto;
+  showResults?: boolean;
 }
 
-export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
+export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) => {
+  const [resultsVisible, setResultsVisible] = useState<boolean>(showResults || false);
+
+  if (resultsVisible) {
+    return <HiveMimeListPostResult post={post} />;
+  } else {
+    return <HiveMimeListPost post={post} onResultsRequested={() => {setResultsVisible(true)}} />;
+  }
+});
+
+export interface HiveMimeListPostProps {
+  post: ListPostDto;
+  onResultsRequested?: () => void;
+}
+
+const HiveMimeListPost = observer(({ post, onResultsRequested }: HiveMimeListPostProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [results, setResults] = useState<PostResultsDto | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
@@ -33,12 +50,6 @@ export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
       })),
     })),
   })));
-
-  async function fetchResults()
-  {
-    const response = await hiveMimeService.api.postDetail(post.id!);
-    setResults(response.data);
-  }
 
   return (
     <Card className="py-4">
@@ -86,6 +97,87 @@ export const HiveMimeListPost = observer(({ post }: HiveMimePostProps) => {
         </EmbeddedTabs>
       </CardContent>
       <CardFooter>
+        <div className="flex flex-row gap-4 w-full">
+          <Badge variant={"outline"} className="h-6 self-end">
+            <User  />
+            128
+          </Badge>
+          <Badge variant={"outline"} className="h-6 self-end">
+            <MessageSquare />
+            64
+          </Badge>
+          <Button variant="ghost" className="text-honey-brown ml-auto" onClick={onResultsRequested}>
+            <ChartBar className="w-4 h-4 mr-2" />
+            View Results
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+});
+
+
+const HiveMimeListPostResult = observer(({ post }: HiveMimePostProps) => {
+  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [results, setResults] = useState<PostResultsDto | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
+  const [countryPoll, setCountryPoll] = useState<ListPollDto>({ title: "Where are you from?", description: "This geographical data was automatically collected.", pollType: PollType.SingleChoice, candidates: [] });
+  const [calendarPoll, setCalendarPoll] = useState<ListPollDto>({ title: "When did you vote?", description: "This temporal data was automatically collected.", pollType: PollType.SingleChoice, candidates: [] });
+
+  async function fetchResults()
+  {
+    const response = await hiveMimeService.api.postDetail(post.id!);
+    setResults(response.data);
+  }
+
+  useEffect(() => {
+    fetchResults();
+  }, []);
+
+  return (
+    <Card className="py-4">
+      <CardHeader>
+        <CardTitle>
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-row gap-2">
+              <span className="text-gray-500 text-sm">
+                User had {post.polls?.length} poll{post.polls?.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <span className="font-bold text-honey-brown">{post.title}</span>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <span className="text-muted-foreground">
+          {post.description}
+        </span>
+        <EmbeddedTabs value={selectedQuestion} onValueChange={(value) => setSelectedQuestion(value)}>
+          <EmbeddedTabsList className="mt-4">
+            {post.polls!.map((subPost, index) => (
+              <EmbeddedTabsTrigger key={getReferenceId(subPost)} value={`${index}`}>{index + 1}</EmbeddedTabsTrigger>
+            ))}
+            <EmbeddedTabsTrigger key="country" value="country">Country</EmbeddedTabsTrigger>
+            <EmbeddedTabsTrigger key="calendar" value="calendar">Calendar</EmbeddedTabsTrigger>
+          </EmbeddedTabsList>
+          {results && (
+            <>
+              {post.polls!.map((poll, index) => (
+                <EmbeddedTabsContent key={getReferenceId(poll)} value={`${index}`}>
+                  <HiveMimeListPollResult poll={poll} pollResult={results!.polls![index]} />
+                </EmbeddedTabsContent>
+              ))}
+              <EmbeddedTabsContent key="country" value="country">
+                <HiveMimeListPollResult poll={countryPoll} pollResult={results!.country!} chartType={ChartType.World} />
+              </EmbeddedTabsContent>
+              <EmbeddedTabsContent key="calendar" value="calendar">
+                <HiveMimeListPollResult poll={calendarPoll} pollResult={results!.date!} chartType={ChartType.Calendar} />
+              </EmbeddedTabsContent>
+            </>
+          )}
+        </EmbeddedTabs>
+      </CardContent>
+      <CardFooter>
         <div className="flex flex-row gap-4">
           <Badge variant={"outline"}>
             <User  />
@@ -119,7 +211,7 @@ export const HiveMimeVoteOverview = observer(({ post, vote }: HiveMimeVoteOvervi
       const poll = post.polls![i];
       const pollVote = vote.polls![i];
       const errors = validatePickPoll(poll, pollVote);
-      
+
       pollErrors.push(errors);
 
       if (errors.length > 0)

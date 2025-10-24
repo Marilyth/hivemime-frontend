@@ -5,23 +5,25 @@ import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
 import { HiveMimePickSingleChoicePollResults } from "./single-choice/hm-pick-single-choice-poll-results";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "../../item";
-import { User } from "lucide-react";
+import { Item, ItemContent, ItemDescription, ItemTitle } from "../../item";
+import { makeAutoObservable } from "mobx";
+import { ChartType } from "@/lib/view-models";
+import { HiveMimeChart } from "../hm-chart";
 
 export type HiveMimeListPollResultProps =   {
   poll: ListPollDto;
   pollResult: PollResultsDto;
+  chartType?: ChartType;
 }
 
-export const HiveMimeListPollResult = observer(({ poll, pollResult }: HiveMimeListPollResultProps) => {
-  const pollMapping: { [key in PollType]: ReactNode } =
-  {
-    [PollType.SingleChoice]: <HiveMimePickSingleChoicePollResults result={pollResult} />,
-    [PollType.MultipleChoice]: <div>ToDo</div>,
-    [PollType.Scoring]: <div>ToDo</div>,
-    [PollType.Ranking]: <div>ToDo</div>,
-    [PollType.Categorization]: <div>ToDo</div>,
-  };
+export const HiveMimeListPollResult = observer(({ poll, pollResult, chartType }: HiveMimeListPollResultProps) => {
+  const chartData = makeAutoObservable({
+    chartType: chartType || ChartType.Doughnut,
+    dataPoints: pollResult.candidates!.map(candidateResult => ({
+      label: candidateResult.name!,
+      value: candidateResult.score!
+    }))
+  });
 
   return (
     <div className="flex flex-col gap-2">
@@ -47,7 +49,8 @@ export const HiveMimeListPollResult = observer(({ poll, pollResult }: HiveMimeLi
           </ItemContent>
         </Item>
       </div>
-      {pollMapping[poll.pollType!]}
+
+      <HiveMimeChart data={chartData} />
     </div>
   );
 });

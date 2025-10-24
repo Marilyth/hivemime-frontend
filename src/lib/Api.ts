@@ -107,6 +107,8 @@ export interface PollResultsDto {
 
 export interface PostResultsDto {
   polls?: PollResultsDto[] | null;
+  country?: PollResultsDto;
+  date?: PollResultsDto;
 }
 
 export interface UpsertVoteToCandidateDto {
