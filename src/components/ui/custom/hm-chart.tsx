@@ -6,6 +6,7 @@ import { mutedColors, getComputedColor } from '@/lib/colors';
 import { EChartsOption, LineSeriesOption, PieSeriesOption, SeriesOption, registerMap, getMap } from 'echarts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import worldJson from "@/lib/world-geo.json";
+import { ScrollArea, ScrollBar } from '../scroll-area';
 
 
 interface ChartProps extends React.HTMLAttributes<ReactECharts>{
@@ -30,6 +31,8 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
 
   function getChartWidth() : string {
     switch (data.chartType) {
+      case ChartType.Column:
+        return `${data.dataPoints.length * 5}rem`;
       default:
         return "100%";
     }
@@ -57,6 +60,7 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
       yAxis: {
           type: 'category',
           data: dataLabels,
+          inverse: true,
           axisLabel: {
             color: getComputedColor("muted-foreground"),
             rotate: 45,
@@ -351,6 +355,9 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
       case ChartType.Bar:
         option = getBarOption();
         break;
+      case ChartType.Column:
+        option = getColumnOption();
+        break;
       case ChartType.Pie:
         option = getPieOption();
         break;
@@ -382,6 +389,14 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
         option = {};
     }
 
+    option.grid = {
+      left: '0rem',
+      right: '12em',
+      top: '12rem',
+      bottom: '0rem',
+      containLabel: true,
+    };
+
     (option.series as SeriesOption).universalTransition = false;
     (option.series as SeriesOption).animation = true;
 
@@ -390,8 +405,10 @@ export const HiveMimeChart: React.FC<ChartProps> = observer(({ data, canChangeTy
 
   return (
     <div>
-      <ReactECharts style={{minHeight: getChartHeight(), minWidth: getChartWidth()}} notMerge option={getOption()} {...props} />
-
+      <ScrollArea className='flex max-h-120 max-w-full flex-col py-4' type='always'>
+        <ReactECharts style={{minHeight: getChartHeight(), minWidth: getChartWidth()}} notMerge option={getOption()} {...props} />
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       {canChangeType && (
         <Select
           value={data.chartType.toString()}

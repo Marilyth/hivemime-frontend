@@ -12,6 +12,7 @@ export interface CombinedPollCategory {
 
 export enum ChartType {
   Bar = "Bar",
+  Column = "Column",
   Pie = "Pie",
   Doughnut = "Doughnut",
   HalfDoughnut = "HalfDoughnut",
