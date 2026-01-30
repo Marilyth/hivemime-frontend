@@ -28,7 +28,7 @@ export interface HiveMimeCreateCategoriesProps {
 
 export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCategoriesProps) => {
   const [selectedCategory, setSelectedCategory] =  useState<PollCategoryDto | null>(null);
-  
+
   function moveCategory(oldIndex: number, newIndex: number) {
     if (newIndex < 0 || newIndex >= poll.categories!.length) {
       return; // Out of bounds
@@ -60,8 +60,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
           />
         </DialogContent>
       </Dialog>
-      
-      <Label>Categories</Label>
+
       <div className="flex flex-col gap-0.5">
         <AnimatePresence>
           {poll.categories!.map((category, index) => (

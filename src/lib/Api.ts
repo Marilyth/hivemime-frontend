@@ -11,41 +11,13 @@
  */
 
 export enum PollType {
-  SingleChoice = "SingleChoice",
-  MultipleChoice = "MultipleChoice",
-  Scoring = "Scoring",
-  Ranking = "Ranking",
-  Categorization = "Categorization",
+  Choice = "Choice",
+  Score = "Score",
+  Rank = "Rank",
+  Category = "Category",
 }
 
 export interface CreatePollDto {
-  title?: string | null;
-  description?: string | null;
-  allowCustomAnswer?: boolean;
-  isShuffled?: boolean;
-  isOptional?: boolean;
-  /** @format int32 */
-  minValue?: number | null;
-  /** @format int32 */
-  maxValue?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  /** @format int32 */
-  minVotes?: number | null;
-  /** @format int32 */
-  maxVotes?: number | null;
-  pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
-}
-
-export interface CreatePostDto {
-  title?: string | null;
-  description?: string | null;
-  polls?: CreatePollDto[] | null;
-}
-
-export interface ListPollDto {
   title?: string | null;
   description?: string | null;
   allowCustomAnswer?: boolean;
@@ -64,6 +36,33 @@ export interface ListPollDto {
   pollType?: PollType;
   candidates?: PollCandidateDto[] | null;
   categories?: PollCategoryDto[] | null;
+}
+
+export interface CreatePostDto {
+  title?: string | null;
+  description?: string | null;
+  polls?: CreatePollDto[] | null;
+}
+
+export interface ListPollDto {
+  title?: string | null;
+  description?: string | null;
+  allowCustomAnswer?: boolean;
+  isShuffled?: boolean;
+  isOptional?: boolean;
+  /** @format double */
+  stepValue?: number | null;
+  pollType?: PollType;
+  candidates?: PollCandidateDto[] | null;
+  categories?: PollCategoryDto[] | null;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
 }
 
 export interface ListPostDto {

@@ -121,8 +121,8 @@ const HiveMimeListPostResult = observer(({ post }: HiveMimePostProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [results, setResults] = useState<PostResultsDto | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
-  const [countryPoll, setCountryPoll] = useState<ListPollDto>({ title: "Where are you from?", description: "This geographical data was automatically collected.", pollType: PollType.SingleChoice, candidates: [] });
-  const [calendarPoll, setCalendarPoll] = useState<ListPollDto>({ title: "When did you vote?", description: "This temporal data was automatically collected.", pollType: PollType.SingleChoice, candidates: [] });
+  const [countryPoll, setCountryPoll] = useState<ListPollDto>({ title: "Where are you from?", description: "This geographical data was automatically collected.", pollType: PollType.Choice, candidates: [] });
+  const [calendarPoll, setCalendarPoll] = useState<ListPollDto>({ title: "When did you vote?", description: "This temporal data was automatically collected.", pollType: PollType.Choice, candidates: [] });
 
   async function fetchResults()
   {

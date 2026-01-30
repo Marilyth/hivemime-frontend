@@ -18,32 +18,38 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     switch (poll.pollType) {
-        case PollType.SingleChoice:
-            errors.push(...validateCreateSingleChoicePoll(poll));
+        case PollType.Choice:
+            errors.push(...validateChoicePoll(poll));
             break;
-        case PollType.MultipleChoice:
-            errors.push(...validateCreateMultipleChoicePoll(poll));
-            break;
-        case PollType.Scoring:
+        case PollType.Score:
             errors.push(...validateScoringPoll(poll));
             break;
-        case PollType.Ranking:
-            errors.push(...validateCreateRankingPoll(poll));
+        case PollType.Rank:
+            errors.push(...validateRankingPoll(poll));
             break;
-        case PollType.Categorization:
-            errors.push(...validateCreateCategorizationPoll(poll));
+        case PollType.Category:
+            errors.push(...validateCategorizationPoll(poll));
             break;
         default:
             errors.push("No poll type was selected.");
     }
 
+    if (!poll.candidates || poll.candidates.length < 1)
+        errors.push("A poll must have at least one candidate.");
+
     if (poll.title == undefined || poll.title == null || poll.title!.trim() === "")
         errors.push("A poll must have a title.");
+
+    if (poll.minVotes! < 1)
+        errors.push("A poll must allow at least 1 vote.");
+
+    if (poll.maxVotes! < poll.minVotes! && poll.maxVotes! != -1)
+        errors.push("Max votes must be greater than min votes.");
 
     return errors;
 }
 
-export function validateCreateSingleChoicePoll(poll: CreatePollDto): string[] {
+function validateChoicePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (!poll.candidates || poll.candidates.length < 2) {
@@ -53,36 +59,24 @@ export function validateCreateSingleChoicePoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-export function validateCreateMultipleChoicePoll(poll: CreatePollDto): string[] {
-    return validateCreateSingleChoicePoll(poll);
-}
-
-export function validateScoringPoll(poll: CreatePollDto): string[] {
+function validateScoringPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
-    if (!poll.candidates || poll.candidates.length < 1) {
-        errors.push("A scoring poll must have at least one candidate.");
+    if (poll.stepValue == undefined || poll.stepValue <= 0) {
+        errors.push("A scoring poll must have a step value higher than 0.");
     }
 
     return errors;
 }
 
-export function validateCreateRankingPoll(poll: CreatePollDto): string[] {
+function validateRankingPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
-
-    if (!poll.candidates || poll.candidates.length < 2) {
-        errors.push("A ranking poll must have at least two candidates.");
-    }
 
     return errors;
 }
 
-export function validateCreateCategorizationPoll(poll: CreatePollDto): string[] {
+function validateCategorizationPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
-
-    if (!poll.candidates || poll.candidates.length < 1) {
-      errors.push("A categorization poll must have at least one candidate.");
-    }
 
     if (!poll.categories || poll.categories.length < 2) {
        errors.push("A categorization poll must have at least two categories.");

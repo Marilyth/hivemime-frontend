@@ -1,7 +1,6 @@
 "use client";
 
 import { ListPollDto, PollType, UpsertVoteToPollDto } from "@/lib/Api";
-import { HiveMimePickSingleChoicePoll } from "./single-choice/hm-pick-single-choice-poll";
 import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -19,11 +18,10 @@ export type HiveMimeListPollProps =   {
 export const HiveMimeListPoll = observer(({ poll, pollVote, footer }: HiveMimeListPollProps) => {
   const pollMapping: { [key in PollType]: ReactNode } =
   {
-    [PollType.SingleChoice]: <HiveMimePickSingleChoicePoll poll={poll} pollVotes={pollVote} />,
-    [PollType.MultipleChoice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
-    [PollType.Scoring]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
-    [PollType.Ranking]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
-    [PollType.Categorization]: <HiveMimePickCategorizationPoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Choice]: <HiveMimePickMultipleChoicePoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Score]: <HiveMimePickScoringPoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Rank]: <HiveMimePickRankingPoll poll={poll} pollVotes={pollVote} />,
+    [PollType.Category]: <HiveMimePickCategorizationPoll poll={poll} pollVotes={pollVote} />,
   };
 
   return (

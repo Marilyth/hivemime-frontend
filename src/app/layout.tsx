@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const api = new Api({
-    baseUrl: "https://api.mayiscoding.com",
+    baseUrl: "http://localhost:5138",
     securityWorker: (securityData) =>
       securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
   });

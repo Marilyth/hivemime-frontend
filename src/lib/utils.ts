@@ -13,3 +13,7 @@ export function getReferenceId(obj: WeakKey) {
 
   return ids.get(obj);
 }
+
+export function deepCopy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}

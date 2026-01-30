@@ -3,48 +3,71 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { Api, CreatePostDto } from "@/lib/Api";
+import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../labelled-input";
 import { Button } from "../../button";
 import { useContext, useRef, useState } from "react";
 import { HiveMimeApiContext } from "@/app/layout";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
-import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
-import { Separator } from "../../separator";
 import { observable } from "mobx";
 import { toast } from "sonner";
 import { validatePostTitle as validatePost } from "@/lib/validate-create";
-import { getReferenceId } from "@/lib/utils";
-import { Select, SelectContent, SelectItem, SelectValue } from "../../select";
-import { HiveMimeInlineSelectTrigger } from "../hm-inline-select";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { HiveMimeHoverCard } from "../hm-hover-card";
+import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
+import { deepCopy, getReferenceId } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { HiveMimeDraggable } from "../hm-draggable";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [hasTitle, setHasTitle] = useState<boolean>(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<string>("1");
+  const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
+  const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
   const post = postRef.current;
 
-  if (post.polls!.length === 0) {
+  if (post.polls!.length === 0 && selectedPoll == null) {
     addPoll();
   }
 
+  function editPoll(index: number) {
+    setSelectedPollIndex(index);
+    setSelectedPoll(observable(deepCopy(post.polls![index])));
+  }
+
+  function finishPoll() {
+    // Clean-up unused values depending on poll type.
+    if (selectedPoll!.pollType != PollType.Category)
+      selectedPoll!.categories = [];
+
+    if (selectedPollIndex == -1)
+      post.polls!.push(selectedPoll!);
+    else
+      post.polls![selectedPollIndex] = selectedPoll!;
+
+    cancelPoll();
+  }
+
   function addPoll() {
-    post.polls?.push({ title: "", description: "", candidates: [], categories: [],
-                       minValue: 0, maxValue: undefined, minVotes: 1, maxVotes: undefined, stepValue: 1,
-                       pollType: undefined });
-    setSelectedQuestion(`${post.polls!.length}`);
+    setSelectedPollIndex(-1);
+    setSelectedPoll(observable({ title: "", description: "", candidates: [], categories: [],
+                       minValue: 0, maxValue: 100, minVotes: 1, maxVotes: -1, stepValue: 1,
+                       pollType: undefined }));
+  }
+
+  function cancelPoll() {
+    setSelectedPollIndex(-1);
+    setSelectedPoll(null);
   }
 
   function removePoll(index: number) {
     post.polls?.splice(index, 1);
 
-    // If the removed poll was the last one, select the previous one.
-    // (The value is 1-based, the index is 0-based)
-    if (index >= post.polls!.length)
-      setSelectedQuestion(`${index}`);
+    if (index >= selectedPollIndex)
+      setSelectedPollIndex(-1);
   }
 
   function canSubmitPost() {
@@ -69,61 +92,106 @@ export const HiveMimeCreatePost = observer(() => {
 
   return (
     <Card className="py-4 text-foreground">
-      <CardHeader>
-        <h2 className="text-2xl font-bold">Create new post</h2>
-      </CardHeader>
+  <CardHeader>
+    <h2 className="text-2xl font-bold">Create new post</h2>
+  </CardHeader>
 
-      <CardContent>
+  <CardContent>
+    {selectedPoll == null ? (
+      <div className="flex flex-col gap-4">
+
+        {/* Optional Post Title */}
         <div className="flex flex-col gap-2">
-          <div>
-              This post
-              <Select
-                value={hasTitle ? "true" : "false"}
-                onValueChange={(value) => setHasTitle(value === "true")}>
-                <HiveMimeInlineSelectTrigger>
-                    <SelectValue />
-                </HiveMimeInlineSelectTrigger>
-                <SelectContent>
-                    <SelectItem value="true">does</SelectItem>
-                    <SelectItem value="false">does not</SelectItem>
-                </SelectContent>
-              </Select>
-              have a title.
-          </div>
-          {hasTitle &&
+          {hasTitle ? (
             <>
-              <InputWithLabel label="Title" placeholder="Optionally, give your post a title." value={post.title!}
-                onChange={(e) => post.title = e.target.value} />
-              <TextAreaWithLabel label="Description" placeholder="Optionally, add a description." value={post.description!}
-                onChange={(e) => post.description = e.target.value} />
-
-              <Separator className="mt-8" orientation="horizontal" />
-            </>
-          }
-          <Label>Polls</Label>
-          <EmbeddedTabs value={selectedQuestion} onValueChange={setSelectedQuestion}>
-            <EmbeddedTabsList actionComponent={
-              <Button variant="outline" className="rounded-b-none border-b-0" onClick={addPoll}>
-                <Plus />Add
+              <InputWithLabel
+                label="Post Title"
+                placeholder="Give your post a title."
+                value={post.title!}
+                onChange={(e) => (post.title = e.target.value)}
+              />
+              <TextAreaWithLabel
+                label="Description"
+                placeholder="Add a description."
+                value={post.description!}
+                onChange={(e) => (post.description = e.target.value)}
+              />
+              <Label className="text-muted-foreground text-sm">
+                * This is <Label className="text-honey-brown">optional</Label>. Leave empty if polls are descriptive enough.
+              </Label>
+              <Button
+                variant="link"
+                className="self-start ml-auto"
+                onClick={() => setHasTitle(false)}
+              >
+                Remove title
               </Button>
-            }>
-              {post.polls!.map((subPoll, index) => (
-                <EmbeddedTabsTrigger
-                  key={getReferenceId(subPoll)} value={`${index + 1}`}>{index + 1}</EmbeddedTabsTrigger>
-              ))}
-            </EmbeddedTabsList>
-            {post.polls!.map((poll, index) => (
-              <EmbeddedTabsContent key={index} value={`${index + 1}`}>
-                <HiveMimeCreatePoll poll={poll} canDelete={post.polls!.length > 1} onDeleteRequested={() => removePoll(index)} />
-              </EmbeddedTabsContent>
-            ))}
-          </EmbeddedTabs>
+            </>
+          ) : (
+            <Button
+              variant="link"
+              className="self-start ml-auto"
+              onClick={() => setHasTitle(true)}
+            >
+              Add an optional post title
+            </Button>
+          )}
         </div>
-      </CardContent>
 
-      <CardFooter>
-        <Button onClick={submitPost}>Submit</Button>
-      </CardFooter>
-    </Card>
+        {/* Polls */}
+        <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
+          <Label className="font-bold">Polls</Label>
+          <AnimatePresence>
+            {post.polls!.map((poll, index) => (
+              <motion.div layout key={getReferenceId(poll)}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}>
+                <HiveMimeDraggable isDraggable isDroppable isSticky data={poll} dataList={post.polls!} allowedEdges={['top', 'bottom']} className="flex flex-row gap-1">
+                  <HiveMimeHoverCard className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <HiveMimePollTypeIcon answerType={poll.pollType} className="text-honey-brown w-8" />
+                      <Label className="flex-1 break-words break-all">{poll.title}</Label>
+                    </div>
+                  </HiveMimeHoverCard>
+                  <Button variant="ghost" onClick={() => editPoll(index)}>
+                    <Edit />
+                  </Button>
+                  <Button variant="ghost"
+                    className="text-muted-foreground hover:text-red-400"
+                    onClick={() => removePoll(index)}>
+                      <Trash2 />
+                  </Button>
+                </HiveMimeDraggable>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          <Button variant="outline" onClick={addPoll} className="mt-2">
+            <Plus /> Add poll
+          </Button>
+          <Label className="text-muted-foreground text-sm mt-1">
+            * Multiple polls help <Label className="text-honey-brown">visualize correlations</Label> between them.
+          </Label>
+        </div>
+
+        <Button className="self-start ml-auto" onClick={submitPost}>
+          Submit
+        </Button>
+      </div>
+    ) : (
+      <HiveMimeCreatePoll
+        poll={selectedPoll!}
+        canCancel={post.polls!.length >= 1}
+        onCancelled={() => cancelPoll()}
+        onFinished={() => finishPoll()}
+      />
+    )}
+  </CardContent>
+</Card>
+
   );
 });
+
+//

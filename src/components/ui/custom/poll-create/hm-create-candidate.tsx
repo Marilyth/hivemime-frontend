@@ -42,7 +42,6 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Candidates</Label>
       <div className="flex flex-col gap-0.5">
         <AnimatePresence>
           {poll.candidates!.map((option, index) => (
@@ -80,7 +79,6 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 export const HiveMimeCreateCandidate = observer(({ index, option, onIndexChange }: HiveMimeCreateCandidateProps) => {
   return (
     <HiveMimeHoverCard className="flex flex-row gap-2">
-      <HiveMimeIndexHandle index={index} onIndexChange={(newIndex) => onIndexChange?.(newIndex)} />
       <HiveMimeEmbeddedInput className="h-auto" value={option.name!} onChange={(e) => option.name = e.target.value} />
     </HiveMimeHoverCard>
   );
