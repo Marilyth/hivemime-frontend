@@ -20,7 +20,6 @@ export enum PollType {
 export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
-  allowCustomAnswer?: boolean;
   isShuffled?: boolean;
   isOptional?: boolean;
   /** @format int32 */
@@ -42,35 +41,6 @@ export interface CreatePostDto {
   title?: string | null;
   description?: string | null;
   polls?: CreatePollDto[] | null;
-}
-
-export interface ListPollDto {
-  title?: string | null;
-  description?: string | null;
-  allowCustomAnswer?: boolean;
-  isShuffled?: boolean;
-  isOptional?: boolean;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-}
-
-export interface ListPostDto {
-  /** @format int32 */
-  id?: number;
-  title?: string | null;
-  description?: string | null;
-  polls?: ListPollDto[] | null;
 }
 
 export interface LoginDto {
@@ -99,30 +69,72 @@ export interface PollCategoryDto {
   color?: number;
 }
 
-export interface PollResultsDto {
+export interface PollDto {
+  title?: string | null;
+  description?: string | null;
+  isShuffled?: boolean;
+  isOptional?: boolean;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
+  candidates?: PollCandidateDto[] | null;
+  categories?: PollCategoryDto[] | null;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+}
+
+export interface PollResultDto {
   candidates?: PollCandidateResultDto[] | null;
 }
 
-export interface PostResultsDto {
-  polls?: PollResultsDto[] | null;
-  country?: PollResultsDto;
-  date?: PollResultsDto;
+export interface PostDto {
+  /** @format int32 */
+  id?: number;
+  title?: string | null;
+  description?: string | null;
+  polls?: PollDto[] | null;
 }
 
-export interface UpsertVoteToCandidateDto {
+export interface PostResultDto {
+  polls?: PollResultDto[] | null;
+}
+
+export interface UserDetailsDto {
+  /** @format int32 */
+  id?: number;
+  username?: string | null;
+  /** @format date-time */
+  dateOfBirth?: string | null;
+  settings?: UserSettingsDto;
+}
+
+export interface UserSettingsDto {
+  /** @format int32 */
+  id?: number;
+  shareDateOfVote?: boolean;
+  shareCountryOfVote?: boolean;
+  shareAgeOfVote?: boolean;
+}
+
+export interface VoteOnCandidateDto {
   /** @format int32 */
   value?: number | null;
 }
 
-export interface UpsertVoteToPollDto {
-  candidates?: UpsertVoteToCandidateDto[] | null;
+export interface VoteOnPollDto {
+  candidates?: VoteOnCandidateDto[] | null;
 }
 
-export interface UpsertVoteToPostDto {
+export interface VoteOnPostDto {
   /** @format int32 */
   postId?: number;
-  polls?: UpsertVoteToPollDto[] | null;
+  polls?: VoteOnPollDto[] | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -396,10 +408,16 @@ export class Api<
      * @request GET:/api/Auth/login
      * @secure
      */
-    authLoginList: (params: RequestParams = {}) =>
+    authLoginList: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<LoginDto, any>({
         path: `/api/Auth/login`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -413,10 +431,18 @@ export class Api<
      * @request GET:/api/post/browse
      * @secure
      */
-    postBrowseList: (params: RequestParams = {}) =>
-      this.request<ListPostDto[], any>({
+    postBrowseList: (
+      query?: {
+        /** @format int32 */
+        afterId?: number;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostDto[], any>({
         path: `/api/post/browse`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -443,31 +469,23 @@ export class Api<
     /**
      * No description
      *
-     * @tags User
-     * @name UserList
-     * @request GET:/api/User
+     * @tags Post
+     * @name PostResultsList
+     * @request GET:/api/post/results
      * @secure
      */
-    userList: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/User`,
+    postResultsList: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostResultDto, any>({
+        path: `/api/post/results`,
         method: "GET",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Vote
-     * @name PostDetail
-     * @request GET:/api/post/{postId}
-     * @secure
-     */
-    postDetail: (postId: number, params: RequestParams = {}) =>
-      this.request<PostResultsDto, any>({
-        path: `/api/post/${postId}`,
-        method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -476,22 +494,58 @@ export class Api<
     /**
      * No description
      *
-     * @tags Vote
+     * @tags Post
      * @name PostVoteCreate
-     * @request POST:/api/post/{postId}/vote
+     * @request POST:/api/post/vote
      * @secure
      */
-    postVoteCreate: (
-      postId: string,
-      data: UpsertVoteToPostDto,
-      params: RequestParams = {},
-    ) =>
+    postVoteCreate: (data: VoteOnPostDto, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/api/post/${postId}/vote`,
+        path: `/api/post/vote`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserLoginList
+     * @request GET:/api/User/login
+     * @secure
+     */
+    userLoginList: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<LoginDto, any>({
+        path: `/api/User/login`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserList
+     * @request GET:/api/User
+     * @secure
+     */
+    userList: (params: RequestParams = {}) =>
+      this.request<UserDetailsDto, any>({
+        path: `/api/User`,
+        method: "GET",
+        secure: true,
+        format: "json",
         ...params,
       }),
   };

@@ -1,4 +1,4 @@
-import { CreatePollDto, CreatePostDto, ListPollDto, PollType, UpsertVoteToPollDto } from "./Api";
+import { CreatePollDto, CreatePostDto, PollDto, PollType, VoteOnPollDto } from "./Api";
 
 export function validatePostTitle(post: CreatePostDto): string[] {
     const errors: string[] = [];

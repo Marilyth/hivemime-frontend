@@ -38,7 +38,7 @@ export default function RootLayout({
   });
 
   async function loginAsync(){
-    const response = (await api.api.authLoginList()).data;
+    const response = (await api.api.userLoginList({ username: "TestUser" })).data;
     api.setSecurityData(response.token);
   }
 

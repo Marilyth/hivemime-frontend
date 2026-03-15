@@ -3,12 +3,12 @@
 import { Crown } from "lucide-react";
 import { HiveMimeHoverCard } from "../../hm-hover-card";
 import { observer } from "mobx-react-lite";
-import { PollCandidateDto, UpsertVoteToCandidateDto } from "@/lib/Api";
+import { PollCandidateDto, VoteOnCandidateDto } from "@/lib/Api";
 import { motion } from "framer-motion";
 
 interface HiveMimePickChoiceCandidateProps {
   onClick?: () => void;
-  vote: UpsertVoteToCandidateDto;
+  vote: VoteOnCandidateDto;
   candidate: PollCandidateDto;
 }
 

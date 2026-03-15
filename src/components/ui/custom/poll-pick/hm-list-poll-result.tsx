@@ -1,6 +1,6 @@
 "use client";
 
-import { ListPollDto, PollResultsDto, PollType } from "@/lib/Api";
+import { PollDto, PollResultDto, PollType } from "@/lib/Api";
 import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -11,8 +11,8 @@ import { ChartType } from "@/lib/view-models";
 import { HiveMimeChart } from "../hm-chart";
 
 export type HiveMimeListPollResultProps =   {
-  poll: ListPollDto;
-  pollResult: PollResultsDto;
+  poll: PollDto;
+  pollResult: PollResultDto;
   chartType?: ChartType;
 }
 

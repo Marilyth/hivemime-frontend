@@ -3,12 +3,12 @@
 import { Send } from "lucide-react"
 import { Button } from "../../../button";
 import { observer } from "mobx-react-lite";
-import { ListPollDto, UpsertVoteToPollDto } from "@/lib/Api";
+import { PollDto, VoteOnPollDto } from "@/lib/Api";
 import { HiveMimePickSingleChoiceCandidate } from "./hm-pick-single-choice-candidate";
 
 export interface HiveMimePickSingleChoicePollProps {
-  poll: ListPollDto;
-  pollVotes: UpsertVoteToPollDto;
+  poll: PollDto;
+  pollVotes: VoteOnPollDto;
 }
 
 export const HiveMimePickSingleChoicePoll = observer(({ poll, pollVotes }: HiveMimePickSingleChoicePollProps) => {

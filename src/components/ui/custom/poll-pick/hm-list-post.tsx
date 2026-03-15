@@ -5,7 +5,7 @@ import { MessageSquare, Send, User, AlertCircleIcon, CircleCheck, CircleX, Arrow
 import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { UpsertVoteToPostDto, ListPostDto, Api, PostResultsDto, ListPollDto, PollType } from "@/lib/Api";
+import { VoteOnPostDto, PostDto, Api, PostResultDto, PollDto, PollType } from "@/lib/Api";
 import { useContext, useEffect, useState } from "react";
 import { observable } from "mobx";
 import { HiveMimeApiContext } from "@/app/layout";
@@ -19,7 +19,7 @@ import { HiveMimeListPollResult } from "./hm-list-poll-result";
 import { ChartType } from "@/lib/view-models";
 
 export interface HiveMimePostProps {
-  post: ListPostDto;
+  post: PostDto;
   showResults?: boolean;
 }
 
@@ -34,15 +34,15 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
 });
 
 export interface HiveMimeListPostProps {
-  post: ListPostDto;
+  post: PostDto;
   onResultsRequested?: () => void;
 }
 
 const HiveMimeListPost = observer(({ post, onResultsRequested }: HiveMimeListPostProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
-  const [results, setResults] = useState<PostResultsDto | null>(null);
+  const [results, setResults] = useState<PostResultDto | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
-  const [postVote, setPostVote] = useState<UpsertVoteToPostDto>(() => (observable({
+  const [postVote, setPostVote] = useState<VoteOnPostDto>(() => (observable({
     postId: post.id!,
     polls: (post.polls || []).map(poll => ({
       candidates: (poll.candidates || []).map(() => ({
@@ -119,14 +119,12 @@ const HiveMimeListPost = observer(({ post, onResultsRequested }: HiveMimeListPos
 
 const HiveMimeListPostResult = observer(({ post }: HiveMimePostProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
-  const [results, setResults] = useState<PostResultsDto | null>(null);
+  const [results, setResults] = useState<PostResultDto | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("0");
-  const [countryPoll, setCountryPoll] = useState<ListPollDto>({ title: "Where are you from?", description: "This geographical data was automatically collected.", pollType: PollType.Choice, candidates: [] });
-  const [calendarPoll, setCalendarPoll] = useState<ListPollDto>({ title: "When did you vote?", description: "This temporal data was automatically collected.", pollType: PollType.Choice, candidates: [] });
 
   async function fetchResults()
   {
-    const response = await hiveMimeService.api.postDetail(post.id!);
+    const response = await hiveMimeService.api.postResultsList({postId: post.id!});
     setResults(response.data);
   }
 
@@ -167,12 +165,6 @@ const HiveMimeListPostResult = observer(({ post }: HiveMimePostProps) => {
                   <HiveMimeListPollResult poll={poll} pollResult={results!.polls![index]} />
                 </EmbeddedTabsContent>
               ))}
-              <EmbeddedTabsContent key="country" value="country">
-                <HiveMimeListPollResult poll={countryPoll} pollResult={results!.country!} chartType={ChartType.World} />
-              </EmbeddedTabsContent>
-              <EmbeddedTabsContent key="calendar" value="calendar">
-                <HiveMimeListPollResult poll={calendarPoll} pollResult={results!.date!} chartType={ChartType.Calendar} />
-              </EmbeddedTabsContent>
             </>
           )}
         </EmbeddedTabs>
@@ -194,8 +186,8 @@ const HiveMimeListPostResult = observer(({ post }: HiveMimePostProps) => {
 });
 
 export interface HiveMimeVoteOverviewProps {
-  post: ListPostDto;
-  vote: UpsertVoteToPostDto;
+  post: PostDto;
+  vote: VoteOnPostDto;
 }
 
 export const HiveMimeVoteOverview = observer(({ post, vote }: HiveMimeVoteOverviewProps) => {
@@ -223,7 +215,7 @@ export const HiveMimeVoteOverview = observer(({ post, vote }: HiveMimeVoteOvervi
 
   async function submitVote()
   {
-    await hiveMimeService.api.postVoteCreate(post.id!.toString(), vote);
+    await hiveMimeService.api.postVoteCreate(vote);
     toast.success("Your vote has been submitted.");
   }
 

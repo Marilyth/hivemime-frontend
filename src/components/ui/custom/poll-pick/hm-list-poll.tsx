@@ -1,6 +1,6 @@
 "use client";
 
-import { ListPollDto, PollType, UpsertVoteToPollDto } from "@/lib/Api";
+import { PollDto, PollType, VoteOnPollDto } from "@/lib/Api";
 import { ReactNode } from "react";
 import { HiveMimePollTypeIcon } from "../hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -10,8 +10,8 @@ import { HiveMimePickRankingPoll } from "./ranking/hm-pick-ranking-poll";
 import { HiveMimePickCategorizationPoll } from "./categorization/hm-pick-categorization-poll";
 
 export type HiveMimeListPollProps =   {
-  poll: ListPollDto;
-  pollVote: UpsertVoteToPollDto;
+  poll: PollDto;
+  pollVote: VoteOnPollDto;
   footer: ReactNode;
 }
 

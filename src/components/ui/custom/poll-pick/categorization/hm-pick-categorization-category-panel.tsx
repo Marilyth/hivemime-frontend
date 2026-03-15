@@ -4,13 +4,13 @@ import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../hm-draggable";
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
-import { ListPollDto } from "@/lib/Api";
+import { PollDto } from "@/lib/Api";
 import { HiveMimeTagItem } from "../../hm-tag-item";
 import { numberToColorHex } from "@/lib/colors";
 
 export interface HiveMimePickCategoryPanelProps {
   candidateClicked: (candidate: CombinedPollCandidate) => void;
-  poll: ListPollDto;
+  poll: PollDto;
   category: CombinedPollCategory;
   candidates: CombinedPollCandidate[];
 }

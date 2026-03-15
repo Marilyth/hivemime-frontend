@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { ListPollDto, UpsertVoteToPollDto } from "@/lib/Api";
+import { PollDto, VoteOnPollDto } from "@/lib/Api";
 import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
 import { LayoutGroup } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
@@ -12,8 +12,8 @@ import { HiveMimeCategoryTagBox, HiveMimePickCategorizationCategoryPanel } from 
 import { mutedColors, colorHexToNumber } from "@/lib/colors";
 
 export interface HiveMimePickCategorizationPollProps {
-  poll: ListPollDto;
-  pollVotes: UpsertVoteToPollDto;
+  poll: PollDto;
+  pollVotes: VoteOnPollDto;
 }
 
 export const HiveMimePickCategorizationPoll = observer(({ poll, pollVotes }: HiveMimePickCategorizationPollProps) => {

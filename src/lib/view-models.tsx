@@ -1,8 +1,8 @@
-import { PollCandidateDto, PollCategoryDto, UpsertVoteToCandidateDto } from "./Api";
+import { PollCandidateDto, PollCategoryDto, VoteOnCandidateDto } from "./Api";
 
 export interface CombinedPollCandidate {
   candidate: PollCandidateDto;
-  vote: UpsertVoteToCandidateDto;
+  vote: VoteOnCandidateDto;
 }
 
 export interface CombinedPollCategory {
