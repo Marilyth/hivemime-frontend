@@ -17,6 +17,11 @@ export enum PollType {
   Category = "Category",
 }
 
+export interface CreateHiveDto {
+  name?: string | null;
+  description?: string | null;
+}
+
 export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
@@ -38,9 +43,24 @@ export interface CreatePollDto {
 }
 
 export interface CreatePostDto {
+  /** @format int32 */
+  hiveId?: number | null;
   title?: string | null;
   description?: string | null;
   polls?: CreatePollDto[] | null;
+}
+
+export interface HiveDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format int32 */
+  postCount?: number;
+  /** @format int32 */
+  followerCount?: number;
 }
 
 export interface LoginDto {
@@ -403,19 +423,88 @@ export class Api<
     /**
      * No description
      *
-     * @tags Auth
-     * @name AuthLoginList
-     * @request GET:/api/Auth/login
+     * @tags Hive
+     * @name HiveGetList
+     * @request GET:/api/Hive/get
      * @secure
      */
-    authLoginList: (
+    hiveGetList: (
       query?: {
-        username?: string;
+        /** @format int32 */
+        hiveId?: number;
       },
       params: RequestParams = {},
     ) =>
-      this.request<LoginDto, any>({
-        path: `/api/Auth/login`,
+      this.request<HiveDto, any>({
+        path: `/api/Hive/get`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveBrowseList
+     * @request GET:/api/Hive/browse
+     * @secure
+     */
+    hiveBrowseList: (
+      query?: {
+        /** @format int32 */
+        afterId?: number;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<HiveDto[], any>({
+        path: `/api/Hive/browse`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveCreateCreate
+     * @request POST:/api/Hive/create
+     * @secure
+     */
+    hiveCreateCreate: (data: CreateHiveDto, params: RequestParams = {}) =>
+      this.request<HiveDto, any>({
+        path: `/api/Hive/create`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostGetList
+     * @request GET:/api/Post/get
+     * @secure
+     */
+    postGetList: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostDto, any>({
+        path: `/api/Post/get`,
         method: "GET",
         query: query,
         secure: true,
@@ -428,19 +517,21 @@ export class Api<
      *
      * @tags Post
      * @name PostBrowseList
-     * @request GET:/api/post/browse
+     * @request GET:/api/Post/browse
      * @secure
      */
     postBrowseList: (
       query?: {
         /** @format int32 */
         afterId?: number;
+        /** @format int32 */
+        hiveId?: number;
         filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<PostDto[], any>({
-        path: `/api/post/browse`,
+        path: `/api/Post/browse`,
         method: "GET",
         query: query,
         secure: true,
@@ -453,16 +544,17 @@ export class Api<
      *
      * @tags Post
      * @name PostCreateCreate
-     * @request POST:/api/post/create
+     * @request POST:/api/Post/create
      * @secure
      */
     postCreateCreate: (data: CreatePostDto, params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/post/create`,
+      this.request<PostDto, any>({
+        path: `/api/Post/create`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -471,7 +563,7 @@ export class Api<
      *
      * @tags Post
      * @name PostResultsList
-     * @request GET:/api/post/results
+     * @request GET:/api/Post/results
      * @secure
      */
     postResultsList: (
@@ -483,7 +575,7 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<PostResultDto, any>({
-        path: `/api/post/results`,
+        path: `/api/Post/results`,
         method: "GET",
         query: query,
         secure: true,
@@ -496,12 +588,12 @@ export class Api<
      *
      * @tags Post
      * @name PostVoteCreate
-     * @request POST:/api/post/vote
+     * @request POST:/api/Post/vote
      * @secure
      */
     postVoteCreate: (data: VoteOnPostDto, params: RequestParams = {}) =>
       this.request<void, any>({
-        path: `/api/post/vote`,
+        path: `/api/Post/vote`,
         method: "POST",
         body: data,
         secure: true,

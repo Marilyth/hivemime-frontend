@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserOptions } from "./user-options"
-import { Tooltip } from "@radix-ui/react-tooltip"
-import { redirect } from "next/navigation"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 
 export function SiteHeader() {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar } = useSidebar();
+  const router = useRouter();
 
   return (
     <header className="z-10 bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b">
@@ -29,10 +30,23 @@ export function SiteHeader() {
         <div className="flex justify-center flex-1">
           <SearchForm className="max-w-128 w-full" />
         </div>
-        <Button variant="outline" onClick={() => redirect("/create")}>
-            <Plus />
-            New post
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Plus />
+              Create...
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push("/posts/create")}>
+              New post
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/hives/create")}>
+              New hive
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <UserOptions user={{name: "test", email: "test@example.com", avatar: "/avatars/test.jpg"}} />
       </div>
     </header>

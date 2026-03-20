@@ -1,9 +1,8 @@
 import { cn } from "@/lib/utils"
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "../button";
 import { Progress } from "../progress";
 import { Field, FieldLabel } from "../field";
-import { motion } from "framer-motion";
 
 interface HiveMimeStepProps extends React.ComponentProps<"div"> {
   canContinue: boolean;

@@ -1,8 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
-import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
 import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../labelled-input";
 import { Button } from "../../button";

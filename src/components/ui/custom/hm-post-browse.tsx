@@ -1,28 +1,72 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
-import { HiveMimeApiContext } from "../layout";
+import { useContext, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Api, PostDto } from "@/lib/Api";
+import { Api, HiveDto, PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/ui/custom/poll-pick/hm-list-post";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { HiveMimeApiContext } from "@/app/layout";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page() {
+export function HiveMimePostBrowse() {
+  const router = useRouter();
+  const params = useSearchParams();
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+
+  const [hive, setHive] = useState<HiveDto>();
   const [posts, setPosts] = useState<PostDto[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
 
+  function getAfterId() {
+    const afterId = params.get("afterId");
+
+    if (!afterId)
+      return undefined;
+
+    return Number(afterId);
+  }
+
+  function getHiveId() {
+    const hiveId = params.get("hiveId");
+
+    if (!hiveId)
+        return undefined;
+
+    return Number(hiveId);
+  }
+
+  async function fetchHiveInformation() {
+    const hiveId = getHiveId();
+
+    if (!hiveId)
+        return;
+
+    const response = await hiveMimeService.api.hiveGetList({hiveId: hiveId!});
+    setHive(response.data);
+  }
+
   async function fetchPostsAsync() {
-    const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : undefined;
-    const response = await hiveMimeService.api.postBrowseList({afterId: lastPostId});
+    const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : getAfterId();
+
+    // Update afterId in URL to keep state on refresh.
+    if (lastPostId) {
+        const newParams = new URLSearchParams(params.toString());
+        newParams.set("afterId", lastPostId.toString());
+        router.replace("?" + newParams.toString());
+    }
+
+    const hiveId = getHiveId();
+    const response = await hiveMimeService.api.postBrowseList({afterId: lastPostId, hiveId: hiveId});
 
     const newPostsState = [...posts, ...response.data];
-    setPosts(newPostsState);
 
+    setPosts(newPostsState);
     setHasMorePosts(response.data.length == 20 && newPostsState.length < 100);
   }
 
   useEffect(() => {
+    fetchHiveInformation();
+
     // Might want to fetch until scrollable, because InfiniteScroll does not trigger before.
     fetchPostsAsync();
   }, []);
@@ -44,7 +88,7 @@ export default function Page() {
           }
           endMessage=
           {
-            <div className="my-4 text-center">You have reached the end of your feed!</div>
+            <div className="my-4 text-center">You reached the end of your feed!</div>
           }
         >
           <div className="flex flex-col gap-4">

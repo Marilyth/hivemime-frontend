@@ -1,11 +1,8 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
-import { Button } from "../../button";
 import { CreatePollDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../labelled-input";
 import { observer } from "mobx-react-lite";
-import { Separator } from "../../separator";
 import { HiveMimeCreatePollTypePicker } from "./hm-create-pick-poll-type";
 import React from "react";
 import { HiveMimeCreateMultipleChoiceRules } from "./hm-create-choice-poll";

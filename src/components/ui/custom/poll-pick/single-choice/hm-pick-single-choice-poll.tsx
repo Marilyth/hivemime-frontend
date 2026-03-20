@@ -1,7 +1,5 @@
 "use client";
 
-import { Send } from "lucide-react"
-import { Button } from "../../../button";
 import { observer } from "mobx-react-lite";
 import { PollDto, VoteOnPollDto } from "@/lib/Api";
 import { HiveMimePickSingleChoiceCandidate } from "./hm-pick-single-choice-candidate";

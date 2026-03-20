@@ -4,8 +4,6 @@ import { CreatePollDto, PollCandidateDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../hm-embedded-input";
-import { HiveMimeIndexHandle } from "../hm-index-handle";
-import { Label } from "../../label";
 import { Button } from "../../button";
 import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

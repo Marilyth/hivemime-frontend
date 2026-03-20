@@ -8,6 +8,7 @@ import {
   History,
   Calendar,
   TrendingUp,
+  Search,
 } from "lucide-react"
 import { NavTags } from "@/components/nav-tags"
 import {
@@ -25,21 +26,26 @@ const data = {
   navMain: [
     {
       name: "Popular",
-      url: "home",
+      url: "/posts",
       icon: TrendingUp,
     },
     {
       name: "New",
-      url: "home",
+      url: "/posts",
       icon: Calendar,
     },
     {
       name: "History",
-      url: "home",
+      url: "/posts",
       icon: History,
     },
   ],
   tags: [
+    {
+      name: "Browse",
+      url: "/hives",
+      icon: Search,
+    },
     {
       name: "Design Engineering",
       url: "#",
@@ -75,8 +81,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </div>
         </SidebarHeader>
-        <NavTags tags={data.navMain} title="Browse" />
-        <NavTags tags={data.tags} title="Followed hives" />
+        <NavTags tags={data.navMain} title="Posts" />
+        <NavTags tags={data.tags} title="Hives" />
       </SidebarContent>
     </Sidebar>
   )

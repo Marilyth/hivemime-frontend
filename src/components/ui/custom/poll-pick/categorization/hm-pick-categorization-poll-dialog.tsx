@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../dialog";
 import { HiveMimeHoverCard } from "../../hm-hover-card";
-import { HiveMimeTagItem } from "../../hm-tag-item";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeCategoryTagBox } from "./hm-pick-categorization-category-panel";
 

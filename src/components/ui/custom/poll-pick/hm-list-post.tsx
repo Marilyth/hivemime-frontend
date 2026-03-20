@@ -1,11 +1,11 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Send, User, AlertCircleIcon, CircleCheck, CircleX, ArrowRight, ChartBar } from "lucide-react"
+import { MessageSquare, Send, User, CircleCheck, CircleX, ArrowRight, ChartBar } from "lucide-react"
 import { Badge } from "../../badge";
 import { HiveMimeListPoll } from "./hm-list-poll";
 import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigger } from "../hm-embedded-tabs";
-import { VoteOnPostDto, PostDto, Api, PostResultDto, PollDto, PollType } from "@/lib/Api";
+import { VoteOnPostDto, PostDto, Api, PostResultDto } from "@/lib/Api";
 import { useContext, useEffect, useState } from "react";
 import { observable } from "mobx";
 import { HiveMimeApiContext } from "@/app/layout";
@@ -16,7 +16,6 @@ import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { HiveMimeBulletItem } from "../hm-bullet-item";
 import { HiveMimeListPollResult } from "./hm-list-poll-result";
-import { ChartType } from "@/lib/view-models";
 
 export interface HiveMimePostProps {
   post: PostDto;
