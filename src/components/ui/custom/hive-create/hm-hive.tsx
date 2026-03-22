@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Api, CreateHiveDto } from "@/lib/Api";
 import { useContext, useRef } from "react";
-import { HiveMimeApiContext } from "@/app/layout";
+import { FollowedHivesContext, HiveMimeApiContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { Button } from "../../button";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import { Input } from "../../input";
 
 export const HiveMimeHiveCreate = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const followedHivesContext = useContext(FollowedHivesContext)!;
   const hiveRef = useRef<CreateHiveDto>(observable({ name: "", description: "" }));
   const router = useRouter();
 
@@ -30,18 +31,15 @@ export const HiveMimeHiveCreate = observer(() => {
     return errors.length === 0;
   }
 
-  async function submitPost() {
+  async function createHive() {
     if (!canCreateHive())
       return;
 
     const response = await hiveMimeService.api.hiveCreateCreate(hiveRef.current);
+    followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, response.data]);
 
     toast.success("Hive created successfully!");
     router.push(`/posts?hiveId=${response.data.id}`);
-  }
-
-  async function createHive() {
-    await hiveMimeService.api.hiveCreateCreate(hiveRef.current);
   }
 
   return (
@@ -62,7 +60,7 @@ export const HiveMimeHiveCreate = observer(() => {
         </Field>
       </CardContent>
       <CardFooter>
-        <Button className="self-start ml-auto" onClick={submitPost}>
+        <Button className="self-start ml-auto" onClick={createHive}>
           Create
         </Button>
       </CardFooter>

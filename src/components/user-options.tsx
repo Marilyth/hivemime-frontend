@@ -14,23 +14,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "./ui/button"
+import { UserContext } from "@/lib/contexts"
+import { useContext } from "react"
 
-export function UserOptions({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function UserOptions() {
+  const userContext = useContext(UserContext);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
         >
-          {user.name}
+          {userContext?.user?.username}
           <ChevronDown className="ml-auto size-4" />
         </Button>
       </DropdownMenuTrigger>

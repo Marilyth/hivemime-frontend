@@ -10,8 +10,9 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { createContext, useEffect } from "react";
-import { Api } from "@/lib/Api";
+import { useContext, useEffect, useState } from "react";
+import { HiveDto, UserDetailsDto } from "@/lib/Api";
+import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,22 +24,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const HiveMimeApiContext = createContext<Api<unknown> | null>(null);
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const api = new Api({
-    baseUrl: "http://localhost:5138",
-    securityWorker: (securityData) =>
-      securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
-  });
+  const [user, setUser] = useState<UserDetailsDto | null>(null);
+  const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
+
+  const api = useContext(HiveMimeApiContext);
 
   async function loginAsync(){
-    const response = (await api.api.userLoginList({ username: "TestUser" })).data;
-    api.setSecurityData(response.token);
+    const loginResponse = await api.api.userLoginList({ username: "TestUser" });
+    api.setSecurityData(loginResponse.data.token);
+
+    const userDetailsResponse = await api.api.userDetailsList();
+    const followedHivesResponse = await api.api.hiveFollowedList();
+
+    setUser(userDetailsResponse.data);
+    setFollowedHives(followedHivesResponse.data);
   }
 
   useEffect(() => {
@@ -54,28 +58,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HiveMimeApiContext.Provider value={api}>
-          <SidebarProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-              <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
-                <SidebarProvider className="flex flex-col">
+        <UserContext.Provider value={{ user, setUser }}>
+          <FollowedHivesContext.Provider value={{ followedHives, setFollowedHives }}>
+            <SidebarProvider>
+              <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
+                  <SidebarProvider className="flex flex-col">
 
-                  <div className="flex flex-1">
-                    <AppSidebar />
-                    <SidebarInset>
-                      <SiteHeader />
-                      <div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
-                        {children}
-                      </div>
-                      <Toaster position="top-center" richColors />
-                    </SidebarInset>
-                  </div>
+                    <div className="flex flex-1">
+                      <AppSidebar />
+                      <SidebarInset>
+                        <SiteHeader />
+                        <div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
+                          {children}
+                        </div>
+                        <Toaster position="top-center" richColors />
+                      </SidebarInset>
+                    </div>
 
-                </SidebarProvider>
-              </div>
-            </ThemeProvider>
-          </SidebarProvider>
-        </HiveMimeApiContext.Provider>
+                  </SidebarProvider>
+                </div>
+              </ThemeProvider>
+            </SidebarProvider>
+          </FollowedHivesContext.Provider>
+        </UserContext.Provider>
       </body>
     </html>
   );

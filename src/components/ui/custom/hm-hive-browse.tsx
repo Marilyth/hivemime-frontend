@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Api, HiveDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeHiveListItem } from "@/components/ui/custom/hive-list/hm-hive";
-import { HiveMimeApiContext } from "@/app/layout";
+import { HiveMimeApiContext } from "@/lib/contexts";
 
 export default function HiveMimeHiveBrowse() {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
@@ -49,7 +49,7 @@ export default function HiveMimeHiveBrowse() {
         >
           <div className="flex justify-center flex-row flex-wrap gap-4">
             {hives.map((hive, index) => (
-              <HiveMimeHiveListItem key={index} hive={hive} className="w-96 max-h-64" />
+              <HiveMimeHiveListItem key={index} hive={hive} className="w-96 min-h-56" />
             ))}
           </div>
         </InfiniteScroll>

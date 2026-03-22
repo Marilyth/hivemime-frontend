@@ -448,6 +448,69 @@ export class Api<
      * No description
      *
      * @tags Hive
+     * @name HiveFollowedList
+     * @request GET:/api/Hive/followed
+     * @secure
+     */
+    hiveFollowedList: (params: RequestParams = {}) =>
+      this.request<HiveDto[], any>({
+        path: `/api/Hive/followed`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveJoinCreate
+     * @request POST:/api/Hive/join
+     * @secure
+     */
+    hiveJoinCreate: (
+      query?: {
+        /** @format int32 */
+        hiveId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Hive/join`,
+        method: "POST",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveLeaveCreate
+     * @request POST:/api/Hive/leave
+     * @secure
+     */
+    hiveLeaveCreate: (
+      query?: {
+        /** @format int32 */
+        hiveId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Hive/leave`,
+        method: "POST",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
      * @name HiveBrowseList
      * @request GET:/api/Hive/browse
      * @secure
@@ -628,13 +691,13 @@ export class Api<
      * No description
      *
      * @tags User
-     * @name UserList
-     * @request GET:/api/User
+     * @name UserDetailsList
+     * @request GET:/api/User/details
      * @secure
      */
-    userList: (params: RequestParams = {}) =>
+    userDetailsList: (params: RequestParams = {}) =>
       this.request<UserDetailsDto, any>({
-        path: `/api/User`,
+        path: `/api/User/details`,
         method: "GET",
         secure: true,
         format: "json",

@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Api, HiveDto, PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/ui/custom/poll-pick/hm-list-post";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { HiveMimeApiContext } from "@/app/layout";
+import { HiveMimeApiContext } from "@/lib/contexts";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export function HiveMimePostBrowse() {

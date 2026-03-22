@@ -1,15 +1,16 @@
 "use client";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { User, FileChartColumn } from "lucide-react"
 import { Api, HiveDto } from "@/lib/Api";
-import { HTMLAttributes, useContext, useState } from "react";
-import { HiveMimeApiContext } from "@/app/layout";
+import { HTMLAttributes, useContext } from "react";
+import { FollowedHivesContext, HiveMimeApiContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Button } from "../../button";
 import { useRouter } from "next/navigation";
 import { HiveMimeExpandableText } from "../hm-expandable-text";
+import { toast } from "sonner";
 
 export type HiveMimeHiveListItemProps = {
   hive: HiveDto;
@@ -17,11 +18,20 @@ export type HiveMimeHiveListItemProps = {
 
 export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveListItemProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const followedHivesContext = useContext(FollowedHivesContext)!;
   const router = useRouter();
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  async function leaveHive() {
+    await hiveMimeService.api.hiveLeaveCreate({ hiveId: hive.id });
+    toast.success(`You have left the hive "${hive.name}".`);
+    followedHivesContext.setFollowedHives(followedHivesContext.followedHives.filter(h => h.id !== hive.id));
+  }
 
   async function joinHive() {
-    // TODO: Implement real join functionality.
+    await hiveMimeService.api.hiveJoinCreate({ hiveId: hive.id });
+    toast.success(`You have joined the hive "${hive.name}".`);
+    
+    followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, hive]);
   }
 
   function browseHive() {
@@ -30,12 +40,12 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
 
   return (
     <div {...props}>
-      <Card className="text-sm">
+      <Card className="text-sm min-h-56">
         <CardContent className="flex flex-col gap-3">
           <div className="flex items-start gap-3">
             <Button
               variant="link"
-              className="h-auto flex-1 whitespace-normal break-words p-0 text-left text-lg font-bold line-clamp-2"
+              className="h-auto flex-1 whitespace-normal text-honey-brown break-words p-0 text-left text-lg font-bold line-clamp-2"
               onClick={browseHive}
             >
               {hive.name}
@@ -45,8 +55,9 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
               variant="outline"
               size="sm"
               className="w-20 flex-shrink-0"
-              onClick={joinHive}>
-              Join
+              onClick={followedHivesContext.followedHives.some(h => h.id === hive.id) ? leaveHive : joinHive}
+            >
+              {followedHivesContext.followedHives.some(h => h.id === hive.id) ? "Leave" : "Join"}
             </Button>
           </div>
 
@@ -54,7 +65,7 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
             {hive.description}
           </HiveMimeExpandableText>
         </CardContent>
-        <CardFooter className="gap-4 text-muted-foreground">
+        <CardFooter className="gap-4 text-muted-foreground mt-auto">
           <Label>
             <User className="mr-1 inline-block h-4 w-4" />
             {hive.followerCount} followers

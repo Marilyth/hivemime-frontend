@@ -23,7 +23,8 @@ export function HiveMimeExpandableText({ children, lines, className, ...props }:
     <div {...props} className={`${className} flex flex-col items-start gap-1`}>
       <span
         ref={ref}
-        className={`${expanded ? "" : `line-clamp-${lines}`}`}
+        style={!expanded ? { WebkitLineClamp: lines, display: "-webkit-box", WebkitBoxOrient: "vertical", overflow: "hidden" } : {}}
+
       >
         {children}
       </span>

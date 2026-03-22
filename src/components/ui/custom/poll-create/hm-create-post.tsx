@@ -6,7 +6,7 @@ import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../labelled-input";
 import { Button } from "../../button";
 import { useContext, useRef, useState } from "react";
-import { HiveMimeApiContext } from "@/app/layout";
+import { HiveMimeApiContext } from "@/lib/contexts";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { redirect } from "next/navigation";

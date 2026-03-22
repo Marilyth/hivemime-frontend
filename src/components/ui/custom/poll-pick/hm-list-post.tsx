@@ -8,7 +8,7 @@ import { EmbeddedTabs, EmbeddedTabsContent, EmbeddedTabsList, EmbeddedTabsTrigge
 import { VoteOnPostDto, PostDto, Api, PostResultDto } from "@/lib/Api";
 import { useContext, useEffect, useState } from "react";
 import { observable } from "mobx";
-import { HiveMimeApiContext } from "@/app/layout";
+import { HiveMimeApiContext } from "@/lib/contexts";
 import { Button } from "../../button";
 import { validatePickPoll } from "@/lib/validate-vote";
 import { toast } from "sonner";

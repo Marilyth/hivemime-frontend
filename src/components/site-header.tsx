@@ -9,10 +9,13 @@ import { useSidebar } from "@/components/ui/sidebar"
 import { UserOptions } from "./user-options"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useRouter } from "next/navigation"
+import { useContext } from "react"
+import { UserContext } from "@/lib/contexts"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
+  const user = useContext(UserContext);
 
   return (
     <header className="z-10 bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b">
@@ -47,7 +50,7 @@ export function SiteHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <UserOptions user={{name: "test", email: "test@example.com", avatar: "/avatars/test.jpg"}} />
+        <UserOptions />
       </div>
     </header>
   )

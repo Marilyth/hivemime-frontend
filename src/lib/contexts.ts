@@ -1,0 +1,21 @@
+import { createContext, useState } from "react";
+import { Api, HiveDto, UserDetailsDto } from "./Api";
+
+type UserContextType = {
+  user: UserDetailsDto | null;
+  setUser: React.Dispatch<React.SetStateAction<UserDetailsDto | null>>;
+};
+
+type FollowedHivesContextType = {
+  followedHives: HiveDto[];
+  setFollowedHives: React.Dispatch<React.SetStateAction<HiveDto[]>>;
+};
+
+export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
+    baseUrl: "http://localhost:5138",
+    securityWorker: (securityData) =>
+      securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
+  }));
+
+export const UserContext = createContext<UserContextType | null>(null);
+export const FollowedHivesContext = createContext<FollowedHivesContextType | null>(null);

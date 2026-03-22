@@ -2,87 +2,80 @@
 
 import * as React from "react"
 import {
-  Frame,
-  Map,
-  PieChart,
-  History,
-  Calendar,
   TrendingUp,
   Search,
+  Users
 } from "lucide-react"
-import { NavTags } from "@/components/nav-tags"
 import {
   Sidebar,
   SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      name: "Popular",
-      url: "/posts",
-      icon: TrendingUp,
-    },
-    {
-      name: "New",
-      url: "/posts",
-      icon: Calendar,
-    },
-    {
-      name: "History",
-      url: "/posts",
-      icon: History,
-    },
-  ],
-  tags: [
-    {
-      name: "Browse",
-      url: "/hives",
-      icon: Search,
-    },
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
+import { FollowedHivesContext } from "@/lib/contexts"
+import Link from "next/link"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const followedHives = React.useContext(FollowedHivesContext);
+
   return (
     <Sidebar
       {...props}
     >
       <SidebarContent>
         <SidebarHeader>
-        <div className="flex flex-col gap-4 items-center">
-          <div className="relative h-24 w-24">
-            <img src="/HiveMimeIcon.png" alt="HiveMime Logo" style={{ objectFit: "contain" }} />
+          <div className="flex flex-col gap-4 items-center">
+            <div className="relative h-24 w-24">
+              <img src="/HiveMimeIcon.png" alt="HiveMime Logo" style={{ objectFit: "contain" }} />
+            </div>
+            <div className="flex text-2xl font-bold">
+              <span className="text-honey-brown">Hive</span>
+              <span className="text-honey-yellow">Mime</span>
+            </div>
           </div>
-          <div className="flex text-2xl font-bold">
-            <span className="text-honey-brown">Hive</span>
-            <span className="text-honey-yellow">Mime</span>
-          </div>
-        </div>
         </SidebarHeader>
-        <NavTags tags={data.navMain} title="Posts" />
-        <NavTags tags={data.tags} title="Hives" />
+
+         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroupLabel>Posts</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href={"/posts"} className="flex items-center gap-2">
+                  <TrendingUp />
+                  Popular
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroupLabel>Hives</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href={"/hives"} className="flex items-center gap-2">
+                  <Search />
+                  Browse
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {followedHives!.followedHives.map((hive) => (
+              <SidebarMenuItem key={hive.id}>
+                <SidebarMenuButton asChild>
+                  <Link href={`/posts?hiveId=${hive.id}`} className="flex items-center gap-2">
+                    <Users />
+                    {hive.name}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   )
