@@ -1,6 +1,6 @@
 "use client";
 
-import HiveMimeHiveBrowse from "@/components/ui/custom/hm-hive-browse";
+import HiveMimeHiveBrowse from "@/components/custom/hive/hm-hive-browse";
 
 
 export default function Page() {
