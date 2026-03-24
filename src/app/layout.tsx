@@ -37,6 +37,7 @@ export default function RootLayout({
   async function loginAsync(){
     const loginResponse = await api.api.userLoginList({ username: "TestUser" });
     api.setSecurityData(loginResponse.data.token);
+    console.log("Logged in with token:", loginResponse.data.token);
 
     const userDetailsResponse = await api.api.userDetailsList();
     const followedHivesResponse = await api.api.hiveFollowedList();
