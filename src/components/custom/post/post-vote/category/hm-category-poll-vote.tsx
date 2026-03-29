@@ -58,7 +58,7 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
           category={openedCategory}
           onClose={() => setOpenedCategory(null)} />
 
-        <span className="text-gray-500 text-sm">Please add categories to the candidates.</span>
+        <span className="text-informational text-sm">Please add categories to the candidates.</span>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {combinedCategories?.map((category, index) => (

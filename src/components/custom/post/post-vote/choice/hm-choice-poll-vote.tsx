@@ -23,7 +23,7 @@ export const HiveMimeChoicePollVote = observer(({ poll, pollVotes }: HiveMimePic
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-gray-500 text-sm">Please pick between {poll.minVotes} and {poll.maxVotes} options</span>
+      <span className="text-informational text-sm">Please pick between {poll.minVotes} and {poll.maxVotes} options</span>
         {poll.candidates!.map((candidate, index) => (
           <HiveMimeChoicePollVoteCandidate key={index} vote={pollVotes.candidates![index]} candidate={candidate}
             onClick={() => selectChoice(index)}

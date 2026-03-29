@@ -1,6 +1,6 @@
 "use client";
 
-import { HiveMimeHiveCreate } from "@/components/custom/hive/hive-create/hm-hive";
+import { HiveMimeHiveCreate } from "@/components/custom/hive/hive-create/hm-create-hive";
 
 
 export default function Page() {

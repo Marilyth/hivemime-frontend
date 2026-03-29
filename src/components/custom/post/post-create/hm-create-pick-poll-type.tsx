@@ -29,7 +29,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
           <HiveMimeHoverCard key={index} className={`flex flex-row cursor-pointer items-center hover:text-honey-brown ${
               poll.pollType === option.value ? 'text-honey-brown border-honey-brown' : ''
             }`} onClick={() => poll.pollType = option.value}>
-            <HiveMimePollTypeIcon answerType={option.value} className={`mr-2 w-8 ${poll.pollType === option.value ? 'text-honey-brown' : 'text-gray-500'}`} />
+            <HiveMimePollTypeIcon answerType={option.value} className={`mr-2 w-8 ${poll.pollType === option.value ? 'text-honey-brown' : 'text-informational'}`} />
             <div className="flex-1 flex flex-col">
               <span>{option.value}</span>
               <span className="text-sm text-muted-foreground">{option.description}</span>

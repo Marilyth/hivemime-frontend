@@ -17,7 +17,7 @@ export const HiveMimeRankPollVoteCandidate = observer(({ combined, onClick }: Hi
 
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isRanked() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
-      {isRanked() && <span className="w-6 font-light text-gray-500">{combined.vote.value}</span>}
+      {isRanked() && <span className="w-6 font-light text-informational">{combined.vote.value}</span>}
       <motion.div layout>{combined.candidate.name}</motion.div>
     </HiveMimeHoverCard>
   );

@@ -12,7 +12,7 @@ export interface HiveMimePickScoringPollProps {
 export const HiveMimeScorePollVote = observer(({ poll, pollVotes }: HiveMimePickScoringPollProps) => {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-gray-500 text-sm">Please score the candidates between {poll.minValue} and {poll.maxValue}.</span>
+      <span className="text-informational text-sm">Please score the candidates between {poll.minValue} and {poll.maxValue}.</span>
         {poll.candidates!.map((candidate, index) => (
           <HiveMimeScorePollVoteCandidate key={index} vote={pollVotes.candidates![index]} candidate={candidate} poll={poll} />
         ))}

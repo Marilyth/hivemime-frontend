@@ -6,6 +6,7 @@ import { Api, PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
 import { HiveMimeApiContext } from "@/lib/contexts";
 import { useSearchParams } from "next/navigation";
+import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
 
 export function HiveMimePostDetails() {
   const params = useSearchParams();
@@ -38,12 +39,15 @@ export function HiveMimePostDetails() {
       <div className="w-full max-w-183">
         {!post ? (
           <Skeleton className="h-64 w-full rounded-xl my-4">
-            <span className="flex h-full w-full items-center justify-center text-gray-500">
+            <span className="flex h-full w-full items-center justify-center text-informational">
               Loading...
             </span>
           </Skeleton>
         ) : (
-          <HiveMimePost post={post} />
+          <div className="flex flex-col gap-6">
+            <HiveMimePost post={post} />
+            <HiveMimeCommentBrowse post={post} />
+          </div>
         )}
       </div>
     </div>

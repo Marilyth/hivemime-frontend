@@ -31,10 +31,13 @@ export default function RootLayout({
 }>) {
   const [user, setUser] = useState<UserDetailsDto | null>(null);
   const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const api = useContext(HiveMimeApiContext);
 
   async function loginAsync(){
+    setIsLoading(true);
+
     const loginResponse = await api.api.userLoginList({ username: "TestUser" });
     api.setSecurityData(loginResponse.data.token);
     console.log("Logged in with token:", loginResponse.data.token);
@@ -44,6 +47,8 @@ export default function RootLayout({
 
     setUser(userDetailsResponse.data);
     setFollowedHives(followedHivesResponse.data);
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -70,9 +75,12 @@ export default function RootLayout({
                       <AppSidebar />
                       <SidebarInset>
                         <SiteHeader />
-                        <div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
-                          {children}
-                        </div>
+                        {isLoading ?
+                          (<div>Loading...</div>) :
+                          (<div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
+                            {children}
+                          </div>)
+                        }
                         <Toaster position="top-center" richColors />
                       </SidebarInset>
                     </div>

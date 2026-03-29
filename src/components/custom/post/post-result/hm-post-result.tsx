@@ -3,18 +3,18 @@ import { HiveMimeApiContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { Api, PostDto, PostResultDto } from "@/lib/Api";
 import { Item, ItemContent, ItemDescription, ItemTitle } from "../../../ui/item";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Vote } from "lucide-react";
+import { Vote } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
 
 interface HiveMimePostResultProps {
   post: PostDto;
   requestVote?: () => void;
+  footer: React.ReactNode;
 }
 
-export const HiveMimePostResult = observer(({ post, requestVote }: HiveMimePostResultProps) => {
+export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveMimePostResultProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [results, setResults] = useState<PostResultDto | null>(null);
 
@@ -60,10 +60,7 @@ export const HiveMimePostResult = observer(({ post, requestVote }: HiveMimePostR
         </Accordion>
 
         <div className="flex flex-row gap-2 w-full">
-          <Badge variant={"outline"} className="h-6 self-end">
-            <MessageSquare />
-            64
-          </Badge>
+          {footer}
           <Button variant="outline" className="ml-auto text-muted-foreground" onClick={requestVote}>
             <Vote />
             Vote
