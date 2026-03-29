@@ -14,9 +14,10 @@ import { Badge } from "@/components/ui/badge";
 interface HiveMimePostVoteProps {
   post: PostDto;
   requestResults?: () => void;
+  footer: React.ReactNode;
 }
 
-export const HiveMimePostVote = observer(({ post, requestResults }: HiveMimePostVoteProps) => {
+export const HiveMimePostVote = observer(({ post, requestResults, footer }: HiveMimePostVoteProps) => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [isValid, setIsValid] = useState(false);
   const [postVote, setPostVote] = useState<VoteOnPostDto>(() => (observable({
@@ -71,14 +72,7 @@ export const HiveMimePostVote = observer(({ post, requestResults }: HiveMimePost
       </Accordion>
 
       <div className="flex flex-row gap-2 w-full">
-        <Badge variant={"outline"} className="h-6 self-end">
-          <User  />
-          128
-        </Badge>
-        <Badge variant={"outline"} className="h-6 self-end">
-          <MessageSquare />
-          64
-        </Badge>
+        {footer}
         <Button variant="outline" className="ml-auto text-muted-foreground" onClick={requestResults}>
           <ChartBar />
           Results

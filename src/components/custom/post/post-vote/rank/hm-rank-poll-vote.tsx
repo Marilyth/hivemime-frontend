@@ -69,7 +69,7 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-gray-500 text-sm">Please rank the candidates in order of preference.</span>
+      <span className="text-informational text-sm">Please rank the candidates in order of preference.</span>
 
       <LayoutGroup>
         <HiveMimeDraggable

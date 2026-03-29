@@ -17,6 +17,31 @@ export enum PollType {
   Category = "Category",
 }
 
+export interface CommentDto {
+  user?: UserDto;
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  postId?: number;
+  /** @format int32 */
+  parentCommentId?: number | null;
+  content?: string | null;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  updatedAt?: string | null;
+  /** @format int32 */
+  replyCount?: number;
+}
+
+export interface CreateCommentDto {
+  /** @format int32 */
+  postId?: number;
+  /** @format int32 */
+  parentCommentId?: number | null;
+  content?: string | null;
+}
+
 export interface CreateHiveDto {
   name?: string | null;
   description?: string | null;
@@ -48,6 +73,12 @@ export interface CreatePostDto {
   title?: string | null;
   description?: string | null;
   polls?: CreatePollDto[] | null;
+}
+
+export interface EditCommentDto {
+  /** @format int32 */
+  commentId?: number;
+  newContent?: string | null;
 }
 
 export interface HiveDto {
@@ -114,11 +145,19 @@ export interface PollResultDto {
 }
 
 export interface PostDto {
+  hive?: HiveDto;
+  creator?: UserDto;
   /** @format int32 */
   id?: number;
   title?: string | null;
   description?: string | null;
   polls?: PollDto[] | null;
+  /** @format int32 */
+  commentCount?: number;
+  /** @format int32 */
+  voteCount?: number;
+  /** @format date-time */
+  createdAt?: string;
 }
 
 export interface PostResultDto {
@@ -126,20 +165,23 @@ export interface PostResultDto {
 }
 
 export interface UserDetailsDto {
-  /** @format int32 */
-  id?: number;
   username?: string | null;
   /** @format date-time */
   dateOfBirth?: string | null;
   settings?: UserSettingsDto;
 }
 
-export interface UserSettingsDto {
+export interface UserDto {
   /** @format int32 */
   id?: number;
-  shareDateOfVote?: boolean;
-  shareCountryOfVote?: boolean;
-  shareAgeOfVote?: boolean;
+  username?: string | null;
+}
+
+export interface UserSettingsDto {
+  country?: string | null;
+  shareDateOnVote?: boolean;
+  shareCountryOnVote?: boolean;
+  shareAgeOnVote?: boolean;
 }
 
 export interface VoteOnCandidateDto {
@@ -420,6 +462,95 @@ export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
   api = {
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentCreateCreate
+     * @request POST:/api/Comment/create
+     * @secure
+     */
+    commentCreateCreate: (data: CreateCommentDto, params: RequestParams = {}) =>
+      this.request<CommentDto, any>({
+        path: `/api/Comment/create`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentEditUpdate
+     * @request PUT:/api/Comment/edit
+     * @secure
+     */
+    commentEditUpdate: (data: EditCommentDto, params: RequestParams = {}) =>
+      this.request<CommentDto, any>({
+        path: `/api/Comment/edit`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentDeleteDelete
+     * @request DELETE:/api/Comment/delete
+     * @secure
+     */
+    commentDeleteDelete: (
+      query?: {
+        /** @format int32 */
+        commentId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Comment/delete`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentGetList
+     * @request GET:/api/Comment/get
+     * @secure
+     */
+    commentGetList: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+        /** @format int32 */
+        parentCommentId?: number;
+        /** @format date-time */
+        beforeDate?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CommentDto[], any>({
+        path: `/api/Comment/get`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * No description
      *

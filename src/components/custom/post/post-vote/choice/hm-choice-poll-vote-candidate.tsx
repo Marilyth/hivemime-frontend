@@ -19,7 +19,7 @@ export const HiveMimeChoicePollVoteCandidate = observer(({ vote, candidate, onCl
 
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isSelected() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
-      {isSelected() && <span className="w-6 font-light text-gray-500"><IoMdCheckboxOutline className="w-4 h-4" /></span>}
+      {isSelected() && <span className="w-6 font-light text-informational"><IoMdCheckboxOutline className="w-4 h-4" /></span>}
       <motion.div layout>{candidate.name}</motion.div>
     </HiveMimeHoverCard>
   );

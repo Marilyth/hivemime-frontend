@@ -25,7 +25,7 @@ export const HiveMimeStateIcon = ({ state, shape = "circle" }: HiveMimeStateIcon
         case "nothing":
             return null;
         case "indeterminate":
-            return <SlashIcon className="text-gray-500" />;
+            return <SlashIcon className="text-informational" />;
         case "finished":
             return <CheckIcon className="text-green-700" />;
         case "error":

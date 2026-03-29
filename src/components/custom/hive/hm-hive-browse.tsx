@@ -37,7 +37,7 @@ export default function HiveMimeHiveBrowse() {
           loader=
           {
             <Skeleton className="h-64 w-full rounded-xl my-4">
-              <span className="flex h-full w-full items-center justify-center text-gray-500">
+              <span className="flex h-full w-full items-center justify-center text-informational">
                 Loading...
               </span>
             </Skeleton>

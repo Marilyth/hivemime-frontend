@@ -6,6 +6,9 @@ import { observer } from "mobx-react-lite";
 import { HiveMimePostResult } from "./post-result/hm-post-result";
 import { HiveMimePostVote } from "./post-vote/hm-post-vote";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
+import { redirect } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { MessageSquare, User } from "lucide-react";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -19,14 +22,30 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     setResultsVisible(prev => !prev);
   }
 
+  function navigateToDetails() {
+    redirect(`/posts/view?postId=${post.id}`);
+  }
+
+  const footer = (
+  <div className="flex flex-row gap-2 w-full">
+    <Badge variant={"outline"} className="h-6 self-end">
+      <User  />
+      {post.voteCount}
+    </Badge>
+    <Badge variant={"outline"} className="h-6 self-end">
+      <MessageSquare />
+      {post.commentCount}
+    </Badge>
+  </div>);
+
   return (
     <Card className="py-4">
       <CardHeader>
-        <CardTitle>
+        <CardTitle onClick={navigateToDetails} className="cursor-pointer">
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-2">
-              <span className="text-gray-500 text-sm">
-                User has {post.polls?.length} poll{post.polls?.length === 1 ? "" : "s"} for you
+              <span className="text-informational text-sm">
+                {post.creator?.username} has {post.polls?.length} poll{post.polls?.length === 1 ? "" : "s"} for you
               </span>
             </div>
             <span className="font-bold text-honey-brown">{post.title}</span>
@@ -38,8 +57,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
           {post.description}
         </span>
         {!resultsVisible ?
-          <HiveMimePostVote post={post} requestResults={toggleResults} /> :
-          <HiveMimePostResult post={post} requestVote={toggleResults} />}
+          <HiveMimePostVote post={post} requestResults={toggleResults} footer={footer} /> :
+          <HiveMimePostResult post={post} requestVote={toggleResults} footer={footer} />}
       </CardContent>
     </Card>
   );
