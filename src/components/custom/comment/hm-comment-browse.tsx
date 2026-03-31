@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { PostDto } from "@/lib/Api";
 import { Badge } from "@/components/ui/badge";
 import { HiveMimeComment } from "./hm-comment";
+import HexWrapper from "../utility/hm-hex-wrapper";
 
 export interface HiveMimeCommentBrowseProps {
   post: PostDto;
@@ -17,7 +18,11 @@ export const HiveMimeCommentBrowse = observer(({ post }: HiveMimeCommentBrowsePr
         <CardTitle>
           <div className="flex flex-row gap-2 items-center">
             Comments
-            <Badge variant="outline">{post.commentCount}</Badge>
+            <HexWrapper>
+              <Badge className="bg-popover text-muted-foreground">
+                {post.commentCount}
+              </Badge>
+            </HexWrapper>
           </div>
         </CardTitle>
       </CardHeader>

@@ -1,163 +1,106 @@
 import { getComputedColor } from "@/lib/colors";
+import React from "react";
 
-type HexWrapperProps =
-  {
-    children: React.ReactNode;
-    cornerLength?: number;
-    backgroundColor?: string;
-    borderColor?: string;
-    borderWidth?: number;
-    direction?: "horizontal" | "vertical";
+type HexWrapperProps = {
+  children: React.ReactNode;
+  pointRatio?: number;
+  borderColor?: string;
+  orientation?: 'horizontal' | 'vertical'; 
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export default function HexWrapper({ 
+  children, 
+  pointRatio = 0.2, 
+  borderColor = 'border',
+  orientation = 'horizontal',
+  ...props 
+}: HexWrapperProps) {
+  const hexRef = React.useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = React.useState({ width: 0, height: 0 });
+
+  React.useEffect(() => {
+    if (hexRef.current) {
+      const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          setDimensions({
+            width: entry.contentRect.width,
+            height: entry.contentRect.height
+          });
+        }
+      });
+      resizeObserver.observe(hexRef.current);
+      return () => resizeObserver.disconnect();
+    }
+  }, []);
+
+  // Calculate responsive point size based on dimensions
+  const cornerCut = React.useMemo(() => {
+    if (dimensions.width === 0 || dimensions.height === 0) return 0;
+    return Math.round(Math.min(dimensions.width, dimensions.height) * pointRatio);
+  }, [dimensions, pointRatio, orientation]);
+
+  // Calculate clip-path and SVG coordinates based on orientation
+  const getClipPath = () => {
+    if (orientation === 'vertical') {
+      return `polygon(
+        0% ${cornerCut}px,
+        50% 0%,
+        100% ${cornerCut}px,
+        100% calc(100% - ${cornerCut}px),
+        50% 100%,
+        0% calc(100% - ${cornerCut}px)
+      )`;
+    } else {
+      return `polygon(
+        ${cornerCut}px 0%, 
+        calc(100% - ${cornerCut}px) 0%, 
+        100% 50%, 
+        calc(100% - ${cornerCut}px) 100%, 
+        ${cornerCut}px 100%, 
+        0% 50%
+      )`;
+    }
   };
 
-export function HexWrapper({
-  children,
-  cornerLength = 12,
-  backgroundColor = "muted",
-  borderColor = "border",
-  borderWidth = 1,
-  direction = "vertical",
-}: HexWrapperProps) {
-  const bg = getComputedColor(backgroundColor);
-  const border = getComputedColor(borderColor);
+  const getSVGPoints = () => {
+    if (orientation === 'vertical') {
+      return `0,${cornerCut} ${dimensions.width / 2},0 ${dimensions.width},${cornerCut} ${dimensions.width},${dimensions.height - cornerCut} ${dimensions.width / 2},${dimensions.height} 0,${dimensions.height - cornerCut}`;
+    } else {
+      return `${cornerCut},0 ${dimensions.width - cornerCut},0 ${dimensions.width},${dimensions.height / 2} ${dimensions.width - cornerCut},${dimensions.height} ${cornerCut},${dimensions.height} 0,${dimensions.height / 2}`;
+    }
+  };
 
-  if (direction === "horizontal") {
-    return (
-      <div className="inline-flex flex-row w-fit">
-        {/* left */}
-        <div style={{ width: cornerLength }} className="relative z-1">
-          <svg
-            className="absolute inset-0 w-full h-full overflow-visible"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-          >
-            <polygon points="100,0 0,50 100,100" style={{ fill: bg }} />
-            <path
-              d="M100 0 L0 50 L100 100"
-              fill="none"
-              stroke={border}
-              strokeWidth={borderWidth}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
-
-        {/* middle */}
-        <div className="relative flex items-center justify-center">
-          <div
-            className="relative"
-            style={{
-              paddingTop: borderWidth,
-              paddingBottom: borderWidth,
-              backgroundColor: bg,
-            }}
-          >
-            {children}
-          </div>
-
-          <svg
-            className="absolute inset-0 w-full h-full overflow-visible"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-          >
-            {/* top + bottom borders */}
-            <path
-              d="M0 0 L100 0 M0 100 L100 100"
-              stroke={border}
-              strokeWidth={borderWidth}
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
-
-        {/* right */}
-        <div style={{ width: cornerLength }} className="relative">
-          <svg
-            className="absolute inset-0 w-full h-full overflow-visible"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-          >
-            <polygon points="0,0 100,50 0,100" style={{ fill: bg }} />
-            <path
-              d="M0 0 L100 50 L0 100"
-              fill="none"
-              stroke={border}
-              strokeWidth={borderWidth}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
-      </div>
-    );
-  }
-
-  // existing vertical version unchanged
   return (
-    <div className="inline-flex flex-col w-fit">
-      {/* top */}
-      <div style={{ height: cornerLength }} className="relative z-1">
-        <svg
-          className="absolute inset-0 w-full h-full overflow-visible"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
+    <div
+      {...props}
+      className={`relative inline-block ${props.className || ""}`}
+    >
+      {/* Content with hex clip-path */}
+      <div
+        ref={hexRef}
+        style={{
+          clipPath: getClipPath()
+        }}
+      >
+        {children}
+      </div>
+      
+      {/* SVG border overlay */}
+      {dimensions.width > 0 && (
+        <svg 
+          className="absolute inset-0 pointer-events-none"
+          width={dimensions.width}
+          height={dimensions.height}
+          style={{ overflow: 'visible' }}
         >
-          <polygon points="0,100 50,0 100,100" style={{ fill: bg }} />
-          <path
-            d="M0 100 L50 0 L100 100"
+          <polygon 
+            points={getSVGPoints()}
             fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ stroke: border, strokeWidth: borderWidth }}
-            vectorEffect="non-scaling-stroke"
+            stroke={getComputedColor(borderColor)}
+            strokeWidth="1"
           />
         </svg>
-      </div>
-
-      {/* middle */}
-      <div className="relative flex items-center justify-center">
-        <div className="relative" style={{ paddingLeft: borderWidth, paddingRight: borderWidth, backgroundColor: bg }}>
-          {children}
-        </div>
-
-        <svg
-          className="absolute inset-0 w-full h-full overflow-visible"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          {/* left + right borders */}
-          <path
-            d="M0 0 L0 100 M100 0 L100 100"
-            style={{
-              stroke: border,
-              strokeWidth: borderWidth,
-            }}
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
-
-      {/* bottom */}
-      <div style={{ height: cornerLength }} className="relative">
-        <svg
-          className="absolute inset-0 w-full h-full overflow-visible"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <polygon points="0,0 50,100 100,0" style={{ fill: bg }} />
-          <path
-            d="M0 0 L50 100 L100 0"
-            fill="none"
-            style={{ stroke: border, strokeWidth: borderWidth }}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
+      )}
     </div>
   );
 }
