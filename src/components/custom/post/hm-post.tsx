@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, User } from "lucide-react";
+import HexWrapper from "../utility/hm-hex-wrapper";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -28,14 +29,18 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
 
   const footer = (
   <div className="flex flex-row gap-2 w-full">
-    <Badge variant={"outline"} className="h-6 self-end">
-      <User  />
-      {post.voteCount}
-    </Badge>
-    <Badge variant={"outline"} className="h-6 self-end">
-      <MessageSquare />
-      {post.commentCount}
-    </Badge>
+    <HexWrapper className="self-end">
+      <Badge className="h-6 bg-popover text-muted-foreground">
+        <User  />
+        {post.voteCount}
+      </Badge>
+    </HexWrapper>
+    <HexWrapper className="self-end">
+      <Badge className="h-6 bg-popover text-muted-foreground">
+        <MessageSquare />
+        {post.commentCount}
+      </Badge>
+    </HexWrapper>
   </div>);
 
   return (
