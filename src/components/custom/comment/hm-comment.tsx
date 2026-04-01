@@ -50,7 +50,7 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
     <div className="flex flex-col">
       {!isRoot && <div className="flex flex-row gap-1 text-sm text-informational mb-2">
           <span className="font-bold">{comment.user?.username}</span>
-          <span>•</span>
+          <span>⬢</span>
           <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
       </div>}
     

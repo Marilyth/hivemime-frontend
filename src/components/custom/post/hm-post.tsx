@@ -3,13 +3,14 @@
 import { PostDto } from "@/lib/Api";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { HiveMimePostResult } from "./post-result/hm-post-result";
-import { HiveMimePostVote } from "./post-vote/hm-post-vote";
+import { HiveMimePostResult } from "./result/hm-post-result";
+import { HiveMimePostVote } from "./vote/hm-post-vote";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, User } from "lucide-react";
 import HexWrapper from "../utility/hm-hex-wrapper";
+import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -50,7 +51,7 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
           <div className="flex flex-col gap-1">
             <div className="flex flex-row gap-2">
               <span className="text-informational text-sm">
-                {post.creator?.username} has {post.polls?.length} poll{post.polls?.length === 1 ? "" : "s"} for you
+                {post.creator?.username} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
               </span>
             </div>
             <span className="font-bold text-honey-brown">{post.title}</span>

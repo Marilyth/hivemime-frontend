@@ -4,6 +4,23 @@ import { Button } from "../../ui/button";
 import { Progress } from "../../ui/progress";
 import { Field, FieldLabel } from "../../ui/field";
 
+interface HiveMimeStepContextValue {
+  next: () => void;
+  back: () => void;
+  currentStepIndex: number;
+  totalSteps: number;
+}
+
+const HiveMimeStepContext = React.createContext<HiveMimeStepContextValue | null>(null);
+
+export function useHiveMimeStep() {
+  const context = React.useContext(HiveMimeStepContext);
+  if (!context) {
+    throw new Error('useHiveMimeStep must be used within a HiveMimeMultiStep component');
+  }
+  return context;
+}
+
 interface HiveMimeStepProps extends React.ComponentProps<"div"> {
   canContinue: boolean;
 };
@@ -13,11 +30,11 @@ export function HiveMimeStep({
   children,
   ...props
 }: HiveMimeStepProps) {
-    return (
-      <div {...props}>
-        {children}
-      </div>
-    );
+  return (
+    <div {...props}>
+      {children}
+    </div>
+  );
 }
 
 type HiveMimeMultiStepProps = React.ComponentProps<"div"> & {
@@ -54,37 +71,47 @@ export function HiveMimeMultiStep({
       setCurrentStep(newValue);
   }
 
+  // Create context value with navigation functions
+  const contextValue: HiveMimeStepContextValue = React.useMemo(() => ({
+    next: () => advanceStep(1),
+    back: () => advanceStep(-1),
+    currentStepIndex: currentStep,
+    totalSteps: totalSteps
+  }), [currentStep, totalSteps]);
+
   return (
-    <div className={cn("flex flex-col gap-8", className)}
-      {...props}
-    >
+    <HiveMimeStepContext.Provider value={contextValue}>
+      <div className={cn("flex flex-col gap-8", className)}
+        {...props}
+      >
         <div className="flex-1">
-            {steps[currentStep]}
+          {steps[currentStep]}
         </div>
 
         <div className="flex flex-row gap-8">
-            <Button
-                variant="outline"
-                disabled={currentStep == 0 && !canCancel}
-                onClick={() => advanceStep(-1)}
-            >
-                {currentStep === 0 ? "Cancel" : "Back"}
-            </Button>
-            <Field className="flex-1">
-                <FieldLabel htmlFor="progress-upload">
-                    <span>Step</span>
-                    <span className="ml-auto">{currentStep + 1}/{totalSteps}</span>
-                </FieldLabel>
-                <Progress value={Math.round(((currentStep + 1) / totalSteps) * 100)} id="progress-upload" />
-            </Field>
-            <Button
-                onClick={() => advanceStep(1)}
-                disabled={!steps[currentStep]?.props.canContinue}
-            >
-                {currentStep === totalSteps - 1 ? "Finish" : "Next"}
-            </Button>
+          <Button
+            variant="outline"
+            disabled={currentStep == 0 && !canCancel}
+            onClick={() => advanceStep(-1)}
+          >
+            {currentStep === 0 ? "Cancel" : "Back"}
+          </Button>
+          <Field className="flex-1">
+            <FieldLabel htmlFor="progress-upload">
+              <span>Step</span>
+              <span className="ml-auto">{currentStep + 1}/{totalSteps}</span>
+            </FieldLabel>
+            <Progress value={Math.round(((currentStep + 1) / totalSteps) * 100)} id="progress-upload" />
+          </Field>
+          <Button
+            onClick={() => advanceStep(1)}
+            disabled={!steps[currentStep]?.props.canContinue}
+          >
+            {currentStep === totalSteps - 1 ? "Finish" : "Next"}
+          </Button>
         </div>
-    </div>
+      </div>
+    </HiveMimeStepContext.Provider>
   )
 }
 
