@@ -527,11 +527,11 @@ export class Api<
      * No description
      *
      * @tags Comment
-     * @name CommentGetList
-     * @request GET:/api/Comment/get
+     * @name CommentGetByPostList
+     * @request GET:/api/Comment/getByPost
      * @secure
      */
-    commentGetList: (
+    commentGetByPostList: (
       query?: {
         /** @format int32 */
         postId?: number;
@@ -543,7 +543,33 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<CommentDto[], any>({
-        path: `/api/Comment/get`,
+        path: `/api/Comment/getByPost`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentGetByUserList
+     * @request GET:/api/Comment/getByUser
+     * @secure
+     */
+    commentGetByUserList: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+        /** @format date-time */
+        beforeDate?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CommentDto[], any>({
+        path: `/api/Comment/getByUser`,
         method: "GET",
         query: query,
         secure: true,
@@ -583,10 +609,17 @@ export class Api<
      * @request GET:/api/Hive/followed
      * @secure
      */
-    hiveFollowedList: (params: RequestParams = {}) =>
+    hiveFollowedList: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<HiveDto[], any>({
         path: `/api/Hive/followed`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -717,10 +750,12 @@ export class Api<
     postBrowseList: (
       query?: {
         /** @format int32 */
-        afterId?: number;
+        creatorId?: number;
         /** @format int32 */
         hiveId?: number;
         filter?: string;
+        /** @format date-time */
+        beforeDate?: string;
       },
       params: RequestParams = {},
     ) =>

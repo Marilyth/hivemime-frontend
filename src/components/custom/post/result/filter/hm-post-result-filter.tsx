@@ -53,22 +53,31 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
 
     return (
         <Dialog open={isOpen} onOpenChange={onFinished}>
-            <DialogContent className="gap-2">
-                <DialogHeader>
-                    <DialogTitle>Filter votes</DialogTitle>
-                </DialogHeader>
-
-                <span className="text-sm text-muted-foreground mb-4">
-                    Easily see correlations between different polls and candidates by creating filters.
-                </span>
-
+            <DialogContent>
                 {showCreator ?
-                    <HiveMimeFilterCreator post={post} onFinished={handleFinished} /> :
-                    <div className="gap-2">
-                        <HiveMimeVoteQueryGroupBuilder builder={builder} />
+                    <div className="flex flex-col">
+                        <span className="text-lg font-semibold">
+                            Create condition
+                        </span>
+
+                        <HiveMimeFilterCreator post={post} onFinished={handleFinished} />
+                    </div> :
+                    <div className="flex flex-col">
+                        <span className="text-lg font-semibold">
+                            Filter votes
+                        </span>
+
+                        <span className="text-sm text-muted-foreground mb-4">
+                            Add conditions to filter out votes you don't want to see.
+                        </span>
+
+                        {builder.children.length > 0 &&
+                        <div className="bg-muted border rounded py-2 mb-2">
+                            <HiveMimeVoteQueryGroupBuilder builder={builder} />
+                        </div>}
                         <Button variant="outline" onClick={() => setShowCreator(true)}>
                             <Plus />
-                            Add filter
+                            Add condition
                         </Button>
                     </div>
                 }
@@ -108,7 +117,7 @@ export const HiveMimeFilterCreator = observer(({ post, currentItem, onFinished }
     };
 
     return (
-        <div className="border p-4 rounded">
+        <div>
             <HiveMimeMultiStep canCancel onCancelled={() => onFinished(null)} onFinished={() => onFinished(item)}>
                 <HiveMimeStep canContinue={item.candidate != null}>
                     <HiveMimeFilterDialogCandidatePicker currentItem={item} post={post} />
@@ -139,11 +148,12 @@ export const HiveMimeFilterDialogCandidatePicker = observer(({ post, currentItem
 
     return (
         <div className="flex-col gap-2">
-            <span className="text-sm text-muted-foreground mb-4">
-                Please pick a candidate to create a filter for.
-            </span>
+            <div className="text-sm text-muted-foreground mb-4">
+                Pick a candidate to create a condition for.
+            </div>
 
-            <Accordion type="single" collapsible>
+            <div className="border rounded">
+                <Accordion type="single" collapsible>
                 {post.polls!.map((poll) => (
                     <AccordionItem key={getReferenceId(poll)} value={getReferenceId(poll)} className="border-b last:border-b-0">
                         <AccordionTrigger className="bg-popover p-2">
@@ -155,9 +165,9 @@ export const HiveMimeFilterDialogCandidatePicker = observer(({ post, currentItem
                             </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 p-2">
                                 {poll.candidates!.map((candidate) => (
-                                    <HiveMimeHoverCard key={getReferenceId(candidate)} onClick={() => onCandidatePicked(poll, candidate)}>
+                                    <HiveMimeHoverCard key={getReferenceId(candidate)} onClick={() => onCandidatePicked(poll, candidate)} className="hover:text-honey-brown ">
                                         {candidate.name}
                                     </HiveMimeHoverCard>
                                 ))}
@@ -165,7 +175,8 @@ export const HiveMimeFilterDialogCandidatePicker = observer(({ post, currentItem
                         </AccordionContent>
                     </AccordionItem>
                 ))}
-            </Accordion>
+                </Accordion>
+            </div>
         </div>
     );
 });
@@ -184,6 +195,10 @@ export const HiveMimeFilterDialogCandidateChoiceValuePicker = observer(({ post, 
 
     return (
         <div className="flex-col gap-2">
+            <div className="text-sm text-muted-foreground mb-4">
+                Adjust the condition for <span className="font-bold">{currentItem.poll?.title}</span>: <span className="font-bold">{currentItem.candidate?.name}</span>.
+            </div>
+
             <span className="text-sm text-muted-foreground mb-4">
                 <span className="font-bold">{currentItem.candidate?.name}</span> was
                 <Select

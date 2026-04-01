@@ -44,22 +44,22 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
       <HiveMimePostResultFilter post={post} builder={queryBuilder} isOpen={filterOpen} onFinished={filterFinished} />
       <div className="flex flex-col gap-4">
         <div className="border rounded-md">
-          <div className="flex justify-between items-center px-4 py-3 border-b bg-muted/30">
-            <h3 className="font-semibold">
+          <div className="flex justify-between items-center border-b bg-muted/30 px-2">
+            <span className="font-semibold">
               Results 
               {post.voteCount && (
                 <span className="font-normal text-sm text-muted-foreground ml-2">
                   ({post.voteCount.toLocaleString()} votes)
                 </span>
               )}
-            </h3>
+            </span>
             <Button variant="link" onClick={() => setFilterOpen(true)}>
               <Filter />
               Filter votes
             </Button>
           </div>
           
-          <Accordion type="single" collapsible className="border-0">
+          <Accordion type="single" collapsible>
             {post.polls!.map((poll, index) => (
               <HiveMimePollResult key={index} poll={poll} pollResult={results?.polls![index]} />
             ))}
