@@ -17,6 +17,24 @@ export enum PollType {
   Category = "Category",
 }
 
+export interface CandidateDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface CategoryDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  color?: number;
+  /** @format int32 */
+  value?: number;
+}
+
 export interface CommentDto {
   user?: UserDto;
   /** @format int32 */
@@ -32,6 +50,18 @@ export interface CommentDto {
   updatedAt?: string | null;
   /** @format int32 */
   replyCount?: number;
+}
+
+export interface CreateCandidateDto {
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface CreateCategoryDto {
+  name?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  color?: number;
 }
 
 export interface CreateCommentDto {
@@ -63,8 +93,8 @@ export interface CreatePollDto {
   /** @format int32 */
   maxVotes?: number;
   pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
+  candidates?: CreateCandidateDto[] | null;
+  categories?: CreateCategoryDto[] | null;
 }
 
 export interface CreatePostDto {
@@ -99,12 +129,9 @@ export interface LoginDto {
   token?: string | null;
 }
 
-export interface PollCandidateDto {
-  name?: string | null;
-  description?: string | null;
-}
-
 export interface PollCandidateResultDto {
+  /** @format int32 */
+  id?: number;
   name?: string | null;
   description?: string | null;
   /** @format int32 */
@@ -113,31 +140,26 @@ export interface PollCandidateResultDto {
   score?: number;
 }
 
-export interface PollCategoryDto {
-  name?: string | null;
-  description?: string | null;
-  /** @format int32 */
-  color?: number;
-}
-
 export interface PollDto {
+  /** @format int32 */
+  id?: number;
   title?: string | null;
   description?: string | null;
   isShuffled?: boolean;
   isOptional?: boolean;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
   maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateDto[] | null;
+  categories?: CategoryDto[] | null;
 }
 
 export interface PollResultDto {

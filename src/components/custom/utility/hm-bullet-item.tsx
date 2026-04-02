@@ -9,11 +9,11 @@ export function HiveMimeBulletItem({
   ...props
 }: HiveMimeBulletItemProps) {
   return (
-    <div className={cn("flex flex-row gap-2", className)}
+    <div className={cn("flex flex-row gap-2 w-full", className)}
       {...props}
     >
-      <span>•</span>
-      <div>
+      <div>•</div>
+      <div className="flex-1 min-w-0">
         {children}
       </div>
     </div>

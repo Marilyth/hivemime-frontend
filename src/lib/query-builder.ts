@@ -1,5 +1,5 @@
 import { makeObservable, observable } from "mobx";
-import { PollDto, PollCandidateDto } from "./Api";
+import { PollDto, CandidateDto } from "./Api";
 
 export enum ValueOperator {
   Equals = "=",
@@ -60,9 +60,9 @@ export class VoteQueryGroup extends VoteQueryBase {
 
 export class VoteQuery extends VoteQueryBase {
   poll: PollDto | null = null;
-  candidate: PollCandidateDto | null = null;
+  candidate: CandidateDto | null = null;
   valueOperator: ValueOperator | null = null;
-  value: unknown = null;
+  value: number | null = null;
 
   constructor() {
     super();
@@ -77,6 +77,6 @@ export class VoteQuery extends VoteQueryBase {
   }
 
   protected getQueryExpression(): string {
-    return `candidateIdPlaceholder${this.valueOperator}${this.value}`;
+    return `${this.candidate?.id}${this.valueOperator}${this.value}`;
   }
 }

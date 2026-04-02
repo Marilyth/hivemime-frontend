@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Vote, Filter } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
-import { HiveMimePostResultFilter, HiveMimeVoteQueryGroupBuilder } from "./filter/hm-post-result-filter";
+import { HiveMimePostResultFilter } from "./filter/hm-post-result-filter";
+import { HiveMimeVoteQueryGroup } from "./filter/hm-vote-query-group";
 import { VoteQueryGroup } from "@/lib/query-builder";
 
 interface HiveMimePostResultProps {

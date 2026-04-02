@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollCandidateDto } from "@/lib/Api";
+import { CreatePollDto, CandidateDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../../utility/hm-embedded-input";
@@ -13,7 +13,7 @@ import { HiveMimeDraggable } from "../../utility/hm-draggable";
 interface HiveMimeCreateCandidateProps {
   index: number;
   onIndexChange?: (newIndex: number) => void;
-  option: PollCandidateDto;
+  option: CandidateDto;
 }
 
 export interface HiveMimeCreateCandidatesProps {

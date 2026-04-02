@@ -1,13 +1,8 @@
-import { PollCandidateDto, PollCategoryDto, VoteOnCandidateDto } from "./Api";
+import { CandidateDto, VoteOnCandidateDto } from "./Api";
 
 export interface CombinedPollCandidate {
-  candidate: PollCandidateDto;
+  candidate: CandidateDto;
   vote: VoteOnCandidateDto;
-}
-
-export interface CombinedPollCategory {
-  category: PollCategoryDto;
-  value: number | null;
 }
 
 export enum ChartType {

@@ -3,13 +3,13 @@
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { observer } from "mobx-react-lite";
-import { PollCandidateDto, VoteOnCandidateDto } from "@/lib/Api";
+import { CandidateDto, VoteOnCandidateDto } from "@/lib/Api";
 import { motion } from "framer-motion";
 
 interface HiveMimePickMultipleChoiceCandidateProps {
   onClick?: () => void;
   vote: VoteOnCandidateDto;
-  candidate: PollCandidateDto;
+  candidate: CandidateDto;
 }
 
 export const HiveMimeChoicePollVoteCandidate = observer(({ vote, candidate, onClick }: HiveMimePickMultipleChoiceCandidateProps) => {

@@ -1,22 +1,22 @@
-import { CombinedPollCandidate, CombinedPollCategory } from "@/lib/view-models";
+import { CombinedPollCandidate } from "@/lib/view-models";
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../../utility/hm-draggable";
 import { motion } from "framer-motion";
 import { Tag } from "lucide-react";
-import { PollDto } from "@/lib/Api";
+import { CategoryDto, PollDto } from "@/lib/Api";
 import { HiveMimeTagItem } from "../../../utility/hm-tag-item";
 import { numberToColorHex } from "@/lib/colors";
 
 export interface HiveMimeCategoryPollVoteCategoryPanelProps {
   candidateClicked: (candidate: CombinedPollCandidate) => void;
   poll: PollDto;
-  category: CombinedPollCategory;
+  category: CategoryDto;
   candidates: CombinedPollCandidate[];
 }
 
 export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPollVoteCategoryPanelProps) {
-  function assignCandidateToCategory(candidate: CombinedPollCandidate, category: CombinedPollCategory) {
+  function assignCandidateToCategory(candidate: CombinedPollCandidate, category: CategoryDto) {
     candidate.vote.value = category.value;
   }
 
@@ -32,12 +32,12 @@ export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPol
       <motion.div layout
         layoutId={getReferenceId(props.category)} key={getReferenceId(props.category)}
         style={{ 
-          backgroundColor: `${numberToColorHex(props.category.category.color!)}00`,
-          borderColor: `${numberToColorHex(props.category.category.color!)}77`,
+          backgroundColor: `${numberToColorHex(props.category.color!)}00`,
+          borderColor: `${numberToColorHex(props.category.color!)}77`,
         }}
         whileHover={{
-          backgroundColor: `${numberToColorHex(props.category.category.color!)}20`,
-          borderColor: `${numberToColorHex(props.category.category.color!)}`,
+          backgroundColor: `${numberToColorHex(props.category.color!)}20`,
+          borderColor: `${numberToColorHex(props.category.color!)}`,
         }}
         className="flex flex-col border-l-6 rounded-md gap-2 p-2">
         {props.candidates.map((candidate, index) => (
@@ -50,7 +50,7 @@ export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPol
                   isDroppable
                   isDraggable
                   data={candidate}
-                  onDropped={data => assignCandidateToCategory(data.droppableData as CombinedPollCandidate, data.draggableData as CombinedPollCategory)}
+                  onDropped={data => assignCandidateToCategory(data.droppableData as CombinedPollCandidate, data.draggableData as CategoryDto)}
                   onClick={() => props.candidateClicked(candidate)}>
                   <HiveMimePickCandidate candidate={candidate} category={props.category} />
                 </HiveMimeDraggable>
@@ -63,11 +63,11 @@ export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPol
   );
 };
 
-export function HiveMimePickCandidate({ candidate, category }: { candidate: CombinedPollCandidate, category: CombinedPollCategory }) {
+export function HiveMimePickCandidate({ candidate, category }: { candidate: CombinedPollCandidate, category: CategoryDto }) {
   return (
     <HiveMimeHoverCard
      style={{
-      borderColor: `${numberToColorHex(category.category.color!)}77`,
+      borderColor: `${numberToColorHex(category.color!)}77`,
      }}
      className={`flex flex-row gap-2 items-center cursor-pointer hover:text-honey-brown`}>
       <span className="flex-1">{candidate.candidate.name}</span>
@@ -76,38 +76,39 @@ export function HiveMimePickCandidate({ candidate, category }: { candidate: Comb
   );
 };
 
-export function HiveMimeCategoryTag({ category }: { category: CombinedPollCategory }) {
+export function HiveMimeCategoryTag({ category }: { category: CategoryDto }) {
   return (
     <div className="flex flex-row items-center gap-2 text-sm text-muted-foreground">
       <Tag 
         style={{ 
-          color: `${numberToColorHex(category.category.color!)}`,
+          color: `${numberToColorHex(category.color!)}`,
         }}
         className="w-4 h-4" />
-      <span title={category.category.name!} className="truncate max-w-32">{category.category.name}</span>
+      <span title={category.name!} className="truncate max-w-32">{category.name}</span>
     </div>
   );
 };
 
 type HiveMimeCategoryTagBoxProps = React.ComponentProps<"div"> & {
-  category: CombinedPollCategory;
+  category: CategoryDto;
 };
 
 export function HiveMimeCategoryTagBox({ category, ...props }: HiveMimeCategoryTagBoxProps) {
+  console.log("Rendering category panel for category " + category.name);
   return (
     <motion.div
       className="cursor-pointer border-1 rounded-md"
       style={{
-        color: `${numberToColorHex(category.category.color!)}`,
-        borderColor: `${numberToColorHex(category.category.color!)}`,
-        backgroundColor: `${numberToColorHex(category.category.color!)}20`,
+        color: `${numberToColorHex(category.color!)}`,
+        borderColor: `${numberToColorHex(category.color!)}`,
+        backgroundColor: `${numberToColorHex(category.color!)}20`,
       }}
       whileHover={{
-        backgroundColor: `${numberToColorHex(category.category.color!)}50`,
+        backgroundColor: `${numberToColorHex(category.color!)}50`,
       }}>
       <HiveMimeTagItem {...props}>
         <div className="text-muted-foreground">
-          {category.category.name}
+          {category.name}
         </div>
       </HiveMimeTagItem>
     </motion.div>
