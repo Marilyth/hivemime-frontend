@@ -24,8 +24,8 @@ export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPol
     <HiveMimeDraggable
       key={getReferenceId(props.category)}
       data={props.category}
-      isDroppable
-      droppableFor={[`${getReferenceId(props.poll)}_category`]}
+      isDropArea
+      dropAreaName={[`${getReferenceId(props.poll)}_category`]}
       onDropped={data => assignCandidateToCategory(data.draggableData as CombinedPollCandidate, props.category)}
       canDrop={data => (data as CombinedPollCandidate).vote.value != props.category.value}>
 
@@ -45,12 +45,12 @@ export function HiveMimeCategoryPollVoteCategoryPanel(props: HiveMimeCategoryPol
             <motion.div layout layoutId={getReferenceId(candidate)} className="flex flex-row">
               <div className="flex-1">
                 <HiveMimeDraggable
-                  draggableOn={[`${getReferenceId(props.poll)}_category`]}
-                  droppableFor={[`${getReferenceId(props.poll)}_candidate`]}
-                  isDroppable
+                  draggableOnArea={[`${getReferenceId(props.poll)}_category`]}
+                  dropAreaName={[`${getReferenceId(props.poll)}_candidate`]}
+                  isDropArea
                   isDraggable
                   data={candidate}
-                  onDropped={data => assignCandidateToCategory(data.droppableData as CombinedPollCandidate, data.draggableData as CategoryDto)}
+                  onDropped={data => assignCandidateToCategory(data.dropAreaData as CombinedPollCandidate, data.draggableData as CategoryDto)}
                   onClick={() => props.candidateClicked(candidate)}>
                   <HiveMimePickCandidate candidate={candidate} category={props.category} />
                 </HiveMimeDraggable>

@@ -80,7 +80,7 @@ export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentIte
     return (
         <Label>
             {currentItem.candidate?.name} is{currentItem.isNegated ? " not" : ""} 
-            <span className="inline-block align-middle ml-2">
+            <span className="inline-block align-middle">
                 <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
             </span>
         </Label>

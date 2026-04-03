@@ -54,9 +54,9 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
             <HiveMimeDraggable
               key={getReferenceId(category)}
               data={category}
-              droppableFor={[`${getReferenceId(poll)}_category`]}
-              draggableOn={[`${getReferenceId(poll)}_candidate`]}
-              isDroppable
+              dropAreaName={[`${getReferenceId(poll)}_category`]}
+              draggableOnArea={[`${getReferenceId(poll)}_candidate`]}
+              isDropArea
               isDraggable
               onClick={() => setOpenedCategory(category)}
               onDropped={data => assignCandidateToCategory(data.draggableData as CombinedPollCandidate, category)}

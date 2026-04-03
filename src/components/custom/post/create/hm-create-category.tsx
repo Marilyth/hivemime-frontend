@@ -70,7 +70,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}>
-                <HiveMimeDraggable isDraggable isDroppable isSticky data={category} dataList={poll.categories!} allowedEdges={['top', 'bottom']}>
+                <HiveMimeDraggable isDraggable isDropArea isSticky data={category} dataList={poll.categories!} allowedZones={['top', 'bottom']}>
                   <div className="flex flex-row items-center">
                     <div className="flex-1">
                       <HiveMimeCreateCategory category={category} index={index} onIndexChange={(newIndex) => moveCategory(index, newIndex)} />
