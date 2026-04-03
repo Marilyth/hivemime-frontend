@@ -44,3 +44,11 @@ export const HiveMimeFilterConditionChoiceValuePicker = observer(({ currentItem 
         </div>
     );
 });
+
+export const HiveMimeFilterConditionChoiceValueViewer = observer(({ currentItem }: HiveMimeFilterConditionChoiceValuePickerProps) => {
+    return (
+        <div>
+            {currentItem.candidate?.name} {currentItem.value === 1 ? "selected" : "not selected"}
+        </div>
+    );
+});

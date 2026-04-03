@@ -23,9 +23,9 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
         [key in PollType]: React.ReactElement;
     } = {
         [PollType.Choice]: <HiveMimeFilterConditionChoiceValuePicker currentItem={item} />,
-        [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} poll={item.poll!} />,
-        [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} poll={item.poll!} />,
-        [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} poll={item.poll!} />,
+        [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} />,
+        [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} />,
+        [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} />,
     };
 
     return (

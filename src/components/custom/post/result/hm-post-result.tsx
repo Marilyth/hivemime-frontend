@@ -48,11 +48,9 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
           <div className="flex justify-between items-center border-b bg-muted/30 px-2">
             <span className="font-semibold">
               Results 
-              {post.voteCount && (
-                <span className="font-normal text-sm text-muted-foreground ml-2">
-                  ({post.voteCount.toLocaleString()} votes)
-                </span>
-              )}
+              <span className="font-normal text-sm text-muted-foreground ml-2">
+                {(post.voteCount ?? 0).toLocaleString()} votes
+              </span>
             </span>
             <Button variant="link" onClick={() => setFilterOpen(true)}>
               <Filter />

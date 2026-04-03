@@ -2,7 +2,6 @@ import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { PollDto } from "@/lib/Api";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
@@ -10,10 +9,9 @@ import { useEffect } from "react";
 
 interface HiveMimeFilterConditionRankValuePickerProps {
     currentItem: VoteQuery;
-    poll: PollDto;
 }
 
-export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem, poll }: HiveMimeFilterConditionRankValuePickerProps) => {
+export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
     useEffect(() => {
         if (currentItem.value != null)
             return;
@@ -84,12 +82,12 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem, p
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
-                                {[...Array(poll.candidates!.length).keys()].map((rank) => (
+                                {[...Array(currentItem.poll!.candidates!.length).keys()].map((rank) => (
                                     <SelectItem key={rank} value={rank.toString()}>
                                         {hiveMimeRankIcon(rank + 1)}
                                     </SelectItem>)
                                 )}
-                                <SelectItem key="unranked" value={poll.maxValue!.toString()}>
+                                <SelectItem key="unranked" value={currentItem.poll!.maxValue!.toString()}>
                                     Unranked
                                 </SelectItem>
                             </SelectContent>
@@ -97,6 +95,14 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem, p
                     </div>
                 </div>
             </HiveMimeBulletItem>
+        </div>
+    );
+});
+
+export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
+    return (
+        <div>
+            {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value === currentItem.poll!.maxValue ? "unranked" : hiveMimeRankIcon(Number(currentItem.value) + 1)}
         </div>
     );
 });

@@ -1,7 +1,6 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { PollDto } from "@/lib/Api";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
@@ -9,16 +8,15 @@ import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vot
 
 interface HiveMimeFilterConditionCategoryValuePickerProps {
     currentItem: VoteQuery;
-    poll: PollDto;
 }
 
-export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentItem, poll }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
     useEffect(() => {
         if (currentItem.value != null)
             return;
 
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = poll.minValue!;
+        currentItem.value = currentItem.poll!.minValue!;
     }, [currentItem]);
 
     function setNegation(value: boolean) {
@@ -63,7 +61,7 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
-                                {poll.categories!.map((category) => (
+                                {currentItem.poll!.categories!.map((category) => (
                                     <SelectItem key={category.id} value={category.value!.toString()}>
                                         <HiveMimeCategoryTag category={category} />
                                     </SelectItem>
@@ -73,6 +71,17 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                     </div>
                 </div>
             </HiveMimeBulletItem>
+        </div>
+    );
+});
+
+export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+    return (
+        <div>
+            {currentItem.candidate?.name} is{currentItem.isNegated ? " not" : ""} 
+            <span className="inline-block align-middle ml-2">
+                <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
+            </span>
         </div>
     );
 });

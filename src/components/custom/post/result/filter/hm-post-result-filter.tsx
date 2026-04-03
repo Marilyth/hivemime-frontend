@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { HiveMimeVoteQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 
 
 interface HiveMimePostResultFilterProps {
@@ -50,9 +51,17 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
                         </span>
 
                         {builder.children.length > 0 &&
-                        <div className="bg-muted border rounded py-2 mb-2">
-                            <HiveMimeVoteQueryGroup builder={builder} />
-                        </div>}
+                            <div className="bg-muted/30 border rounded py-2 mb-2">
+                                <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} isRoot={true} />
+                            </div>
+                        }
+
+                        {builder.children.length > 1 &&
+                            <HiveMimeBulletItem className="mb-2">
+                                <span className="text-muted-foreground text-sm">You can <span className="text-honey-brown">drag & drop</span> your conditions to re-order and group them up.</span>
+                            </HiveMimeBulletItem>
+                        }
+
                         <Button variant="outline" onClick={() => setShowCreator(true)}>
                             <Plus />
                             Add condition

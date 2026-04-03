@@ -16,7 +16,7 @@ export enum BooleanOperator {
 
 export abstract class VoteQueryBase {
   isNegated = false;
-  leftOperator: BooleanOperator | null = null;
+  leftOperator: BooleanOperator = BooleanOperator.And;
 
   public toString(): string {
     let queryExpression = this.getQueryExpression();

@@ -2,7 +2,6 @@ import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { PollDto } from "@/lib/Api";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
@@ -10,16 +9,15 @@ import { useEffect } from "react";
 
 interface HiveMimeFilterConditionScoreValuePickerProps {
     currentItem: VoteQuery;
-    poll: PollDto;
 }
 
-export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem, poll }: HiveMimeFilterConditionScoreValuePickerProps) => {
+export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
     useEffect(() => {
         if (currentItem.value != null)
             return;
         
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = poll.minValue!;
+        currentItem.value = currentItem.poll!.minValue!;
     }, [currentItem]);
 
     function setNegation(value: boolean) {
@@ -79,14 +77,22 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem, 
                     </div>
 
                     <Slider
-                        value={[currentItem.value ?? poll.minValue!]}
+                        value={[currentItem.value ?? currentItem.poll!.minValue!]}
                         onValueChange={(value) => setValue(value[0])}
-                        min={poll.minValue}
-                        max={poll.maxValue}
-                        step={poll.stepValue!}
+                        min={currentItem.poll!.minValue!}
+                        max={currentItem.poll!.maxValue!}
+                        step={currentItem.poll!.stepValue!}
                     />
                 </div>
             </HiveMimeBulletItem>
+        </div>
+    );
+});
+
+export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
+    return (
+        <div>
+            {currentItem.candidate?.name} score {currentItem.isNegated ? " not" : ""} {currentItem.valueOperator!} {currentItem.value}
         </div>
     );
 });
