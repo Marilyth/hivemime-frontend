@@ -7,6 +7,12 @@ import { GripVertical } from "lucide-react";
 import { FaCircle } from "react-icons/fa6";
 import { Input } from "@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types";
 
+export type OnDroppedArgs = {
+    draggableData: unknown;
+    dropAreaData: unknown | undefined;
+    zone: DropZone | null;
+}
+
 type DropZone = Edge | "center";
 
 type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
@@ -19,7 +25,7 @@ type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
 
     isDropArea?: boolean;
     canDrop?: (draggableData: unknown) => boolean;
-    onDropped?: ({draggableData, dropAreaData, zone}: {draggableData: unknown, dropAreaData: unknown | undefined, zone: DropZone | null}) => void;
+    onDropped?: (args: OnDroppedArgs) => void;
     dropAreaName?: Key[] | null;
 
     isDraggable?: boolean;
@@ -45,7 +51,6 @@ export function HiveMimeDraggable({
   const [isDragging, setDragging] = useState<boolean>(false);
 
   function getDropZone(element: HTMLElement, input: Input): DropZone | null {
-    console.log("Calculating drop zone", { element, input, allowedEdges: allowedZones });
     if (allowedZones.length === 0) {
       return null;
     }
@@ -167,7 +172,7 @@ export function HiveMimeDraggable({
       dropCleanup();
       dragCleanup();
     };
-  }, []);
+  }, [dataList]);
 
   return (
   <div
@@ -199,7 +204,12 @@ export function HiveMimeDraggable({
     )}
     {currentZone === "center" && (
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <FaCircle className="h-4 w-4 text-honey-brown" />
+        <div className="relative">
+          <div className="w-6 h-6 rounded-full border-2 border-honey-brown/30 bg-honey-brown/5"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-honey-brown/80"></div>
+          </div>
+        </div>
       </div>
     )}
       <div className="flex w-full items-center gap-1">
