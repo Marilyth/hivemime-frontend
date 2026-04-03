@@ -5,6 +5,7 @@ import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vote-category";
+import { Label } from "@/components/ui/label";
 
 interface HiveMimeFilterConditionCategoryValuePickerProps {
     currentItem: VoteQuery;
@@ -77,11 +78,11 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
 
 export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
     return (
-        <div>
+        <Label>
             {currentItem.candidate?.name} is{currentItem.isNegated ? " not" : ""} 
             <span className="inline-block align-middle ml-2">
                 <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
             </span>
-        </div>
+        </Label>
     );
 });

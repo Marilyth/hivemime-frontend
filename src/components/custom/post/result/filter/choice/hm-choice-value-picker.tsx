@@ -1,5 +1,6 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
@@ -47,8 +48,8 @@ export const HiveMimeFilterConditionChoiceValuePicker = observer(({ currentItem 
 
 export const HiveMimeFilterConditionChoiceValueViewer = observer(({ currentItem }: HiveMimeFilterConditionChoiceValuePickerProps) => {
     return (
-        <div>
+        <Label>
             {currentItem.candidate?.name} {currentItem.value === 1 ? "selected" : "not selected"}
-        </div>
+        </Label>
     );
 });

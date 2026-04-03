@@ -1,5 +1,6 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
@@ -91,8 +92,8 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
 
 export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
     return (
-        <div>
+        <Label>
             {currentItem.candidate?.name} score {currentItem.isNegated ? " not" : ""} {currentItem.valueOperator!} {currentItem.value}
-        </div>
+        </Label>
     );
 });

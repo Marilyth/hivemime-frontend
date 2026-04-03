@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { HiveMimeVoteQuery } from "./hm-vote-query";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
+import { HiveMimeDraggable } from "@/components/custom/utility/hm-draggable";
 
 
 type HiveMimeVoteQueryGroupProps = {
@@ -11,21 +12,21 @@ type HiveMimeVoteQueryGroupProps = {
     isRoot: boolean;
 };
 
-export const HiveMimeVoteQueryGroup = observer(({ group: builder, isFirstItem, isRoot }: HiveMimeVoteQueryGroupProps) => {
+export const HiveMimeVoteQueryGroup = observer(({ group, isFirstItem, isRoot }: HiveMimeVoteQueryGroupProps) => {
 
     function setLeftOperator(value: BooleanOperator) {
-        builder.leftOperator = value;
+        group.leftOperator = value;
     }
 
     function removeItem(item: VoteQuery) {
-        builder.children = builder.children.filter(i => i !== item);
+        group.children = group.children.filter(i => i !== item);
     }
     
     return (
         <div className="flex flex-col text-sm text-muted-foreground gap-2">
             {!isFirstItem && (
                 <Select
-                    value={builder.leftOperator}
+                    value={group.leftOperator}
                     onValueChange={(value) => setLeftOperator(value as BooleanOperator)}
                 >
                     <HiveMimeInlineSelectTrigger className="p-0">
@@ -39,9 +40,9 @@ export const HiveMimeVoteQueryGroup = observer(({ group: builder, isFirstItem, i
             )}
 
             <div className={`${!isRoot ? "ml-2 border-l" : ""}`}>
-                {builder.children.map((item, index) => item instanceof VoteQueryGroup ?
+                {group.children.map((item, index) => item instanceof VoteQueryGroup ?
                     <HiveMimeVoteQueryGroup key={index} group={item as VoteQueryGroup} isFirstItem={index == 0} isRoot={false} /> :
-                    <HiveMimeVoteQuery key={index} currentItem={item as VoteQuery} isFirstItem={index == 0} onRemove={() => removeItem(item as VoteQuery)} />
+                    <HiveMimeVoteQuery key={index} currentItem={item as VoteQuery} currentGroup={group} isFirstItem={index == 0} onRemove={() => removeItem(item as VoteQuery)} />
                 )}
             </div>
         </div>

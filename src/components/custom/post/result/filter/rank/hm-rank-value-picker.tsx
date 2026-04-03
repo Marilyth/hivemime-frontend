@@ -1,6 +1,7 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { valueOperatorToInlineString } from "@/lib/utils";
@@ -101,8 +102,8 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
 
 export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
     return (
-        <div>
+        <Label>
             {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value === currentItem.poll!.maxValue ? "unranked" : hiveMimeRankIcon(Number(currentItem.value) + 1)}
-        </div>
+        </Label>
     );
 });

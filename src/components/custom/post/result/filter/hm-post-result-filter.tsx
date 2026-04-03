@@ -1,14 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { PostDto } from "@/lib/Api";
 import { VoteQuery, VoteQueryGroup } from "@/lib/query-builder";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { HiveMimeVoteQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
+import { LayoutGroup } from "framer-motion";
 
 
 interface HiveMimePostResultFilterProps {
@@ -32,7 +32,6 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
     return (
         <Dialog open={isOpen} onOpenChange={onFinished}>
             <DialogContent>
-                <DialogTitle></DialogTitle>
                 {showCreator ?
                     <div className="flex flex-col">
                         <span className="text-lg font-semibold">
@@ -50,11 +49,13 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
                             Add conditions to filter out votes you don&apos;t want to see.
                         </span>
 
-                        {builder.children.length > 0 &&
-                            <div className="bg-muted/30 border rounded py-2 mb-2">
-                                <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} isRoot={true} />
-                            </div>
-                        }
+                        <LayoutGroup>
+                            {builder.children.length > 0 &&
+                                <div className="bg-muted/30 border rounded mb-2">
+                                    <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} isRoot={true} />
+                                </div>
+                            }
+                        </LayoutGroup>
 
                         {builder.children.length > 1 &&
                             <HiveMimeBulletItem className="mb-2">
