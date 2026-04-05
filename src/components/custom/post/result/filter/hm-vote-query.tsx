@@ -6,7 +6,7 @@ import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-
 import { HiveMimeFilterConditionRankValueViewer } from "./rank/hm-rank-value-picker";
 import { HiveMimeFilterConditionCategoryValueViewer } from "./category/hm-category-value-picker";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { HiveMimeDraggable, OnDroppedArgs } from "@/components/custom/utility/hm-draggable";
@@ -15,14 +15,14 @@ import { motion } from "framer-motion";
 
 
 type HiveMimeVoteQueryProps = {
+    ancestors: VoteQueryGroup[];
     currentItem: VoteQuery;
-    currentGroup: VoteQueryGroup;
-    isFirstItem?: boolean;
+    isFirstItem: boolean;
     onEdit?: () => void;
     onMoved?: () => void;
 };
 
-export const HiveMimeVoteQuery = observer(({ currentItem, currentGroup, isFirstItem = false, onEdit, onMoved }: HiveMimeVoteQueryProps) => {
+export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved }: HiveMimeVoteQueryProps) => {
     const pollMapping: {
         [key in PollType]: React.ReactElement;
     } = {
@@ -32,12 +32,20 @@ export const HiveMimeVoteQuery = observer(({ currentItem, currentGroup, isFirstI
         [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} />,
     };
 
-    function removeItem(item: VoteQuery) {
-        currentGroup.children = currentGroup.children.filter(i => i !== item);
+    function isNotAncestor(draggable: unknown): boolean {
+        return !(draggable instanceof VoteQueryGroup &&
+                 ancestors.includes(draggable as VoteQueryGroup));
+    }
+    
+    function getParent() {
+        return ancestors[ancestors.length - 1];
+    }
 
-        if (onMoved) {
-            onMoved();
-        }
+    function removeItem(item: VoteQuery) {
+        const parent = getParent();
+        parent.children = parent.children.filter(i => i !== item);
+
+        onMoved?.();
     }
 
     function onDropped(args: OnDroppedArgs) {
@@ -45,7 +53,7 @@ export const HiveMimeVoteQuery = observer(({ currentItem, currentGroup, isFirstI
 
         if (zone === "center" && draggableData instanceof VoteQuery) {
             // We are the only children of the group no need for another.
-            if (currentGroup.children.length == 2)
+            if (getParent().children.length == 2)
                 return;
 
             const targetItem = draggableData as VoteQuery;
@@ -56,9 +64,9 @@ export const HiveMimeVoteQuery = observer(({ currentItem, currentGroup, isFirstI
             newGroup.children.push(targetItem);
 
             // Replace the items in the current group with the new group.
-            const currentIndex = currentGroup.children.findIndex(i => i === currentItem);
-            currentGroup.children[currentIndex] = newGroup;
-            currentGroup.children = currentGroup.children.filter(i => i !== targetItem && i !== currentItem);
+            const currentIndex = getParent().children.findIndex(i => i === currentItem);
+            getParent().children[currentIndex] = newGroup;
+            getParent().children = getParent().children.filter(i => i !== targetItem && i !== currentItem);
         }
 
         onMoved?.();
@@ -75,9 +83,9 @@ export const HiveMimeVoteQuery = observer(({ currentItem, currentGroup, isFirstI
               key={getReferenceId(currentItem)}
               className="border-b"
               transition={{ duration: 0.2 }}>
-            <HiveMimeDraggable className="flex flex-row gap-2" isDraggable isDropArea allowedZones={["top", "bottom", "center"]} isSticky
-                data={currentItem} dataList={currentGroup.children} onDropped={onDropped}>
-                <div className="flex flex-row items-center gap-2 flex-1 min-w-0 py-2 pl-2 ">
+            <HiveMimeDraggable className="flex flex-row gap-2 hover:bg-honey-yellow/10" isDraggable isDropArea allowedZones={["top", "bottom", "center"]}
+                data={currentItem} dataList={getParent().children} onDropped={onDropped} canDrop={isNotAncestor}>
+                <div className="flex flex-row items-center gap-2 flex-1 min-w-0 py-3 pl-2">
                     {!isFirstItem && (
                         <Select
                             value={currentItem.leftOperator}

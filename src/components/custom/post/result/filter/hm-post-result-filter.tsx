@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { PostDto } from "@/lib/Api";
 import { VoteQuery, VoteQueryGroup } from "@/lib/query-builder";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Plus } from "lucide-react";
@@ -51,8 +51,8 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
 
                         <LayoutGroup>
                             {builder.children.length > 0 &&
-                                <div className="bg-muted/30 border rounded mb-2">
-                                    <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} isRoot={true} />
+                                <div className="border rounded mb-2 text-sm text-muted-foreground ">
+                                    <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} ancestors={[]} />
                                 </div>
                             }
                         </LayoutGroup>
