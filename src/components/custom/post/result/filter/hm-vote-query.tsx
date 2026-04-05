@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { BooleanOperator, VoteQuery, VoteQueryGroup } from "@/lib/query-builder";
+import { BooleanOperator, VoteQuery, VoteQueryBase, VoteQueryGroup } from "@/lib/query-builder";
 import { PollType } from "@/lib/Api";
 import { HiveMimeFilterConditionChoiceValueViewer } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-picker";
@@ -51,22 +51,22 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
     function onDropped(args: OnDroppedArgs) {
         const { draggableData, dropAreaData, zone } = args;
 
-        if (zone === "center" && draggableData instanceof VoteQuery) {
+        if (zone === "center" && draggableData instanceof VoteQueryBase) {
             // We are the only children of the group no need for another.
             if (getParent().children.length == 2)
                 return;
 
-            const targetItem = draggableData as VoteQuery;
+            const draggableItem = draggableData as VoteQueryBase;
 
             // Create a new group with the dragged item and the target item.
             const newGroup = new VoteQueryGroup();
             newGroup.children.push(currentItem);
-            newGroup.children.push(targetItem);
+            newGroup.children.push(draggableItem);
 
             // Replace the items in the current group with the new group.
             const currentIndex = getParent().children.findIndex(i => i === currentItem);
             getParent().children[currentIndex] = newGroup;
-            getParent().children = getParent().children.filter(i => i !== targetItem && i !== currentItem);
+            getParent().children = getParent().children.filter(i => i !== draggableItem && i !== currentItem);
         }
 
         onMoved?.();

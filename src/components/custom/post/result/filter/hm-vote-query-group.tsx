@@ -26,11 +26,19 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
     /**
      * Simplifies and cleans up the query group recursively by removing empty groups and collapsing groups with only 1 element.
      */
-    function cleanUpGroup() {
+    function cleanUpGroup(group: VoteQueryGroup) {
+        // Root will handle this. Trickle up.
+        if (!isRoot()){
+            onMoved?.();
+            return;
+        }
+
         for (let i = group.children.length - 1; i >= 0; i--) {
             const child = group.children[i];
             
             if (child instanceof VoteQueryGroup) {
+                cleanUpGroup(child);
+
                 // Adopt the child if there is only 1 left or it is my only child.
                 if (child.children.length == 1 || group.children.length == 1)
                     group.children.splice(i, 1, ...child.children);
@@ -40,9 +48,6 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
                     group.children.splice(i, 1);
             }
         }
-
-        // Notify the parent as well.
-        onMoved?.();
     }
 
     function isRoot() {
@@ -82,8 +87,8 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
 
                 <div className={`${!isRoot() ? "mx-2 border border-l-3 border-b-3 rounded bg-muted/30" : ""}`}>
                     {group.children.map((item, index) => item instanceof VoteQueryGroup ?
-                        <HiveMimeVoteQueryGroup key={index} group={item as VoteQueryGroup} isFirstItem={index == 0} onMoved={cleanUpGroup} ancestors={newAncestors} /> :
-                        <HiveMimeVoteQuery key={index} currentItem={item as VoteQuery} isFirstItem={index == 0} onMoved={cleanUpGroup} ancestors={newAncestors}  />
+                        <HiveMimeVoteQueryGroup key={index} group={item as VoteQueryGroup} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors} /> :
+                        <HiveMimeVoteQuery key={index} currentItem={item as VoteQuery} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors}  />
                     )}
                 </div>
             </HiveMimeDraggable>
