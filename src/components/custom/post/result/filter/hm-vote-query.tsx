@@ -81,11 +81,10 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
               layout
               layoutId={getReferenceId(currentItem)}
               key={getReferenceId(currentItem)}
-              className="border-b"
               transition={{ duration: 0.2 }}>
-            <HiveMimeDraggable className="flex flex-row gap-2 hover:bg-honey-yellow/10" isDraggable isDropArea allowedZones={["top", "bottom", "center"]}
+            <HiveMimeDraggable className="flex flex-row gap-2 border-b hover:bg-honey-yellow/10" isDraggable isDropArea allowedZones={["top", "bottom", "center"]}
                 data={currentItem} dataList={getParent().children} onDropped={onDropped} canDrop={isNotAncestor}>
-                <div className="flex flex-row items-center gap-2 flex-1 min-w-0 py-3 pl-2">
+                <div className="flex flex-row items-center gap-2 flex-1 min-w-0 my-3 pl-2">
                     {!isFirstItem && (
                         <Select
                             value={currentItem.leftOperator}
