@@ -18,14 +18,14 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
             return;
 
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = 0;
+        currentItem.value = currentItem.poll!.maxValue!;
     }, [currentItem]);
 
     function setNegation(value: boolean) {
         currentItem.isNegated = value;
     }
 
-    function setValue(value: number) {
+    function setValue(value: number | null) {
         currentItem.value = value;
     }
 
@@ -76,20 +76,20 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
 
                         {/* This score must be adjusted before sending it out. Ranks are inverse. */}
                         <Select
-                            value={(currentItem.value ?? 0).toString()}
-                            onValueChange={(value) => setValue(Number(value))}
+                            value={currentItem.value?.toString() ?? "none"}
+                            onValueChange={(value) => setValue(value === "none" ? null : Number(value))}
                         >
                             <HiveMimeInlineSelectTrigger>
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
                                 {[...Array(currentItem.poll!.candidates!.length).keys()].map((rank) => (
-                                    <SelectItem key={rank} value={rank.toString()}>
+                                    <SelectItem key={rank} value={(currentItem.poll!.maxValue! - rank).toString()}>
                                         {hiveMimeRankIcon(rank + 1)}
                                     </SelectItem>)
                                 )}
-                                <SelectItem key="unranked" value={currentItem.poll!.maxValue!.toString()}>
-                                    Unranked
+                                <SelectItem key="none" value="none">
+                                    Nothing
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -103,7 +103,7 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
 export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
     return (
         <Label>
-            {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value === currentItem.poll!.maxValue ? "unranked" : hiveMimeRankIcon(Number(currentItem.value) + 1)}
+            {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value == null ? "unranked" : hiveMimeRankIcon(Number(currentItem.poll!.maxValue! - currentItem.value) + 1)}
         </Label>
     );
 });

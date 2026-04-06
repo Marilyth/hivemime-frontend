@@ -34,7 +34,7 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
                 <HiveMimeStep canContinue={item.candidate != null}>
                     <HiveMimeFilterConditionCandidatePicker currentItem={item} post={post} />
                 </HiveMimeStep>
-                <HiveMimeStep canContinue={item.value != null}>
+                <HiveMimeStep canContinue={true}>
                     <div>
                         <div className="text-sm text-muted-foreground mb-4">
                             Adjust the condition for <span className="font-bold">{item?.poll?.title}</span>: <span className="font-bold">{item?.candidate?.name}</span>.
