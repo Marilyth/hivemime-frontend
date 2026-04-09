@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollCategoryDto } from "@/lib/Api";
+import { CreatePollDto, CategoryDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../../utility/hm-embedded-input";
@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogPortal, Dialog
 interface HiveMimeCreateCategoryProps {
   index: number;
   onIndexChange?: (newIndex: number) => void;
-  category: PollCategoryDto;
+  category: CategoryDto;
 }
 
 export interface HiveMimeCreateCategoriesProps {
@@ -27,7 +27,7 @@ export interface HiveMimeCreateCategoriesProps {
 }
 
 export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCategoriesProps) => {
-  const [selectedCategory, setSelectedCategory] =  useState<PollCategoryDto | null>(null);
+  const [selectedCategory, setSelectedCategory] =  useState<CategoryDto | null>(null);
 
   function moveCategory(oldIndex: number, newIndex: number) {
     if (newIndex < 0 || newIndex >= poll.categories!.length) {
@@ -70,7 +70,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}>
-                <HiveMimeDraggable isDraggable isDroppable isSticky data={category} dataList={poll.categories!} allowedEdges={['top', 'bottom']}>
+                <HiveMimeDraggable isDraggable isDropArea isSticky data={category} dataList={poll.categories!} allowedZones={['top', 'bottom']}>
                   <div className="flex flex-row items-center">
                     <div className="flex-1">
                       <HiveMimeCreateCategory category={category} index={index} onIndexChange={(newIndex) => moveCategory(index, newIndex)} />

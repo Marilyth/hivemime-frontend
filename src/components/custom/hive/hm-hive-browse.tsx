@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Api, HiveDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeApiContext } from "@/lib/contexts";
-import { HiveMimeHiveListItem } from "./hive-list/hm-hive";
+import { HiveMimeHiveListItem } from "./list/hm-hive";
 
 export default function HiveMimeHiveBrowse() {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;

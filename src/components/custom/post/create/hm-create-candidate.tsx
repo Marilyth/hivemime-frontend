@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollCandidateDto } from "@/lib/Api";
+import { CreatePollDto, CandidateDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../../utility/hm-embedded-input";
@@ -13,7 +13,7 @@ import { HiveMimeDraggable } from "../../utility/hm-draggable";
 interface HiveMimeCreateCandidateProps {
   index: number;
   onIndexChange?: (newIndex: number) => void;
-  option: PollCandidateDto;
+  option: CandidateDto;
 }
 
 export interface HiveMimeCreateCandidatesProps {
@@ -49,7 +49,7 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}>
-                <HiveMimeDraggable isDraggable isDroppable isSticky data={option} dataList={poll.candidates!} allowedEdges={['top', 'bottom']}>
+                <HiveMimeDraggable isDraggable isDropArea isSticky data={option} dataList={poll.candidates!} allowedZones={['top', 'bottom']}>
                   <div className="flex flex-row items-center">
                     <div className="flex-1">
                       <HiveMimeCreateCandidate option={option} index={index} onIndexChange={(newIndex) => moveCandidate(index, newIndex)} />

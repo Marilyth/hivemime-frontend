@@ -19,7 +19,7 @@ export function HiveMimeInlineSelectTrigger({
     >
       <div className="flex items-center gap-1">
         {children}
-        <ChevronDownIcon className="size-3 text-foreground" />
+        <ChevronDownIcon className="size-3 text-foreground ml-auto" />
       </div>
     </SelectPrimitive.Trigger>
   )

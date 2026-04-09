@@ -147,7 +147,7 @@ export const HiveMimeCreatePost = observer(() => {
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}>
-                <HiveMimeDraggable isDraggable isDroppable isSticky data={poll} dataList={post.polls!} allowedEdges={['top', 'bottom']} className="flex flex-row gap-1">
+                <HiveMimeDraggable isDraggable isDropArea isSticky data={poll} dataList={post.polls!} allowedZones={['top', 'bottom']} className="flex flex-row gap-1">
                   <HiveMimeHoverCard className="flex-1">
                     <div className="flex items-center gap-2">
                       <HiveMimePollTypeIcon answerType={poll.pollType} className="text-honey-brown w-8" />

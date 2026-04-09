@@ -17,13 +17,13 @@ export function HiveMimePostBrowse() {
   const [posts, setPosts] = useState<PostDto[]>([]);
   const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
 
-  function getAfterId() {
-    const afterId = params.get("afterId");
+  function getBeforeDate() {
+    const beforeDate = params.get("beforeDate");
 
-    if (!afterId)
+    if (!beforeDate)
       return undefined;
 
-    return Number(afterId);
+    return beforeDate;
   }
 
   function getHiveId() {
@@ -46,17 +46,17 @@ export function HiveMimePostBrowse() {
   }
 
   async function fetchPostsAsync() {
-    const lastPostId = posts.length > 0 ? posts[posts.length - 1].id : getAfterId();
+    const lastPostId = posts.length > 0 ? posts[posts.length - 1].createdAt : getBeforeDate();
 
-    // Update afterId in URL to keep state on refresh.
+    // Update beforeDate in URL to keep state on refresh.
     if (lastPostId) {
         const newParams = new URLSearchParams(params.toString());
-        newParams.set("afterId", lastPostId.toString());
+        newParams.set("beforeDate", lastPostId.toString());
         router.replace("?" + newParams.toString());
     }
 
     const hiveId = getHiveId();
-    const response = await hiveMimeService.api.postBrowseList({afterId: lastPostId, hiveId: hiveId});
+    const response = await hiveMimeService.api.postBrowseList({beforeDate: lastPostId, hiveId: hiveId});
 
     const newPostsState = [...posts, ...response.data];
 

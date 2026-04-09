@@ -1,0 +1,109 @@
+import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
+import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
+import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { ValueOperator, VoteQuery } from "@/lib/query-builder";
+import { valueOperatorToInlineString } from "@/lib/utils";
+import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
+
+interface HiveMimeFilterConditionRankValuePickerProps {
+    currentItem: VoteQuery;
+}
+
+export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
+    useEffect(() => {
+        if (currentItem.value != null)
+            return;
+
+        currentItem.valueOperator = ValueOperator.Equals;
+        currentItem.value = currentItem.poll!.maxValue!;
+    }, [currentItem]);
+
+    function setNegation(value: boolean) {
+        currentItem.isNegated = value;
+    }
+
+    function setValue(value: number | null) {
+        currentItem.value = value;
+    }
+
+    function setOperator(operator: ValueOperator) {
+        currentItem.valueOperator = operator;
+    }
+
+    return (
+        <div className="flex-col gap-2">
+            <HiveMimeBulletItem>
+                <span className="text-sm text-muted-foreground">
+                    This condition
+                    <Select
+                        value={currentItem.isNegated ? "true" : "false"}
+                        onValueChange={(value) => setNegation(value === "true")}
+                    >
+                        <HiveMimeInlineSelectTrigger>
+                            <SelectValue />
+                        </HiveMimeInlineSelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="false">must</SelectItem>
+                            <SelectItem value="true">must not</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    match
+                </span>
+            </HiveMimeBulletItem>
+
+            <HiveMimeBulletItem className="gap-2">
+                <div className="flex flex-col gap-4">
+                    <div className="text-sm text-muted-foreground">
+                        Candidate&apos;s rank was
+                        <Select
+                            value={currentItem.valueOperator!}
+                            onValueChange={(value) => setOperator(value as ValueOperator)}
+                        >
+                            <HiveMimeInlineSelectTrigger>
+                                {currentItem.valueOperator!}
+                            </HiveMimeInlineSelectTrigger>
+                            <SelectContent>
+                                {Object.values(ValueOperator).map((operator) => (
+                                    <SelectItem key={operator} value={operator}>
+                                        {valueOperatorToInlineString(operator)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {/* This score must be adjusted before sending it out. Ranks are inverse. */}
+                        <Select
+                            value={currentItem.value?.toString() ?? "none"}
+                            onValueChange={(value) => setValue(value === "none" ? null : Number(value))}
+                        >
+                            <HiveMimeInlineSelectTrigger>
+                                <SelectValue />
+                            </HiveMimeInlineSelectTrigger>
+                            <SelectContent>
+                                {[...Array(currentItem.poll!.candidates!.length).keys()].map((rank) => (
+                                    <SelectItem key={rank} value={(currentItem.poll!.maxValue! - rank).toString()}>
+                                        {hiveMimeRankIcon(rank + 1)}
+                                    </SelectItem>)
+                                )}
+                                <SelectItem key="none" value="none">
+                                    Nothing
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+            </HiveMimeBulletItem>
+        </div>
+    );
+});
+
+export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
+    return (
+        <Label>
+            {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value == null ? "unranked" : hiveMimeRankIcon(Number(currentItem.poll!.maxValue! - currentItem.value) + 1)}
+        </Label>
+    );
+});

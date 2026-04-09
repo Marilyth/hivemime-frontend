@@ -2,13 +2,13 @@
 
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { observer } from "mobx-react-lite";
-import { PollDto, PollCandidateDto, VoteOnCandidateDto } from "@/lib/Api";
+import { PollDto, CandidateDto, VoteOnCandidateDto } from "@/lib/Api";
 import { Slider } from "../../../../ui/slider";
 
 interface HiveMimeScorePollVoteCandidateProps {
   poll: PollDto;
   vote: VoteOnCandidateDto;
-  candidate: PollCandidateDto;
+  candidate: CandidateDto;
 }
 
 export const HiveMimeScorePollVoteCandidate = observer(({ poll, vote, candidate }: HiveMimeScorePollVoteCandidateProps) => {

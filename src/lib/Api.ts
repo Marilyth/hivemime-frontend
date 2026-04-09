@@ -17,6 +17,24 @@ export enum PollType {
   Category = "Category",
 }
 
+export interface CandidateDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface CategoryDto {
+  /** @format int32 */
+  id?: number;
+  name?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  color?: number;
+  /** @format int32 */
+  value?: number;
+}
+
 export interface CommentDto {
   user?: UserDto;
   /** @format int32 */
@@ -32,6 +50,18 @@ export interface CommentDto {
   updatedAt?: string | null;
   /** @format int32 */
   replyCount?: number;
+}
+
+export interface CreateCandidateDto {
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface CreateCategoryDto {
+  name?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  color?: number;
 }
 
 export interface CreateCommentDto {
@@ -63,8 +93,8 @@ export interface CreatePollDto {
   /** @format int32 */
   maxVotes?: number;
   pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
+  candidates?: CreateCandidateDto[] | null;
+  categories?: CreateCategoryDto[] | null;
 }
 
 export interface CreatePostDto {
@@ -99,12 +129,9 @@ export interface LoginDto {
   token?: string | null;
 }
 
-export interface PollCandidateDto {
-  name?: string | null;
-  description?: string | null;
-}
-
 export interface PollCandidateResultDto {
+  /** @format int32 */
+  id?: number;
   name?: string | null;
   description?: string | null;
   /** @format int32 */
@@ -113,31 +140,26 @@ export interface PollCandidateResultDto {
   score?: number;
 }
 
-export interface PollCategoryDto {
-  name?: string | null;
-  description?: string | null;
-  /** @format int32 */
-  color?: number;
-}
-
 export interface PollDto {
+  /** @format int32 */
+  id?: number;
   title?: string | null;
   description?: string | null;
   isShuffled?: boolean;
   isOptional?: boolean;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
-  candidates?: PollCandidateDto[] | null;
-  categories?: PollCategoryDto[] | null;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
   maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateDto[] | null;
+  categories?: CategoryDto[] | null;
 }
 
 export interface PollResultDto {
@@ -527,11 +549,11 @@ export class Api<
      * No description
      *
      * @tags Comment
-     * @name CommentGetList
-     * @request GET:/api/Comment/get
+     * @name CommentGetByPostList
+     * @request GET:/api/Comment/getByPost
      * @secure
      */
-    commentGetList: (
+    commentGetByPostList: (
       query?: {
         /** @format int32 */
         postId?: number;
@@ -543,7 +565,33 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<CommentDto[], any>({
-        path: `/api/Comment/get`,
+        path: `/api/Comment/getByPost`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
+     * @name CommentGetByUserList
+     * @request GET:/api/Comment/getByUser
+     * @secure
+     */
+    commentGetByUserList: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+        /** @format date-time */
+        beforeDate?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CommentDto[], any>({
+        path: `/api/Comment/getByUser`,
         method: "GET",
         query: query,
         secure: true,
@@ -583,10 +631,17 @@ export class Api<
      * @request GET:/api/Hive/followed
      * @secure
      */
-    hiveFollowedList: (params: RequestParams = {}) =>
+    hiveFollowedList: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<HiveDto[], any>({
         path: `/api/Hive/followed`,
         method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,
@@ -717,10 +772,12 @@ export class Api<
     postBrowseList: (
       query?: {
         /** @format int32 */
-        afterId?: number;
+        creatorId?: number;
         /** @format int32 */
         hiveId?: number;
         filter?: string;
+        /** @format date-time */
+        beforeDate?: string;
       },
       params: RequestParams = {},
     ) =>

@@ -25,7 +25,7 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
   async function loadReplies() {
     setIsLoadingReplies(true);
     const beforeDate = replies.length > 0 ? replies[replies.length - 1].createdAt : undefined;
-    const response = await hiveMimeService.api.commentGetList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate: beforeDate });
+    const response = await hiveMimeService.api.commentGetByPostList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate: beforeDate });
     setIsLoadingReplies(false);
 
     setReplies(prev => [...prev, ...response.data]);
@@ -49,9 +49,7 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
   return (
     <div className="flex flex-col">
       {!isRoot && <div className="flex flex-row gap-1 text-sm text-informational mb-2">
-          <span className="font-bold">{comment.user?.username}</span>
-          <span>•</span>
-          <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
+          <span className="font-bold">{comment.user?.username}</span> • <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
       </div>}
     
       <div className={`flex flex-col gap-2 ${isRoot ? "" : "border-l pl-4"}`}>

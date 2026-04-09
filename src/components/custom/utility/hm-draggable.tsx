@@ -2,9 +2,18 @@
 
 import { Key, useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { extractClosestEdge, attachClosestEdge, Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { GripVertical } from "lucide-react";
 import { FaCircle } from "react-icons/fa6";
+import { Input } from "@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types";
+
+export type OnDroppedArgs = {
+    draggableData: unknown;
+    dropAreaData: unknown | undefined;
+    zone: DropZone | null;
+}
+
+type DropZone = Edge | "center";
 
 type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
     data?: unknown;
@@ -14,35 +23,63 @@ type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
      */
     dataList?: unknown[];
 
+    isDropArea?: boolean;
     canDrop?: (draggableData: unknown) => boolean;
-    isDroppable?: boolean;
-    onDropped?: ({draggableData, droppableData, edge}: {draggableData: unknown, droppableData: unknown | undefined, edge: Edge | null}) => void;
+    onDropped?: (args: OnDroppedArgs) => void;
+    dropAreaName?: Key[] | null;
 
-    canDrag?: () => boolean;
     isDraggable?: boolean;
+    canDrag?: () => boolean;
+    /**
+     * If set, draggables can only be dropped on droppables whose dropAreaName matches.
+     */
+    draggableOnArea?: Key[] | null;
 
     isSticky?: boolean;
     hasHandle?: boolean;
 
-    allowedEdges?: Edge[];
-    droppableFor?: Key[] | null;
-
-    /**
-     * If set, draggables can only be dropped on droppables whose droppableFor matches.
-     */
-    draggableOn?: Key[] | null;
+    allowedZones?: DropZone[];
 }
 
 export function HiveMimeDraggable({
     className, data, dataList, onDropped, isSticky = false, hasHandle = false,
-    canDrop, canDrag, isDroppable = false, isDraggable = false, allowedEdges = [], droppableFor: droppableGroups, draggableOn: droppableOn, ...props }: HiveMimeDraggableProps) {
+    canDrop, canDrag, isDropArea = false, isDraggable = false, allowedZones = [], dropAreaName, draggableOnArea, ...props }: HiveMimeDraggableProps) {
   const ref = useRef(null);
   const handleRef = useRef(null);
   const [isDropping, setDropping] = useState<boolean>(false);
-  const [currentEdge, setCurrentEdge] = useState<Edge | null>(null);
+  const [currentZone, setCurrentZone] = useState<DropZone | null>(null);
   const [isDragging, setDragging] = useState<boolean>(false);
 
-  function moveToList(draggable: Record<string, unknown>, edge: Edge | null)
+  function getDropZone(element: HTMLElement, input: Input): DropZone | null {
+    if (allowedZones.length === 0) {
+      return null;
+    }
+
+    const rect = element.getBoundingClientRect();
+    const { clientY, clientX } = input;
+    
+    // Calculate relative position within the element (0 to 1)
+    const relativeY = (clientY - rect.top) / rect.height;
+    const relativeX = (clientX - rect.left) / rect.width;
+    
+    // If center is allowed, create a 33% buffer zone for it.
+    const centerRadius = allowedZones.includes('center') ? 0.17 : 0;
+
+    // If center is an allowed edge, divide into thirds.
+    if (allowedZones.includes('top') && relativeY < 0.5 - centerRadius) {
+      return 'top';
+    } else if (allowedZones.includes('bottom') && relativeY > 0.5 + centerRadius) {
+      return 'bottom';
+    } else if (allowedZones.includes('left') && relativeX < 0.5 - centerRadius) {
+      return 'left';
+    } else if (allowedZones.includes('right') && relativeX > 0.5 + centerRadius) {
+      return 'right';
+    }
+
+    return 'center';
+  }
+  
+  function moveToList(draggable: Record<string, unknown>, edge: DropZone | null)
   {
     const draggableList = draggable["inputDataList"] as unknown[];
 
@@ -74,7 +111,7 @@ export function HiveMimeDraggable({
 
     const dragCleanup = draggable({
       element,
-      getInitialData: () => { return { "inputData": data, "inputDataList": dataList, "droppableOn": droppableOn } },
+      getInitialData: () => { return { "inputData": data, "inputDataList": dataList, "draggableOnArea": draggableOnArea } },
       onDragStart: () => setDragging(true),
       onDrop: () => setDragging(false),
       canDrag: () => isDraggable && (canDrag ? canDrag() : true),
@@ -83,34 +120,27 @@ export function HiveMimeDraggable({
 
     const dropCleanup = dropTargetForElements({
       element,
-      getData: ({ input }) => {
-        // If we have allowed edges, attach the closest edge data to the drop target.
-        return attachClosestEdge({ "inputData": data }, {
-          element,
-          input,
-          allowedEdges: allowedEdges,
-        });
-      },
+      getData: () => { return { "inputData": data, "inputDataList": dataList, "dropAreaName": dropAreaName } },
       onDrag: ({location}) => {
         const targetData = location.current.dropTargets[0].data;
 
         // Don't propagate if we aren't the top target.
         if (targetData.inputData !== data) {
           setDropping(false);
-          setCurrentEdge(null);
+          setCurrentZone(null);
         }
         else {
           setDropping(true);
-          setCurrentEdge(extractClosestEdge(targetData));
+          setCurrentZone(getDropZone(element, location.current.input));
         }
       },
       onDragLeave: () => {
         setDropping(false);
-        setCurrentEdge(null);
+        setCurrentZone(null);
       },
       onDrop: ({location, source}) => {
         setDropping(false);
-        setCurrentEdge(null);
+        setCurrentZone(null);
 
         const target = location.current.dropTargets[0];
 
@@ -122,17 +152,17 @@ export function HiveMimeDraggable({
           return;
         }
 
-        const edge = extractClosestEdge(targetData);
-        moveToList(sourceData, edge);
+        const dropZone = getDropZone(element, location.current.input);
+        moveToList(sourceData, dropZone);
 
         if (onDropped) {
-          onDropped({draggableData: sourceData.inputData, droppableData: data, edge});
+          onDropped({draggableData: sourceData.inputData, dropAreaData: data, zone: dropZone});
         }
       },
       getIsSticky: () => isSticky,
       canDrop: (args) => {
-        return isDroppable &&
-          (!args.source.data.droppableOn || (args.source.data.droppableOn as Key[]).some(k => droppableGroups?.includes(k))) &&
+        return isDropArea &&
+          (!args.source.data.draggableOnArea || (args.source.data.draggableOnArea as Key[]).some(k => dropAreaName?.includes(k))) &&
           args.source.element !== element &&
           (canDrop ? canDrop(args.source.data.inputData) : true);
       }
@@ -142,34 +172,44 @@ export function HiveMimeDraggable({
       dropCleanup();
       dragCleanup();
     };
-  }, []);
+  }, [dataList]);
 
   return (
   <div
     ref={ref}
-    className={`relative rounded-lg ${isDragging ? "opacity-20" : ""} ${(isDropping && allowedEdges.length == 0) ? "bg-honey-yellow/5" : ""}`}
+    className={`relative ${isDragging ? "opacity-20" : ""} ${(isDropping && (allowedZones.length == 0 || currentZone == "center")) ? "bg-honey-yellow/10" : ""}`}
     {...props}
   >
-    {currentEdge && (
+    {currentZone && currentZone !== "center" && (
       <div>
         <FaCircle className={`absolute h-2 justify-center text-honey-brown ${
-            currentEdge === "top"
+            currentZone === "top"
               ? `-top-0.5 -left-3 right-0`
-              : currentEdge === "bottom"
+              : currentZone === "bottom"
               ? `-bottom-0.5 -left-3 right-0`
-              : currentEdge === "left"
+              : currentZone === "left"
               ? `-left-0.5 -top-3 bottom-0`
               : `-right-0.5 -top-3 bottom-0`
           }`} />
           <div className={`absolute w-full bg-honey-brown/50 ${
-            currentEdge === "top"
+            currentZone === "top"
               ? `top-0 h-1`
-              : currentEdge === "bottom"
+              : currentZone === "bottom"
               ? `bottom-0 h-1`
-              : currentEdge === "left"
+              : currentZone === "left"
               ? `left-0 w-1`
               : `right-0 w-1`
           }`}></div>
+        </div>
+    )}
+    {currentZone === "center" && (
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="relative">
+          <div className="w-6 h-6 rounded-full border-2 border-honey-brown/30 bg-honey-brown/5"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-honey-brown/80"></div>
+          </div>
+        </div>
       </div>
     )}
       <div className="flex w-full items-center gap-1">
