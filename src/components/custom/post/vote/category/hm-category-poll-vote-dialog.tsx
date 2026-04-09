@@ -55,7 +55,7 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
           </DialogDescription>
         </DialogHeader>
 
-        {candidates?.map((candidate, index) => (
+        {candidates?.filter(c => c.vote.value != category?.value).map((candidate, index) => (
           <HiveMimeHoverCard key={index}
             onClick={() => {candidate!.vote.value = category?.value; onClose();}}
             className="cursor-pointer hover:text-honey-brown flex flex-col p-2 rounded-md border-1 gap-2">
