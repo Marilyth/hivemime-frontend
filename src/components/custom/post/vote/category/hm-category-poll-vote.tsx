@@ -3,12 +3,12 @@
 import { observer } from "mobx-react-lite";
 import { CategoryDto, PollDto, VoteOnPollDto } from "@/lib/Api";
 import { CombinedPollCandidate } from "@/lib/view-models";
-import { LayoutGroup } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../../utility/hm-draggable";
 import { useState } from "react";
 import { HiveMimeCategoryPollVoteCandidateDialog, HiveMimeCategoryPollVoteCategoryDialog } from "./hm-category-poll-vote-dialog";
-import { HiveMimeCategoryTagBox, HiveMimeCategoryPollVoteCategoryPanel } from "./hm-category-poll-vote-category";
+import { HiveMimeCategoryTagBox, HiveMimePickCandidate } from "./hm-category-poll-vote-category";
 
 export interface HiveMimeCategoryPollVoteProps {
   poll: PollDto;
@@ -26,12 +26,13 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
     }));
   });
 
-  function getCandidatesForCategory(categoryIndex: number | null) {
-    return combinedCandidates!.filter(candidate => candidate.vote.value === categoryIndex);
-  }
-
   function assignCandidateToCategory(candidate: CombinedPollCandidate, category: CategoryDto) {
     candidate.vote.value = category.value;
+  }
+
+  function getCandidatesCategory(candidate: CombinedPollCandidate) {
+    const category = poll.categories!.find(category => category.value === candidate.vote.value);
+    return category ?? null;
   }
 
   return (
@@ -66,14 +67,23 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
           ))}
         </div>
 
-        {poll.categories!.map(category => (
-          combinedCandidates!.some(candidate => candidate.vote.value === category.value) &&
-            <HiveMimeCategoryPollVoteCategoryPanel
-              key={getReferenceId(category)}
-              poll={poll}
-              category={category}
-              candidates={getCandidatesForCategory(category.value!)}
-              candidateClicked={setOpenedCandidate} />
+        {combinedCandidates.map((candidate, index) => (
+          <div key={getReferenceId(candidate)} >
+            <motion.div layout layoutId={getReferenceId(candidate)} className="flex flex-row">
+              <div className="flex-1">
+                <HiveMimeDraggable
+                  draggableOnArea={[`${getReferenceId(poll)}_category`]}
+                  dropAreaName={[`${getReferenceId(poll)}_candidate`]}
+                  isDropArea
+                  isDraggable
+                  data={candidate}
+                  onDropped={data => assignCandidateToCategory(data.dropAreaData as CombinedPollCandidate, data.draggableData as CategoryDto)}
+                  onClick={() => setOpenedCandidate(candidate)}>
+                  <HiveMimePickCandidate candidate={candidate} category={getCandidatesCategory(candidate)} />
+                </HiveMimeDraggable>
+              </div>
+            </motion.div>
+          </div>
         ))}
         
       </div>

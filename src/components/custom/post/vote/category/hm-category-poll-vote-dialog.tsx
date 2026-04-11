@@ -4,9 +4,10 @@ import { observer } from "mobx-react-lite";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../../ui/dialog";
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
-import { getReferenceId } from "@/lib/utils";
-import { HiveMimeCategoryTagBox } from "./hm-category-poll-vote-category";
 import { CategoryDto } from "@/lib/Api";
+import { SquareCheck } from "lucide-react"; 
+import { motion } from "framer-motion";
+import { HiveMimeCategoryTag } from "./hm-category-poll-vote-category";
 
 export interface HiveMimeCategoryPollVoteCandidateDialogProps {
   categories: CategoryDto[];
@@ -15,6 +16,21 @@ export interface HiveMimeCategoryPollVoteCandidateDialogProps {
 }
 
 export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, candidate, onClose }: HiveMimeCategoryPollVoteCandidateDialogProps) => {
+  function isSelected(category: CategoryDto) {
+    return candidate?.vote.value == category?.value;
+  }
+
+  function selectCategory(category: CategoryDto) {
+    if (category == null || candidate == null)
+      return;
+
+    if (isSelected(category)) {
+      candidate.vote.value = null;
+    } else {
+      candidate.vote.value = category!.value;
+    }
+  }
+
   return (
     <Dialog open={candidate != null} onOpenChange={() => onClose()}>
       <DialogContent className="gap-2">
@@ -25,14 +41,12 @@ export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, c
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-wrap gap-2">
-          {categories?.map((category) => (
-            <HiveMimeCategoryTagBox key={getReferenceId(category)}
-              category={category}
-              onClick={() => { candidate!.vote.value = category.value; onClose(); }}
-            />
-          ))}
-        </div>
+        {categories?.map((category, index) => (
+          <HiveMimeHoverCard key={index} className={`flex flex-row items-center cursor-pointer ${isSelected(category) ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={() => selectCategory(category)}>
+            {isSelected(category) && <span className="w-6 font-light text-informational"><SquareCheck className="w-4 h-4" /></span>}
+            <motion.div layout><HiveMimeCategoryTag category={category} /></motion.div>
+          </HiveMimeHoverCard>
+        ))}
       </DialogContent>
     </Dialog>
   );
@@ -45,21 +59,35 @@ export interface HiveMimeCategoryPollVoteCategoryDialogProps {
 }
 
 export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, category, onClose }: HiveMimeCategoryPollVoteCategoryDialogProps) => {
+  function isSelected(candidate: CombinedPollCandidate) {
+    return candidate.vote.value === category?.value;
+  }
+
+  function selectCategory(candidate: CombinedPollCandidate) {
+    if (candidate == null)
+      return;
+
+    if (isSelected(candidate)) {
+      candidate.vote.value = null;
+    } else {
+      candidate.vote.value = category!.value;
+    }
+  }
+
   return (
     <Dialog open={category != null} onOpenChange={() => onClose()}>
       <DialogContent className="gap-2">
         <DialogHeader>
-          <DialogTitle>Pick a candidate for <span className="text-honey-brown">{category?.name}</span></DialogTitle>
+          <DialogTitle>Pick candidates for <span className="text-honey-brown">{category?.name}</span></DialogTitle>
           <DialogDescription>
-            Please pick a candidate to assign the category to.
+            Please pick candidates to assign the category to.
           </DialogDescription>
         </DialogHeader>
 
-        {candidates?.filter(c => c.vote.value != category?.value).map((candidate, index) => (
-          <HiveMimeHoverCard key={index}
-            onClick={() => {candidate!.vote.value = category?.value; onClose();}}
-            className="cursor-pointer hover:text-honey-brown flex flex-col p-2 rounded-md border-1 gap-2">
-              {candidate.candidate.name}
+        {candidates?.map((candidate, index) => (
+          <HiveMimeHoverCard key={index} className={`flex flex-row items-center cursor-pointer ${isSelected(candidate) ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={() => selectCategory(candidate)}>
+            {isSelected(candidate) && <span className="w-6 font-light text-informational"><SquareCheck className="w-4 h-4" /></span>}
+            <motion.div layout>{candidate.candidate.name}</motion.div>
           </HiveMimeHoverCard>
         ))}
       </DialogContent>
