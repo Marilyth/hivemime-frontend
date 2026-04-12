@@ -29,7 +29,7 @@ export const HiveMimePollResult = observer(({ poll, pollResult, chartType }: Hiv
 
   return (
     <AccordionItem value={getReferenceId(poll)} className="border-b last:border-b-0">
-      <AccordionTrigger className="bg-popover p-2">
+      <AccordionTrigger className="bg-popover rounded-none p-2">
         <div className="flex flex-row gap-4 font-bold items-center">
           <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-honey-brown w-6 h-6 self-start" />
           <span className="text-muted-foreground font-bold">
