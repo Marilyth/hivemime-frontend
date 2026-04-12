@@ -11,13 +11,13 @@ export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
   const totalScore = props.pollResult!.candidates!.reduce((sum, candidate) => sum + candidate.voterAmount!, 0);
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
         {props.pollResult?.candidates!.map((candidate, index) => {
             const percentage = totalScore > 0 ? (candidate.voterAmount! / totalScore) * 100 : 0;
             return (
                 <HiveMimeHoverCard 
                     key={candidate.id} 
-                    className="p-2 mb-2 rounded-md relative overflow-hidden"
+                    className="p-2 rounded-md relative overflow-hidden"
                 >
                     <AnimatedBackground percentage={percentage} />
                     <div className="relative flex flex-row gap-2 items-center">

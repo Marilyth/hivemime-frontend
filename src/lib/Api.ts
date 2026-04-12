@@ -19,6 +19,8 @@ export enum PollType {
 
 export interface CandidateDistributionDto {
   /** @format int32 */
+  value?: number;
+  /** @format int32 */
   score?: number;
 }
 
