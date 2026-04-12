@@ -22,6 +22,9 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
             onClose={() => setSelectedCandidate(null)}
         />
 
+        <span className="text-sm text-informational">
+            You can see the <span className="font-medium text-honey-brown">vote distribution</span> of a candidate <span className="font-medium text-honey-brown">by clicking</span> on it.
+        </span>
         {props.pollResult?.candidates!.map((candidate, index) => {
             const candidateValue = candidate.voterAmount! > 0 ? candidate.averageScore! : 0;
             const relativeValue = candidateValue - props.poll.minValue!;
@@ -30,15 +33,20 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
             return (
                 <HiveMimeHoverCard 
                     key={candidate.id} 
-                    className="p-2 rounded-md relative overflow-hidden"
-                    onClick={() => setSelectedCandidate(candidate)}
+                    className="rounded-md relative overflow-hidden"
+                    onClick={() => setSelectedCandidate(candidate)} 
                 >
                     <AnimatedBackground percentage={percentage} />
-                    <div className="relative flex flex-row gap-2 items-center">
-                        <span className="font-medium">{candidate.name}</span>
-                        <span className="text-sm text-muted-foreground ml-auto">
-                            {Number(candidateValue.toFixed(2))}
-                        </span>
+                    <div className="flex flex-col gap-0 relative">
+                        <div className="flex flex-row gap-2 items-center">
+                            {candidate.name}
+                            <span className="text-muted-foreground ml-auto">
+                                {Number(candidateValue.toFixed(2))}
+                            </span>
+                        </div>
+                        <div className="text-muted-foreground">
+                            {candidate.voterAmount} votes
+                        </div>
                     </div>
                 </HiveMimeHoverCard>
             );
@@ -65,11 +73,16 @@ export function HiveMimeScoreDistributionResult(props: HiveMimeDistributionResul
                     className="p-2 rounded-md relative overflow-hidden"
                 >
                     <AnimatedBackground percentage={percentage} />
-                    <div className="relative flex flex-row gap-2 items-center">
-                        <span className="font-medium">{stepStart} - {stepStart + stepSize - 1}</span>
-                        <span className="text-sm text-muted-foreground ml-auto">
-                            {Number(percentage.toFixed(2))}%
-                        </span>
+                    <div className="flex flex-col gap-0 relative">
+                        <div className="relative flex flex-row gap-2 items-center">
+                            <span className="font-medium">{stepStart} - {stepStart + stepSize - 1}</span>
+                            <span className="text-sm text-muted-foreground ml-auto">
+                                {Number(percentage.toFixed(2))}%
+                            </span>
+                        </div>
+                        <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
+                            {stepScore} votes
+                        </div>
                     </div>
                 </HiveMimeHoverCard>
             );

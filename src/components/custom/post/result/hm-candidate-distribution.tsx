@@ -60,7 +60,7 @@ export function HiveMimeDistributionResult(props: HiveMimeDistributionResultProp
             <DialogTitle>
                 Vote distribution for <span className="text-honey-brown">{props.candidate?.name}</span>
             </DialogTitle>
-            <span>
+            <span className="leading-tight">
                 This is how users voted on each of the options for the candidate.
             </span>
                 {isLoading ? (

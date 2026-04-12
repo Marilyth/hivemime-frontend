@@ -38,7 +38,7 @@ export const HiveMimePollResult = observer(({ poll, pollResult, chartType }: Hiv
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-4 flex flex-col gap-2" >
-          <span className="text-muted-foreground">{poll.description}</span>
+          {poll.description && <span className="text-muted-foreground">{poll.description}</span>}
           {pollMapping[poll.pollType!]} 
       </AccordionContent>
     </AccordionItem>

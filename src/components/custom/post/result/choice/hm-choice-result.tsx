@@ -20,11 +20,16 @@ export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
                     className="p-2 rounded-md relative overflow-hidden"
                 >
                     <AnimatedBackground percentage={percentage} />
-                    <div className="relative flex flex-row gap-2 items-center">
-                        <span className="font-medium">{candidate.name}</span>
-                        <span className="text-sm text-muted-foreground ml-auto">
-                            {percentage.toFixed(1)}%
-                        </span>
+                    <div className="flex flex-col gap-0 relative">
+                        <div className="relative flex flex-row gap-2 items-center">
+                            <span className="font-medium">{candidate.name}</span>
+                            <span className="text-sm text-muted-foreground ml-auto">
+                                {Number(percentage.toFixed(2))}%
+                            </span>
+                        </div>
+                        <div className="text-muted-foreground">
+                            {candidate.voterAmount} votes
+                        </div>
                     </div>
                 </HiveMimeHoverCard>
             );

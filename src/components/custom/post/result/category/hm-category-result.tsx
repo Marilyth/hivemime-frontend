@@ -23,11 +23,19 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
             candidate={selectedCandidate!}
             onClose={() => setSelectedCandidate(null)}
         />
-        
+        <span className="text-sm text-informational">
+            You can see the <span className="text-honey-brown">vote distribution</span> of a candidate <span className="text-honey-brown">by clicking</span> on it.
+        </span>
         {props.pollResult?.candidates!.toSorted((a, b) => {
-            if (a.majorityRatio == null) return 1;
-            if (b.majorityRatio == null) return -1;
-            return b.majorityRatio - a.majorityRatio;
+            if (a.majorityVote == null && b.majorityVote == null) return 0;
+            if (a.majorityVote == null) return 1;
+            if (b.majorityVote == null) return -1;
+            
+            // Order by category first, and ratio as tiebreaker.
+            const voteDiff = a.majorityVote - b.majorityVote;
+            if (voteDiff !== 0) return voteDiff;
+
+            return b.majorityRatio! - a.majorityRatio!;
         }).map((candidate, index) => {
             const category = props.poll.categories!.find(category => category.value === candidate.majorityVote);
 
@@ -42,11 +50,16 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
                             colorStart={numberToColorHex(category!.color!)+"77"}
                             colorEnd={numberToColorHex(category!.color!)+"20"} />
                     }
-                    <div className="relative flex flex-row gap-2 items-center">
-                        <span className="font-medium">{candidate.name}</span>
-                        <span className="text-sm text-muted-foreground ml-auto">
-                            {category && <HiveMimeCategoryTag category={category} />}
-                        </span>
+                    <div className="flex flex-col gap-0 relative">
+                        <div className="relative flex flex-row gap-2 items-center">
+                            <span className="font-medium">{candidate.name}</span>
+                            <span className="text-sm text-muted-foreground ml-auto">
+                                {category && <HiveMimeCategoryTag category={category} />}
+                            </span>
+                        </div>
+                        <div className="text-muted-foreground">
+                            {candidate.voterAmount} votes
+                        </div>
                     </div>
                 </HiveMimeHoverCard>
             );
@@ -77,11 +90,16 @@ export function HiveMimeCategoryDistributionResult(props: HiveMimeDistributionRe
                             colorStart={numberToColorHex(category!.color!)+"77"}
                             colorEnd={numberToColorHex(category!.color!)+"20"} />
                     }
-                    <div className="relative flex flex-row gap-2 items-center">
-                        <HiveMimeCategoryTag category={category!} />
-                        <span className="text-sm text-muted-foreground ml-auto">
-                            {Number(percentage.toFixed(2))}%
-                        </span>
+                    <div className="flex flex-col gap-0 relative">
+                        <div className="relative flex flex-row gap-2 items-center">
+                            <HiveMimeCategoryTag category={category!} />
+                            <span className="text-sm text-muted-foreground ml-auto">
+                                {Number(percentage.toFixed(2))}%
+                            </span>
+                        </div>
+                        <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
+                            {bucketScore} votes
+                        </div>
                     </div>
                 </HiveMimeHoverCard>
             );
