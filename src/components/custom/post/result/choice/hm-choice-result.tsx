@@ -1,0 +1,34 @@
+import { AnimatedBackground } from "@/components/custom/utility/hm-animated-background";
+import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
+import { PollResultDto } from "@/lib/Api";
+
+
+export interface HiveMimeChoiceResultProps {
+    pollResult: PollResultDto;
+}
+
+export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
+  const totalScore = props.pollResult!.candidates!.reduce((sum, candidate) => sum + candidate.voterAmount!, 0);
+
+  return (
+    <div>
+        {props.pollResult?.candidates!.map((candidate, index) => {
+            const percentage = totalScore > 0 ? (candidate.voterAmount! / totalScore) * 100 : 0;
+            return (
+                <HiveMimeHoverCard 
+                    key={candidate.id} 
+                    className="p-2 mb-2 rounded-md relative overflow-hidden"
+                >
+                    <AnimatedBackground percentage={percentage} />
+                    <div className="relative flex flex-row gap-2 items-center">
+                        <span className="font-medium">{candidate.name}</span>
+                        <span className="text-sm text-muted-foreground ml-auto">
+                            {percentage.toFixed(1)}%
+                        </span>
+                    </div>
+                </HiveMimeHoverCard>
+            );
+        })}
+    </div>
+  );
+}

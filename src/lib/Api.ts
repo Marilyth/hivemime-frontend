@@ -17,6 +17,11 @@ export enum PollType {
   Category = "Category",
 }
 
+export interface CandidateDistributionDto {
+  /** @format int32 */
+  score?: number;
+}
+
 export interface CandidateDto {
   /** @format int32 */
   id?: number;
@@ -136,8 +141,12 @@ export interface PollCandidateResultDto {
   description?: string | null;
   /** @format int32 */
   voterAmount?: number;
+  /** @format double */
+  averageScore?: number | null;
   /** @format int32 */
-  score?: number;
+  majorityVote?: number | null;
+  /** @format double */
+  majorityRatio?: number | null;
 }
 
 export interface PollDto {
@@ -827,6 +836,31 @@ export class Api<
     ) =>
       this.request<PostResultDto, any>({
         path: `/api/Post/results`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostDistributionList
+     * @request GET:/api/Post/distribution
+     * @secure
+     */
+    postDistributionList: (
+      query?: {
+        /** @format int32 */
+        candidateId?: number;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateDistributionDto[], any>({
+        path: `/api/Post/distribution`,
         method: "GET",
         query: query,
         secure: true,

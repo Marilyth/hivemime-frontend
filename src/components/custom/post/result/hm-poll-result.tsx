@@ -7,6 +7,10 @@ import { ChartType } from "@/lib/view-models";
 import { ReactNode } from "react";
 import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { getReferenceId } from "@/lib/utils";
+import { HiveMimeChoiceResult } from "./choice/hm-choice-result";
+import { HiveMimeScoreResult } from "./score/hm-score-result";
+import { HiveMimeRankResult } from "./rank/hm-rank-result";
+import { HiveMimeCategoryResult } from "./category/hm-category-result";
 
 export type HiveMimePollResultProps =   {
   poll: PollDto;
@@ -17,10 +21,10 @@ export type HiveMimePollResultProps =   {
 export const HiveMimePollResult = observer(({ poll, pollResult, chartType }: HiveMimePollResultProps) => {
   const pollMapping: { [key in PollType]: ReactNode } =
   {
-    [PollType.Choice]: <span>ToDo</span>,
-    [PollType.Score]: <span>ToDo</span>,
-    [PollType.Rank]: <span>ToDo</span>,
-    [PollType.Category]: <span>ToDo</span>,
+    [PollType.Choice]: <HiveMimeChoiceResult pollResult={pollResult!} />,
+    [PollType.Score]: <HiveMimeScoreResult pollResult={pollResult!} poll={poll} />,
+    [PollType.Rank]: <HiveMimeRankResult pollResult={pollResult!} poll={poll} />,
+    [PollType.Category]: <HiveMimeCategoryResult pollResult={pollResult!} poll={poll} />,
   };
 
   return (
