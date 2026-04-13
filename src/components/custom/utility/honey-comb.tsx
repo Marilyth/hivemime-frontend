@@ -89,11 +89,9 @@ export function CombGenerator({ distances }: CombGeneratorProps) {
     for (const gen of combs) {
       const effectiveHeight = window.innerHeight + height / gen.distance;
       const lastY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y : 0;
-      const step = 800 / gen.distance;
+      const step = 600 / gen.distance;
       const combSize = 128 / gen.distance;
       const matrixDimension = 3;
-
-      console.log(`Generating combs for distance ${gen.distance}... (effective height: ${effectiveHeight}, lastY: ${lastY})`);
 
       // Don't render more than visible.
       for (let y = lastY + step; y < effectiveHeight + 100; y += step) {
@@ -116,7 +114,6 @@ export function CombGenerator({ distances }: CombGeneratorProps) {
     const el = document.body;
 
     const ro = new ResizeObserver(() => {
-      console.log("Generating combs...");
       generateCombs();
     });
 

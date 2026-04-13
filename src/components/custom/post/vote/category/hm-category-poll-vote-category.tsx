@@ -38,7 +38,6 @@ type HiveMimeCategoryTagBoxProps = React.ComponentProps<"div"> & {
 };
 
 export function HiveMimeCategoryTagBox({ category, ...props }: HiveMimeCategoryTagBoxProps) {
-  console.log("Rendering category panel for category " + category.name);
   return (
     <motion.div
       className="cursor-pointer border-1 rounded-md"
