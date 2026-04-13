@@ -13,6 +13,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
+import { HoneycombGroup } from "@/components/custom/honey-comb";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,19 +71,29 @@ export default function RootLayout({
               <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                 <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
                   <SidebarProvider className="flex flex-col">
-
                     <div className="flex flex-1">
                       <AppSidebar />
                       <SidebarInset>
+                        <div className="absolute left-10 top-20 blur-[1px]">
+                          <HoneycombGroup combSize={128} combMatrix={[[0, 1, 1, 1], [1, 0, 1, 1, 1], [1, 1, 1, 1]]} />
+                        </div>
+
+                        <div className="absolute bottom-10 right-20 blur-[1px]">
+                          <HoneycombGroup combSize={128} combMatrix={[[1, 1, 1, 1], [0, 1, 1], [1, 1, 1]]} />
+                        </div>
+
                         <SiteHeader />
                         {isLoading ?
                           (<div>Loading...</div>) :
-                          (<div className="flex flex-1 flex-col gap-4 py-4 bg-pattern">
+                          (<div className="flex flex-1 flex-col gap-4 py-4 z-10">
                             {children}
                           </div>)
                         }
                         <Toaster position="top-center" richColors />
                       </SidebarInset>
+                        
+                      <div className="fixed h-full w-full blur-[3px] bg-pattern">
+                      </div>
                     </div>
 
                   </SidebarProvider>
