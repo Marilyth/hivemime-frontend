@@ -81,7 +81,7 @@ export default function RootLayout({
                         <SiteHeader />
                         {isLoading ?
                           (<div>Loading...</div>) :
-                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0 min-h-10000">
+                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
                             {children}
                           </div>)
                         }

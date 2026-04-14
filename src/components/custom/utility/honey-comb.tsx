@@ -81,23 +81,24 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
 
   function generateCombs() {
     const height = window.pageYOffset;
+    const stepSize = 600;
 
     // Don't generate new combs on every scroll event to avoid performance issues.
-    if (lastRenderedScroll.current !== null && Math.abs(height - lastRenderedScroll.current) < 300)
+    if (lastRenderedScroll.current !== null && Math.abs(height - lastRenderedScroll.current) < stepSize / 2)
       return;
 
     lastRenderedScroll.current = height;
 
     for (const gen of combs) {
-      const step = 600 / gen.distance;
+      const effectiveStep = stepSize / gen.distance;
       const effectiveOffset = height / gen.distance;
-      const effectiveEnd = window.innerHeight + effectiveOffset + step;
-      const effectiveStart = effectiveOffset - step;
+      const effectiveEnd = window.innerHeight + effectiveOffset + effectiveStep;
+      const effectiveStart = effectiveOffset - effectiveStep;
 
       gen.combs = gen.combs.filter(comb => comb.y >= effectiveStart && comb.y <= effectiveEnd);
 
-      const startY = gen.combs.length > 0 ? gen.combs[0].y - step : 0;
-      const endY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y + step : 0;
+      const startY = gen.combs.length > 0 ? gen.combs[0].y - effectiveStep : 0;
+      const endY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y + effectiveStep : 0;
       const combSize = 128 / gen.distance;
       const matrixDimension = 3;
 
@@ -117,13 +118,13 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
       }
 
       // Add new combs after the last one.
-      for (let y = endY; y <= effectiveEnd; y += step) {
+      for (let y = endY; y <= effectiveEnd; y += effectiveStep) {
         const lastX = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].x : 0;
         gen.combs.push(generateComb(y, lastX));
       }
 
       // Add new combs before the first one.
-      for (let y = startY; y >= effectiveStart; y -= step) {
+      for (let y = startY; y >= effectiveStart; y -= effectiveStep) {
         const firstX = gen.combs.length > 0 ? gen.combs[0].x : 0;
         gen.combs = [generateComb(y, firstX), ...gen.combs];
       }

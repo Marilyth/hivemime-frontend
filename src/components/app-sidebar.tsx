@@ -4,7 +4,8 @@ import * as React from "react"
 import {
   TrendingUp,
   Search,
-  Users
+  Users,
+  Lightbulb
 } from "lucide-react"
 import {
   Sidebar,
@@ -18,9 +19,16 @@ import {
 } from "@/components/ui/sidebar"
 import { FollowedHivesContext } from "@/lib/contexts"
 import Link from "next/link"
+import { Button } from "./ui/button"
+import { useTheme } from "next-themes"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const followedHives = React.useContext(FollowedHivesContext);
+  const theme = useTheme();
+
+  function toggleTheme() {
+    theme.setTheme(theme.theme === "dark" ? "light" : "dark");
+  }
 
   return (
     <Sidebar
@@ -76,6 +84,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ))}
           </SidebarMenu>
         </SidebarGroup>
+        <div className="mt-auto mx-auto p-4">
+          <Button variant="outline" size="sm" onClick={toggleTheme}>
+            <Lightbulb />
+            Toggle theme
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   )
