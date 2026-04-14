@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from "react";
 import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
-import { ParallaxContainer } from "@/components/custom/utility/parallax-container";
+import { mutedColors } from "@/lib/colors";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,16 +75,13 @@ export default function RootLayout({
                     <div className="flex flex-1">
                       <AppSidebar />
                       <SidebarInset>
-                        <CombGenerator distances={[2, 4, 8]} />
-                        
-                        <ParallaxContainer distance={12}>
-                          <div className="h-full w-full blur-[3px] bg-pattern">
-                          </div>
-                        </ParallaxContainer>
+                        <CombGenerator distances={[8, 4, 2]}
+                          color={mutedColors.honeyBrown} />
+
                         <SiteHeader />
                         {isLoading ?
                           (<div>Loading...</div>) :
-                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
+                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0 min-h-10000">
                             {children}
                           </div>)
                         }

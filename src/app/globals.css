@@ -8,7 +8,7 @@
   --honey-yellow: oklch(73.448% 0.13515 99.402);
   --background: oklch(0.98 0.01 93.48);
   --foreground: oklch(0.34 0.03 94.42);
-  --card: oklch(0.98 0.01 93.48);
+  --card: oklch(97.951% 0.00968 87.435 / 0.8);
   --card-foreground: oklch(0.19 0 0);
   --popover: oklch(1.00 0 0);
   --popover-foreground: oklch(0.27 0.02 99.70);
@@ -30,7 +30,7 @@
   --chart-3: oklch(0.88 0.03 91.64);
   --chart-4: oklch(0.88 0.04 298.21);
   --chart-5: oklch(0.56 0.13 41.94);
-  --sidebar: oklch(0.97 0.01 93.49);
+  --sidebar: oklch(96.976% 0.0094 93.603 / 0.8);
   --sidebar-foreground: oklch(0.36 0.01 106.85);
   --sidebar-primary: oklch(0.62 0.14 39.15);
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -175,10 +175,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-.bg-pattern {
-  background-image: url('/patterntransparent.svg');
-  background-repeat: repeat;
-  background-size: auto;
 }
