@@ -144,28 +144,18 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
 
   return (
     <div style={{color: color, transition: "color 0.5s"}}>
-      <ParallaxContainer distance={12}>
-        <div className="absolute inset-0 pointer-events-none blur-[3px]">
-          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern
-                id="comb-pattern"
-                width="29"
-                height="50.115"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  fill="color-mix(in srgb, currentColor 40%, transparent)"
-                  stroke="color-mix(in srgb, currentColor 20%, transparent)"
-                  strokeWidth="3.5"
-                  d="M14.498 16.858 0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z"
-                />
-              </pattern>
-            </defs>
-
-            <rect width="100%" height="100%" fill="url(#comb-pattern)" />
-          </svg>
-        </div>
+      <ParallaxContainer className="blur-[3px]" distance={12}>
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(`
+              <svg width='29' height='50.115' xmlns='http://www.w3.org/2000/svg'>
+                <path fill='${color}66' stroke='${color}33' stroke-width='3.5' d='M14.498 16.858 0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z'/>
+              </svg>
+            `)}")`,
+            backgroundRepeat: 'repeat'
+          }}
+        />
       </ParallaxContainer>
 
       {combs.map((gen) => (
