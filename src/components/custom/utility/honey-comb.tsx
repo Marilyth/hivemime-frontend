@@ -1,5 +1,5 @@
 import { ParallaxContainer } from "./parallax-container";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface HoneyCombProps {
   combSize: number;
@@ -77,34 +77,55 @@ export interface CombGeneratorProps {
 
 export function CombGenerator({ distances, color }: CombGeneratorProps) {
   const [combs, setCombs] = useState<GeneratorCombs[]>(distances.map((distance) => ({ distance, combs: [] })));
-
-  const infiniteComb = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="29" height="50.115">
-      <path fill="${color}40" stroke="${color}20" stroke-width="3.5" d="M14.498 16.858 0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z"/>
-    </svg>`;
+  const lastRenderedScroll = useRef<number | null>(null);
 
   function generateCombs() {
-    const height = document.body.scrollHeight;
+    const height = window.pageYOffset;
+
+    // Don't generate new combs on every scroll event to avoid performance issues.
+    if (lastRenderedScroll.current !== null && Math.abs(height - lastRenderedScroll.current) < 300)
+      return;
+
+    lastRenderedScroll.current = height;
 
     for (const gen of combs) {
       const step = 600 / gen.distance;
+      const effectiveOffset = height / gen.distance;
+      const effectiveEnd = window.innerHeight + effectiveOffset + step;
+      const effectiveStart = effectiveOffset - step;
 
-      const effectiveHeight = window.innerHeight + height / gen.distance;
-      const lastY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y : 0;
+      gen.combs = gen.combs.filter(comb => comb.y >= effectiveStart && comb.y <= effectiveEnd);
+
+      const startY = gen.combs.length > 0 ? gen.combs[0].y - step : 0;
+      const endY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y + step : 0;
       const combSize = 128 / gen.distance;
       const matrixDimension = 3;
 
-      // Don't render more than visible.
-      for (let y = lastY + step; y < effectiveHeight + step; y += step) {
-        let x = Math.random() * window.innerWidth / 2;
-        if (gen.combs.length % 2 == 0)
-          x += window.innerWidth / 2;
+      const generateComb = (y: number, previousCombX: number) => {
+        const halfWidth = window.innerWidth / 2;
+        let x = Math.random() * halfWidth;
+
+        // Flip combs between left and right to create a more even pattern.
+        if (previousCombX < halfWidth)
+          x += halfWidth;
 
         const combMatrix = Array.from({ length: matrixDimension }, () =>
           Array.from({ length: matrixDimension }, () => Math.random() < 0.85 ? 1 : 0)
         );
 
-        gen.combs.push({ x, y, props: { combSize, combMatrix } });
+        return { x, y, props: { combSize, combMatrix } };
+      }
+
+      // Add new combs after the last one.
+      for (let y = endY; y <= effectiveEnd; y += step) {
+        const lastX = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].x : 0;
+        gen.combs.push(generateComb(y, lastX));
+      }
+
+      // Add new combs before the first one.
+      for (let y = startY; y >= effectiveStart; y -= step) {
+        const firstX = gen.combs.length > 0 ? gen.combs[0].x : 0;
+        gen.combs = [generateComb(y, firstX), ...gen.combs];
       }
     }
 
@@ -112,23 +133,37 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
   }
 
   useEffect(() => {
-    const el = document.body;
-
-    const ro = new ResizeObserver(() => {
-      generateCombs();
-    });
-
-    ro.observe(el);
+    window.addEventListener("scroll", generateCombs);
     generateCombs();
 
-    return () => ro.disconnect();
+    return () => {
+      window.removeEventListener("scroll", generateCombs);
+    };
   }, []);
 
   return (
-    <div style={{color: color}}>
+    <div style={{color: color, transition: "color 0.5s"}}>
       <ParallaxContainer distance={12}>
-        <div className="h-full w-full blur-[3px]"
-          style={{backgroundImage: `url('data:image/svg+xml;utf8,${encodeURIComponent(infiniteComb)}')`}}>
+        <div className="absolute inset-0 pointer-events-none blur-[3px]">
+          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="comb-pattern"
+                width="29"
+                height="50.115"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  fill="color-mix(in srgb, currentColor 40%, transparent)"
+                  stroke="color-mix(in srgb, currentColor 20%, transparent)"
+                  strokeWidth="3.5"
+                  d="M14.498 16.858 0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z"
+                />
+              </pattern>
+            </defs>
+
+            <rect width="100%" height="100%" fill="url(#comb-pattern)" />
+          </svg>
         </div>
       </ParallaxContainer>
 
