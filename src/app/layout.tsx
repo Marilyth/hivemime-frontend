@@ -85,7 +85,7 @@ export default function RootLayout({
                     <SidebarProvider className="flex flex-col">
                       <div className="flex flex-1">
                         <AppSidebar className="backdrop-blur-sm" />
-                        <SidebarInset>
+                        <SidebarInset className="min-h-10000">
                           <CombGenerator distances={[8, 4, 2]}
                             color={accentColour ?? mutedColors.honeyBrown} />
 
