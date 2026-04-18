@@ -5,7 +5,6 @@ import {
   TrendingUp,
   Search,
   Users,
-  Lightbulb
 } from "lucide-react"
 import {
   Sidebar,
@@ -19,8 +18,8 @@ import {
 } from "@/components/ui/sidebar"
 import { FollowedHivesContext } from "@/lib/contexts"
 import Link from "next/link"
-import { Button } from "./ui/button"
 import { useTheme } from "next-themes"
+import { ThemePicker } from "./custom/utility/hm-theme-picker"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const followedHives = React.useContext(FollowedHivesContext);
@@ -85,10 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
         <div className="mt-auto mx-auto p-4">
-          <Button variant="outline" size="sm" onClick={toggleTheme}>
-            <Lightbulb />
-            Toggle theme
-          </Button>
+          <ThemePicker />
         </div>
       </SidebarContent>
     </Sidebar>

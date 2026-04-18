@@ -17,6 +17,12 @@ export enum PollType {
   Category = "Category",
 }
 
+export enum OrderBy {
+  New = "New",
+  Old = "Old",
+  Hot = "Hot",
+}
+
 export interface CandidateDistributionDto {
   /** @format int32 */
   value?: number;
@@ -191,6 +197,14 @@ export interface PostDto {
   voteCount?: number;
   /** @format date-time */
   createdAt?: string;
+}
+
+export interface PostPaginationDto {
+  /** @format int32 */
+  cursor?: number | null;
+  orderBy?: OrderBy;
+  /** @format int32 */
+  pageSize?: number;
 }
 
 export interface PostResultDto {
@@ -776,27 +790,28 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostBrowseList
-     * @request GET:/api/Post/browse
+     * @name PostBrowseCreate
+     * @request POST:/api/Post/browse
      * @secure
      */
-    postBrowseList: (
+    postBrowseCreate: (
+      data: PostPaginationDto,
       query?: {
         /** @format int32 */
         creatorId?: number;
         /** @format int32 */
         hiveId?: number;
         filter?: string;
-        /** @format date-time */
-        beforeDate?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<PostDto[], any>({
         path: `/api/Post/browse`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

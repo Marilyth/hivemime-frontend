@@ -11,6 +11,11 @@ type FollowedHivesContextType = {
   setFollowedHives: React.Dispatch<React.SetStateAction<HiveDto[]>>;
 };
 
+type AccentColourContextType = {
+  accentColour: string | null;
+  setAccentColour: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
 export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
     baseUrl: "http://localhost:5138",
     securityWorker: (securityData) =>
@@ -19,3 +24,4 @@ export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
 
 export const UserContext = createContext<UserContextType | null>(null);
 export const FollowedHivesContext = createContext<FollowedHivesContextType | null>(null);
+export const AccentColourContext = createContext<AccentColourContextType | null>(null);

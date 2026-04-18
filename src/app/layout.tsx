@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useContext, useEffect, useState } from "react";
 import { HiveDto, UserDetailsDto } from "@/lib/Api";
-import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
+import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
 
@@ -34,6 +34,7 @@ export default function RootLayout({
   const [user, setUser] = useState<UserDetailsDto | null>(null);
   const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [accentColour, setAccentColour] = useState<string | null>(null);
 
   const api = useContext(HiveMimeApiContext);
 
@@ -54,8 +55,17 @@ export default function RootLayout({
   }
 
   useEffect(() => {
+    setAccentColour(localStorage.getItem("accentColour"));
     loginAsync();
   }, []);
+
+  useEffect(() => {
+    if (accentColour) {
+      localStorage.setItem("accentColour", accentColour);
+    } else {
+      localStorage.removeItem("accentColour");
+    }
+  }, [accentColour]);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -68,31 +78,33 @@ export default function RootLayout({
       >
         <UserContext.Provider value={{ user, setUser }}>
           <FollowedHivesContext.Provider value={{ followedHives, setFollowedHives }}>
-            <SidebarProvider>
-              <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-                <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
-                  <SidebarProvider className="flex flex-col">
-                    <div className="flex flex-1">
-                      <AppSidebar />
-                      <SidebarInset>
-                        <CombGenerator distances={[8, 4, 2]}
-                          color={mutedColors.honeyBrown} />
+            <AccentColourContext.Provider value={{ accentColour, setAccentColour }}>
+              <SidebarProvider>
+                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                  <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
+                    <SidebarProvider className="flex flex-col">
+                      <div className="flex flex-1">
+                        <AppSidebar className="backdrop-blur-sm" />
+                        <SidebarInset>
+                          <CombGenerator distances={[8, 4, 2]}
+                            color={accentColour ?? mutedColors.honeyBrown} />
 
-                        <SiteHeader />
-                        {isLoading ?
-                          (<div>Loading...</div>) :
-                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
-                            {children}
-                          </div>)
-                        }
-                        <Toaster position="top-center" richColors />
-                      </SidebarInset>
-                    </div>
+                          <SiteHeader />
+                          {isLoading ?
+                            (<div>Loading...</div>) :
+                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
+                              {children}
+                            </div>)
+                          }
+                          <Toaster position="top-center" richColors />
+                        </SidebarInset>
+                      </div>
 
-                  </SidebarProvider>
-                </div>
-              </ThemeProvider>
-            </SidebarProvider>
+                    </SidebarProvider>
+                  </div>
+                </ThemeProvider>
+              </SidebarProvider>
+            </AccentColourContext.Provider>
           </FollowedHivesContext.Provider>
         </UserContext.Provider>
       </body>

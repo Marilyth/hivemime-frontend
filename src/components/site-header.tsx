@@ -18,7 +18,7 @@ export function SiteHeader() {
   const user = useContext(UserContext);
 
   return (
-    <header className="z-10 bg-sidebar sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b">
+    <header className="z-10 bg-sidebar sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b backdrop-blur-sm">
       <div className="flex h-(--header-height) w-full items-center gap-2 px-4">
         <Button
           className="h-8 w-8"
