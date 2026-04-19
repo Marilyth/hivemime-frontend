@@ -144,7 +144,7 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
 
   return (
     <div style={{color: color}}>
-      <ParallaxContainer className="blur-[4px]" distance={12}>
+      <ParallaxContainer className="blur-[4px]" distance={12} style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden'}}>
         <div 
           className="absolute inset-0"
           style={{
@@ -159,7 +159,7 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
       </ParallaxContainer>
 
       {combs.map((gen) => (
-        <ParallaxContainer key={gen.distance} distance={gen.distance} style={{filter: `blur(${gen.distance / 2}px)`}}>
+        <ParallaxContainer key={gen.distance} distance={gen.distance} style={{filter: `blur(${gen.distance / 2}px)`, WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden'}}>
           <div className="relative">
             {gen.combs.map((comb, idx) => (
               <div

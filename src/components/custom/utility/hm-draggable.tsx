@@ -44,7 +44,7 @@ type HiveMimeDraggableProps = React.ComponentProps<"div"> & {
 export function HiveMimeDraggable({
     className, data, dataList, onDropped, isSticky = false, hasHandle = false,
     canDrop, canDrag, isDropArea = false, isDraggable = false, allowedZones = [], dropAreaName, draggableOnArea, ...props }: HiveMimeDraggableProps) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const handleRef = useRef(null);
   const [isDropping, setDropping] = useState<boolean>(false);
   const [currentZone, setCurrentZone] = useState<DropZone | null>(null);
@@ -104,6 +104,17 @@ export function HiveMimeDraggable({
       else
         dataList.splice(newIndex, 0, draggable["inputData"]);
     }
+  }
+
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1853069
+  function onMouseEnter() {
+    if (hasHandle)
+      ref.current!.draggable = false;
+  }
+
+  function onMouseLeave() {
+    if (hasHandle)
+      ref.current!.draggable = true;
   }
 
   useEffect(() => {
@@ -172,7 +183,7 @@ export function HiveMimeDraggable({
       dropCleanup();
       dragCleanup();
     };
-  }, [dataList]);
+  }, [dataList, hasHandle]);
 
   return (
   <div
@@ -214,7 +225,7 @@ export function HiveMimeDraggable({
     )}
       <div className="flex w-full items-center gap-1">
         {hasHandle && (<GripVertical className="h-4 w-4 text-honey-brown cursor-grab " ref={handleRef} />)}
-        <div className={`flex-1 ${className}`}>
+        <div className={`flex-1 ${className}`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
           {props.children}
         </div>
       </div>

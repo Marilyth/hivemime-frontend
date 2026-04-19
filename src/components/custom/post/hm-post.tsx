@@ -48,20 +48,12 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     <Card className="py-4">
       <CardHeader>
         <CardTitle onClick={navigateToDetails} className="cursor-pointer">
-          <div className="flex flex-col gap-1">
-            <div className="flex flex-row gap-2">
-              <span className="text-informational text-sm">
-                {post.creator?.username} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
-              </span>
-            </div>
-            <span className="font-bold text-honey-brown">{post.title}</span>
-          </div>
+          <span className="text-informational text-sm">
+            {post.creator?.username} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <span className="text-muted-foreground">
-          {post.description}
-        </span>
         {!resultsVisible ?
           <HiveMimePostVote post={post} requestResults={toggleResults} footer={footer} /> :
           <HiveMimePostResult post={post} requestVote={toggleResults} footer={footer} />}

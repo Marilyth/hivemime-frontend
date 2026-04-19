@@ -17,7 +17,7 @@ type AccentColourContextType = {
 };
 
 export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
-    baseUrl: "http://localhost:5138",
+    baseUrl: "http://192.168.178.52:8080",
     securityWorker: (securityData) =>
       securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
   }));

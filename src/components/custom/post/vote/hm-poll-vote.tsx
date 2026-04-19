@@ -59,7 +59,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-4 flex flex-col gap-2" >
-          <span className="text-muted-foreground">{poll.description}test</span>
+          <span className="text-muted-foreground">{poll.description}</span>
           {pollMapping[poll.pollType!]}
 
         <div>

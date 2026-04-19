@@ -55,7 +55,6 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">
                 <Label className="text-sm text-muted-foreground">Create categories for the users to assign the candidates to.</Label>
-                <Label className="text-sm text-muted-foreground">You can <span className="text-honey-brown text-sm">reorder</span> categories by dragging them.</Label>
               </div>
               <HiveMimeCreateCategories poll={props.poll} />
             </div>
@@ -66,7 +65,6 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               <Label className="text-sm text-muted-foreground">Create candidates for the users to vote for.</Label>
-              <Label className="text-sm text-muted-foreground">You can <span className="text-honey-brown text-sm">reorder</span> candidates by dragging them.</Label>
             </div>
             <HiveMimeCreateCandidates poll={props.poll} />
           </div>

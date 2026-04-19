@@ -8,14 +8,21 @@ import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserOptions } from "./user-options"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useContext } from "react"
 import { UserContext } from "@/lib/contexts"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useContext(UserContext);
+
+  const navigateWithParams = (path: string) => {
+    const currentParams = searchParams.toString();
+    const newUrl = `${path}${currentParams ? `?${currentParams}` : ''}`;
+    router.push(newUrl);
+  };
 
   return (
     <header className="z-10 bg-sidebar sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b backdrop-blur-sm">
@@ -42,10 +49,10 @@ export function SiteHeader() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push("/posts/create")}>
+            <DropdownMenuItem onClick={() => navigateWithParams("/posts/create")}>
               New post
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/hives/create")}>
+            <DropdownMenuItem onClick={() => navigateWithParams("/hives/create")}>
               New hive
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
 import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
-import { InputWithLabel, TextAreaWithLabel } from "../../utility/labelled-input";
 import { Button } from "../../../ui/button";
 import { useContext, useRef, useState } from "react";
 import { HiveMimeApiContext } from "@/lib/contexts";
@@ -19,10 +18,10 @@ import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { deepCopy, getReferenceId } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiveMimeDraggable } from "../../utility/hm-draggable";
+import { HiveSelection } from "./hm-hive-selection";
 
 export const HiveMimeCreatePost = observer(() => {
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
-  const [hasTitle, setHasTitle] = useState<boolean>(false);
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
@@ -98,44 +97,7 @@ export const HiveMimeCreatePost = observer(() => {
   <CardContent>
     {selectedPoll == null ? (
       <div className="flex flex-col gap-4">
-
-        {/* Optional Post Title */}
-        <div className="flex flex-col gap-2">
-          {hasTitle ? (
-            <>
-              <InputWithLabel
-                label="Post Title"
-                placeholder="Give your post a title."
-                value={post.title!}
-                onChange={(e) => (post.title = e.target.value)}
-              />
-              <TextAreaWithLabel
-                label="Description"
-                placeholder="Add a description."
-                value={post.description!}
-                onChange={(e) => (post.description = e.target.value)}
-              />
-              <Label className="text-muted-foreground text-sm">
-                * This is <Label className="text-honey-brown">optional</Label>. Leave empty if polls are descriptive enough.
-              </Label>
-              <Button
-                variant="link"
-                className="self-start ml-auto"
-                onClick={() => setHasTitle(false)}
-              >
-                Remove title
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="link"
-              className="self-start ml-auto"
-              onClick={() => setHasTitle(true)}
-            >
-              Add an optional post title
-            </Button>
-          )}
-        </div>
+        <HiveSelection post={post} />
 
         {/* Polls */}
         <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
@@ -192,5 +154,3 @@ export const HiveMimeCreatePost = observer(() => {
 
   );
 });
-
-//

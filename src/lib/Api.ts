@@ -113,8 +113,6 @@ export interface CreatePollDto {
 export interface CreatePostDto {
   /** @format int32 */
   hiveId?: number | null;
-  title?: string | null;
-  description?: string | null;
   polls?: CreatePollDto[] | null;
 }
 
@@ -188,8 +186,6 @@ export interface PostDto {
   creator?: UserDto;
   /** @format int32 */
   id?: number;
-  title?: string | null;
-  description?: string | null;
   polls?: PollDto[] | null;
   /** @format int32 */
   commentCount?: number;
