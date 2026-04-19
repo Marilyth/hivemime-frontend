@@ -10,7 +10,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import { useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
@@ -89,7 +89,10 @@ export default function RootLayout({
                           <CombGenerator distances={[8, 4, 2]}
                             color={accentColour ?? mutedColors.honeyBrown} />
 
-                          <SiteHeader />
+                          <Suspense>
+                            <SiteHeader />
+                          </Suspense>
+                          
                           {isLoading ?
                             (<div>Loading...</div>) :
                             (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
