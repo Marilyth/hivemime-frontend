@@ -1,0 +1,117 @@
+"use client"
+
+import {
+  ChevronDown,
+  Settings,
+  User2,
+  LogOut,
+} from "lucide-react"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "../../ui/button"
+import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts"
+import { useContext, useEffect, useRef, useState } from "react"
+import { getCurrentUser, logInAnonymously, logOut } from "@/lib/firebase"
+import { User } from "firebase/auth"
+import { LoginForm } from "./login-dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { SelectSeparator } from "@/components/ui/select"
+import { toast } from "sonner"
+
+export function UserOptions() {
+  const userContext = useContext(UserContext);
+  const hivesContext = useContext(FollowedHivesContext);
+  const api = useContext(HiveMimeApiContext);
+  const currentFirebaseUser = useRef<User | null>(null);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+
+  async function autoLogIn(){
+    const user = await getCurrentUser() || (await logInAnonymously()).user;
+    const token = await user.getIdToken();
+
+    api.setSecurityData(token);
+    currentFirebaseUser.current = user;
+
+    const userDetailsResponse = await api.api.userLoginList();
+    const followedHivesResponse = await api.api.hiveFollowedList();
+
+    userContext!.setUser(userDetailsResponse.data);
+    hivesContext!.setFollowedHives(followedHivesResponse.data);
+
+    return userDetailsResponse.data;
+  }
+
+  async function logOutSession() {
+    await logOut();
+    userContext!.setUser(null);
+  }
+
+  useEffect(() => {
+    setIsLoginDialogOpen(false);
+
+    if (!userContext?.user)
+      toast.promise(autoLogIn(), {
+        loading: "Logging in...",
+        success: (userDetails) => `Logged in as ${userDetails.username}!`,
+        error: "Failed to log in.",
+      });
+  }, [userContext?.user]);
+
+  return (
+    <div>
+      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+        <DialogContent>
+          <DialogTitle>Log in</DialogTitle>
+          <LoginForm />
+        </DialogContent>
+      </Dialog>
+      {currentFirebaseUser.current == null || currentFirebaseUser.current?.isAnonymous ?
+        <Button
+          variant="link"
+          onClick={() => setIsLoginDialogOpen(true)}
+        >
+          Log in
+        </Button>
+      :
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button variant="link">
+              <User2 className="h-6 w-12" />
+              <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            align="end"
+            sideOffset={4}
+          >
+            <div className="text-muted-foreground text-sm mb-2 px-2 py-2">
+              Hello, {userContext?.user?.username}!
+            </div>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <User2 />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings />
+                Settings
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <SelectSeparator />
+            <DropdownMenuItem onClick={logOutSession}>
+              <LogOut />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      }
+    </div>
+  )
+}

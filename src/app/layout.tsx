@@ -15,7 +15,6 @@ import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
-import { getCurrentUser, logInAnonymously } from "@/lib/firebase";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,29 +33,12 @@ export default function RootLayout({
 }>) {
   const [user, setUser] = useState<UserDetailsDto | null>(null);
   const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accentColour, setAccentColour] = useState<string | null>(null);
 
   const api = useContext(HiveMimeApiContext);
 
-  async function loginAsync(){
-    setIsLoading(true);
-
-    const user = await getCurrentUser() || (await logInAnonymously()).user;
-    const token = await user.getIdToken();
-
-    api.setSecurityData(token);
-
-    const userDetailsResponse = await api.api.userLoginList();
-    const followedHivesResponse = await api.api.hiveFollowedList();
-
-    setUser(userDetailsResponse.data);
-    setFollowedHives(followedHivesResponse.data);
-  }
-
   useEffect(() => {
     setAccentColour(localStorage.getItem("accentColour"));
-    loginAsync().finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -93,13 +75,13 @@ export default function RootLayout({
                             <SiteHeader />
                           </Suspense>
                           
-                          {isLoading || !user ?
+                          {!user ?
                             (<div>Loading...</div>) :
                             (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
                               {children}
                             </div>)
                           }
-                          <Toaster position="top-center" richColors />
+                          <Toaster position="bottom-right" />
                         </SidebarInset>
                       </div>
 

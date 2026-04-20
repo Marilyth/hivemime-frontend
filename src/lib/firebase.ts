@@ -26,6 +26,9 @@ const checkPromise = new Promise((resolve) => {
 });
 
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 auth.app.automaticDataCollectionEnabled = false;
 
