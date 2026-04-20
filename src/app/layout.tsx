@@ -15,6 +15,7 @@ import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
+import { getCurrentUser, logInAnonymously } from "@/lib/firebase";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,22 +42,21 @@ export default function RootLayout({
   async function loginAsync(){
     setIsLoading(true);
 
-    const loginResponse = await api.api.userLoginList({ username: "TestUser" });
-    api.setSecurityData(loginResponse.data.token);
-    console.log("Logged in with token:", loginResponse.data.token);
+    const user = await getCurrentUser() || (await logInAnonymously()).user;
+    const token = await user.getIdToken();
 
-    const userDetailsResponse = await api.api.userDetailsList();
+    api.setSecurityData(token);
+
+    const userDetailsResponse = await api.api.userLoginList();
     const followedHivesResponse = await api.api.hiveFollowedList();
 
     setUser(userDetailsResponse.data);
     setFollowedHives(followedHivesResponse.data);
-
-    setIsLoading(false);
   }
 
   useEffect(() => {
     setAccentColour(localStorage.getItem("accentColour"));
-    loginAsync();
+    loginAsync().finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function RootLayout({
                             <SiteHeader />
                           </Suspense>
                           
-                          {isLoading ?
+                          {isLoading || !user ?
                             (<div>Loading...</div>) :
                             (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
                               {children}

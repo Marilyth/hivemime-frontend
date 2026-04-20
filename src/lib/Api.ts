@@ -135,11 +135,6 @@ export interface HiveDto {
   followerCount?: number;
 }
 
-export interface LoginDto {
-  username?: string | null;
-  token?: string | null;
-}
-
 export interface PollCandidateResultDto {
   /** @format int32 */
   id?: number;
@@ -903,20 +898,36 @@ export class Api<
      * No description
      *
      * @tags User
-     * @name UserLoginList
-     * @request GET:/api/User/login
+     * @name UserMergeList
+     * @request GET:/api/User/merge
      * @secure
      */
-    userLoginList: (
+    userMergeList: (
       query?: {
-        username?: string;
+        previousJwt?: string;
       },
       params: RequestParams = {},
     ) =>
-      this.request<LoginDto, any>({
-        path: `/api/User/login`,
+      this.request<void, any>({
+        path: `/api/User/merge`,
         method: "GET",
         query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserMeList
+     * @request GET:/api/User/me
+     * @secure
+     */
+    userMeList: (params: RequestParams = {}) =>
+      this.request<UserDetailsDto, any>({
+        path: `/api/User/me`,
+        method: "GET",
         secure: true,
         format: "json",
         ...params,
@@ -926,13 +937,13 @@ export class Api<
      * No description
      *
      * @tags User
-     * @name UserDetailsList
-     * @request GET:/api/User/details
+     * @name UserLoginList
+     * @request GET:/api/User/login
      * @secure
      */
-    userDetailsList: (params: RequestParams = {}) =>
+    userLoginList: (params: RequestParams = {}) =>
       this.request<UserDetailsDto, any>({
-        path: `/api/User/details`,
+        path: `/api/User/login`,
         method: "GET",
         secure: true,
         format: "json",
