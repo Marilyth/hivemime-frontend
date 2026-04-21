@@ -15,6 +15,7 @@ import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,30 +34,13 @@ export default function RootLayout({
 }>) {
   const [user, setUser] = useState<UserDetailsDto | null>(null);
   const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accentColour, setAccentColour] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const api = useContext(HiveMimeApiContext);
 
-  async function loginAsync(){
-    setIsLoading(true);
-
-    const loginResponse = await api.api.userLoginList({ username: "TestUser" });
-    api.setSecurityData(loginResponse.data.token);
-    console.log("Logged in with token:", loginResponse.data.token);
-
-    const userDetailsResponse = await api.api.userDetailsList();
-    const followedHivesResponse = await api.api.hiveFollowedList();
-
-    setUser(userDetailsResponse.data);
-    setFollowedHives(followedHivesResponse.data);
-
-    setIsLoading(false);
-  }
-
   useEffect(() => {
     setAccentColour(localStorage.getItem("accentColour"));
-    loginAsync();
   }, []);
 
   useEffect(() => {
@@ -92,14 +76,14 @@ export default function RootLayout({
                           <Suspense>
                             <SiteHeader />
                           </Suspense>
-                          
-                          {isLoading ?
+
+                          {!user ?
                             (<div>Loading...</div>) :
-                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
+                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
                               {children}
                             </div>)
                           }
-                          <Toaster position="top-center" richColors />
+                          <Toaster position={isMobile ? "top-center" : "bottom-right"} />
                         </SidebarInset>
                       </div>
 

@@ -6,17 +6,17 @@ import { SearchForm } from "@/components/search-form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
-import { UserOptions } from "./user-options"
+import { UserOptions } from "./custom/user/user-options"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useContext } from "react"
-import { UserContext } from "@/lib/contexts"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { NotificationBanner } from "./notification-banner"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useContext(UserContext);
+  const isMobile = useIsMobile();
 
   const navigateWithParams = (path: string) => {
     const currentParams = searchParams.toString();
@@ -25,8 +25,8 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="z-10 bg-sidebar sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b backdrop-blur-sm">
-      <div className="flex h-(--header-height) w-full items-center gap-2 px-4">
+    <header className="z-10 sticky top-0 flex flex-col shrink-0 items-center gap-2">
+      <div className="flex h-(--header-height) w-full items-center gap-2 px-4 bg-sidebar backdrop-blur-sm border-b">
         <Button
           className="h-8 w-8"
           variant="ghost"
@@ -42,9 +42,8 @@ export function SiteHeader() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <Plus />
-              Create...
+            <Button variant="outline" className={`${isMobile ? "p-1! h-auto rounded-xl" : ""}`}>
+              <Plus className="w-2 h-2" />{isMobile || "Create..."}
             </Button>
           </DropdownMenuTrigger>
 
@@ -58,6 +57,9 @@ export function SiteHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
         <UserOptions />
+      </div>
+      <div className="px-2">
+        <NotificationBanner />
       </div>
     </header>
   )

@@ -10,6 +10,7 @@ import { Button } from "../../../ui/button";
 import { HiveMimeListPoll } from "./hm-poll-vote";
 import { Accordion } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { AsyncButton } from "../../utility/async-button";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -47,8 +48,13 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
 
   async function submitVote()
   {
-    await hiveMimeService.api.postVoteCreate(postVote);
-    toast.success("Your vote has been submitted.");
+    const task = hiveMimeService.api.postVoteCreate(postVote);
+    toast.promise(task, {
+      loading: 'Submitting your vote...',
+      success: 'Your vote has been submitted!',
+      error: 'Failed to submit your vote.'
+    });
+    await task;
 
     requestResults!();
   }
@@ -67,7 +73,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
     <div className="flex flex-col gap-4">
       <Accordion type="single" collapsible className="border rounded-md">
         {post.polls!.map((poll, index) => (
-            <HiveMimeListPoll key={index} poll={poll} pollVote={postVote.polls![index]} />
+          <HiveMimeListPoll key={index} poll={poll} pollVote={postVote.polls![index]} />
         ))}
       </Accordion>
 
@@ -77,10 +83,10 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
           <ChartBar />
           Results
         </Button>
-        <Button variant="default" disabled={!isValid} onClick={submitVote}>
+        <AsyncButton variant="default" disabled={!isValid} onClick={submitVote}>
           <Vote />
           Vote
-        </Button>
+        </AsyncButton>
       </div>
     </div>
   );

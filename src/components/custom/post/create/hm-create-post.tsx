@@ -8,7 +8,7 @@ import { useContext, useRef, useState } from "react";
 import { HiveMimeApiContext } from "@/lib/contexts";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { observable } from "mobx";
 import { toast } from "sonner";
 import { validatePostTitle as validatePost } from "@/lib/validate-create";
@@ -19,8 +19,10 @@ import { deepCopy, getReferenceId } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiveMimeDraggable } from "../../utility/hm-draggable";
 import { HiveSelection } from "./hm-hive-selection";
+import { AsyncButton } from "../../utility/async-button";
 
 export const HiveMimeCreatePost = observer(() => {
+  const router = useRouter();
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
@@ -82,10 +84,15 @@ export const HiveMimeCreatePost = observer(() => {
     if (!canSubmitPost())
       return;
 
-    const response = await hiveMimeService.api.postCreateCreate(post);
+    const task = hiveMimeService.api.postCreateCreate(post);
+    toast.promise(task, {
+      loading: 'Submitting post...',
+      success: 'Post submitted successfully!',
+      error: 'Failed to submit post.'
+    });
 
-    toast.success("Post created successfully!");
-    redirect(`/posts/view?postId=${response.data.id}`);
+    const response = await task;
+    router.push(`/posts/view?postId=${response.data.id}`);
   }
 
   return (
@@ -137,9 +144,9 @@ export const HiveMimeCreatePost = observer(() => {
           </Label>
         </div>
 
-        <Button className="self-start ml-auto" onClick={submitPost}>
+        <AsyncButton className="self-start ml-auto" onClick={submitPost}>
           Submit
-        </Button>
+        </AsyncButton>
       </div>
     ) : (
       <HiveMimeCreatePoll
