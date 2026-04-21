@@ -36,9 +36,16 @@ export function UserOptions() {
     const token = await user.getIdToken();
 
     api.setSecurityData(token);
+    const previousUser = currentFirebaseUser.current;
     currentFirebaseUser.current = user;
 
     const userDetailsResponse = await api.api.userLoginList();
+
+    if (previousUser?.uid !== user.uid
+        && previousUser?.isAnonymous) {
+      await api.api.userMergeList({previousJwt: await previousUser.getIdToken()});
+    }
+
     const followedHivesResponse = await api.api.hiveFollowedList();
 
     userContext!.setUser(userDetailsResponse.data);
