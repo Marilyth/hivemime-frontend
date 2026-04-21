@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  ChevronDown,
   Settings,
   User2,
   LogOut,
@@ -23,6 +22,7 @@ import { LoginForm } from "./login-dialog"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { SelectSeparator } from "@/components/ui/select"
 import { toast } from "sonner"
+import HexWrapper from "../utility/hm-hex-wrapper"
 
 export function UserOptions() {
   const userContext = useContext(UserContext);
@@ -87,11 +87,12 @@ export function UserOptions() {
         </Button>
       :
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="link">
-              <User2 className="h-6 w-12" />
-              <ChevronDown />
-            </Button>
+          <DropdownMenuTrigger asChild>
+            <HexWrapper pointRatio={0.25}>
+              <Button className="px-3! h-auto">
+                <User2 />
+              </Button>
+            </HexWrapper>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
