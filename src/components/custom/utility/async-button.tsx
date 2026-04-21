@@ -19,10 +19,7 @@ export const AsyncButton: FC<AsyncButtonProps> = ({ behaviour = "alwaysEnable", 
     setIsLoading(true);
 
     try {
-      const response: any = onClick?.(e);
-
-      if (response instanceof Promise)
-        await response;
+      await Promise.resolve(onClick?.(e));
     } catch (error) {
       if (behaviour === "enableIfError")
         await reEnable();
