@@ -9,6 +9,8 @@ import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 import { Reply } from "lucide-react";
 import { HiveMimeApiContext } from "@/lib/contexts";
 import { HiveMimeExpandableText } from "../utility/hm-expandable-text";
+import { AsyncButton } from "../utility/async-button";
+import { toast } from "sonner";
 
 export interface HiveMimeCommentProps {
   comment: CommentDto;
@@ -20,13 +22,16 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replies, setReplies] = useState<CommentDto[]>([]);
   const [hasMoreReplies, setHasMoreReplies] = useState<boolean>(comment.replyCount! > 0);
-  const [isLoadingReplies, setIsLoadingReplies] = useState<boolean>(false);
 
   async function loadReplies() {
-    setIsLoadingReplies(true);
     const beforeDate = replies.length > 0 ? replies[replies.length - 1].createdAt : undefined;
-    const response = await hiveMimeService.api.commentGetByPostList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate: beforeDate });
-    setIsLoadingReplies(false);
+    const task = hiveMimeService.api.commentGetByPostList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate });
+    toast.promise(task, {
+      loading: 'Loading comments...',
+      success: 'Comments loaded successfully!',
+      error: 'Failed to load comments.'
+    });
+    const response = await task;
 
     setReplies(prev => [...prev, ...response.data]);
     setHasMoreReplies(response.data.length > 0 && replies.length + response.data.length < comment.replyCount!);
@@ -81,9 +86,9 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
           </>
         )}
         {hasMoreReplies && (
-          <Button variant="link" size="sm" onClick={loadReplies} className="self-start p-0" disabled={isLoadingReplies}>
-              {isLoadingReplies ? "Loading..." : "See more comments..."}
-          </Button>
+          <AsyncButton variant="link" size="sm" onClick={loadReplies} className="self-start p-0">
+              See more comments...
+          </AsyncButton>
         )}
       </div>
     </div>

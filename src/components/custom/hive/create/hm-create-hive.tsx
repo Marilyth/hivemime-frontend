@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { AsyncButton } from "../../utility/async-button";
 
 
 export const HiveMimeHiveCreate = observer(() => {
@@ -35,11 +36,19 @@ export const HiveMimeHiveCreate = observer(() => {
     if (!canCreateHive())
       return;
 
-    const response = await hiveMimeService.api.hiveCreateCreate(hiveRef.current);
-    followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, response.data]);
+    const task = hiveMimeService.api.hiveCreateCreate(hiveRef.current);
+    toast.promise(task, {
+      loading: 'Creating hive...',
+      success: (response) => {
+        followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, response.data]);
+        router.push(`/posts?hiveId=${response.data.id}`);
 
-    toast.success("Hive created successfully!");
-    router.push(`/posts?hiveId=${response.data.id}`);
+        return 'Hive created successfully!';
+      },
+      error: 'Failed to create hive.'
+    });
+
+    await task;
   }
 
   return (
@@ -60,9 +69,9 @@ export const HiveMimeHiveCreate = observer(() => {
         </Field>
       </CardContent>
       <CardFooter>
-        <Button className="self-start ml-auto" onClick={createHive}>
+        <AsyncButton className="self-start ml-auto" onClick={createHive}>
           Create
-        </Button>
+        </AsyncButton>
       </CardFooter>
     </Card>
   );

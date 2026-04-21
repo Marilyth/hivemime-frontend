@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { HiveMimeExpandableText } from "../../utility/hm-expandable-text";
+import { AsyncButton } from "../../utility/async-button";
 
 export type HiveMimeHiveListItemProps = {
   hive: HiveDto;
@@ -22,16 +23,31 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
   const router = useRouter();
 
   async function leaveHive() {
-    await hiveMimeService.api.hiveLeaveCreate({ hiveId: hive.id });
-    toast.success(`You have left the hive "${hive.name}".`);
-    followedHivesContext.setFollowedHives(followedHivesContext.followedHives.filter(h => h.id !== hive.id));
+    const task = hiveMimeService.api.hiveLeaveCreate({ hiveId: hive.id });
+    toast.promise(task, {
+      loading: 'Leaving hive...',
+      success: () =>{
+        followedHivesContext.setFollowedHives(followedHivesContext.followedHives.filter(h => h.id !== hive.id));
+        return "Hive left successfully!";
+      },
+      error: 'Failed to leave hive.'
+    });
+
+    await task;
   }
 
   async function joinHive() {
-    await hiveMimeService.api.hiveJoinCreate({ hiveId: hive.id });
-    toast.success(`You have joined the hive "${hive.name}".`);
-    
-    followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, hive]);
+    const task = hiveMimeService.api.hiveJoinCreate({ hiveId: hive.id });
+    toast.promise(task, {
+      loading: 'Joining hive...',
+      success: () =>{
+        followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, hive]);
+        return "Hive joined successfully!";
+      },
+      error: 'Failed to join hive.'
+    });
+
+    await task;
   }
 
   function browseHive() {
@@ -51,14 +67,14 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
               {hive.name}
             </Button>
 
-            <Button
+            <AsyncButton
               variant="outline"
               size="sm"
               className="w-20 flex-shrink-0"
               onClick={followedHivesContext.followedHives.some(h => h.id === hive.id) ? leaveHive : joinHive}
             >
               {followedHivesContext.followedHives.some(h => h.id === hive.id) ? "Leave" : "Join"}
-            </Button>
+            </AsyncButton>
           </div>
 
           <HiveMimeExpandableText className="text-muted-foreground" lines={3}>

@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import { HiveMimePostResult } from "./result/hm-post-result";
 import { HiveMimePostVote } from "./vote/hm-post-vote";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, User } from "lucide-react";
 import HexWrapper from "../utility/hm-hex-wrapper";
@@ -19,13 +19,14 @@ export interface HiveMimePostProps {
 
 export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) => {
   const [resultsVisible, setResultsVisible] = useState<boolean>(showResults || false);
+  const router = useRouter();
 
   function toggleResults() {
     setResultsVisible(prev => !prev);
   }
 
   function navigateToDetails() {
-    redirect(`/posts/view?postId=${post.id}`);
+    router.push(`/posts/view?postId=${post.id}`);
   }
 
   const footer = (

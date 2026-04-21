@@ -6,6 +6,8 @@ import { Api, CommentDto } from "@/lib/Api";
 import { HiveMimeApiContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { HTMLAttributes, useContext, useState } from "react";
+import { AsyncButton } from "../utility/async-button";
+import { toast } from "sonner";
 
 export type HiveMimeCommentCreateProps = HTMLAttributes<HTMLDivElement> & {
   postId: number;
@@ -19,7 +21,14 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   async function createComment() {
-    const response = await hiveMimeService.api.commentCreateCreate({ postId, parentCommentId, content });
+    const task = hiveMimeService.api.commentCreateCreate({ postId, parentCommentId, content });
+    toast.promise(task, {
+      loading: 'Creating comment...',
+      success: 'Comment created successfully!',
+      error: 'Failed to create comment.'
+    });
+
+    const response = await task;
     
     if (onFinished)
       onFinished(response.data);
@@ -36,9 +45,9 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
             <Button variant="outline" onClick={() => onFinished ? onFinished(null) : setContent("")}>
                 Cancel
             </Button>
-            <Button onClick={createComment} disabled={content.trim().length === 0}>
+            <AsyncButton onClick={createComment} disabled={content.trim().length === 0}>
                 Post
-            </Button>
+            </AsyncButton>
         </div>}
     </div>
   );

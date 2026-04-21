@@ -4,9 +4,9 @@ import { Field, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useContext, useState } from "react";
 import { logInWithEmailPassword, createWithEmailPassword, logInWithGoogle } from "@/lib/firebase";
-import { Button } from "@/components/ui/button";
 import { SiGoogle } from "react-icons/si";
 import { UserContext } from "@/lib/contexts";
+import { AsyncButton } from "../utility/async-button";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -31,10 +31,10 @@ export function LoginForm() {
     <div>
       <div className="flex flex-col gap-4">
         {/* Integrations with SSO services */}
-        <Button variant="outline" onClick={logInUsingGoogle}>
+        <AsyncButton variant="outline" onClick={logInUsingGoogle}>
           <SiGoogle className="mr-2 text-honey-brown" />
           Continue with Google
-        </Button>
+        </AsyncButton>
 
         <div className="flex items-center gap-4 text-muted-foreground">
           <FieldSeparator className="flex-1" />
@@ -54,9 +54,9 @@ export function LoginForm() {
                  value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
 
-        <Button onClick={logInUsingEmail} className="mt-2" disabled={!email || !password}>
+        <AsyncButton onClick={logInUsingEmail} className="mt-2" disabled={!email || !password}>
           Log in / Sign up
-        </Button>
+        </AsyncButton>
       </div>
     </div>
   )
