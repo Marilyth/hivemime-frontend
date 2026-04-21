@@ -15,6 +15,7 @@ import { HiveDto, UserDetailsDto } from "@/lib/Api";
 import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
   const [user, setUser] = useState<UserDetailsDto | null>(null);
   const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
   const [accentColour, setAccentColour] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const api = useContext(HiveMimeApiContext);
 
@@ -74,14 +76,14 @@ export default function RootLayout({
                           <Suspense>
                             <SiteHeader />
                           </Suspense>
-                          
+
                           {!user ?
                             (<div>Loading...</div>) :
-                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0">
+                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
                               {children}
                             </div>)
                           }
-                          <Toaster position="bottom-right" />
+                          <Toaster position={isMobile ? "top-center" : "bottom-right"} />
                         </SidebarInset>
                       </div>
 
