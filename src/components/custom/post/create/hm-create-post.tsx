@@ -54,7 +54,7 @@ export const HiveMimeCreatePost = observer(() => {
   function addPoll() {
     setSelectedPollIndex(-1);
     setSelectedPoll(observable({ title: "", description: "", candidates: [], categories: [],
-                       minValue: 0, maxValue: 100, minVotes: 1, maxVotes: -1, stepValue: 1,
+                       minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
                        pollType: undefined }));
   }
 
@@ -111,11 +111,7 @@ export const HiveMimeCreatePost = observer(() => {
           <Label className="font-bold">Polls</Label>
           <AnimatePresence>
             {post.polls!.map((poll, index) => (
-              <motion.div layout key={getReferenceId(poll)}
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}>
+              <motion.div layout key={getReferenceId(poll)}>
                 <HiveMimeDraggable isDraggable isDropArea isSticky data={poll} dataList={post.polls!} allowedZones={['top', 'bottom']} className="flex flex-row gap-1">
                   <HiveMimeHoverCard className="flex-1">
                     <div className="flex items-center gap-2">

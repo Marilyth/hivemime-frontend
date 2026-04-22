@@ -3,7 +3,7 @@
 import { observer } from "mobx-react-lite";
 import { HiveMimeInlineInput } from "../../utility/hm-embedded-input";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
-import { HiveMimeCreateMinvoteRule, HiveMimeCreateShuffleRule } from "./hm-create-rules";
+import { HiveMimeCreateMaxvoteRule, HiveMimeCreateMinvoteRule, HiveMimeCreateShuffleRule } from "./hm-create-rules";
 import { HiveMimeCreatePollProps } from "./hm-create-choice-poll";
 
 
@@ -11,18 +11,19 @@ export const HiveMimeCreateScoringRules = observer((props: HiveMimeCreatePollPro
   return (
     <div>
       <HiveMimeBulletItem>
-        The user has to score candidates from
+        The minimum score is
         <HiveMimeInlineInput min={1} value={props.poll.minValue!}
-          onChange={(value) => props.poll.minValue = Number(value.target.value)} />
-        to
+          onChange={(value) => props.poll.minValue = Number(value.target.value)} />.
+      </HiveMimeBulletItem>
+
+      <HiveMimeBulletItem>
+        The maximum score is
         <HiveMimeInlineInput min={1} value={props.poll.maxValue!}
-          onChange={(value) => props.poll.maxValue = Number(value.target.value)} />
-        in steps of
-        <HiveMimeInlineInput min={1} value={props.poll.stepValue!}
-          onChange={(value) => props.poll.stepValue = Number(value.target.value)} />.
+          onChange={(value) => props.poll.maxValue = Number(value.target.value)} />.
       </HiveMimeBulletItem>
 
       <HiveMimeCreateMinvoteRule poll={props.poll} />
+      <HiveMimeCreateMaxvoteRule poll={props.poll} />
       <HiveMimeCreateShuffleRule poll={props.poll} />
     </div>
   );

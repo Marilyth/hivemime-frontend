@@ -49,7 +49,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
   return (
     <AccordionItem value={getReferenceId(poll)} className="border-b last:border-b-0">
-      <AccordionTrigger className="bg-popover rounded-none p-2">
+      <AccordionTrigger className="bg-card rounded-none p-2">
         <div className="flex flex-row gap-4 font-bold items-center">
           <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-honey-brown w-6 h-6 self-start" />
           <span className="text-muted-foreground font-bold">
@@ -58,7 +58,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
           <HiveMimeStateIcon state={state} shape="none" />
         </div>
       </AccordionTrigger>
-      <AccordionContent className="p-4 flex flex-col gap-2" >
+      <AccordionContent className="p-4 flex flex-col gap-2 bg-card " >
           <span className="text-muted-foreground">{poll.description}</span>
           {pollMapping[poll.pollType!]}
 

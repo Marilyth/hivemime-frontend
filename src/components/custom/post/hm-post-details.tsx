@@ -5,18 +5,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Api, PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
 import { HiveMimeApiContext } from "@/lib/contexts";
-import { useSearchParams } from "next/navigation";
 import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
+import { useQueryParam } from "../utility/use-query-param";
 
 export function HiveMimePostDetails() {
-  const params = useSearchParams();
+  const [postId, setPostId] = useQueryParam("postId");
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
 
   const [post, setPost] = useState<PostDto | null>(null);
 
   function getPostId() {
-    const postId = params.get("postId");
-
     if (!postId)
       throw new Error("postId is required");
 
@@ -32,7 +30,7 @@ export function HiveMimePostDetails() {
 
   useEffect(() => {
     fetchPostAsync();
-  }, []);
+  }, [postId]);
 
   return (
     <div className="flex justify-center">

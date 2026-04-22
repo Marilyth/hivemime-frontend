@@ -32,10 +32,26 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 
   function removeCandidate(index: number) {
     poll.candidates!.splice(index, 1);
+
+    if (poll.candidates!.length < poll.maxVotes!) {
+      poll.maxVotes = poll.candidates!.length;
+    }
+
+    if (poll.candidates!.length < poll.minVotes!) {
+      poll.minVotes = poll.candidates!.length;
+    }
   }
 
   function addCandidate() {
     poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
+
+    if (poll.minVotes! == poll.candidates!.length - 1) {
+      poll.minVotes = poll.candidates!.length;
+    }
+
+    if (poll.maxVotes! == poll.candidates!.length - 1) {
+      poll.maxVotes = poll.candidates!.length;
+    }
   }
 
   return (

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { MessageSquare, User } from "lucide-react";
 import HexWrapper from "../utility/hm-hex-wrapper";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
+import { Button } from "@/components/ui/button";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -30,7 +31,7 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   }
 
   const footer = (
-  <div className="flex flex-row gap-2 w-full">
+  <div className="flex flex-row gap-2 cursor-pointer" onClick={navigateToDetails}>
     <HexWrapper className="self-end">
       <Badge className="h-6 bg-popover text-muted-foreground">
         <User  />
@@ -48,9 +49,10 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   return (
     <Card className="py-4">
       <CardHeader>
-        <CardTitle onClick={navigateToDetails} className="cursor-pointer">
-          <span className="text-informational text-sm">
-            {post.creator?.username} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
+        <CardTitle className="text-informational text-sm">
+          <span>
+            {post.hive ? <Button className="p-0 h-auto" variant="link"
+              onClick={() => router.push(`/posts?hiveId=${post.hive!.id}`)}>{post.hive.name}</Button> : "Private"} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
           </span>
         </CardTitle>
       </CardHeader>

@@ -8,21 +8,25 @@ import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserOptions } from "./custom/user/user-options"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { NotificationBanner } from "./notification-banner"
+import { useQueryParam } from "./custom/utility/use-query-param"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [hiveId, setHiveId] = useQueryParam("hiveId");
   const isMobile = useIsMobile();
 
-  const navigateWithParams = (path: string) => {
-    const currentParams = searchParams.toString();
-    const newUrl = `${path}${currentParams ? `?${currentParams}` : ''}`;
-    router.push(newUrl);
-  };
+  function navigateWithHive(path: string) {
+    if (!hiveId) {
+      router.push(path);
+      return;
+    }
+
+    router.push(`${path}?hiveId=${hiveId}`);
+  }
 
   return (
     <header className="z-10 sticky top-0 flex flex-col shrink-0 items-center gap-2">
@@ -48,10 +52,10 @@ export function SiteHeader() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigateWithParams("/posts/create")}>
+            <DropdownMenuItem onClick={() => navigateWithHive("/posts/create")}>
               New post
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigateWithParams("/hives/create")}>
+            <DropdownMenuItem onClick={() => navigateWithHive("/hives/create")}>
               New hive
             </DropdownMenuItem>
           </DropdownMenuContent>
