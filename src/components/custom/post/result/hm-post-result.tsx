@@ -67,7 +67,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
 
         <div className="flex flex-row gap-2 w-full">
           {footer}
-          <Button variant="outline" className="text-muted-foreground" onClick={requestVote}>
+          <Button variant="outline" className="ml-auto text-muted-foreground" onClick={requestVote}>
             <Vote />
             Vote
           </Button>

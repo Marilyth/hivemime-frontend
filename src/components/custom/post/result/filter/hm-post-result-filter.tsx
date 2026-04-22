@@ -31,7 +31,7 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
 
     return (
         <Dialog open={isOpen} onOpenChange={onFinished}>
-            <DialogContent>
+            <DialogContent onClick={(e) => e.stopPropagation()}>
                 {showCreator ?
                     <div className="flex flex-col">
                         <span className="text-lg font-semibold">
