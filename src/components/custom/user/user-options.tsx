@@ -23,10 +23,12 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { SelectSeparator } from "@/components/ui/select"
 import { toast } from "sonner"
 import HexWrapper from "../utility/hm-hex-wrapper"
+import { useRouter } from "next/navigation"
 
 export function UserOptions() {
   const userContext = useContext(UserContext);
   const hivesContext = useContext(FollowedHivesContext);
+  const router = useRouter();
   const api = useContext(HiveMimeApiContext);
   const currentFirebaseUser = useRef<User | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -103,11 +105,11 @@ export function UserOptions() {
               Hello, {userContext?.user?.username}!
             </div>
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/user")}>
                 <User2 />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/user/settings")}>
                 <Settings />
                 Settings
               </DropdownMenuItem>
