@@ -28,8 +28,7 @@ export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentPro
     const task = hiveMimeService.api.commentGetByPostList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate });
     toast.promise(task, {
       loading: 'Loading comments...',
-      success: 'Comments loaded successfully!',
-      error: 'Failed to load comments.'
+      success: 'Comments loaded successfully!'
     });
     const response = await task;
 

@@ -29,8 +29,7 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
       success: () =>{
         followedHivesContext.setFollowedHives(followedHivesContext.followedHives.filter(h => h.id !== hive.id));
         return "Hive left successfully!";
-      },
-      error: 'Failed to leave hive.'
+      }
     });
 
     await task;
@@ -43,8 +42,7 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
       success: () =>{
         followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, hive]);
         return "Hive joined successfully!";
-      },
-      error: 'Failed to join hive.'
+      }
     });
 
     await task;

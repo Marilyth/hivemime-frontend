@@ -220,6 +220,7 @@ export interface UserSettingsDto {
   shareDateOnVote?: boolean;
   shareCountryOnVote?: boolean;
   shareAgeOnVote?: boolean;
+  protectVoteOnFilter?: boolean;
 }
 
 export interface VoteOnCandidateDto {
@@ -946,6 +947,25 @@ export class Api<
         path: `/api/User/login`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserUpdateCreate
+     * @request POST:/api/User/update
+     * @secure
+     */
+    userUpdateCreate: (data: UserDetailsDto, params: RequestParams = {}) =>
+      this.request<UserDetailsDto, any>({
+        path: `/api/User/update`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

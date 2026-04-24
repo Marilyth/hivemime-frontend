@@ -1,19 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldDescription, FieldContent, FieldGroup, FieldSet, FieldLegend } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { UserContext } from "@/lib/contexts";
+import { HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { useContext } from "react";
 import { useObservableDraft } from "../../utility/observable-draft";
-import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 export const UserPrivacySettings = observer(() => {
+  const api = useContext(HiveMimeApiContext);
   const userContext = useContext(UserContext);
   const [user, isDirty, resetChanges] = useObservableDraft(userContext!.user!);
 
   async function saveSettings() {
-    // ToDo...
+    const task = api.api.userUpdateCreate(user);
+    toast.promise(task, {
+      loading: "Saving your settings...",
+      success: "Your settings have been saved."
+    });
+
+    userContext?.setUser((await task).data);
   }
 
   return (
@@ -28,21 +34,21 @@ export const UserPrivacySettings = observer(() => {
               <FieldLabel>Age group</FieldLabel>
               <FieldDescription>Your age group will be counted.</FieldDescription>
             </FieldContent>
-            <Switch checked={user.settings?.shareAgeOnVote ?? false} onCheckedChange={(checked) => (user.settings!.shareAgeOnVote = checked)} />
+            <Switch checked={user.settings?.shareAgeOnVote ?? true} onCheckedChange={(checked) => user.settings!.shareAgeOnVote = checked} />
           </Field>
           <Field orientation="horizontal">
             <FieldContent className="gap-1">
               <FieldLabel>Country</FieldLabel>
               <FieldDescription>Your country will be counted.</FieldDescription>
             </FieldContent>
-            <Switch checked={user.settings?.shareCountryOnVote ?? false} onCheckedChange={(checked) => (user.settings!.shareCountryOnVote = checked)} />
+            <Switch checked={user.settings?.shareCountryOnVote ?? true} onCheckedChange={(checked) => user.settings!.shareCountryOnVote = checked} />
           </Field>
           <Field orientation="horizontal">
             <FieldContent className="gap-1">
               <FieldLabel>Date of vote</FieldLabel>
               <FieldDescription>Your date of vote will be counted.</FieldDescription>
             </FieldContent>
-            <Switch checked={user.settings?.shareDateOnVote ?? false} onCheckedChange={(checked) => (user.settings!.shareDateOnVote = checked)} />
+            <Switch checked={user.settings?.shareDateOnVote ?? true} onCheckedChange={(checked) => user.settings!.shareDateOnVote = checked} />
           </Field>
         </FieldGroup>
       </FieldSet>
@@ -54,7 +60,7 @@ export const UserPrivacySettings = observer(() => {
             When results are filtered by conditions, your votes are excluded to prevent them from being inferred.
           </FieldDescription>
         </FieldContent>
-        <Switch checked={false} onCheckedChange={(checked) => console.log("ToDo")} />
+        <Switch checked={user.settings?.protectVoteOnFilter ?? false} onCheckedChange={(checked) => user.settings!.protectVoteOnFilter = checked} />
       </Field>
 
       <div className="self-end flex flex-row gap-2 mt-2">

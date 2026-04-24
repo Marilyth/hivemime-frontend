@@ -16,6 +16,7 @@ import { AccentColourContext, FollowedHivesContext, HiveMimeApiContext, UserCont
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const queryClient = new QueryClient();
 
 export default function RootLayout({
   children,
@@ -60,40 +63,42 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserContext.Provider value={{ user, setUser }}>
-          <FollowedHivesContext.Provider value={{ followedHives, setFollowedHives }}>
-            <AccentColourContext.Provider value={{ accentColour, setAccentColour }}>
-              <SidebarProvider>
-                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-                  <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
-                    <SidebarProvider className="flex flex-col">
-                      <div className="flex flex-1">
-                        <AppSidebar className="backdrop-blur-sm" />
-                        <SidebarInset className="min-h-10000">
-                          <CombGenerator distances={[8, 4, 2]}
-                            color={accentColour ?? mutedColors.honeyBrown} />
+        <QueryClientProvider client={queryClient}>
+          <UserContext.Provider value={{ user, setUser }}>
+            <FollowedHivesContext.Provider value={{ followedHives, setFollowedHives }}>
+              <AccentColourContext.Provider value={{ accentColour, setAccentColour }}>
+                <SidebarProvider>
+                  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+                    <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
+                      <SidebarProvider className="flex flex-col">
+                        <div className="flex flex-1">
+                          <AppSidebar className="backdrop-blur-sm" />
+                          <SidebarInset className="min-h-10000">
+                            <CombGenerator distances={[8, 4, 2]}
+                              color={accentColour ?? mutedColors.honeyBrown} />
 
-                          <Suspense>
-                            <SiteHeader />
-                          </Suspense>
+                            <Suspense>
+                              <SiteHeader />
+                            </Suspense>
 
-                          {!user ?
-                            (<div>Loading...</div>) :
-                            (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
-                              {children}
-                            </div>)
-                          }
-                          <Toaster position={isMobile ? "top-center" : "bottom-right"} />
-                        </SidebarInset>
-                      </div>
+                            {!user ?
+                              (<div>Loading...</div>) :
+                              (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
+                                {children}
+                              </div>)
+                            }
+                            <Toaster position="bottom-right" />
+                          </SidebarInset>
+                        </div>
 
-                    </SidebarProvider>
-                  </div>
-                </ThemeProvider>
-              </SidebarProvider>
-            </AccentColourContext.Provider>
-          </FollowedHivesContext.Provider>
-        </UserContext.Provider>
+                      </SidebarProvider>
+                    </div>
+                  </ThemeProvider>
+                </SidebarProvider>
+              </AccentColourContext.Provider>
+            </FollowedHivesContext.Provider>
+          </UserContext.Provider>
+        </QueryClientProvider>
       </body>
     </html>
   );
