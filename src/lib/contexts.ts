@@ -18,7 +18,7 @@ type AccentColourContextType = {
 };
 
 export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
-    baseUrl: "http://localhost:5138",
+    baseUrl: "https://home.mayiscoding.com/hivemime",
     securityWorker: (securityData) =>
       securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
     customFetch: async (input, init) => {
