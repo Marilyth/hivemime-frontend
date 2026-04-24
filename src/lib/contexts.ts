@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import { Api, HiveDto, UserDetailsDto } from "./Api";
+import { toast } from "sonner";
 
 type UserContextType = {
   user: UserDetailsDto | null;
@@ -17,9 +18,29 @@ type AccentColourContextType = {
 };
 
 export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
-    baseUrl: "https://home.mayiscoding.com/hivemime",
+    baseUrl: "http://localhost:5138",
     securityWorker: (securityData) =>
       securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
+    customFetch: async (input, init) => {
+      const response = await fetch(input, init);
+      
+      if (response.ok)
+        return response;
+      const errorData = await response.json();
+      
+      console.log("Request failed:", errorData);
+      let errorMessage: string = "";
+
+      if (response.status === 400 || response.status === 404) {
+        errorMessage = errorData.error;
+      }
+      else {
+        errorMessage = `The server encountered an error. Please try again later. ${errorData.error ?? ""}`;
+      }
+
+      toast.error(errorMessage, { closeButton: true, duration: Infinity, richColors: true });
+      throw new Error(`Request failed with status ${response.status}`);
+    },
   }));
 
 export const UserContext = createContext<UserContextType | null>(null);

@@ -51,8 +51,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
     const task = hiveMimeService.api.postVoteCreate(postVote);
     toast.promise(task, {
       loading: 'Submitting your vote...',
-      success: 'Your vote has been submitted!',
-      error: 'Failed to submit your vote.'
+      success: 'Your vote has been submitted!'
     });
     await task;
 

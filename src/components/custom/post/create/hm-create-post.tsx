@@ -20,13 +20,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { HiveMimeDraggable } from "../../utility/hm-draggable";
 import { HiveSelection } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
+import { useQueryParam } from "../../utility/use-query-param";
 
 export const HiveMimeCreatePost = observer(() => {
   const router = useRouter();
   const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
-  const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [] }));
+  const [hiveId, setHiveId] = useQueryParam("hiveId", undefined);
+  const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [], hiveId: hiveId ? Number(hiveId) : undefined }));
   const post = postRef.current;
 
   if (post.polls!.length === 0 && selectedPoll == null) {
@@ -87,8 +89,7 @@ export const HiveMimeCreatePost = observer(() => {
     const task = hiveMimeService.api.postCreateCreate(post);
     toast.promise(task, {
       loading: 'Submitting post...',
-      success: 'Post submitted successfully!',
-      error: 'Failed to submit post.'
+      success: 'Post submitted successfully!'
     });
 
     const response = await task;

@@ -44,8 +44,7 @@ export const HiveMimeHiveCreate = observer(() => {
         router.push(`/posts?hiveId=${response.data.id}`);
 
         return 'Hive created successfully!';
-      },
-      error: 'Failed to create hive.'
+      }
     });
 
     await task;
