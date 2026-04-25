@@ -26,7 +26,7 @@ export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration 
     if (newHoney === undefined || oldHoney === undefined || newHoney === oldHoney)
       return;
 
-    let startTime = performance.now();
+    const startTime = performance.now();
     
     const honeyGained = newHoney - oldHoney;
     setHoneyGained(0);
