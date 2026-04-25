@@ -36,10 +36,7 @@ export const api = new Api({
     if (response.ok)
     {
       if (data.honeyDelta)
-      {
         userStore.user!.honey += data.honeyDelta;
-        toast.success(`You earned ${data.honeyDelta} honey! Your new balance is ${userStore.user!.honey} honey.`);
-      }
 
       return response;
     }
