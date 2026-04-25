@@ -31,11 +31,13 @@ export const api = new Api({
     token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
   customFetch: async (input, init) => {
     const response = await fetch(input, init);
-    const data = await response.clone().json();
+
+    const responseText = await response.clone().text();
+    const data = await responseText ? JSON.parse(responseText) : null;
 
     if (response.ok)
     {
-      if (data.honeyDelta)
+      if (data?.honeyDelta)
         userStore.user!.honey += data.honeyDelta;
 
       return response;
