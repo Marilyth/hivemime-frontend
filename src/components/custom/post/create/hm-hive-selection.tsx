@@ -1,24 +1,23 @@
 "use client";
 
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectValue } from "@/components/ui/select";
-import { useContext, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
 import { observer } from "mobx-react-lite";
 import { CreatePostDto, HiveDto } from "@/lib/Api";
-import { HiveMimeApiContext } from "@/lib/contexts";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { ChevronDownIcon, FileChartColumn, SearchIcon, User } from "lucide-react";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryParam } from "../../utility/use-query-param";
+import { api } from "@/lib/contexts";
 
 export interface HiveMimeHiveSelectionProps {
   post: CreatePostDto;
 }
 
 export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
-  const hiveMimeService = useContext(HiveMimeApiContext)!;
   const [hiveIdQueryParam, setHiveIdQueryParam] = useQueryParam("hiveId", undefined);
   const [hiveSearchInput, setHiveSearchInput] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -28,7 +27,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
     queryKey: ["hive", props.post.hiveId],
     enabled: props.post.hiveId !== undefined && props.post.hiveId! > 0,
     queryFn: async () => {
-      const res = await hiveMimeService.api.hiveGetList({ hiveId: props.post.hiveId! });
+      const res = await api.api.hiveGetList({ hiveId: props.post.hiveId! });
       return res.data;
     }
   });
@@ -37,7 +36,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
     queryKey: ["hive-search", hiveSearchInput],
     enabled: hiveSearchInput.length > 0,
     queryFn: async () => {
-      const res = await hiveMimeService.api.hiveBrowseList({ filter: hiveSearchInput });
+      const res = await api.api.hiveBrowseCreate({ filter: hiveSearchInput });
       return res.data;
     }
   });

@@ -2,20 +2,19 @@
 
 import { Field, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { logInWithEmailPassword, createWithEmailPassword, logInWithGoogle } from "@/lib/firebase";
 import { SiGoogle } from "react-icons/si";
-import { UserContext } from "@/lib/contexts";
 import { AsyncButton } from "../utility/async-button";
+import { userStore } from "@/lib/contexts";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const userContext = useContext(UserContext);
 
   async function logInUsingGoogle() {
     await logInWithGoogle();
-    userContext?.setUser(null);
+    userStore.setUser(null);
   }
 
   async function logInUsingEmail() {
@@ -24,7 +23,7 @@ export function LoginForm() {
     } catch (error) {
       await createWithEmailPassword(email, password);
     }
-    userContext?.setUser(null);
+    userStore.setUser(null);
   }
 
   return (

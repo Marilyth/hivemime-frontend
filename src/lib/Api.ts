@@ -10,6 +10,12 @@
  * ---------------------------------------------------------------
  */
 
+export enum PostOrderBy {
+  New = "New",
+  Old = "Old",
+  Hot = "Hot",
+}
+
 export enum PollType {
   Choice = "Choice",
   Score = "Score",
@@ -17,10 +23,22 @@ export enum PollType {
   Category = "Category",
 }
 
-export enum OrderBy {
+export enum HiveOrderBy {
   New = "New",
   Old = "Old",
-  Hot = "Hot",
+  Followers = "Followers",
+}
+
+export enum CommentOrderBy {
+  New = "New",
+  Old = "Old",
+  Best = "Best",
+}
+
+export interface BooleanHoneyDeltaDto {
+  /** @format double */
+  honeyDelta?: number;
+  dto?: boolean;
 }
 
 export interface CandidateDistributionDto {
@@ -35,6 +53,11 @@ export interface CandidateDto {
   id?: number;
   name?: string | null;
   description?: string | null;
+}
+
+export interface CandidateVoteDto {
+  /** @format int32 */
+  value?: number | null;
 }
 
 export interface CategoryDto {
@@ -63,6 +86,21 @@ export interface CommentDto {
   updatedAt?: string | null;
   /** @format int32 */
   replyCount?: number;
+}
+
+export interface CommentDtoHoneyDeltaDto {
+  /** @format double */
+  honeyDelta?: number;
+  dto?: CommentDto;
+}
+
+export interface CommentPaginationDto {
+  /** @format int32 */
+  cursor?: number | null;
+  filter?: string | null;
+  orderBy?: CommentOrderBy;
+  /** @format int32 */
+  pageSize?: number;
 }
 
 export interface CreateCandidateDto {
@@ -135,6 +173,15 @@ export interface HiveDto {
   followerCount?: number;
 }
 
+export interface HivePaginationDto {
+  /** @format int32 */
+  cursor?: number | null;
+  filter?: string | null;
+  orderBy?: HiveOrderBy;
+  /** @format int32 */
+  pageSize?: number;
+}
+
 export interface PollCandidateResultDto {
   /** @format int32 */
   id?: number;
@@ -176,6 +223,10 @@ export interface PollResultDto {
   candidates?: PollCandidateResultDto[] | null;
 }
 
+export interface PollVoteDto {
+  candidates?: CandidateVoteDto[] | null;
+}
+
 export interface PostDto {
   hive?: HiveDto;
   creator?: UserDto;
@@ -190,10 +241,17 @@ export interface PostDto {
   createdAt?: string;
 }
 
+export interface PostDtoHoneyDeltaDto {
+  /** @format double */
+  honeyDelta?: number;
+  dto?: PostDto;
+}
+
 export interface PostPaginationDto {
   /** @format int32 */
   cursor?: number | null;
-  orderBy?: OrderBy;
+  filter?: string | null;
+  orderBy?: PostOrderBy;
   /** @format int32 */
   pageSize?: number;
 }
@@ -202,8 +260,16 @@ export interface PostResultDto {
   polls?: PollResultDto[] | null;
 }
 
+export interface PostVoteDto {
+  /** @format int32 */
+  postId?: number;
+  polls?: PollVoteDto[] | null;
+}
+
 export interface UserDetailsDto {
   username?: string | null;
+  /** @format double */
+  honey?: number;
   /** @format date-time */
   dateOfBirth?: string | null;
   settings?: UserSettingsDto;
@@ -215,27 +281,28 @@ export interface UserDto {
   username?: string | null;
 }
 
+export interface UserProfileDto {
+  /** @format int32 */
+  id?: number;
+  username?: string | null;
+  /** @format double */
+  honey?: number;
+  /** @format int32 */
+  postCount?: number;
+  /** @format int32 */
+  commentCount?: number;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  lastLogin?: string;
+}
+
 export interface UserSettingsDto {
   country?: string | null;
   shareDateOnVote?: boolean;
   shareCountryOnVote?: boolean;
   shareAgeOnVote?: boolean;
   protectVoteOnFilter?: boolean;
-}
-
-export interface VoteOnCandidateDto {
-  /** @format int32 */
-  value?: number | null;
-}
-
-export interface VoteOnPollDto {
-  candidates?: VoteOnCandidateDto[] | null;
-}
-
-export interface VoteOnPostDto {
-  /** @format int32 */
-  postId?: number;
-  polls?: VoteOnPollDto[] | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -510,7 +577,7 @@ export class Api<
      * @secure
      */
     commentCreateCreate: (data: CreateCommentDto, params: RequestParams = {}) =>
-      this.request<CommentDto, any>({
+      this.request<CommentDtoHoneyDeltaDto, any>({
         path: `/api/Comment/create`,
         method: "POST",
         body: data,
@@ -566,52 +633,29 @@ export class Api<
      * No description
      *
      * @tags Comment
-     * @name CommentGetByPostList
-     * @request GET:/api/Comment/getByPost
+     * @name CommentBrowseCreate
+     * @request POST:/api/Comment/browse
      * @secure
      */
-    commentGetByPostList: (
+    commentBrowseCreate: (
+      data: CommentPaginationDto,
       query?: {
+        /** @format int32 */
+        userId?: number;
         /** @format int32 */
         postId?: number;
         /** @format int32 */
         parentCommentId?: number;
-        /** @format date-time */
-        beforeDate?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CommentDto[], any>({
-        path: `/api/Comment/getByPost`,
-        method: "GET",
+        path: `/api/Comment/browse`,
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Comment
-     * @name CommentGetByUserList
-     * @request GET:/api/Comment/getByUser
-     * @secure
-     */
-    commentGetByUserList: (
-      query?: {
-        /** @format int32 */
-        userId?: number;
-        /** @format date-time */
-        beforeDate?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<CommentDto[], any>({
-        path: `/api/Comment/getByUser`,
-        method: "GET",
-        query: query,
-        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -714,23 +758,17 @@ export class Api<
      * No description
      *
      * @tags Hive
-     * @name HiveBrowseList
-     * @request GET:/api/Hive/browse
+     * @name HiveBrowseCreate
+     * @request POST:/api/Hive/browse
      * @secure
      */
-    hiveBrowseList: (
-      query?: {
-        /** @format int32 */
-        afterId?: number;
-        filter?: string;
-      },
-      params: RequestParams = {},
-    ) =>
+    hiveBrowseCreate: (data: HivePaginationDto, params: RequestParams = {}) =>
       this.request<HiveDto[], any>({
         path: `/api/Hive/browse`,
-        method: "GET",
-        query: query,
+        method: "POST",
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -793,7 +831,6 @@ export class Api<
         creatorId?: number;
         /** @format int32 */
         hiveId?: number;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -817,7 +854,7 @@ export class Api<
      * @secure
      */
     postCreateCreate: (data: CreatePostDto, params: RequestParams = {}) =>
-      this.request<PostDto, any>({
+      this.request<PostDtoHoneyDeltaDto, any>({
         path: `/api/Post/create`,
         method: "POST",
         body: data,
@@ -885,13 +922,14 @@ export class Api<
      * @request POST:/api/Post/vote
      * @secure
      */
-    postVoteCreate: (data: VoteOnPostDto, params: RequestParams = {}) =>
-      this.request<void, any>({
+    postVoteCreate: (data: PostVoteDto, params: RequestParams = {}) =>
+      this.request<BooleanHoneyDeltaDto, any>({
         path: `/api/Post/vote`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -929,6 +967,30 @@ export class Api<
       this.request<UserDetailsDto, any>({
         path: `/api/User/me`,
         method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserProfileList
+     * @request GET:/api/User/profile
+     * @secure
+     */
+    userProfileList: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<UserProfileDto, any>({
+        path: `/api/User/profile`,
+        method: "GET",
+        query: query,
         secure: true,
         format: "json",
         ...params,

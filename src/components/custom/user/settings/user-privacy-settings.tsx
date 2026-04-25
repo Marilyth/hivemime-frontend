@@ -1,16 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldDescription, FieldContent, FieldGroup, FieldSet, FieldLegend } from "@/components/ui/field";
-import { HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
-import { useContext } from "react";
 import { useObservableDraft } from "../../utility/observable-draft";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { api, userStore } from "@/lib/contexts";
 
 export const UserPrivacySettings = observer(() => {
-  const api = useContext(HiveMimeApiContext);
-  const userContext = useContext(UserContext);
-  const [user, isDirty, resetChanges] = useObservableDraft(userContext!.user!);
+  const [user, isDirty, resetChanges] = useObservableDraft(userStore.user!);
 
   async function saveSettings() {
     const task = api.api.userUpdateCreate(user);
@@ -19,7 +16,7 @@ export const UserPrivacySettings = observer(() => {
       success: "Your settings have been saved."
     });
 
-    userContext?.setUser((await task).data);
+    userStore.setUser((await task).data);
   }
 
   return (

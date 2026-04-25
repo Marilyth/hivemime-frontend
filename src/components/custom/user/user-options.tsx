@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../../ui/button"
-import { FollowedHivesContext, HiveMimeApiContext, UserContext } from "@/lib/contexts"
+import { api, FollowedHivesContext, userStore } from "@/lib/contexts"
 import { useContext, useEffect, useRef, useState } from "react"
 import { getCurrentUser, logInAnonymously, logOut } from "@/lib/firebase"
 import { User } from "firebase/auth"
@@ -24,12 +24,12 @@ import { SelectSeparator } from "@/components/ui/select"
 import { toast } from "sonner"
 import HexWrapper from "../utility/hm-hex-wrapper"
 import { useRouter } from "next/navigation"
+import { observer } from "mobx-react-lite"
+import { reaction } from "mobx"
 
-export function UserOptions() {
-  const userContext = useContext(UserContext);
+export const UserOptions = observer(() => {
   const hivesContext = useContext(FollowedHivesContext);
   const router = useRouter();
-  const api = useContext(HiveMimeApiContext);
   const currentFirebaseUser = useRef<User | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
@@ -38,6 +38,7 @@ export function UserOptions() {
     const token = await user.getIdToken();
 
     api.setSecurityData(token);
+
     const previousUser = currentFirebaseUser.current;
     currentFirebaseUser.current = user;
 
@@ -50,7 +51,7 @@ export function UserOptions() {
 
     const followedHivesResponse = await api.api.hiveFollowedList();
 
-    userContext!.setUser(userDetailsResponse.data);
+    userStore!.setUser(userDetailsResponse.data);
     hivesContext!.setFollowedHives(followedHivesResponse.data);
 
     return userDetailsResponse.data;
@@ -58,19 +59,28 @@ export function UserOptions() {
 
   async function logOutSession() {
     await logOut();
-    userContext!.setUser(null);
+    userStore!.setUser(null);
   }
 
   useEffect(() => {
-    setIsLoginDialogOpen(false);
+    const dispose = reaction(
+      () => userStore.user,
+      (user) => {
+        setIsLoginDialogOpen(false);
 
-    if (!userContext?.user)
-      toast.promise(autoLogIn(), {
-        loading: "Logging in...",
-        success: (userDetails) => `Logged in as ${userDetails.username}!`,
-        error: "Failed to log in.",
-      });
-  }, [userContext?.user]);
+        if (!user) {
+          toast.promise(autoLogIn(), {
+            loading: "Logging in...",
+            success: (u) => `Logged in as ${u.username}!`,
+            error: "Failed to log in.",
+          });
+        }
+      },
+      { fireImmediately: true }
+    );
+
+    return () => dispose();
+  }, []);
 
   return (
     <div>
@@ -102,7 +112,7 @@ export function UserOptions() {
             sideOffset={4}
           >
             <div className="text-muted-foreground text-sm mb-2 px-2 py-2">
-              Hello, {userContext?.user?.username}!
+              Hello, {userStore?.user?.username}!
             </div>
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => router.push("/user")}>
@@ -124,4 +134,4 @@ export function UserOptions() {
       }
     </div>
   )
-}
+});

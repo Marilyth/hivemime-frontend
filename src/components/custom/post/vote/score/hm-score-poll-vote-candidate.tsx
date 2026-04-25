@@ -2,12 +2,12 @@
 
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { observer } from "mobx-react-lite";
-import { PollDto, CandidateDto, VoteOnCandidateDto } from "@/lib/Api";
+import { PollDto, CandidateDto, CandidateVoteDto } from "@/lib/Api";
 import { Slider } from "../../../../ui/slider";
 
 interface HiveMimeScorePollVoteCandidateProps {
   poll: PollDto;
-  vote: VoteOnCandidateDto;
+  vote: CandidateVoteDto;
   candidate: CandidateDto;
 }
 

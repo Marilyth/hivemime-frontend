@@ -1,20 +1,21 @@
-import { UserContext } from "@/lib/contexts";
 import { getCurrentUser, refreshUser, sendVerificationEmail } from "@/lib/firebase";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { InfoIcon, AlertCircle } from "lucide-react";
 import { AsyncButton } from "./custom/utility/async-button";
+import { observer } from "mobx-react-lite";
+import { userStore } from "@/lib/contexts";
+import { reaction } from "mobx";
 
-export function NotificationBanner() {
-  const userContext = useContext(UserContext);
+export const NotificationBanner = observer(() => {
   const [messages, setMessages] = useState<Notification[]>([]);
   const [hasSentVerificationEmail, setHasSentVerificationEmail] = useState<boolean>(false);
 
   async function getMessages() {
     const messages: Notification[] = [];
 
-    if (userContext?.user){
+    if (userStore.user){
         const firebaseUser = await getCurrentUser();
 
         if (!firebaseUser?.emailVerified && firebaseUser?.email) {
@@ -28,7 +29,7 @@ export function NotificationBanner() {
                       if (hasSentVerificationEmail) {
                         setHasSentVerificationEmail(false);
                         await refreshUser();
-                        userContext.setUser(null);
+                        userStore.setUser(null);
                       }
                       else {
                         const task = sendVerificationEmail();
@@ -53,8 +54,13 @@ export function NotificationBanner() {
   }
 
   useEffect(() => {
-    getMessages();
-  }, [userContext?.user, hasSentVerificationEmail]);
+    const dispose = reaction(
+      () => userStore.user,
+      () => getMessages()
+    );
+
+    return () => dispose();
+  }, []);
 
   return (
     <div className="flex flex-col gap-2 max-w-128">
@@ -76,7 +82,7 @@ export function NotificationBanner() {
       ))}
     </div>
   )
-}
+});
 
 interface Notification {
   type: NotificationType;

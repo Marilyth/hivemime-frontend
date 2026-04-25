@@ -1,11 +1,19 @@
-import { createContext, useState } from "react";
+import { createContext } from "react";
 import { Api, HiveDto, UserDetailsDto } from "./Api";
+import { makeAutoObservable } from "mobx";
 import { toast } from "sonner";
 
-type UserContextType = {
-  user: UserDetailsDto | null;
-  setUser: React.Dispatch<React.SetStateAction<UserDetailsDto | null>>;
-};
+class UserStore {
+  user: UserDetailsDto | null = null;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  setUser(user: UserDetailsDto | null) {
+    this.user = user;
+  }
+}
 
 type FollowedHivesContextType = {
   followedHives: HiveDto[];
@@ -17,32 +25,31 @@ type AccentColourContextType = {
   setAccentColour: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export const HiveMimeApiContext = createContext<Api<unknown>>(new Api({
-    baseUrl: "https://home.mayiscoding.com/hivemime",
-    securityWorker: (securityData) =>
-      securityData ? { headers: { Authorization: `Bearer ${securityData}` } } : undefined,
-    customFetch: async (input, init) => {
-      const response = await fetch(input, init);
-      
-      if (response.ok)
-        return response;
-      const errorData = await response.json();
-      
-      console.log("Request failed:", errorData);
-      let errorMessage: string = "";
+export const api = new Api({
+  baseUrl: "http://localhost:5138",
+  securityWorker: (token) =>
+    token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
+  customFetch: async (input, init) => {
+    const response = await fetch(input, init);
+    const data = await response.clone().json();
 
-      if (response.status === 400 || response.status === 404) {
-        errorMessage = errorData.error;
-      }
-      else {
-        errorMessage = `The server encountered an error. Please try again later. ${errorData.error ?? ""}`;
+    if (response.ok)
+    {
+      if (data.honeyDelta)
+      {
+        userStore.user!.honey += data.honeyDelta;
+        toast.success(`You earned ${data.honeyDelta} honey! Your new balance is ${userStore.user!.honey} honey.`);
       }
 
-      toast.error(errorMessage, { closeButton: true, duration: Infinity, richColors: true });
-      throw new Error(`Request failed with status ${response.status}`);
-    },
-  }));
+      return response;
+    }
+    
+    toast.error(data.error ?? "Request failed", { closeButton: true, duration: Infinity, richColors: true });
+    throw new Error(`Request failed with status ${response.status}`);
+  },
+});
 
-export const UserContext = createContext<UserContextType | null>(null);
+export const userStore = new UserStore();
+
 export const FollowedHivesContext = createContext<FollowedHivesContextType | null>(null);
 export const AccentColourContext = createContext<AccentColourContextType | null>(null);

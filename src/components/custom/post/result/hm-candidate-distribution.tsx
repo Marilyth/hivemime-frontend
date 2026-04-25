@@ -1,11 +1,10 @@
 import { PollDto, CandidateDto, CandidateDistributionDto, Api, PollType } from "@/lib/Api";
-import { HiveMimeApiContext } from "@/lib/contexts";
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { HiveMimeScoreDistributionResult } from "./score/hm-score-result";
-import { set } from "mobx";
 import { HiveMimeRankDistributionResult } from "./rank/hm-rank-result";
 import { HiveMimeCategoryDistributionResult } from "./category/hm-category-result";
+import { api } from "@/lib/contexts";
 
 export interface HiveMimeDistributionResultTypeProps {
     poll: PollDto;
@@ -20,8 +19,6 @@ export interface HiveMimeDistributionResultProps {
 
 export function HiveMimeDistributionResult(props: HiveMimeDistributionResultProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
-  const span = props.poll.maxValue! - props.poll.minValue!;
   const [candidateDistribution, setCandidateDistribution] = useState<CandidateDistributionDto[] | null>(null);
 
   const pollMapping: { [key in PollType]: ReactNode } =
@@ -36,7 +33,7 @@ export function HiveMimeDistributionResult(props: HiveMimeDistributionResultProp
     setIsLoading(true);
 
     try {
-        const response = await hiveMimeService.api.postDistributionList({ candidateId: candidateId });
+        const response = await api.api.postDistributionList({ candidateId: candidateId });
         setCandidateDistribution(response.data);
     }
     finally {

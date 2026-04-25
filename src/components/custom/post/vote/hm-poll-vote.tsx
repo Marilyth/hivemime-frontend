@@ -1,6 +1,6 @@
 "use client";
 
-import { PollDto, PollType, VoteOnPollDto } from "@/lib/Api";
+import { PollDto, PollType, PollVoteDto } from "@/lib/Api";
 import { ReactNode, useEffect, useState } from "react";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -17,7 +17,7 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
-  pollVote: VoteOnPollDto;
+  pollVote: PollVoteDto;
 }
 
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
