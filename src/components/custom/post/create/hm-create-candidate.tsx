@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, CandidateDto } from "@/lib/Api";
+import { CreatePollDto, CandidateDto, PollType } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
 import { HiveMimeEmbeddedInput } from "../../utility/hm-embedded-input";
@@ -45,7 +45,7 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
   function addCandidate() {
     poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
 
-    if (poll.minVotes! == poll.candidates!.length - 1) {
+    if (poll.minVotes! == poll.candidates!.length - 1 && poll.pollType != PollType.Choice) {
       poll.minVotes = poll.candidates!.length;
     }
 

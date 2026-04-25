@@ -18,7 +18,7 @@ export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration 
   const [currentLevel, setCurrentLevel] = useState<number>(0);
   const [currentProgress, setCurrentProgress] = useState<number>(0);
 
-  function easeOutQuad(t: number) {
+  function easeOut(t: number) {
     return 1 - Math.pow(1 - t, 3);
   }
 
@@ -34,7 +34,7 @@ export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration 
     function updateCurrentExpGained(time: number) {
       const elapsed = time - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-      const easedProgress = easeOutQuad(progress);
+      const easedProgress = easeOut(progress);
       const easedHoneyGained = honeyGained * easedProgress;
       setHoneyGained(easedHoneyGained);
 
