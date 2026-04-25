@@ -1,14 +1,13 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import { HiveMimeApiContext } from "@/lib/contexts";
+import { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Api, PostDto, PostResultDto } from "@/lib/Api";
+import { PostDto, PostResultDto } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
 import { Vote, Filter } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
 import { HiveMimePostResultFilter } from "./filter/hm-post-result-filter";
-import { HiveMimeVoteQueryGroup } from "./filter/hm-vote-query-group";
 import { VoteQueryGroup } from "@/lib/query-builder";
+import { api } from "@/lib/contexts";
 
 interface HiveMimePostResultProps {
   post: PostDto;
@@ -17,7 +16,6 @@ interface HiveMimePostResultProps {
 }
 
 export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveMimePostResultProps) => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [results, setResults] = useState<PostResultDto | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const queryBuilder: VoteQueryGroup = useMemo(() => 
@@ -27,7 +25,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
 
   async function fetchResults()
   {
-    const response = await hiveMimeService.api.postResultsList({postId: post.id!, filter: queryBuilder.toString()});
+    const response = await api.api.postResultsList({postId: post.id!, filter: queryBuilder.toString()});
     setResults(response.data);
   }
 

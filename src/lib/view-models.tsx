@@ -1,8 +1,8 @@
-import { CandidateDto, VoteOnCandidateDto } from "./Api";
+import { CandidateDto, CandidateVoteDto } from "./Api";
 
 export interface CombinedPollCandidate {
   candidate: CandidateDto;
-  vote: VoteOnCandidateDto;
+  vote: CandidateVoteDto;
 }
 
 export enum ChartType {

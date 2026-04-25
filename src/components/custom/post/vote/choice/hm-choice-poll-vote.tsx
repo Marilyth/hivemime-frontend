@@ -1,12 +1,12 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { PollDto, VoteOnPollDto } from "@/lib/Api";
+import { PollDto, PollVoteDto } from "@/lib/Api";
 import { HiveMimeChoicePollVoteCandidate } from "./hm-choice-poll-vote-candidate";
 
 export interface HiveMimePickMultipleChoicePollProps {
   poll: PollDto;
-  pollVotes: VoteOnPollDto;
+  pollVotes: PollVoteDto;
 }
 
 export const HiveMimeChoicePollVote = observer(({ poll, pollVotes }: HiveMimePickMultipleChoicePollProps) => {

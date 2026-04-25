@@ -1,17 +1,15 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Api, PostDto } from "@/lib/Api";
+import { PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
-import { HiveMimeApiContext } from "@/lib/contexts";
 import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
 import { useQueryParam } from "../utility/use-query-param";
+import { api } from "@/lib/contexts";
 
 export function HiveMimePostDetails() {
   const [postId, setPostId] = useQueryParam("postId");
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
-
   const [post, setPost] = useState<PostDto | null>(null);
 
   function getPostId() {
@@ -23,7 +21,7 @@ export function HiveMimePostDetails() {
 
   async function fetchPostAsync() {
     const postId = getPostId();
-    const response = await hiveMimeService.api.postGetList({postId: postId});
+    const response = await api.api.postGetList({postId: postId});
 
     setPost(response.data);
   }

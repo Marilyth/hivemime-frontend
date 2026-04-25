@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { User, FileChartColumn } from "lucide-react"
 import { Api, HiveDto } from "@/lib/Api";
 import { HTMLAttributes, useContext } from "react";
-import { FollowedHivesContext, HiveMimeApiContext } from "@/lib/contexts";
+import { api, FollowedHivesContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
@@ -18,12 +18,11 @@ export type HiveMimeHiveListItemProps = {
 } & HTMLAttributes<HTMLDivElement>;
 
 export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveListItemProps) => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const followedHivesContext = useContext(FollowedHivesContext)!;
   const router = useRouter();
 
   async function leaveHive() {
-    const task = hiveMimeService.api.hiveLeaveCreate({ hiveId: hive.id });
+    const task = api.api.hiveLeaveCreate({ hiveId: hive.id });
     toast.promise(task, {
       loading: 'Leaving hive...',
       success: () =>{
@@ -36,7 +35,7 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
   }
 
   async function joinHive() {
-    const task = hiveMimeService.api.hiveJoinCreate({ hiveId: hive.id });
+    const task = api.api.hiveJoinCreate({ hiveId: hive.id });
     toast.promise(task, {
       loading: 'Joining hive...',
       success: () =>{

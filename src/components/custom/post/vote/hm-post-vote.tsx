@@ -1,16 +1,15 @@
-import { Api, VoteOnPostDto, PostDto } from "@/lib/Api";
-import { HiveMimeApiContext } from "@/lib/contexts";
+import { PostVoteDto, PostDto } from "@/lib/Api";
 import { validatePickPoll } from "@/lib/validate-vote";
-import { ChartBar, MessageSquare, Send, User, Vote } from "lucide-react";
+import { ChartBar, Vote } from "lucide-react";
 import { observable, reaction, toJS } from "mobx";
 import { observer } from "mobx-react-lite";
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../../../ui/button";
 import { HiveMimeListPoll } from "./hm-poll-vote";
 import { Accordion } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { AsyncButton } from "../../utility/async-button";
+import { api } from "@/lib/contexts";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -19,9 +18,8 @@ interface HiveMimePostVoteProps {
 }
 
 export const HiveMimePostVote = observer(({ post, requestResults, footer }: HiveMimePostVoteProps) => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [isValid, setIsValid] = useState(false);
-  const [postVote, setPostVote] = useState<VoteOnPostDto>(() => (observable({
+  const [postVote, setPostVote] = useState<PostVoteDto>(() => (observable({
     postId: post.id!,
     polls: (post.polls || []).map(poll => ({
       candidates: (poll.candidates || []).map(() => ({
@@ -48,7 +46,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
 
   async function submitVote()
   {
-    const task = hiveMimeService.api.postVoteCreate(postVote);
+    const task = api.api.postVoteCreate(postVote);
     toast.promise(task, {
       loading: 'Submitting your vote...',
       success: 'Your vote has been submitted!'

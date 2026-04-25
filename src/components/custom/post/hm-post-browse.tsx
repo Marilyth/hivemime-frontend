@@ -1,11 +1,10 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Api, HiveDto, OrderBy, PostDto } from "@/lib/Api";
+import { HiveDto, PostDto, PostOrderBy } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { HiveMimeApiContext } from "@/lib/contexts";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -14,11 +13,11 @@ import HexWrapper from "../utility/hm-hex-wrapper";
 import { AnimatePresence, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { useQueryParam } from "../utility/use-query-param";
+import { api } from "@/lib/contexts";
 
 export function HiveMimePostBrowse() {
   const [hiveId, setHiveId] = useQueryParam("hiveId");
-  const [orderBy, setOrderBy] = useQueryParam("orderBy", OrderBy.Hot);
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
+  const [orderBy, setOrderBy] = useQueryParam("orderBy", PostOrderBy.Hot);
 
   const cursor = useRef<number | null>(null);
   const [hive, setHive] = useState<HiveDto>();
@@ -38,13 +37,13 @@ export function HiveMimePostBrowse() {
     if (!hiveId)
         return;
 
-    const response = await hiveMimeService.api.hiveGetList({hiveId: hiveId!});
+    const response = await api.api.hiveGetList({hiveId: hiveId!});
     setHive(response.data);
   }
 
   async function fetchPostsAsync(replace: boolean = false) {
     const hiveId = getHiveId();
-    const response = await hiveMimeService.api.postBrowseCreate({orderBy: orderBy as OrderBy, cursor: cursor.current, pageSize: 20}, {hiveId: hiveId});
+    const response = await api.api.postBrowseCreate({orderBy: orderBy as PostOrderBy, cursor: cursor.current, pageSize: 20}, {hiveId: hiveId});
     cursor.current = response.data.length > 0 ? response.data[response.data.length - 1].id! : cursor.current;
 
     const newPostsState = replace ? response.data : [...posts, ...response.data];
@@ -91,7 +90,7 @@ export function HiveMimePostBrowse() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  {Object.values(OrderBy).map((order) => (
+                  {Object.values(PostOrderBy).map((order) => (
                     <DropdownMenuItem key={order} onSelect={() => setOrderBy(order)}>
                       {order}
                     </DropdownMenuItem>

@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { HiveMimeApiContext, UserContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
-import { useContext } from "react";
 import { useObservableDraft } from "../../utility/observable-draft";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 
@@ -12,15 +10,14 @@ import en from "i18n-iso-countries/langs/en.json";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { AsyncButton } from "../../utility/async-button";
+import { api, userStore } from "@/lib/contexts";
 
 countries.registerLocale(en);
 const options = Object.entries(countries.getNames("en", { select: "official" }))
   .map(([code, name]) => ({ value: code, label: name }));
 
 export const UserAccountSettings = observer(() => {
-  const api = useContext(HiveMimeApiContext);
-  const userContext = useContext(UserContext);
-  const [user, isDirty, resetChanges] = useObservableDraft(userContext!.user!);
+  const [user, isDirty, resetChanges] = useObservableDraft(userStore.user!);
 
   const minDateOfBirth = new Date();
   minDateOfBirth.setFullYear(minDateOfBirth.getFullYear() - 130);
@@ -34,7 +31,7 @@ export const UserAccountSettings = observer(() => {
       success: "Your settings have been saved."
     });
 
-    userContext?.setUser((await task).data);
+    userStore.setUser((await task).data);
   }
 
   function getErrors() {

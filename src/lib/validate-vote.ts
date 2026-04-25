@@ -1,7 +1,7 @@
 import { error } from "console";
-import { PollDto, VoteOnPollDto, VoteOnPostDto } from "./Api";
+import { PollDto, PollVoteDto, PostVoteDto } from "./Api";
 
-export function validatePickPost(postPolls: PollDto[], postVotes: VoteOnPostDto): string[] {
+export function validatePickPost(postPolls: PollDto[], postVotes: PostVoteDto): string[] {
     const errors: string[] = [];
 
     postPolls.forEach((poll, index) => {
@@ -12,7 +12,7 @@ export function validatePickPost(postPolls: PollDto[], postVotes: VoteOnPostDto)
     return errors;
 }
 
-export function validatePickPoll(poll: PollDto, vote: VoteOnPollDto): string[] {
+export function validatePickPoll(poll: PollDto, vote: PollVoteDto): string[] {
     const errors: string[] = [];
 
     const voteValues = vote.candidates!.map(c => c.value);

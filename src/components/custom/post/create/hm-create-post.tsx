@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
 import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { Button } from "../../../ui/button";
-import { useContext, useRef, useState } from "react";
-import { HiveMimeApiContext } from "@/lib/contexts";
+import { useRef, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { useRouter } from "next/navigation";
@@ -21,10 +20,10 @@ import { HiveMimeDraggable } from "../../utility/hm-draggable";
 import { HiveSelection } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
+import { api } from "@/lib/contexts";
 
 export const HiveMimeCreatePost = observer(() => {
   const router = useRouter();
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
   const [hiveId, setHiveId] = useQueryParam("hiveId", undefined);
@@ -86,14 +85,14 @@ export const HiveMimeCreatePost = observer(() => {
     if (!canSubmitPost())
       return;
 
-    const task = hiveMimeService.api.postCreateCreate(post);
+    const task = api.api.postCreateCreate(post);
     toast.promise(task, {
       loading: 'Submitting post...',
       success: 'Post submitted successfully!'
     });
 
     const response = await task;
-    router.push(`/posts/view?postId=${response.data.id}`);
+    router.push(`/posts/view?postId=${response.data.dto?.id}`);
   }
 
   return (

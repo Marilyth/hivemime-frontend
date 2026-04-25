@@ -35,3 +35,11 @@ export function valueOperatorToInlineString(operator: ValueOperator) {
       return operator;
   }
 }
+
+export function levelToHoney(level: number): number {
+  return level * level * 20;
+}
+
+export function honeyToLevel(honey: number): number {
+  return Math.sqrt(honey / 20);
+}

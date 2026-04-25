@@ -1,21 +1,19 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Api, CreateHiveDto } from "@/lib/Api";
+import { CreateHiveDto } from "@/lib/Api";
 import { useContext, useRef } from "react";
-import { FollowedHivesContext, HiveMimeApiContext } from "@/lib/contexts";
+import { api, FollowedHivesContext } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { toast } from "sonner";
 import { observable } from "mobx";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { AsyncButton } from "../../utility/async-button";
 
 
 export const HiveMimeHiveCreate = observer(() => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const followedHivesContext = useContext(FollowedHivesContext)!;
   const hiveRef = useRef<CreateHiveDto>(observable({ name: "", description: "" }));
   const router = useRouter();
@@ -36,7 +34,7 @@ export const HiveMimeHiveCreate = observer(() => {
     if (!canCreateHive())
       return;
 
-    const task = hiveMimeService.api.hiveCreateCreate(hiveRef.current);
+    const task = api.api.hiveCreateCreate(hiveRef.current);
     toast.promise(task, {
       loading: 'Creating hive...',
       success: (response) => {

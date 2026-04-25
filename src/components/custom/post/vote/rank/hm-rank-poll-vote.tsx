@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { PollDto, VoteOnPollDto } from "@/lib/Api";
+import { PollDto, PollVoteDto } from "@/lib/Api";
 import { HiveMimeRankPollVoteCandidate } from "./hm-rank-poll-vote-candidate";
 import { useEffect, useRef, useState } from "react";
 import { CombinedPollCandidate } from "@/lib/view-models";
@@ -12,7 +12,7 @@ import { observable, reaction } from "mobx";
 
 export interface HiveMimeRankPollVoteProps {
   poll: PollDto;
-  pollVotes: VoteOnPollDto;
+  pollVotes: PollVoteDto;
 }
 
 export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankPollVoteProps) => {

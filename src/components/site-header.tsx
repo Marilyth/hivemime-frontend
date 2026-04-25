@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { NotificationBanner } from "./notification-banner"
 import { useQueryParam } from "./custom/utility/use-query-param"
+import { LevelBanner } from "./level-banner"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
@@ -64,6 +65,9 @@ export function SiteHeader() {
       </div>
       <div className="px-2">
         <NotificationBanner />
+      </div>
+      <div className="absolute right-0 top-15 px-2 w-64">
+        <LevelBanner />
       </div>
     </header>
   )

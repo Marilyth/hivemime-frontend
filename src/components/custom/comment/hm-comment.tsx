@@ -1,16 +1,16 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Api, CommentDto } from "@/lib/Api";
+import { CommentDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiveMimeCommentCreate } from "./hm-comment-create";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 import { Reply } from "lucide-react";
-import { HiveMimeApiContext } from "@/lib/contexts";
 import { HiveMimeExpandableText } from "../utility/hm-expandable-text";
 import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
+import { api } from "@/lib/contexts";
 
 export interface HiveMimeCommentProps {
   comment: CommentDto;
@@ -18,14 +18,13 @@ export interface HiveMimeCommentProps {
 }
 
 export const HiveMimeComment = observer(({ comment, isRoot }: HiveMimeCommentProps) => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replies, setReplies] = useState<CommentDto[]>([]);
   const [hasMoreReplies, setHasMoreReplies] = useState<boolean>(comment.replyCount! > 0);
 
   async function loadReplies() {
     const beforeDate = replies.length > 0 ? replies[replies.length - 1].createdAt : undefined;
-    const task = hiveMimeService.api.commentGetByPostList({ postId: comment.postId!, parentCommentId: comment.id, beforeDate });
+    const task = api.api.commentBrowseCreate({}, { postId: comment.postId!, parentCommentId: comment.id });
     toast.promise(task, {
       loading: 'Loading comments...',
       success: 'Comments loaded successfully!'

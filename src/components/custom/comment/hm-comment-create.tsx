@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Api, CommentDto } from "@/lib/Api";
-import { HiveMimeApiContext } from "@/lib/contexts";
+import { CommentDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
-import { HTMLAttributes, useContext, useState } from "react";
+import { HTMLAttributes, useState } from "react";
 import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
+import { api } from "@/lib/contexts";
 
 export type HiveMimeCommentCreateProps = HTMLAttributes<HTMLDivElement> & {
   postId: number;
@@ -16,12 +16,11 @@ export type HiveMimeCommentCreateProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFinished, className, ...props }: HiveMimeCommentCreateProps) => {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [content, setContent] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   async function createComment() {
-    const task = hiveMimeService.api.commentCreateCreate({ postId, parentCommentId, content });
+    const task = api.api.commentCreateCreate({ postId, parentCommentId, content });
     toast.promise(task, {
       loading: 'Creating comment...',
       success: 'Comment created successfully!'
@@ -30,7 +29,7 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
     const response = await task;
     
     if (onFinished)
-      onFinished(response.data);
+      onFinished(response.data.dto!);
 
     setContent("");
   }

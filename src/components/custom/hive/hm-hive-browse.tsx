@@ -1,20 +1,19 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Api, HiveDto } from "@/lib/Api";
+import { HiveDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { HiveMimeApiContext } from "@/lib/contexts";
 import { HiveMimeHiveListItem } from "./list/hm-hive";
+import { api } from "@/lib/contexts";
 
 export default function HiveMimeHiveBrowse() {
-  const hiveMimeService: Api<unknown> = useContext(HiveMimeApiContext)!;
   const [hives, setHives] = useState<HiveDto[]>([]);
   const [hasMoreHives, setHasMoreHives] = useState<boolean>(true);
 
   async function fetchHivesAsync() {
     const lastHiveId = hives.length > 0 ? hives[hives.length - 1].id : undefined;
-    const response = await hiveMimeService.api.hiveBrowseList({afterId: lastHiveId});
+    const response = await api.api.hiveBrowseCreate({cursor: lastHiveId});
 
     const newHivesState = [...hives, ...response.data];
     setHives(newHivesState);
