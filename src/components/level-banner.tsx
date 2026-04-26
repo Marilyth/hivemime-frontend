@@ -82,9 +82,10 @@ export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration 
                 You gained <span className="font-bold text-honey-brown">🍯 {honeyGained.toFixed(2)}</span> honey!
               </span>
               <div className="flex flex-row gap-2 text-muted-foreground items-center">
-                {currentLevel}
                 <Progress className="[&>div]:transition-none" value={currentProgress} />
-                {currentLevel + 1}
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  Lv. {currentLevel}
+                </span>
               </div>
             </AlertDescription>
           </Alert>

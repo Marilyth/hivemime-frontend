@@ -15,9 +15,11 @@ import { getReferenceId } from "@/lib/utils";
 import { useQueryParam } from "../utility/use-query-param";
 import { api } from "@/lib/contexts";
 
-export function HiveMimePostBrowse() {
+
+export function HiveMimePostBrowse({defaultOrderBy=PostOrderBy.Hot}: {defaultOrderBy?: PostOrderBy}) {
+  const [userId, setUserId] = useQueryParam("userId");
   const [hiveId, setHiveId] = useQueryParam("hiveId");
-  const [orderBy, setOrderBy] = useQueryParam("orderBy", PostOrderBy.Hot);
+  const [orderBy, setOrderBy] = useQueryParam("orderBy", defaultOrderBy);
 
   const cursor = useRef<number | null>(null);
   const [hive, setHive] = useState<HiveDto>();
@@ -43,7 +45,8 @@ export function HiveMimePostBrowse() {
 
   async function fetchPostsAsync(replace: boolean = false) {
     const hiveId = getHiveId();
-    const response = await api.api.postBrowseCreate({orderBy: orderBy as PostOrderBy, cursor: cursor.current, pageSize: 20}, {hiveId: hiveId});
+    const userIdNumber = userId ? Number(userId) : undefined;
+    const response = await api.api.postBrowseCreate({orderBy: orderBy as PostOrderBy, cursor: cursor.current, pageSize: 20}, {hiveId: hiveId, creatorId: userIdNumber});
     cursor.current = response.data.length > 0 ? response.data[response.data.length - 1].id! : cursor.current;
 
     const newPostsState = replace ? response.data : [...posts, ...response.data];
@@ -61,62 +64,58 @@ export function HiveMimePostBrowse() {
   }, [orderBy, hiveId]);
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-183">
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={() => fetchPostsAsync(false)}
-          hasMore={hasMorePosts}
-          loader=
-          {
-            <Skeleton className="h-64 w-full rounded-xl my-4">
-              <span className="flex h-full w-full items-center justify-center text-informational">
-                Loading...
-              </span>
-            </Skeleton>
-          }
-          endMessage=
-          {
-            <div className="my-4 text-center">You reached the end of your feed!</div>
-          }
-        >
-          <div className="flex flex-col gap-4">
-            <HexWrapper className="mr-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="link" className="bg-card">
-                    <ArrowUpDown />
-                    {orderBy}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {Object.values(PostOrderBy).map((order) => (
-                    <DropdownMenuItem key={order} onSelect={() => setOrderBy(order)}>
-                      {order}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </HexWrapper>
+    <InfiniteScroll
+      dataLength={posts.length}
+      next={() => fetchPostsAsync(false)}
+      hasMore={hasMorePosts}
+      loader=
+      {
+        <Skeleton className="h-64 w-full rounded-xl my-4">
+          <span className="flex h-full w-full items-center justify-center text-informational">
+            Loading...
+          </span>
+        </Skeleton>
+      }
+      endMessage=
+      {
+        <div className="my-4 text-center">You reached the end of your feed!</div>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <HexWrapper className="mr-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="link" className="bg-card">
+                <ArrowUpDown />
+                {orderBy}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {Object.values(PostOrderBy).map((order) => (
+                <DropdownMenuItem key={order} onSelect={() => setOrderBy(order)}>
+                  {order}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </HexWrapper>
 
-            {posts.length > 0 &&
-              <AnimatePresence initial={false} mode="popLayout">
-                {posts.map((post, index) => (
-                  <motion.div
-                    key={getReferenceId(post)}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1, transition: { duration: 0.3, delay: 0.3 } }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <HiveMimePost key={index} post={post} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            }
-          </div>
-        </InfiniteScroll>
+        {posts.length > 0 &&
+          <AnimatePresence initial={false} mode="popLayout">
+            {posts.map((post, index) => (
+              <motion.div
+                key={getReferenceId(post)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.3, delay: 0.3 } }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <HiveMimePost key={index} post={post} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        }
       </div>
-    </div>
+    </InfiniteScroll>
   );
 }

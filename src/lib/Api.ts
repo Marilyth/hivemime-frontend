@@ -267,6 +267,8 @@ export interface PostVoteDto {
 }
 
 export interface UserDetailsDto {
+  /** @format int32 */
+  id?: number;
   username?: string | null;
   /** @format double */
   honey?: number;

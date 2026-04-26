@@ -27,32 +27,28 @@ export default function HiveMimeHiveBrowse() {
   }, []);
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full">
-        <InfiniteScroll
-          dataLength={hives.length}
-          next={fetchHivesAsync}
-          hasMore={hasMoreHives}
-          loader=
-          {
-            <Skeleton className="h-64 w-full rounded-xl my-4">
-              <span className="flex h-full w-full items-center justify-center text-informational">
-                Loading...
-              </span>
-            </Skeleton>
-          }
-          endMessage=
-          {
-            <div className="my-4 text-center">There are no more hives! Consider creating your own.</div>
-          }
-        >
-          <div className="flex justify-center flex-row flex-wrap gap-4">
-            {hives.map((hive, index) => (
-              <HiveMimeHiveListItem key={index} hive={hive} className="w-96 min-h-56" />
-            ))}
-          </div>
-        </InfiniteScroll>
+    <InfiniteScroll
+      dataLength={hives.length}
+      next={fetchHivesAsync}
+      hasMore={hasMoreHives}
+      loader=
+      {
+        <Skeleton className="h-64 w-full rounded-xl my-4">
+          <span className="flex h-full w-full items-center justify-center text-informational">
+            Loading...
+          </span>
+        </Skeleton>
+      }
+      endMessage=
+      {
+        <div className="my-4 text-center">There are no more hives! Consider creating your own.</div>
+      }
+    >
+      <div className="flex justify-center flex-row flex-wrap gap-4">
+        {hives.map((hive, index) => (
+          <HiveMimeHiveListItem key={index} hive={hive} className="w-96 min-h-56" />
+        ))}
       </div>
-    </div>
+    </InfiniteScroll>
   );
 }

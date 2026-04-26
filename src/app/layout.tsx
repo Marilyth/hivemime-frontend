@@ -72,12 +72,16 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
                           <SiteHeader />
                         </Suspense>
 
-                        {!userStore.user ?
-                          (<div>Loading...</div>) :
-                          (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
-                            {children}
-                          </div>)
-                        }
+                        <div className="flex justify-center">
+                          <div className="w-full max-w-183 gap-4">
+                            {!userStore.user ?
+                              (<div>Loading...</div>) :
+                              (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
+                                {children}
+                              </div>)
+                            }
+                          </div>
+                        </div>
                         <Toaster position="bottom-right" />
                       </SidebarInset>
                     </div>
