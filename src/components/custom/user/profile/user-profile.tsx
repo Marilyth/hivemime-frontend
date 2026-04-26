@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useQueryParam } from "../../utility/use-query-param";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfileHeader } from "./user-profile-header";
@@ -6,10 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { api, userStore } from "@/lib/contexts";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import HexWrapper from "../../utility/hm-hex-wrapper";
 import { HiveMimePostBrowse } from "../../post/hm-post-browse";
 import { PostOrderBy } from "@/lib/Api";
-import { HiveMimeCommentBrowse } from "../../comment/hm-comment-browse";
+import { UserProfileComments } from "./user-profile-comments";
 
 export function UserProfile() {
   const [userData, setUserData] = useQueryParam("id", userStore.user?.id!.toString() ?? null);
@@ -21,8 +20,7 @@ export function UserProfile() {
     queryFn: async () => {
       const task = api.api.userProfileList({ userId: Number(userData) });
       toast.promise(task, {
-        loading: 'Loading user profile...',
-        error: 'Failed to load user profile.'
+        loading: 'Loading user profile...'
       });
 
       const res = await task;
@@ -52,7 +50,7 @@ export function UserProfile() {
           <HiveMimePostBrowse defaultOrderBy={PostOrderBy.New} />
         </TabsContent>
         <TabsContent value="comments" className="mt-4">
-          <HiveMimeCommentBrowse />
+          {data && <UserProfileComments user={data} />}
         </TabsContent>
       </Tabs>
     </div>

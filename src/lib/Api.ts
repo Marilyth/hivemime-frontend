@@ -574,6 +574,30 @@ export class Api<
      * No description
      *
      * @tags Comment
+     * @name CommentGetList
+     * @request GET:/api/Comment/get
+     * @secure
+     */
+    commentGetList: (
+      query?: {
+        /** @format int32 */
+        commentId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CommentDto, any>({
+        path: `/api/Comment/get`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
      * @name CommentCreateCreate
      * @request POST:/api/Comment/create
      * @secure
