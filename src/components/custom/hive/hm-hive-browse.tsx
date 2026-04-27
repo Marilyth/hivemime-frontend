@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HiveDto } from "@/lib/Api";
+import { HiveDto, PaginationCursorDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeHiveListItem } from "./list/hm-hive";
 import { api } from "@/lib/contexts";
@@ -10,15 +10,16 @@ import { api } from "@/lib/contexts";
 export default function HiveMimeHiveBrowse() {
   const [hives, setHives] = useState<HiveDto[]>([]);
   const [hasMoreHives, setHasMoreHives] = useState<boolean>(true);
+  const cursor = useRef<PaginationCursorDto | undefined>(undefined);
 
   async function fetchHivesAsync() {
-    const lastHiveId = hives.length > 0 ? hives[hives.length - 1].id : undefined;
-    const response = await api.api.hiveBrowseCreate({cursor: lastHiveId});
+    const response = await api.api.hiveBrowseCreate({cursor: cursor.current, pageSize: 1});
 
-    const newHivesState = [...hives, ...response.data];
+    const newHivesState = [...hives, ...response.data.items!];
     setHives(newHivesState);
 
-    setHasMoreHives(response.data.length == 20 && newHivesState.length < 100);
+    cursor.current = response.data.nextCursor;
+    setHasMoreHives(!!response.data.nextCursor);
   }
 
   useEffect(() => {

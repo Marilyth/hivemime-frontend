@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { api } from "@/lib/contexts";
 import { HiveMimeComment } from "../../comment/hm-comment";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -29,7 +28,7 @@ export function UserProfileComments(props: UserProfileCommentsProps) {
 
   return (
     <div className="flex flex-col items-center gap-2 w-full">
-        {data ? data.map(comment => (
+        {data ? data.items!.map(comment => (
           <Card key={comment.id} className="w-full">
             <CardHeader>
               <CardTitle>

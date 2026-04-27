@@ -64,7 +64,7 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
                   <SidebarProvider className="flex flex-col">
                     <div className="flex flex-1">
                       <AppSidebar className="backdrop-blur-sm" />
-                      <SidebarInset className="min-h-10000">
+                      <SidebarInset>
                         <CombGenerator distances={[8, 4, 2]}
                           color={accentColour ?? mutedColors.honeyBrown} />
 

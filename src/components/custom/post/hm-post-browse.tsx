@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HiveDto, PostDto, PostOrderBy } from "@/lib/Api";
+import { HiveDto, PaginationCursorDto, PostDto, PostOrderBy } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -21,10 +21,10 @@ export function HiveMimePostBrowse({defaultOrderBy=PostOrderBy.Hot}: {defaultOrd
   const [hiveId, setHiveId] = useQueryParam("hiveId");
   const [orderBy, setOrderBy] = useQueryParam("orderBy", defaultOrderBy);
 
-  const cursor = useRef<number | null>(null);
+  const cursor = useRef<PaginationCursorDto | undefined>(undefined);
   const [hive, setHive] = useState<HiveDto>();
   const [posts, setPosts] = useState<PostDto[]>([]);
-  const [hasMorePosts, setHasMorePosts] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState(true);
 
   function getHiveId() {
     if (!hiveId)
@@ -47,16 +47,16 @@ export function HiveMimePostBrowse({defaultOrderBy=PostOrderBy.Hot}: {defaultOrd
     const hiveId = getHiveId();
     const userIdNumber = userId ? Number(userId) : undefined;
     const response = await api.api.postBrowseCreate({orderBy: orderBy as PostOrderBy, cursor: cursor.current, pageSize: 20}, {hiveId: hiveId, creatorId: userIdNumber});
-    cursor.current = response.data.length > 0 ? response.data[response.data.length - 1].id! : cursor.current;
+    cursor.current = response.data.nextCursor;
+    setHasMore(!!cursor.current);
 
-    const newPostsState = replace ? response.data : [...posts, ...response.data];
+    const newPostsState = replace ? response.data.items! : [...posts, ...response.data.items!];
 
     setPosts(newPostsState);
-    setHasMorePosts(response.data.length == 20 && newPostsState.length < 100);
   }
 
   useEffect(() => {
-    cursor.current = null;
+    cursor.current = undefined;
     fetchHiveInformation();
 
     // Might want to fetch until scrollable, because InfiniteScroll does not trigger before.
@@ -67,7 +67,7 @@ export function HiveMimePostBrowse({defaultOrderBy=PostOrderBy.Hot}: {defaultOrd
     <InfiniteScroll
       dataLength={posts.length}
       next={() => fetchPostsAsync(false)}
-      hasMore={hasMorePosts}
+      hasMore={hasMore}
       loader=
       {
         <Skeleton className="h-64 w-full rounded-xl my-4">

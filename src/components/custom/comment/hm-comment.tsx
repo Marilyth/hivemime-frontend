@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CommentDto } from "@/lib/Api";
+import { CommentDto, PaginationCursorDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { HiveMimeCommentCreate } from "./hm-comment-create";
@@ -24,9 +24,9 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const repliesCount = useRef<number>(comment.replyCount || 0);
   const [replies, setReplies] = useState<CommentDto[]>(prefetchedReplies?.filter(r => r.parentCommentId == comment.id) || []);
-  const [hasMoreReplies, setHasMoreReplies] = useState<boolean>(false);
+  const [hasMoreReplies, setHasMoreReplies] = useState<boolean>(replies.length < repliesCount.current);
   const [parentComment, setParentComment] = useState<CommentDto | null>(null);
-  const cursor = useRef<CommentDto | undefined>(undefined);
+  const cursor = useRef<PaginationCursorDto | undefined>(undefined);
   
   function mergePreLoadedReplies() {
     const arr = [...(prefetchedReplies || []), ...replies, comment];
@@ -54,15 +54,17 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
   }
 
   async function loadReplies() {
-    const task = api.api.commentBrowseCreate({pageSize: 20, cursor: cursor.current?.id}, { postId: comment.postId!, parentCommentId: comment.id });
+    const task = api.api.commentBrowseCreate({pageSize: 20, cursor: cursor.current}, { postId: comment.postId!, parentCommentId: comment.id });
     toast.promise(task, {
       loading: 'Loading comments...',
       success: 'Comments loaded.'
     });
     const response = await task;
 
-    setReplies(prev => [...prev, ...response.data.filter(r => !prev.some(pr => pr.id === r.id))]);
-    cursor.current = response.data.length > 0 ? response.data[response.data.length - 1] : cursor.current;
+    setReplies(prev => [...prev, ...response.data.items!.filter(r => !prev.some(pr => pr.id === r.id))]);
+    cursor.current = response.data.nextCursor;
+
+    setHasMoreReplies(!!response.data.nextCursor);
   }
 
   function createFinished(newComment: CommentDto | null) {
@@ -80,10 +82,6 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
 
     loadReplies();
   }, []);
-
-  useEffect(() => {
-    setHasMoreReplies(repliesCount.current > 0 && replies.length < repliesCount.current);
-  }, [replies.length]);
 
   return (
     <div className="flex flex-col">
