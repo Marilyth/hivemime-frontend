@@ -1,37 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HiveDto, PaginationCursorDto } from "@/lib/Api";
+import { PaginationCursorDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeHiveListItem } from "./list/hm-hive";
 import { api } from "@/lib/contexts";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function HiveMimeHiveBrowse() {
-  const [hives, setHives] = useState<HiveDto[]>([]);
-  const [hasMoreHives, setHasMoreHives] = useState<boolean>(true);
-  const cursor = useRef<PaginationCursorDto | undefined>(undefined);
+  const data = useInfiniteQuery({
+    queryKey: ['hives'],
+    queryFn: async ({ pageParam }) => {
+      const response = await api.api.hiveBrowseCreate({cursor: pageParam, pageSize: 20});
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined as PaginationCursorDto | undefined
+  });
 
-  async function fetchHivesAsync() {
-    const response = await api.api.hiveBrowseCreate({cursor: cursor.current, pageSize: 1});
-
-    const newHivesState = [...hives, ...response.data.items!];
-    setHives(newHivesState);
-
-    cursor.current = response.data.nextCursor;
-    setHasMoreHives(!!response.data.nextCursor);
-  }
-
-  useEffect(() => {
-    // Might want to fetch until scrollable, because InfiniteScroll does not trigger before.
-    fetchHivesAsync();
-  }, []);
+  const hives = data.data?.pages.flatMap(p => p.items!) ?? [];
 
   return (
     <InfiniteScroll
       dataLength={hives.length}
-      next={fetchHivesAsync}
-      hasMore={hasMoreHives}
+      next={data.fetchNextPage}
+      hasMore={data.hasNextPage}
       loader=
       {
         <Skeleton className="h-64 w-full rounded-xl my-4">

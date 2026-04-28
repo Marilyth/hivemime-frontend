@@ -107,7 +107,7 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
           <Link href={`/user?id=${comment.user?.id}`} className="font-bold">{comment.user?.username}</Link> • <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
           </div>}
         
-          <div className={`flex flex-col gap-2 ${isRoot ? "" : "border-l pl-4"}`}>
+          <div className={`flex flex-col gap-1 ${isRoot ? "" : "border-l pl-4"}`}>
             {!isRoot &&
               <>
                 <HiveMimeExpandableText lines={3} className="[overflow-wrap:anywhere]">
@@ -141,7 +141,7 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
             </InfiniteScroll>
 
             {hasMoreReplies() && (
-              <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 h-auto">
+              <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 pb-1 h-auto">
                   Load replies...
               </AsyncButton>
             )}
