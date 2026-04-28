@@ -47,7 +47,7 @@ export function UserProfile() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="posts" className="mt-4">
-          <HiveMimePostBrowse orderBy={PostOrderBy.New} userId={userStore.user?.id} />
+          <HiveMimePostBrowse orderBy={PostOrderBy.New} userId={Number(userData)} />
         </TabsContent>
         <TabsContent value="comments" className="mt-4">
           {data && <UserProfileComments user={data} />}
