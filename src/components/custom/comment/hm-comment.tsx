@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/contexts";
 import Link from "next/link";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export interface HiveMimeCommentProps {
   comment: CommentDto;
@@ -128,13 +129,20 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
                 />)
             }
             
-            {replies.map(reply => (
-                <HiveMimeComment key={reply.id} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} />
-            ))}
+            <InfiniteScroll
+              dataLength={replies.length}
+              next={() => repliesQuery.fetchNextPage()}
+              hasMore={isRoot && hasMoreReplies()}
+              loader={<p>Loading...</p>}
+            >
+              {replies.map(reply => (
+                  <HiveMimeComment key={reply.id} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} />
+              ))}
+            </InfiniteScroll>
 
             {hasMoreReplies() && (
               <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 h-auto">
-                  See more comments...
+                  Load replies...
               </AsyncButton>
             )}
           </div>
