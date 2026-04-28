@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useQuery } from "@tanstack/react-query";
 import { useQueryParam } from "../../utility/use-query-param";
 import { api } from "@/lib/contexts";
+import { useDebounce } from "../../utility/debounce";
 
 export interface HiveMimeHiveSelectionProps {
   post: CreatePostDto;
@@ -22,8 +23,9 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
   const [hiveSearchInput, setHiveSearchInput] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [debouncedHiveSearchInput, isLoading] = useDebounce(hiveSearchInput, 300);
 
-  const { data: hive } = useQuery({
+  const hiveData = useQuery({
     queryKey: ["hive", props.post.hiveId],
     enabled: props.post.hiveId !== undefined && props.post.hiveId! > 0,
     queryFn: async () => {
@@ -32,11 +34,11 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
     }
   });
 
-  const { data: suggestions = [], isLoading } = useQuery({
-    queryKey: ["hive-search", hiveSearchInput],
-    enabled: hiveSearchInput.length > 0,
+  const hiveSearchData = useQuery({
+    queryKey: ["hive-search", debouncedHiveSearchInput],
+    enabled: debouncedHiveSearchInput.length > 0,
     queryFn: async () => {
-      const res = await api.api.hiveBrowseCreate({ filter: hiveSearchInput });
+      const res = await api.api.hiveBrowseCreate({ filter: debouncedHiveSearchInput });
       return res.data;
     }
   });
@@ -74,7 +76,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger className="px-1 py-0 h-auto mx-1.5 border-b border-honey-brown ml-2 text-honey-brown">
               <div className="flex items-center gap-1">
-                {hive?.name ?? "Select hive"}
+                {hiveData.data?.name ?? "Select hive"}
                 <ChevronDownIcon className="size-3" />
               </div>
             </PopoverTrigger>
@@ -96,11 +98,11 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
 
               {isLoading && <div>Loading...</div>}
 
-              {!isLoading && suggestions.length === 0 && (
+              {!isLoading && (hiveSearchData.data?.items?.length ?? 0) == 0 && (
                 <div>No hives found.</div>
               )}
 
-              {!isLoading && suggestions.map((s) => (
+              {!isLoading && hiveSearchData.data?.items?.map((s) => (
                 <div key={s.id} onClick={() => setHiveId(s.id!)}>
                   <HiveSelectionItem hive={s} />
                 </div>

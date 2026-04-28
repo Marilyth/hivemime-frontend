@@ -94,13 +94,17 @@ export interface CommentDtoHoneyDeltaDto {
   dto?: CommentDto;
 }
 
+export interface CommentDtoPaginationResultDto {
+  items?: CommentDto[] | null;
+  nextCursor?: PaginationCursorDto;
+}
+
 export interface CommentPaginationDto {
   /** @format int32 */
-  cursor?: number | null;
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
   filter?: string | null;
   orderBy?: CommentOrderBy;
-  /** @format int32 */
-  pageSize?: number;
 }
 
 export interface CreateCandidateDto {
@@ -173,13 +177,23 @@ export interface HiveDto {
   followerCount?: number;
 }
 
+export interface HiveDtoPaginationResultDto {
+  items?: HiveDto[] | null;
+  nextCursor?: PaginationCursorDto;
+}
+
 export interface HivePaginationDto {
   /** @format int32 */
-  cursor?: number | null;
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
   filter?: string | null;
   orderBy?: HiveOrderBy;
+}
+
+export interface PaginationCursorDto {
+  cursor?: any | null;
   /** @format int32 */
-  pageSize?: number;
+  id?: number;
 }
 
 export interface PollCandidateResultDto {
@@ -239,6 +253,8 @@ export interface PostDto {
   voteCount?: number;
   /** @format date-time */
   createdAt?: string;
+  /** @format double */
+  hotness?: number;
 }
 
 export interface PostDtoHoneyDeltaDto {
@@ -247,13 +263,17 @@ export interface PostDtoHoneyDeltaDto {
   dto?: PostDto;
 }
 
+export interface PostDtoPaginationResultDto {
+  items?: PostDto[] | null;
+  nextCursor?: PaginationCursorDto;
+}
+
 export interface PostPaginationDto {
   /** @format int32 */
-  cursor?: number | null;
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
   filter?: string | null;
   orderBy?: PostOrderBy;
-  /** @format int32 */
-  pageSize?: number;
 }
 
 export interface PostResultDto {
@@ -267,6 +287,8 @@ export interface PostVoteDto {
 }
 
 export interface UserDetailsDto {
+  /** @format int32 */
+  id?: number;
   username?: string | null;
   /** @format double */
   honey?: number;
@@ -572,6 +594,30 @@ export class Api<
      * No description
      *
      * @tags Comment
+     * @name CommentGetList
+     * @request GET:/api/Comment/get
+     * @secure
+     */
+    commentGetList: (
+      query?: {
+        /** @format int32 */
+        commentId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CommentDto, any>({
+        path: `/api/Comment/get`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Comment
      * @name CommentCreateCreate
      * @request POST:/api/Comment/create
      * @secure
@@ -649,7 +695,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CommentDto[], any>({
+      this.request<CommentDtoPaginationResultDto, any>({
         path: `/api/Comment/browse`,
         method: "POST",
         query: query,
@@ -763,7 +809,7 @@ export class Api<
      * @secure
      */
     hiveBrowseCreate: (data: HivePaginationDto, params: RequestParams = {}) =>
-      this.request<HiveDto[], any>({
+      this.request<HiveDtoPaginationResultDto, any>({
         path: `/api/Hive/browse`,
         method: "POST",
         body: data,
@@ -834,7 +880,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<PostDto[], any>({
+      this.request<PostDtoPaginationResultDto, any>({
         path: `/api/Post/browse`,
         method: "POST",
         query: query,

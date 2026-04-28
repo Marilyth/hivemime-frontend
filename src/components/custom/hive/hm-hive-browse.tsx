@@ -1,58 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HiveDto } from "@/lib/Api";
+import { PaginationCursorDto } from "@/lib/Api";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeHiveListItem } from "./list/hm-hive";
 import { api } from "@/lib/contexts";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function HiveMimeHiveBrowse() {
-  const [hives, setHives] = useState<HiveDto[]>([]);
-  const [hasMoreHives, setHasMoreHives] = useState<boolean>(true);
+  const data = useInfiniteQuery({
+    queryKey: ['hives'],
+    queryFn: async ({ pageParam }) => {
+      const response = await api.api.hiveBrowseCreate({cursor: pageParam, pageSize: 20});
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined as PaginationCursorDto | undefined
+  });
 
-  async function fetchHivesAsync() {
-    const lastHiveId = hives.length > 0 ? hives[hives.length - 1].id : undefined;
-    const response = await api.api.hiveBrowseCreate({cursor: lastHiveId});
-
-    const newHivesState = [...hives, ...response.data];
-    setHives(newHivesState);
-
-    setHasMoreHives(response.data.length == 20 && newHivesState.length < 100);
-  }
-
-  useEffect(() => {
-    // Might want to fetch until scrollable, because InfiniteScroll does not trigger before.
-    fetchHivesAsync();
-  }, []);
+  const hives = data.data?.pages.flatMap(p => p.items!) ?? [];
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full">
-        <InfiniteScroll
-          dataLength={hives.length}
-          next={fetchHivesAsync}
-          hasMore={hasMoreHives}
-          loader=
-          {
-            <Skeleton className="h-64 w-full rounded-xl my-4">
-              <span className="flex h-full w-full items-center justify-center text-informational">
-                Loading...
-              </span>
-            </Skeleton>
-          }
-          endMessage=
-          {
-            <div className="my-4 text-center">There are no more hives! Consider creating your own.</div>
-          }
-        >
-          <div className="flex justify-center flex-row flex-wrap gap-4">
-            {hives.map((hive, index) => (
-              <HiveMimeHiveListItem key={index} hive={hive} className="w-96 min-h-56" />
-            ))}
-          </div>
-        </InfiniteScroll>
+    <InfiniteScroll
+      dataLength={hives.length}
+      next={data.fetchNextPage}
+      hasMore={data.hasNextPage}
+      loader=
+      {
+        <Skeleton className="h-64 w-full rounded-xl my-4">
+          <span className="flex h-full w-full items-center justify-center text-informational">
+            Loading...
+          </span>
+        </Skeleton>
+      }
+      endMessage=
+      {
+        <div className="my-4 text-center">There are no more hives! Consider creating your own.</div>
+      }
+    >
+      <div className="flex justify-center flex-row flex-wrap gap-4">
+        {hives.map((hive, index) => (
+          <HiveMimeHiveListItem key={index} hive={hive} className="w-96 min-h-56" />
+        ))}
       </div>
-    </div>
+    </InfiniteScroll>
   );
 }

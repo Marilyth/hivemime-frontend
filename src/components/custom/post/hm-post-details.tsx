@@ -31,21 +31,19 @@ export function HiveMimePostDetails() {
   }, [postId]);
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full max-w-183">
-        {!post ? (
-          <Skeleton className="h-64 w-full rounded-xl my-4">
-            <span className="flex h-full w-full items-center justify-center text-informational">
-              Loading...
-            </span>
-          </Skeleton>
-        ) : (
-          <div className="flex flex-col gap-6">
-            <HiveMimePost post={post} />
-            <HiveMimeCommentBrowse post={post} />
-          </div>
-        )}
-      </div>
+    <div>
+      {!post ? (
+        <Skeleton className="h-64 w-full rounded-xl my-4">
+          <span className="flex h-full w-full items-center justify-center text-informational">
+            Loading...
+          </span>
+        </Skeleton>
+      ) : (
+        <div className="flex flex-col gap-6">
+          <HiveMimePost post={post} />
+          <HiveMimeCommentBrowse post={post} />
+        </div>
+      )}
     </div>
   );
 }

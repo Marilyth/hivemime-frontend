@@ -26,6 +26,7 @@ import HexWrapper from "../utility/hm-hex-wrapper"
 import { useRouter } from "next/navigation"
 import { observer } from "mobx-react-lite"
 import { reaction } from "mobx"
+import { UserAvatar } from "./user-avatar"
 
 export const UserOptions = observer(() => {
   const hivesContext = useContext(FollowedHivesContext);
@@ -99,12 +100,8 @@ export const UserOptions = observer(() => {
         </Button>
       :
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <HexWrapper pointRatio={0.25}>
-              <Button className="px-3! h-auto">
-                <User2 />
-              </Button>
-            </HexWrapper>
+          <DropdownMenuTrigger>
+            <UserAvatar user={userStore.user!} size={40} />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
@@ -115,7 +112,7 @@ export const UserOptions = observer(() => {
               Hello, {userStore?.user?.username}!
             </div>
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/user")}>
+              <DropdownMenuItem onClick={() => router.push("/user?userId=" + userStore.user?.id)}>
                 <User2 />
                 Profile
               </DropdownMenuItem>
