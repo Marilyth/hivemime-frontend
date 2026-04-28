@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CommentDto, PaginationCursorDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { HiveMimeCommentCreate } from "./hm-comment-create";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 import { Reply } from "lucide-react";
@@ -12,6 +12,7 @@ import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
 import { api } from "@/lib/contexts";
 import Link from "next/link";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export interface HiveMimeCommentProps {
   comment: CommentDto;
@@ -22,22 +23,35 @@ export interface HiveMimeCommentProps {
 
 export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, allowLoadParent = false }: HiveMimeCommentProps) => {
   const [isReplying, setIsReplying] = useState<boolean>(false);
-  const repliesCount = useRef<number>(comment.replyCount || 0);
-  const [replies, setReplies] = useState<CommentDto[]>(prefetchedReplies?.filter(r => r.parentCommentId == comment.id) || []);
-  const [hasMoreReplies, setHasMoreReplies] = useState<boolean>(replies.length < repliesCount.current);
   const [parentComment, setParentComment] = useState<CommentDto | null>(null);
-  const cursor = useRef<PaginationCursorDto | undefined>(undefined);
-  
-  function mergePreLoadedReplies() {
-    const arr = [...(prefetchedReplies || []), ...replies, comment];
+  const [createdReplies, setCreatedReplies] = useState<CommentDto[]>([]);
 
-    const distinct = arr.filter(
-      (item, index, self) =>
-        index === self.findIndex(i => i.id === item.id)
-    );
-    
-    return distinct;
-  }
+  const repliesQuery = useInfiniteQuery({
+    queryKey: ['commentReplies', comment.id],
+    queryFn: async ({ pageParam }) => {
+      const task = api.api.commentBrowseCreate({pageSize: 20, cursor: pageParam}, { postId: comment.postId!, parentCommentId: comment.id });
+      toast.promise(task, {
+        loading: 'Loading comments...',
+        success: 'Comments loaded.'
+      });
+
+      const response = await task;
+      return response.data;
+    },
+    enabled: isRoot,
+    initialPageParam: undefined as PaginationCursorDto | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor
+  });
+
+  const replies: CommentDto[] = [...
+    new Map(
+      [
+        ...(createdReplies ?? []),
+        ...(prefetchedReplies ?? []).filter(c => c.parentCommentId === comment.id),
+        ...(repliesQuery.data?.pages.flatMap(p => p.items) ?? []),
+      ].map(item => [item?.id, item])
+    ).values()
+  ] as CommentDto[];
 
   async function loadParentComment() {
     if (!comment.parentCommentId)
@@ -53,35 +67,26 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
     setParentComment(response.data);
   }
 
-  async function loadReplies() {
-    const task = api.api.commentBrowseCreate({pageSize: 20, cursor: cursor.current}, { postId: comment.postId!, parentCommentId: comment.id });
-    toast.promise(task, {
-      loading: 'Loading comments...',
-      success: 'Comments loaded.'
-    });
-    const response = await task;
-
-    setReplies(prev => [...prev, ...response.data.items!.filter(r => !prev.some(pr => pr.id === r.id))]);
-    cursor.current = response.data.nextCursor;
-
-    setHasMoreReplies(!!response.data.nextCursor);
-  }
-
   function createFinished(newComment: CommentDto | null) {
     setIsReplying(false);
 
     if (newComment){
-      repliesCount.current += 1;
-      setReplies(prev => prev ? [newComment, ...prev] : [newComment]);
+      setCreatedReplies(prev => prev ? [newComment, ...prev] : [newComment]);
     }
   }
-  
-  useEffect(() => {
-    if (!isRoot)
-      return;
 
-    loadReplies();
-  }, []);
+  function getNextPrefetchedReplies() {
+    return [comment,
+            ...replies,
+            ...(prefetchedReplies ?? []).filter(c => c.parentCommentId != comment.id && !replies.some(r => r.id === c.id))];
+  }
+
+  function hasMoreReplies() {
+    if (!repliesQuery.data || repliesQuery.data.pages.length === 0)
+      return replies.length < comment.replyCount! + createdReplies.length;
+
+    return repliesQuery.hasNextPage;
+  }
 
   return (
     <div className="flex flex-col">
@@ -91,7 +96,7 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
             Load parent comment...
         </AsyncButton>
         ) : (
-          <HiveMimeComment comment={parentComment} isRoot={false} allowLoadParent={true} prefetchedReplies={mergePreLoadedReplies()} />
+          <HiveMimeComment comment={parentComment} isRoot={false} allowLoadParent={true} prefetchedReplies={getNextPrefetchedReplies()} />
         )
       )}
 
@@ -122,15 +127,13 @@ export const HiveMimeComment = observer(({ comment, isRoot, prefetchedReplies, a
                     onFinished={createFinished}
                 />)
             }
-            {replies.length > 0 && (
-              <>
-                {replies.map(reply => (
-                    <HiveMimeComment key={reply.id} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} />
-                ))}
-              </>
-            )}
-            {hasMoreReplies && (
-              <AsyncButton variant="link" size="sm" onClick={loadReplies} className="self-start p-0 h-auto">
+            
+            {replies.map(reply => (
+                <HiveMimeComment key={reply.id} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} />
+            ))}
+
+            {hasMoreReplies() && (
+              <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 h-auto">
                   See more comments...
               </AsyncButton>
             )}
