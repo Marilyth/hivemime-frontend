@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
-import { Api, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
+import { CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { Button } from "../../../ui/button";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { observer } from "mobx-react-lite";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,8 @@ import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
 import { api } from "@/lib/contexts";
 
+export const mediaFiles = observable.map<string, File>()
+
 export const HiveMimeCreatePost = observer(() => {
   const router = useRouter();
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
@@ -33,6 +35,10 @@ export const HiveMimeCreatePost = observer(() => {
   if (post.polls!.length === 0 && selectedPoll == null) {
     addPoll();
   }
+
+  useEffect(() => {
+    mediaFiles.clear()
+  }, []);
 
   function editPoll(index: number) {
     setSelectedPollIndex(index);

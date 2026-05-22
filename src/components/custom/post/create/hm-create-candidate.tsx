@@ -1,19 +1,22 @@
 "use client";
 
-import { CreatePollDto, CandidateDto, PollType } from "@/lib/Api";
+import { CreatePollDto, PollType, CreateCandidateDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
-import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
-import { HiveMimeEmbeddedInput } from "../../utility/hm-embedded-input";
 import { Button } from "../../../ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../utility/hm-draggable";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { useEffect } from "react";
+import { mediaFiles } from "./hm-create-post";
+import { ImageEditor } from "../../utility/image-viewer";
+import { reaction } from "mobx";
+
 
 interface HiveMimeCreateCandidateProps {
-  index: number;
-  onIndexChange?: (newIndex: number) => void;
-  option: CandidateDto;
+  candidates: CreateCandidateDto[];
+  candidate: CreateCandidateDto;
 }
 
 export interface HiveMimeCreateCandidatesProps {
@@ -21,17 +24,22 @@ export interface HiveMimeCreateCandidatesProps {
 }
 
 export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandidatesProps) => {
-  function moveCandidate(oldIndex: number, newIndex: number) {
-    if (newIndex < 0 || newIndex >= poll.candidates!.length) {
-      return; // Out of bounds
-    }
-
-    const [movedCandidate] = poll.candidates!.splice(oldIndex, 1);
-    poll.candidates!.splice(newIndex, 0, movedCandidate);
+  function addCandidate() {
+    poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
   }
 
-  function removeCandidate(index: number) {
-    poll.candidates!.splice(index, 1);
+  function handleCandidateCountChanged(current: number, previous: number) {
+    if (current > previous) {
+      if (poll.minVotes! == poll.candidates!.length - 1 && poll.pollType != PollType.Choice) {
+        poll.minVotes = poll.candidates!.length;
+      }
+
+      if (poll.maxVotes! == poll.candidates!.length - 1) {
+        poll.maxVotes = poll.candidates!.length;
+      }
+
+      return;
+    }
 
     if (poll.candidates!.length < poll.maxVotes!) {
       poll.maxVotes = poll.candidates!.length;
@@ -42,58 +50,61 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
     }
   }
 
-  function addCandidate() {
-    poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
-
-    if (poll.minVotes! == poll.candidates!.length - 1 && poll.pollType != PollType.Choice) {
-      poll.minVotes = poll.candidates!.length;
-    }
-
-    if (poll.maxVotes! == poll.candidates!.length - 1) {
-      poll.maxVotes = poll.candidates!.length;
-    }
-  }
+  useEffect(() => reaction(
+      () => poll.candidates!.length,
+      handleCandidateCountChanged), [poll]);
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-0.5">
-        <AnimatePresence>
-          {poll.candidates!.map((option, index) => (
-            <motion.div layout
-              key={getReferenceId(option)}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}>
-                <HiveMimeDraggable hasHandle isDraggable isDropArea isSticky data={option} dataList={poll.candidates!} allowedZones={['top', 'bottom']}>
-                  <div className="flex flex-row items-center">
-                    <div className="flex-1">
-                      <HiveMimeCreateCandidate option={option} index={index} onIndexChange={(newIndex) => moveCandidate(index, newIndex)} />
-                    </div>
-                      <Button variant="ghost"
-                        className="ml-2 text-muted-foreground hover:text-red-400"
-                        onClick={() => removeCandidate(index)}>
-                          <Trash2 />
-                      </Button>
-                    </div>
-                </HiveMimeDraggable>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      <AnimatePresence>
+        {poll.candidates!.map((option) => (
+          <motion.div layout
+            key={getReferenceId(option)}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto"}}
+            exit={{ opacity: 0, height: 0, marginBottom: -4, marginTop: -4 }}>
+              <HiveMimeDraggable hasHandle isDraggable isDropArea isSticky data={option} dataList={poll.candidates!} allowedZones={['top', 'bottom']}>
+              <HiveMimeCreateCandidate candidates={poll.candidates!} candidate={option} />
+              </HiveMimeDraggable>
+          </motion.div>
+        ))}
 
-      <Button variant="outline" onClick={addCandidate}>
-        <Plus />Add candidate
-      </Button>
+        <Button variant="outline" onClick={addCandidate} className="w-full">
+          <Plus />Add candidate
+        </Button>
+      </AnimatePresence>
     </div>
   );
 });
 
 
-export const HiveMimeCreateCandidate = observer(({ index, option, onIndexChange }: HiveMimeCreateCandidateProps) => {
+export const HiveMimeCreateCandidate = observer(({ candidates, candidate }: HiveMimeCreateCandidateProps) => {
+  function handleFileChange(file: File | null, thumbnail: File | null) {
+    if (!file || !thumbnail) {
+      mediaFiles.delete(getReferenceId(candidate));
+      mediaFiles.delete(getReferenceId(candidate) + "-thumb");
+      return;
+    }
+
+    mediaFiles.set(getReferenceId(candidate), file);
+    mediaFiles.set(getReferenceId(candidate) + "-thumb", thumbnail);
+  }
+
   return (
-    <HiveMimeHoverCard className="flex flex-row gap-2">
-      <HiveMimeEmbeddedInput className="h-auto" value={option.name!} onChange={(e) => option.name = e.target.value} />
-    </HiveMimeHoverCard>
+    <InputGroup className="hover:border-honey-brown transition-colors duration-200 bg-transparent! h-auto">
+      <InputGroupAddon>
+        <ImageEditor src={mediaFiles.get(getReferenceId(candidate))} thumb={mediaFiles.get(getReferenceId(candidate) + "-thumb")} onChange={handleFileChange}></ImageEditor>
+      </InputGroupAddon>
+
+      <InputGroupInput placeholder="Candidate name..." value={candidate.name!} onChange={(e) => candidate.name = e.target.value} />
+
+      <InputGroupAddon align="inline-end">
+        <Button variant="ghost"
+          className="text-muted-foreground hover:text-red-400 p-1! h-auto"
+          onClick={() => candidates.splice(candidates.indexOf(candidate), 1)}>
+            <Trash2 />
+        </Button>
+      </InputGroupAddon>
+    </InputGroup>
   );
 });

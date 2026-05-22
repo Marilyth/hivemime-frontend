@@ -61,7 +61,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
-        <HiveMimeStep canContinue={props.poll.candidates!.length > 0}>
+        <HiveMimeStep canContinue={props.poll.candidates!.length > 0 && props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               <Label className="text-sm text-muted-foreground">Create candidates for the users to vote for.</Label>
