@@ -8,6 +8,7 @@ import { CategoryDto } from "@/lib/Api";
 import { SquareCheck } from "lucide-react"; 
 import { motion } from "framer-motion";
 import { HiveMimeCategoryTag } from "./hm-category-poll-vote-category";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 export interface HiveMimeCategoryPollVoteCandidateDialogProps {
   categories: CategoryDto[];
@@ -87,7 +88,7 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
         {candidates?.map((candidate, index) => (
           <HiveMimeHoverCard key={index} className={`flex flex-row items-center cursor-pointer ${isSelected(candidate) ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={() => selectCategory(candidate)}>
             {isSelected(candidate) && <span className="w-6 font-light text-informational"><SquareCheck className="w-4 h-4" /></span>}
-            <motion.div layout>{candidate.candidate.name}</motion.div>
+            <motion.div layout><HiveMimeViewCandidate candidate={candidate.candidate} /></motion.div>
           </HiveMimeHoverCard>
         ))}
       </DialogContent>

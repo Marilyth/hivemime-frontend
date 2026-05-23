@@ -6,6 +6,7 @@ import { CombinedPollCandidate } from "@/lib/view-models";
 import { motion } from "framer-motion";
 import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
 import { PollDto } from "@/lib/Api";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 interface HiveMimeRankPollVoteCandidateProps {
   onClick?: () => void;
@@ -21,7 +22,7 @@ export const HiveMimeRankPollVoteCandidate = observer(({ combined, poll, onClick
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isRanked() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
       {isRanked() && <span className="w-6 font-light text-informational">{hiveMimeRankIcon(poll.maxValue! - combined.vote.value! + 1)}</span>}
-      <motion.div layout>{combined.candidate.name}</motion.div>
+      <motion.div layout><HiveMimeViewCandidate candidate={combined.candidate} /></motion.div>
     </HiveMimeHoverCard>
   );
 });
