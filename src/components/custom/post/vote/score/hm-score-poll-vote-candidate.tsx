@@ -4,6 +4,7 @@ import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { PollDto, CandidateDto, CandidateVoteDto } from "@/lib/Api";
 import { Slider } from "../../../../ui/slider";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 interface HiveMimeScorePollVoteCandidateProps {
   poll: PollDto;
@@ -15,7 +16,7 @@ export const HiveMimeScorePollVoteCandidate = observer(({ poll, vote, candidate 
   return (
     <HiveMimeHoverCard className={`flex flex-col gap-4 !pb-4 hover:text-honey-brown`}>
       <div className="flex flex-row">
-        <span className="flex-1">{candidate.name}</span>
+        <HiveMimeViewCandidate candidate={candidate} className="flex-1" />
         <span className="text-sm text-honey-brown">{vote.value}</span>
       </div>
       <Slider

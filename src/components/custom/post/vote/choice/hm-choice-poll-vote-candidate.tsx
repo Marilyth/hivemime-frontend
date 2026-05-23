@@ -5,6 +5,7 @@ import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
 import { observer } from "mobx-react-lite";
 import { CandidateDto, CandidateVoteDto } from "@/lib/Api";
 import { motion } from "framer-motion";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 interface HiveMimePickMultipleChoiceCandidateProps {
   onClick?: () => void;
@@ -20,7 +21,7 @@ export const HiveMimeChoicePollVoteCandidate = observer(({ vote, candidate, onCl
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isSelected() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
       {isSelected() && <span className="w-6 font-light text-informational"><IoMdCheckboxOutline className="w-4 h-4" /></span>}
-      <motion.div layout>{candidate.name}</motion.div>
+      <motion.div layout><HiveMimeViewCandidate candidate={candidate} /></motion.div>
     </HiveMimeHoverCard>
   );
 });

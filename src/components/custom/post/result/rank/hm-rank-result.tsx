@@ -4,6 +4,7 @@ import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
 import { CandidateDto, PollDto, PollResultDto } from "@/lib/Api";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
 import { useState } from "react";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 export interface HiveMimeRankResultProps {
@@ -39,13 +40,14 @@ export function HiveMimeRankResult(props: HiveMimeRankResultProps) {
                     <AnimatedBackground percentage={percentage} />
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
-                            <span className="font-medium">{candidate.name}</span>
-                            <span className="text-muted-foreground ml-auto">
+                            <HiveMimeViewCandidate candidate={candidate} />
+
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {hiveMimeRankIcon(index + 1)}
-                            </span>
-                        </div>
-                        <div className="text-muted-foreground">
-                            {candidate.voterAmount} votes
+                                <div className="text-muted-foreground">
+                                    {candidate.voterAmount} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>
@@ -73,14 +75,16 @@ export function HiveMimeRankDistributionResult(props: HiveMimeDistributionResult
                 >
                     <AnimatedBackground percentage={percentage} />
                     <div className="flex flex-col gap-0 relative">
+                        
                         <div className="relative flex flex-row gap-2 items-center">
                             {hiveMimeRankIcon(i + 1)}
-                            <span className="text-sm text-muted-foreground ml-auto">
+                            
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto text-sm">
                                 {Number(percentage.toFixed(2))}%
-                            </span>
-                        </div>
-                        <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
-                            {bucketScore} votes
+                                <div className="text-muted-foreground">
+                                    {bucketScore} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>

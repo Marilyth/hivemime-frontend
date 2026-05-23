@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import imageCompression from "browser-image-compression";
 import { useEffect, useRef, useState } from "react";
-import { Clipboard, Edit, FolderOpen, Image, Save, Trash2 } from "lucide-react";
+import { Clipboard, Edit, Eye, FolderOpen, Image, Save, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
@@ -24,9 +24,27 @@ export interface ImageEditorProps {
 }
 
 export function ImageViewer(props: ImageViewerProps) {
-    return (
-        <img src={props.thumb ?? props.src} alt={props.alt} className="w-full h-auto object-cover rounded-md" />
-    );
+  return (
+    <div onClick={e => e.stopPropagation()}>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="group relative cursor-pointer overflow-hidden rounded-md">
+            <img src={props.thumb} alt={props.alt} className="h-auto w-full object-cover" />
+
+            <div className="absolute inset-0 hidden items-center justify-center bg-black/40 group-hover:flex">
+              <Eye className="h-5 w-5 text-white" />
+            </div>
+          </div>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{props.alt}</DialogTitle>
+          </DialogHeader>
+          {props.src && <img src={props.src} alt={props.alt} className="w-fit h-fit rounded-md border" />}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
 
 export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {

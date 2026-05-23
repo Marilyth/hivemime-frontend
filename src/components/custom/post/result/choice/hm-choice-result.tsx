@@ -1,6 +1,7 @@
 import { AnimatedBackground } from "@/components/custom/utility/hm-animated-background";
 import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 import { PollResultDto } from "@/lib/Api";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 export interface HiveMimeChoiceResultProps {
@@ -22,13 +23,14 @@ export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
                     <AnimatedBackground percentage={percentage} />
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
-                            <span className="font-medium">{candidate.name}</span>
-                            <span className="text-sm text-muted-foreground ml-auto">
+                            <HiveMimeViewCandidate candidate={candidate} />
+
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {Number(percentage.toFixed(2))}%
-                            </span>
-                        </div>
-                        <div className="text-muted-foreground">
-                            {candidate.voterAmount} votes
+                                <div className="text-muted-foreground">
+                                    {candidate.voterAmount} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>
