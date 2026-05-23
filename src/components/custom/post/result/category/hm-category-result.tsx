@@ -98,7 +98,7 @@ export function HiveMimeCategoryDistributionResult(props: HiveMimeDistributionRe
                         <div className="relative flex flex-row gap-2 items-center">
                             <HiveMimeCategoryTag category={category!} />
 
-                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto text-sm">
                                 {Number(percentage.toFixed(2))}%
                                 
                                 <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">

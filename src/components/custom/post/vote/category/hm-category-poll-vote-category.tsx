@@ -5,6 +5,7 @@ import { Tag } from "lucide-react";
 import { CategoryDto } from "@/lib/Api";
 import { HiveMimeTagItem } from "../../../utility/hm-tag-item";
 import { numberToColorHex } from "@/lib/colors";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 export function HiveMimePickCandidate({ candidate, category }: { candidate: CombinedPollCandidate, category: CategoryDto | null }) {
@@ -14,7 +15,7 @@ export function HiveMimePickCandidate({ candidate, category }: { candidate: Comb
       background: `${numberToColorHex(category?.color ?? 0)}20`,
      } : undefined}
      className={`flex flex-row gap-2 items-center cursor-pointer hover:text-honey-brown`}>
-      <span className="flex-1">{candidate.candidate.name}</span>
+      <HiveMimeViewCandidate candidate={candidate.candidate} className="flex-1" />
       {category && <HiveMimeCategoryTag category={category} />}
     </HiveMimeHoverCard>
   );
