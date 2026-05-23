@@ -3,6 +3,7 @@ import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 import { CandidateDto, PollDto, PollResultDto } from "@/lib/Api";
 import { useState } from "react";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 export interface HiveMimeScoreResultProps {
@@ -39,13 +40,14 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
                     <AnimatedBackground percentage={percentage} />
                     <div className="flex flex-col gap-0 relative">
                         <div className="flex flex-row gap-2 items-center">
-                            {candidate.name}
-                            <span className="text-muted-foreground ml-auto">
+                            <HiveMimeViewCandidate candidate={candidate} />
+
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {Number(candidateValue.toFixed(2))}
-                            </span>
-                        </div>
-                        <div className="text-muted-foreground">
-                            {candidate.voterAmount} votes
+                                <div className="text-muted-foreground">
+                                    {candidate.voterAmount} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>
@@ -76,12 +78,13 @@ export function HiveMimeScoreDistributionResult(props: HiveMimeDistributionResul
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
                             <span className="font-medium">{stepStart} - {stepStart + stepSize - 1}</span>
-                            <span className="text-sm text-muted-foreground ml-auto">
+
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto text-sm">
                                 {Number(percentage.toFixed(2))}%
-                            </span>
-                        </div>
-                        <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
-                            {stepScore} votes
+                                <div className="text-muted-foreground">
+                                    {stepScore} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>

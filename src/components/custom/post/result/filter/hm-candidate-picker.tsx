@@ -6,6 +6,7 @@ import { CandidateDto, PollDto, PostDto } from "@/lib/Api";
 import { VoteQuery } from "@/lib/query-builder";
 import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 interface HiveMimeFilterConditionCandidatePickerProps {
@@ -51,7 +52,7 @@ export const HiveMimeFilterConditionCandidatePicker = observer(({ post, currentI
                             <div className="flex flex-col gap-2 p-2">
                                 {poll.candidates!.map((candidate) => (
                                     <HiveMimeHoverCard key={getReferenceId(candidate)} onClick={() => onCandidatePicked(poll, candidate)} className="hover:text-honey-brown ">
-                                        {candidate.name}
+                                        <HiveMimeViewCandidate candidate={candidate} />
                                     </HiveMimeHoverCard>
                                 ))}
                             </div>

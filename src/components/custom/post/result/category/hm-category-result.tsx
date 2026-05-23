@@ -6,6 +6,7 @@ import { HiveMimeCategoryTag } from "../../vote/category/hm-category-poll-vote-c
 import { numberToColorHex } from "@/lib/colors";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
 import { useState } from "react";
+import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
 export interface HiveMimeCategoryResultProps {
@@ -52,13 +53,16 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
                     }
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
-                            <span className="font-medium">{candidate.name}</span>
-                            <span className="text-sm text-muted-foreground ml-auto">
-                                {category && <HiveMimeCategoryTag category={category} />}
-                            </span>
-                        </div>
-                        <div className="text-muted-foreground">
-                            {candidate.voterAmount} votes
+                            <HiveMimeViewCandidate candidate={candidate} />
+                            
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
+                                <span>
+                                    {category && <HiveMimeCategoryTag category={category} />}
+                                </span>
+                                <div className="text-muted-foreground">
+                                    {candidate.voterAmount} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>
@@ -93,12 +97,14 @@ export function HiveMimeCategoryDistributionResult(props: HiveMimeDistributionRe
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
                             <HiveMimeCategoryTag category={category!} />
-                            <span className="text-sm text-muted-foreground ml-auto">
+
+                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {Number(percentage.toFixed(2))}%
-                            </span>
-                        </div>
-                        <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
-                            {bucketScore} votes
+                                
+                                <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
+                                    {bucketScore} votes
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </HiveMimeHoverCard>

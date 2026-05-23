@@ -53,6 +53,7 @@ export interface CandidateDto {
   id?: number;
   name?: string | null;
   description?: string | null;
+  mediaKeys?: string[] | null;
 }
 
 export interface CandidateVoteDto {
@@ -110,6 +111,7 @@ export interface CommentPaginationDto {
 export interface CreateCandidateDto {
   name?: string | null;
   description?: string | null;
+  media?: UploadMediaRequestDto;
 }
 
 export interface CreateCategoryDto {
@@ -135,6 +137,7 @@ export interface CreateHiveDto {
 export interface CreatePollDto {
   title?: string | null;
   description?: string | null;
+  media?: UploadMediaRequestDto;
   isShuffled?: boolean;
   isOptional?: boolean;
   /** @format int32 */
@@ -191,7 +194,7 @@ export interface HivePaginationDto {
 }
 
 export interface PaginationCursorDto {
-  cursor?: any | null;
+  cursor?: string | null;
   /** @format int32 */
   id?: number;
 }
@@ -201,6 +204,7 @@ export interface PollCandidateResultDto {
   id?: number;
   name?: string | null;
   description?: string | null;
+  mediaKeys?: string[] | null;
   /** @format int32 */
   voterAmount?: number;
   /** @format double */
@@ -215,6 +219,7 @@ export interface PollDto {
   /** @format int32 */
   id?: number;
   title?: string | null;
+  mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
   isOptional?: boolean;
@@ -284,6 +289,33 @@ export interface PostVoteDto {
   /** @format int32 */
   postId?: number;
   polls?: PollVoteDto[] | null;
+}
+
+export interface UploadCandidateDto {
+  /** @format int32 */
+  id?: number;
+  mediaUploadUrls?: string[] | null;
+}
+
+export interface UploadMediaRequestDto {
+  contentType?: string | null;
+  /** @format int64 */
+  contentLength?: number;
+  /** @format int64 */
+  thumbnailContentLength?: number;
+}
+
+export interface UploadPollDto {
+  /** @format int32 */
+  id?: number;
+  mediaUploadUrls?: string[] | null;
+  candidates?: UploadCandidateDto[] | null;
+}
+
+export interface UploadPostDto {
+  /** @format int32 */
+  id?: number;
+  polls?: UploadPollDto[] | null;
 }
 
 export interface UserDetailsDto {
@@ -895,12 +927,36 @@ export class Api<
      * No description
      *
      * @tags Post
+     * @name PostPublishPartialUpdate
+     * @request PATCH:/api/Post/publish
+     * @secure
+     */
+    postPublishPartialUpdate: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostDtoHoneyDeltaDto, any>({
+        path: `/api/Post/publish`,
+        method: "PATCH",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
      * @name PostCreateCreate
      * @request POST:/api/Post/create
      * @secure
      */
     postCreateCreate: (data: CreatePostDto, params: RequestParams = {}) =>
-      this.request<PostDtoHoneyDeltaDto, any>({
+      this.request<UploadPostDto, any>({
         path: `/api/Post/create`,
         method: "POST",
         body: data,
@@ -964,14 +1020,14 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostVoteCreate
-     * @request POST:/api/Post/vote
+     * @name PostVoteUpdate
+     * @request PUT:/api/Post/vote
      * @secure
      */
-    postVoteCreate: (data: PostVoteDto, params: RequestParams = {}) =>
+    postVoteUpdate: (data: PostVoteDto, params: RequestParams = {}) =>
       this.request<BooleanHoneyDeltaDto, any>({
         path: `/api/Post/vote`,
-        method: "POST",
+        method: "PUT",
         body: data,
         secure: true,
         type: ContentType.Json,
