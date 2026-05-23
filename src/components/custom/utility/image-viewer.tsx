@@ -3,10 +3,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import imageCompression from "browser-image-compression";
 import { useEffect, useRef, useState } from "react";
-import { Edit, FolderOpen, Image, Save, Trash2 } from "lucide-react";
+import { Clipboard, Edit, FolderOpen, Image, Save, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { toast } from "sonner";
+import { FieldSeparator } from "@/components/ui/field";
 
 
 export interface ImageViewerProps {
@@ -38,8 +40,14 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileChange(file: File | null) {
-    if (!file) return;
+  async function handleFile(file: File | null) {
+    if (!file)
+      return;
+    
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selected file is not an image.");
+      return;
+    }
 
     const compressedFullResFile = await imageCompression(file, {
       maxSizeMB: 1,
@@ -73,28 +81,91 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   }
 
   async function handleUrl(url: string) {
-    if(!url || !url.startsWith("http"))
+    if(!url || !url.startsWith("http")) {
+      toast.error("Invalid URL.");
       return;
+    }
     
     const response = await fetch(url);
-    if (!response.ok) return;
-    const blob = await response.blob();
-    const file = new File([blob], "url-image", { type: blob.type });
-    handleFileChange(file);
-  }
-
-  async function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const file = Array.from(e.clipboardData?.items ?? [])
-      .find((item) => item.kind === "file" && item.type.startsWith("image/"))
-      ?.getAsFile()
-
-    if (file) {
-      handleFileChange(file);
+    if (!response.ok) {
+      toast.error("Failed to fetch image from URL.");
       return;
     }
 
-    const imageUrl = e.clipboardData?.getData("text/plain") ?? "";
-    handleUrl(imageUrl);
+    const blob = await response.blob();
+
+    if (!blob.type.startsWith("image/")) {
+      toast.error("URL does not point to an image.");
+      return;
+    }
+
+    const file = new File([blob], "url-image", { type: blob.type });
+    handleFile(file);
+  }
+
+  async function handleClipboard() {
+    const clipboardItems = await navigator.clipboard.read();
+
+    if (clipboardItems.length === 0) {
+      toast.error("Clipboard is empty.");
+      return;
+    }
+
+    const item = clipboardItems[0];
+
+    const isImage = item.types.some((type) => type.startsWith("image/"));
+
+    if (isImage) {
+      const image: Blob = await item.getType(item.types.find((type) => type.startsWith("image/"))!);
+      const file = new File([image], "clipboard-image", { type: image.type });
+      handleFile(file);
+      return;
+    }
+
+    const isText = item.types.some((type) => type.startsWith("text/"));
+
+    if (isText) {
+      const text = await item.getType("text/plain");
+      handleUrl(await text.text());
+      return;
+    }
+
+    toast.error("No image found in clipboard.");
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+
+    if (file) {
+      handleFile(file);
+    }
+  }
+
+  function handlePaste(e: ClipboardEvent) {
+    const item = e.clipboardData?.items[0];
+
+    if (!item)
+      return;
+
+    if (item.type.startsWith("image/")) {
+      const file = item.getAsFile();
+      if (file) {
+        handleFile(file);
+      }
+
+      return;
+    }
+    
+    if (item.type.startsWith("text/")) {
+      item.getAsString((text) => {
+        handleUrl(text);
+      });
+
+      return;
+    }
+
+    toast.error("No image found in clipboard.");
   }
 
   useEffect(() => {
@@ -103,6 +174,14 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
       setThumbFile(thumb ?? null);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    window.addEventListener("paste", handlePaste);
+
+    return () => {
+      window.removeEventListener("paste", handlePaste);
+    }
+  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -134,17 +213,23 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
 
         <div className="flex flex-col gap-2">
           {!previewUrl && (
-            <div className="flex flex-col gap-2">
-              <Button className="w-fit" variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <div className="flex flex-col gap-2 border-dashed border-1 rounded-md p-4" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+              <Image className="w-16 h-16 text-border mx-auto" />
+              <span className="mx-auto text-muted-foreground">Drag an image here</span>
+
+              <div className="flex items-center gap-4 text-muted-foreground">
+                <FieldSeparator className="flex-1" />
+                <span className="text-sm text-muted-foreground">OR</span>
+                <FieldSeparator className="flex-1" />
+              </div>
+              
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
                 <FolderOpen className="text-honey-brown" />Pick a file
               </Button>
-              <Input placeholder="...or paste a link or image" autoFocus onPaste={handlePaste} onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleUrl(e.currentTarget.value);
-                }
-              }} />
-              <Input type="file" accept="image/*" ref={fileInputRef} onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)} className="hidden" />
+              <Button variant="outline" onClick={handleClipboard}>
+                <Clipboard className="text-honey-brown" />Paste from clipboard
+              </Button>
+              <Input type="file" accept="image/*" ref={fileInputRef} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} className="hidden" />
             </div>) ||
             (
               <InputGroup>
