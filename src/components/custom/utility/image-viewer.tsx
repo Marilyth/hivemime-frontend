@@ -61,36 +61,46 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   async function handleFile(file: File | null) {
     if (!file)
       return;
-    
+
     if (!file.type.startsWith("image/")) {
       toast.error("Selected file is not an image.");
       return;
     }
 
-    const compressedFullResFile = await imageCompression(file, {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 800,
-      initialQuality: 0.75,
-      fileType: "image/webp",
-      useWebWorker: true
-    });
+    async function compressor() {
+      // Recreate the file so we don't lose access.
+      const arrayBuffer = await file!.arrayBuffer();
+      file =  new File([arrayBuffer!], file!.name, { type: file!.type, lastModified: file!.lastModified });
 
-    const compressedThumbFile = await imageCompression(file, {
-      maxSizeMB: 0.1,
-      maxWidthOrHeight: 64,
-      initialQuality: 0.75,
-      fileType: "image/webp",
-      useWebWorker: true
-    });
+      const compressedFullResFile = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        initialQuality: 0.75,
+        fileType: "image/webp",
+        useWebWorker: true
+      });
 
-    setFullResFile(compressedFullResFile);
-    setThumbFile(compressedThumbFile);
+      const compressedThumbFile = await imageCompression(file, {
+        maxSizeMB: 0.1,
+        maxWidthOrHeight: 64,
+        initialQuality: 0.75,
+        fileType: "image/webp",
+        useWebWorker: true
+      });
+
+      setFullResFile(compressedFullResFile);
+      setThumbFile(compressedThumbFile);
+    }
+
+    toast.promise(compressor(), {
+      loading: "Compressing image...",
+      error: "Failed to compress image."
+    });
   }
 
   function handleRemove() {
     setFullResFile(null);
     setThumbFile(null);
-    fileInputRef.current!.value = "";
   }
 
   function saveChanges() {
