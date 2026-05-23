@@ -91,14 +91,55 @@ export const HiveMimeCreatePost = observer(() => {
     if (!canSubmitPost())
       return;
 
+    // Create post draft.
     const task = api.api.postCreateCreate(post);
     toast.promise(task, {
-      loading: 'Submitting post...',
-      success: 'Post submitted successfully!'
+      loading: 'Submitting post...'
     });
 
     const response = await task;
-    router.push(`/posts/view?postId=${response.data.dto?.id}`);
+
+    // Upload media files.
+    for (let i = 0; i < post.polls!.length; i++) {
+      const uploadPoll = response.data.polls![i];
+      const poll = post.polls![i];
+
+      for (let j = 0; j < poll.candidates!.length; j++) {
+        const uploadCandidate = response.data.polls![i].candidates![j];
+        const candidate = poll.candidates![j];
+
+        if (!candidate.media)
+          continue;
+
+        const uploadUrl = uploadCandidate.mediaUploadUrls!;
+        const mainUploadTask = fetch(uploadUrl[0], {
+          method: "PUT",
+          body: mediaFiles.get(getReferenceId(candidate))
+        });
+        const thumbUploadTask = fetch(uploadUrl[1], {
+          method: "PUT",
+          body: mediaFiles.get(getReferenceId(candidate) + "-thumb")
+        });
+
+        const uploadTasks = Promise.all([mainUploadTask, thumbUploadTask]);
+        toast.promise(uploadTasks, {
+          loading: `Uploading media for candidate "${candidate.name}"...`
+        });
+
+        await uploadTasks;
+      }
+    }
+
+    // Publish post.
+    const publishTask = api.api.postPublishPartialUpdate({ postId: response.data.id });
+    toast.promise(publishTask, {
+      loading: 'Publishing post...',
+      success: 'Post published successfully!',
+    });
+
+    await publishTask;
+
+    router.push(`/posts/view?postId=${response.data.id}`);
   }
 
   return (

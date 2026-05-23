@@ -83,11 +83,18 @@ export const HiveMimeCreateCandidate = observer(({ candidates, candidate }: Hive
     if (!file || !thumbnail) {
       mediaFiles.delete(getReferenceId(candidate));
       mediaFiles.delete(getReferenceId(candidate) + "-thumb");
+      candidate.media = undefined;
+
       return;
     }
 
     mediaFiles.set(getReferenceId(candidate), file);
     mediaFiles.set(getReferenceId(candidate) + "-thumb", thumbnail);
+    candidate.media = {
+      contentLength: file.size,
+      thumbnailContentLength: thumbnail.size,
+      contentType: file.type
+    };
   }
 
   return (
