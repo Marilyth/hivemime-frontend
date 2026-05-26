@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ValueOperator } from "./query-builder";
+import { MemberRole } from "./Api";
 
 const ids = new WeakMap();
 
@@ -42,4 +43,30 @@ export function levelToHoney(level: number): number {
 
 export function honeyToLevel(honey: number): number {
   return Math.sqrt(honey / 20);
+}
+
+export function getRoleRank(role: MemberRole) {
+  switch (role) {
+    case MemberRole.Creator:
+      return 4;
+    case MemberRole.Admin:
+      return 3;
+    case MemberRole.Moderator:
+      return 2;
+    case MemberRole.Follower:
+      return 1;
+  }
+}
+
+export function getRoleColor(role: MemberRole) {
+  switch (role) {
+    case MemberRole.Creator:
+      return "text-blue-500";
+    case MemberRole.Admin:
+      return "text-orange-500";
+    case MemberRole.Moderator:
+      return "text-green-500";
+    case MemberRole.Follower:
+      return "text-muted-foreground";
+  }
 }

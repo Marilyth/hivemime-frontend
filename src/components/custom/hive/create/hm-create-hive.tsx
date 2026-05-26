@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateHiveDto } from "@/lib/Api";
-import { useContext, useRef } from "react";
-import { api, FollowedHivesContext } from "@/lib/contexts";
+import { useRef } from "react";
+import { api, followedHivesStore } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { toast } from "sonner";
 import { observable } from "mobx";
@@ -11,10 +11,10 @@ import { useRouter } from "next/navigation";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { AsyncButton } from "../../utility/async-button";
+import { Textarea } from "@/components/ui/textarea";
 
 
 export const HiveMimeHiveCreate = observer(() => {
-  const followedHivesContext = useContext(FollowedHivesContext)!;
   const hiveRef = useRef<CreateHiveDto>(observable({ name: "", description: "" }));
   const router = useRouter();
 
@@ -38,8 +38,8 @@ export const HiveMimeHiveCreate = observer(() => {
     toast.promise(task, {
       loading: 'Creating hive...',
       success: (response) => {
-        followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, response.data]);
-        router.push(`/posts?hiveId=${response.data.id}`);
+        followedHivesStore.setFollowedHives([...followedHivesStore.followedHives, response.data]);
+        router.push(`/hives/settings?hiveId=${response.data.id}`);
 
         return 'Hive created successfully!';
       }
@@ -62,7 +62,7 @@ export const HiveMimeHiveCreate = observer(() => {
         </Field>
         <Field>
           <FieldLabel>Description</FieldLabel>
-          <Input placeholder="A community to discuss world politics." value={hiveRef.current.description!} onChange={(e) => hiveRef.current.description = e.target.value} />
+          <Textarea placeholder="A community to discuss world politics." value={hiveRef.current.description!} onChange={(e) => hiveRef.current.description = e.target.value} />
         </Field>
       </CardContent>
       <CardFooter>

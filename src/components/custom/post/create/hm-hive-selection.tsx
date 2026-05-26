@@ -120,7 +120,7 @@ function HiveSelectionItem({ hive }: { hive: HiveDto }) {
     <div className="flex flex-col">
       <span>{hive.name}</span>
       <div className="text-muted-foreground text-sm flex gap-2 items-center">
-        <User className="w-4" /> {hive.followerCount}
+        <User className="w-4" /> {hive.userCount}
         <FileChartColumn className="w-4" /> {hive.postCount}
       </div>
     </div>

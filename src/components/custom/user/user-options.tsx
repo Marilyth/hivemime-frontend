@@ -14,24 +14,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "../../ui/button"
-import { api, FollowedHivesContext, userStore } from "@/lib/contexts"
-import { useContext, useEffect, useRef, useState } from "react"
+import { api, followedHivesStore, userStore } from "@/lib/contexts"
+import { useEffect, useRef, useState } from "react"
 import { getCurrentUser, logInAnonymously, logOut } from "@/lib/firebase"
 import { User } from "firebase/auth"
 import { LoginForm } from "./login-dialog"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { SelectSeparator } from "@/components/ui/select"
 import { toast } from "sonner"
-import HexWrapper from "../utility/hm-hex-wrapper"
 import { useRouter } from "next/navigation"
 import { observer } from "mobx-react-lite"
 import { reaction } from "mobx"
 import { UserAvatar } from "./user-avatar"
 
 export const UserOptions = observer(() => {
-  const hivesContext = useContext(FollowedHivesContext);
   const router = useRouter();
-  const currentFirebaseUser = useRef<User | null>(null);
+  const [currentFirebaseUser, setCurrentFirebaseUser] = useState<User | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   async function autoLogIn(){
@@ -40,8 +38,8 @@ export const UserOptions = observer(() => {
 
     api.setSecurityData(token);
 
-    const previousUser = currentFirebaseUser.current;
-    currentFirebaseUser.current = user;
+    const previousUser = currentFirebaseUser;
+    setCurrentFirebaseUser(user);
 
     const userDetailsResponse = await api.api.userLoginList();
 
@@ -50,10 +48,10 @@ export const UserOptions = observer(() => {
       await api.api.userMergeList({previousJwt: await previousUser.getIdToken()});
     }
 
-    const followedHivesResponse = await api.api.hiveFollowedList();
+    const followedHivesResponse = await api.api.hiveJoinedList();
 
     userStore!.setUser(userDetailsResponse.data);
-    hivesContext!.setFollowedHives(followedHivesResponse.data);
+    followedHivesStore!.setFollowedHives(followedHivesResponse.data);
 
     return userDetailsResponse.data;
   }
@@ -91,7 +89,8 @@ export const UserOptions = observer(() => {
           <LoginForm />
         </DialogContent>
       </Dialog>
-      {currentFirebaseUser.current == null || currentFirebaseUser.current?.isAnonymous ?
+      
+      {currentFirebaseUser == null || currentFirebaseUser?.isAnonymous ?
         <Button
           variant="link"
           onClick={() => setIsLoginDialogOpen(true)}

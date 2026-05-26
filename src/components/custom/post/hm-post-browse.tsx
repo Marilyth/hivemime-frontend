@@ -14,6 +14,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { api } from "@/lib/contexts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { HiveMimeHiveListItem } from "../hive/list/hm-hive";
 
 
 interface HiveMimePostBrowseProps {
@@ -51,7 +52,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
 
   return (
     <div className="flex flex-col gap-2 mb-4">
-      {hiveInformation.data?.name && <h2 className="text-2xl font-bold">{hiveInformation.data.name}</h2>}
+      {hiveInformation.data && <HiveMimeHiveListItem hive={hiveInformation.data} className="mb-8" />}
       
       <div>
         <HexWrapper>

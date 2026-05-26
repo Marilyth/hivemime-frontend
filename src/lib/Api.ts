@@ -10,6 +10,19 @@
  * ---------------------------------------------------------------
  */
 
+export enum UserOrderBy {
+  New = "New",
+  Old = "Old",
+  Honey = "Honey",
+  Name = "Name",
+}
+
+export enum PostPolicy {
+  Anyone = "Anyone",
+  FollowersOnly = "FollowersOnly",
+  ModeratorsOnly = "ModeratorsOnly",
+}
+
 export enum PostOrderBy {
   New = "New",
   Old = "Old",
@@ -23,16 +36,34 @@ export enum PollType {
   Category = "Category",
 }
 
+export enum MemberRole {
+  Follower = "Follower",
+  Moderator = "Moderator",
+  Admin = "Admin",
+  Creator = "Creator",
+}
+
+export enum HiveUserOrderBy {
+  New = "New",
+  Old = "Old",
+}
+
 export enum HiveOrderBy {
   New = "New",
   Old = "Old",
-  Followers = "Followers",
+  Users = "Users",
 }
 
 export enum CommentOrderBy {
   New = "New",
   Old = "Old",
   Best = "Best",
+}
+
+export enum ApprovalStatus {
+  Pending = "Pending",
+  Approved = "Approved",
+  Rejected = "Rejected",
 }
 
 export interface BooleanHoneyDeltaDto {
@@ -177,12 +208,21 @@ export interface HiveDto {
   /** @format int32 */
   postCount?: number;
   /** @format int32 */
-  followerCount?: number;
+  userCount?: number;
+  settings?: HiveOptionsDto;
 }
 
 export interface HiveDtoPaginationResultDto {
   items?: HiveDto[] | null;
   nextCursor?: PaginationCursorDto;
+}
+
+export interface HiveOptionsDto {
+  mustBeApprovedToPost?: boolean;
+  mustBeApprovedToJoin?: boolean;
+  /** @format double */
+  minHoneyToPost?: number;
+  postPolicy?: PostPolicy;
 }
 
 export interface HivePaginationDto {
@@ -191,6 +231,30 @@ export interface HivePaginationDto {
   cursor?: PaginationCursorDto;
   filter?: string | null;
   orderBy?: HiveOrderBy;
+}
+
+export interface HiveUserDto {
+  /** @format int32 */
+  id?: number;
+  hive?: HiveDto;
+  user?: UserDto;
+  approvalStatus?: ApprovalStatus;
+  role?: MemberRole;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface HiveUserDtoPaginationResultDto {
+  items?: HiveUserDto[] | null;
+  nextCursor?: PaginationCursorDto;
+}
+
+export interface HiveUserPaginationDto {
+  /** @format int32 */
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
+  filter?: string | null;
+  orderBy?: HiveUserOrderBy;
 }
 
 export interface PaginationCursorDto {
@@ -239,7 +303,26 @@ export interface PollDto {
 }
 
 export interface PollResultDto {
+  /** @format int32 */
+  id?: number;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  isShuffled?: boolean;
+  isOptional?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
   candidates?: PollCandidateResultDto[] | null;
+  categories?: CategoryDto[] | null;
 }
 
 export interface PollVoteDto {
@@ -260,6 +343,8 @@ export interface PostDto {
   createdAt?: string;
   /** @format double */
   hotness?: number;
+  isApproved?: boolean;
+  isDraft?: boolean;
 }
 
 export interface PostDtoHoneyDeltaDto {
@@ -333,6 +418,23 @@ export interface UserDto {
   /** @format int32 */
   id?: number;
   username?: string | null;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format double */
+  honey?: number;
+}
+
+export interface UserDtoPaginationResultDto {
+  items?: UserDto[] | null;
+  nextCursor?: PaginationCursorDto;
+}
+
+export interface UserPaginationDto {
+  /** @format int32 */
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
+  filter?: string | null;
+  orderBy?: UserOrderBy;
 }
 
 export interface UserProfileDto {
@@ -669,14 +771,17 @@ export class Api<
      * No description
      *
      * @tags Comment
-     * @name CommentEditUpdate
-     * @request PUT:/api/Comment/edit
+     * @name CommentEditPartialUpdate
+     * @request PATCH:/api/Comment/edit
      * @secure
      */
-    commentEditUpdate: (data: EditCommentDto, params: RequestParams = {}) =>
+    commentEditPartialUpdate: (
+      data: EditCommentDto,
+      params: RequestParams = {},
+    ) =>
       this.request<CommentDto, any>({
         path: `/api/Comment/edit`,
-        method: "PUT",
+        method: "PATCH",
         body: data,
         secure: true,
         type: ContentType.Json,
@@ -766,19 +871,19 @@ export class Api<
      * No description
      *
      * @tags Hive
-     * @name HiveFollowedList
-     * @request GET:/api/Hive/followed
+     * @name HiveJoinedList
+     * @request GET:/api/Hive/joined
      * @secure
      */
-    hiveFollowedList: (
+    hiveJoinedList: (
       query?: {
         /** @format int32 */
         userId?: number;
       },
       params: RequestParams = {},
     ) =>
-      this.request<HiveDto[], any>({
-        path: `/api/Hive/followed`,
+      this.request<HiveUserDto[], any>({
+        path: `/api/Hive/joined`,
         method: "GET",
         query: query,
         secure: true,
@@ -801,9 +906,63 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<void, any>({
+      this.request<HiveUserDto, any>({
         path: `/api/Hive/join`,
         method: "POST",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveUsersCreate
+     * @request POST:/api/Hive/users
+     * @secure
+     */
+    hiveUsersCreate: (
+      data: HiveUserPaginationDto,
+      query?: {
+        /** @format int32 */
+        hiveId?: number;
+        status?: ApprovalStatus;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<HiveUserDtoPaginationResultDto, any>({
+        path: `/api/Hive/users`,
+        method: "POST",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveModifyUserPartialUpdate
+     * @request PATCH:/api/Hive/modifyUser
+     * @secure
+     */
+    hiveModifyUserPartialUpdate: (
+      query?: {
+        /** @format int32 */
+        followRequestId?: number;
+        approvalStatus?: ApprovalStatus;
+        role?: MemberRole;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Hive/modifyUser`,
+        method: "PATCH",
         query: query,
         secure: true,
         ...params,
@@ -813,20 +972,20 @@ export class Api<
      * No description
      *
      * @tags Hive
-     * @name HiveLeaveCreate
-     * @request POST:/api/Hive/leave
+     * @name HiveLeaveDelete
+     * @request DELETE:/api/Hive/leave
      * @secure
      */
-    hiveLeaveCreate: (
+    hiveLeaveDelete: (
       query?: {
         /** @format int32 */
-        hiveId?: number;
+        followId?: number;
       },
       params: RequestParams = {},
     ) =>
       this.request<void, any>({
         path: `/api/Hive/leave`,
-        method: "POST",
+        method: "DELETE",
         query: query,
         secure: true,
         ...params,
@@ -873,6 +1032,25 @@ export class Api<
     /**
      * No description
      *
+     * @tags Hive
+     * @name HiveUpdatePartialUpdate
+     * @request PATCH:/api/Hive/update
+     * @secure
+     */
+    hiveUpdatePartialUpdate: (data: HiveDto, params: RequestParams = {}) =>
+      this.request<HiveDto, any>({
+        path: `/api/Hive/update`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Post
      * @name PostGetList
      * @request GET:/api/Post/get
@@ -890,6 +1068,33 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostBrowseOutstandingCreate
+     * @request POST:/api/Post/browseOutstanding
+     * @secure
+     */
+    postBrowseOutstandingCreate: (
+      data: PostPaginationDto,
+      query?: {
+        /** @format int32 */
+        hiveId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<PostDtoPaginationResultDto, any>({
+        path: `/api/Post/browseOutstanding`,
+        method: "POST",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -970,6 +1175,29 @@ export class Api<
      * No description
      *
      * @tags Post
+     * @name PostDeleteDelete
+     * @request DELETE:/api/Post/delete
+     * @secure
+     */
+    postDeleteDelete: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Post/delete`,
+        method: "DELETE",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
      * @name PostResultsList
      * @request GET:/api/Post/results
      * @secure
@@ -1020,14 +1248,14 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostVoteUpdate
-     * @request PUT:/api/Post/vote
+     * @name PostVoteCreate
+     * @request POST:/api/Post/vote
      * @secure
      */
-    postVoteUpdate: (data: PostVoteDto, params: RequestParams = {}) =>
+    postVoteCreate: (data: PostVoteDto, params: RequestParams = {}) =>
       this.request<BooleanHoneyDeltaDto, any>({
         path: `/api/Post/vote`,
-        method: "PUT",
+        method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
@@ -1070,6 +1298,25 @@ export class Api<
         path: `/api/User/me`,
         method: "GET",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserBrowseCreate
+     * @request POST:/api/User/browse
+     * @secure
+     */
+    userBrowseCreate: (data: UserPaginationDto, params: RequestParams = {}) =>
+      this.request<UserDtoPaginationResultDto, any>({
+        path: `/api/User/browse`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

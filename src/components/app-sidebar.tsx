@@ -16,13 +16,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { FollowedHivesContext } from "@/lib/contexts"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { ThemePicker } from "./custom/utility/hm-theme-picker"
+import { followedHivesStore } from "@/lib/contexts"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const followedHives = React.useContext(FollowedHivesContext);
   const theme = useTheme();
 
   function toggleTheme() {
@@ -71,12 +70,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {followedHives!.followedHives.map((hive) => (
+            {followedHivesStore.followedHives.map((hive) => (
               <SidebarMenuItem key={hive.id}>
                 <SidebarMenuButton asChild>
                   <Link href={`/posts?hiveId=${hive.id}`} className="flex items-center gap-2">
                     <Users />
-                    {hive.name}
+                    {hive.hive?.name}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
