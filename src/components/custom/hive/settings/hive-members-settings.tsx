@@ -3,7 +3,7 @@ import { useObservableDraft } from "../../utility/observable-draft";
 
 import { toast } from "sonner";
 import { AsyncButton } from "../../utility/async-button";
-import { api, followedHivesStore } from "@/lib/contexts";
+import { api } from "@/lib/contexts";
 import { ApprovalStatus, HiveDto, HiveUserDto, HiveUserOrderBy, MemberRole, PaginationCursorDto } from "@/lib/Api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -11,14 +11,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpDown, Check, Gavel, Hammer, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
+import { ArrowUpDown, UserRoundPlus, UserRoundX, X } from "lucide-react";
 import { useDebounce } from "../../utility/debounce";
 import { observable } from "mobx";
 import { getRoleColor, getRoleRank } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import Link from "next/link";
+import { UserAvatar } from "../../user/user-avatar";
 
 export interface HiveMembersSettingsProps {
   hiveDto: HiveDto;
@@ -91,7 +90,7 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
           <div className="my-4 text-center">There are no more members!</div>
         }
       >
-      <div className="flex justify-center flex-row flex-wrap gap-4">
+      <div className="flex flex-col">
         {members.map((member, index) => (
           <HiveMember key={index} user={observable(member!)} currentUser={currentUser} />
         ))}
@@ -150,67 +149,69 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
   }
 
   return (
-    <HiveMimeHoverCard className="flex flex-col gap-1 border rounded-lg w-full pt-2">
-      <div className="flex flex-row gap-4 items-start w-full">
+    <div className="flex flex-row gap-2 items-center w-full border-t p-2">
+      <UserAvatar user={user.user!} size={48} />
+
+      <div className="flex flex-col mr-auto">
         <Link href={`/user?id=${user.user?.id}`} className="text-sm text-honey-brown flex-1">
           {user.user?.username}
         </Link>
-
-        {user.approvalStatus == ApprovalStatus.Approved && (
-          <>
-            {canBan() && (
-              <Tooltip>
-                <TooltipTrigger className="text-sm text-destructive">
-                  <Button variant="ghost" className="text-red-500" onClick={banMemberApprovalStatus}>
-                    <Gavel />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Reject member
-                </TooltipContent>
-              </Tooltip>
-            )}
-            <Select onValueChange={(value) => setMemberRole(value as MemberRole)} defaultValue={user.role}>
-              <SelectTrigger size="sm">
-                <span className={`text-sm ${getRoleColor(user.role!)}`}>
-                  {user.role}
-                </span>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>Follower</SelectItem>
-                <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>Moderator</SelectItem>
-                <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>Admin</SelectItem>
-                <SelectItem className={getRoleColor(MemberRole.Creator)} disabled={!canSetToRole(MemberRole.Creator)} value={MemberRole.Creator}>Creator</SelectItem>
-              </SelectContent>
-            </Select>
-          </>
-        )}
-        {user.approvalStatus != ApprovalStatus.Approved && (
-          <Tooltip>
-            <TooltipTrigger className="text-sm text-green-500">
-              <Button variant="ghost" className="text-green-500" onClick={() => setMemberApprovalStatus(ApprovalStatus.Approved)}>
-                <Check />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              Approve member
-            </TooltipContent>
-          </Tooltip>
-        )}
-        {user.approvalStatus == ApprovalStatus.Pending && (
-          <Tooltip>
-            <TooltipTrigger className="text-sm text-destructive">
-              <Button variant="ghost" className="text-red-500" onClick={banMemberApprovalStatus}>
-                <X />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              Reject member
-            </TooltipContent>
-          </Tooltip>
-        )}
+        <span className="text-sm text-muted-foreground">Joined on {new Date(user.createdAt!).toLocaleDateString()}</span>
       </div>
-      <span className="text-sm text-muted-foreground">Joined on {new Date(user.createdAt!).toLocaleDateString()}</span>
-    </HiveMimeHoverCard>
+
+      {user.approvalStatus == ApprovalStatus.Approved && (
+        <>
+          {canBan() && (
+            <Tooltip>
+              <TooltipTrigger className="text-sm">
+                <AsyncButton variant="ghost" onClick={banMemberApprovalStatus}>
+                  <UserRoundX />
+                </AsyncButton>
+              </TooltipTrigger>
+              <TooltipContent>
+                Reject member
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <Select onValueChange={(value) => setMemberRole(value as MemberRole)} defaultValue={user.role}>
+            <SelectTrigger size="sm">
+              <span className={`text-sm ${getRoleColor(user.role!)}`}>
+                {user.role}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>Follower</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>Moderator</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>Admin</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Creator)} disabled={!canSetToRole(MemberRole.Creator)} value={MemberRole.Creator}>Creator</SelectItem>
+            </SelectContent>
+          </Select>
+        </>
+      )}
+      {user.approvalStatus != ApprovalStatus.Approved && (
+        <Tooltip>
+          <TooltipTrigger className="text-sm">
+            <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Approved)}>
+              <UserRoundPlus />
+            </AsyncButton>
+          </TooltipTrigger>
+          <TooltipContent>
+            Approve member
+          </TooltipContent>
+        </Tooltip>
+      )}
+      {user.approvalStatus == ApprovalStatus.Pending && (
+        <Tooltip>
+          <TooltipTrigger className="text-sm">
+            <AsyncButton variant="ghost" onClick={banMemberApprovalStatus}>
+              <UserRoundX />
+            </AsyncButton>
+          </TooltipTrigger>
+          <TooltipContent>
+            Reject member
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </div>
   );
 });

@@ -1,9 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreateHiveDto } from "@/lib/Api";
+import { ApprovalStatus, CreateHiveDto, MemberRole } from "@/lib/Api";
 import { useRef } from "react";
-import { api, followedHivesStore } from "@/lib/contexts";
+import { api, followedHivesStore, userStore } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { toast } from "sonner";
 import { observable } from "mobx";
@@ -38,7 +38,7 @@ export const HiveMimeHiveCreate = observer(() => {
     toast.promise(task, {
       loading: 'Creating hive...',
       success: (response) => {
-        followedHivesStore.setFollowedHives([...followedHivesStore.followedHives, response.data]);
+        followedHivesStore.setFollowedHives([...followedHivesStore.followedHives, { hive: response.data, role: MemberRole.Creator, approvalStatus: ApprovalStatus.Approved, user: userStore.user! }]);
         router.push(`/hives/settings?hiveId=${response.data.id}`);
 
         return 'Hive created successfully!';

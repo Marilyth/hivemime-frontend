@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import HexWrapper from "../utility/hm-hex-wrapper";
 import { User2 } from "lucide-react";
-import { UserDetailsDto, UserProfileDto } from "@/lib/Api";
+import { UserDetailsDto, UserDto, UserProfileDto } from "@/lib/Api";
 
 interface UserAvatarProps {
-    user: UserDetailsDto | UserProfileDto;
+    user: UserDetailsDto | UserProfileDto | UserDto;
     size: number;
     borderColor?: string;
 }

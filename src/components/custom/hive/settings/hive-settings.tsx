@@ -11,12 +11,15 @@ import { observable } from "mobx";
 import { HiveMembersSettings } from "./hive-members-settings";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { MemberRole } from "@/lib/Api";
+import { getRoleRank } from "@/lib/utils";
 
 export function HiveSettings() {
   const [hiveId] = useQueryParam("hiveId");
   const [tab, setTab] = useQueryParam("tab", "general");
   const router = useRouter();
   const currentHiveUser = followedHivesStore.followedHives.find(h => h.hive?.id === Number(hiveId));
+  const canViewSettings = currentHiveUser != null && (getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));
 
   const hiveData = useQuery({
     queryKey: ["hive", hiveId],
@@ -27,7 +30,7 @@ export function HiveSettings() {
   });
 
   return (
-    <Card>
+    canViewSettings ? <Card>
       <CardHeader className="flex flex-row">
         <CardTitle className="flex flex-row items-center gap-2">
           <Settings className="text-muted-foreground" /> Hive Settings
@@ -63,5 +66,6 @@ export function HiveSettings() {
         
       </CardContent>
     </Card>
+    : <div className="text-center py-10">You do not have permission to view these settings.</div>
   );
 }
