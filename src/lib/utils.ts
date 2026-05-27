@@ -55,6 +55,8 @@ export function getRoleRank(role: MemberRole) {
       return 2;
     case MemberRole.Follower:
       return 1;
+    case MemberRole.Guest:
+      return 0;
   }
 }
 
@@ -68,5 +70,7 @@ export function getRoleColor(role: MemberRole) {
       return "text-green-500";
     case MemberRole.Follower:
       return "text-muted-foreground";
+    case MemberRole.Guest:
+      return "text-gray-500";
   }
 }

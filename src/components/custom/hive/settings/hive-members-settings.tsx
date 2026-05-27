@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpDown, UserRoundPlus, UserRoundX, X } from "lucide-react";
+import { ArrowUpDown, Gavel, UserRoundPlus, UserRoundX, X } from "lucide-react";
 import { useDebounce } from "../../utility/debounce";
 import { observable } from "mobx";
 import { getRoleColor, getRoleRank } from "@/lib/utils";
@@ -60,6 +60,7 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
             <SelectItem value={ApprovalStatus.Approved}>Approved</SelectItem>
             <SelectItem value={ApprovalStatus.Pending}>Pending</SelectItem>
             <SelectItem value={ApprovalStatus.Rejected}>Rejected</SelectItem>
+            <SelectItem value={ApprovalStatus.Banned}>Banned</SelectItem>
           </SelectContent>
         </Select>
         <Select onValueChange={(value) => setOrderBy(value as HiveUserOrderBy)} defaultValue={orderBy}>
@@ -113,20 +114,15 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
 
     toast.promise(task, {
       loading: `Updating member...`,
-      success: `Member updated.`,
-      error: () => {
-        resetChanges();
-      }
+      success: `Member updated.`
     });
 
-    await task;
-    applyChanges();
-  }
-
-  async function banMemberApprovalStatus() {
-    draft.approvalStatus = ApprovalStatus.Rejected;
-    draft.role = MemberRole.Follower;
-    await updateMember();
+    try{
+      await task;
+      applyChanges();
+    } catch (error) {
+      resetChanges();
+    }
   }
 
   async function setMemberApprovalStatus(status: ApprovalStatus) {
@@ -140,7 +136,8 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
   }
 
   function canSetToRole(role: MemberRole) {
-    return getRoleRank(currentUser.role!) > getRoleRank(user.role!) &&
+    return getRoleRank(user.role!) > 0 &&
+      getRoleRank(currentUser.role!) > getRoleRank(user.role!) &&
       getRoleRank(currentUser.role!) > getRoleRank(role);
   }
 
@@ -164,12 +161,12 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
           {canBan() && (
             <Tooltip>
               <TooltipTrigger className="text-sm">
-                <AsyncButton variant="ghost" onClick={banMemberApprovalStatus}>
-                  <UserRoundX />
+                <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Banned)}>
+                  <Gavel className="text-red-400" />
                 </AsyncButton>
               </TooltipTrigger>
               <TooltipContent>
-                Reject member
+                Ban member
               </TooltipContent>
             </Tooltip>
           )}
@@ -180,6 +177,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
               </span>
             </SelectTrigger>
             <SelectContent>
+              <SelectItem className={getRoleColor(MemberRole.Guest)} disabled value={MemberRole.Guest}>Guest</SelectItem>
               <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>Follower</SelectItem>
               <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>Moderator</SelectItem>
               <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>Admin</SelectItem>
@@ -203,7 +201,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
       {user.approvalStatus == ApprovalStatus.Pending && (
         <Tooltip>
           <TooltipTrigger className="text-sm">
-            <AsyncButton variant="ghost" onClick={banMemberApprovalStatus}>
+            <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Rejected)}>
               <UserRoundX />
             </AsyncButton>
           </TooltipTrigger>

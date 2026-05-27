@@ -17,12 +17,6 @@ export enum UserOrderBy {
   Name = "Name",
 }
 
-export enum PostPolicy {
-  Anyone = "Anyone",
-  FollowersOnly = "FollowersOnly",
-  ModeratorsOnly = "ModeratorsOnly",
-}
-
 export enum PostOrderBy {
   New = "New",
   Old = "Old",
@@ -37,6 +31,7 @@ export enum PollType {
 }
 
 export enum MemberRole {
+  Guest = "Guest",
   Follower = "Follower",
   Moderator = "Moderator",
   Admin = "Admin",
@@ -64,6 +59,7 @@ export enum ApprovalStatus {
   Pending = "Pending",
   Approved = "Approved",
   Rejected = "Rejected",
+  Banned = "Banned",
 }
 
 export interface BooleanHoneyDeltaDto {
@@ -222,7 +218,7 @@ export interface HiveOptionsDto {
   mustBeApprovedToJoin?: boolean;
   /** @format double */
   minHoneyToPost?: number;
-  postPolicy?: PostPolicy;
+  minRoleToPost?: MemberRole;
 }
 
 export interface HivePaginationDto {
@@ -963,6 +959,31 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/api/Hive/modifyUser`,
+        method: "PATCH",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Hive
+     * @name HiveBanUserPartialUpdate
+     * @request PATCH:/api/Hive/banUser
+     * @secure
+     */
+    hiveBanUserPartialUpdate: (
+      query?: {
+        /** @format int32 */
+        userId?: number;
+        /** @format int32 */
+        hiveId?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Hive/banUser`,
         method: "PATCH",
         query: query,
         secure: true,

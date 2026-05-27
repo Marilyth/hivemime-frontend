@@ -16,6 +16,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { getRoleRank } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface HiveMimeCommentProps {
   hiveId?: number;
@@ -159,46 +160,54 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                 </DropdownMenu>
               </div>
             }
-          
-            {!isCollapsed && <div className="flex flex-col gap-1">
-              {!isRoot &&
-                <>
-                  <HiveMimeExpandableText lines={3} className="[overflow-wrap:anywhere]">
-                    {comment.content} 
-                  </HiveMimeExpandableText>
-                  <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
-                      <Button variant="ghost" size="sm" onClick={() => setIsReplying(true)} className="p-1!">
-                          <Reply className="mr-1" />
-                          Reply
-                      </Button>
-                  </div>
-                </>
-              }
-              {(isReplying || isRoot) &&
-                (<HiveMimeCommentCreate
-                  postId={comment.postId!}
-                  parentCommentId={comment.id}
-                  onFinished={createFinished}
-                />)
-              }
-              
-              <InfiniteScroll
-                dataLength={replies.length}
-                next={() => repliesQuery.fetchNextPage()}
-                hasMore={isRoot && hasMoreReplies()}
-                loader={<p>Loading...</p>}
-              >
-                {replies.map(reply => (
-                    <HiveMimeComment key={reply.id} hiveId={hiveId} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} parentComment={comment} />
-                ))}
-              </InfiniteScroll>
 
-              {hasMoreReplies() && (
-                <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 pb-1 h-auto">
-                    Load replies...
-                </AsyncButton>
-              )}
-          </div>}
+            <AnimatePresence>
+              {!isCollapsed && <motion.div className="flex flex-col gap-1" 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                  {!isRoot &&
+                    <>
+                      <HiveMimeExpandableText lines={3} className="[overflow-wrap:anywhere]">
+                        {comment.content} 
+                      </HiveMimeExpandableText>
+                      <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
+                          <Button variant="ghost" size="sm" onClick={() => setIsReplying(true)} className="p-1!">
+                              <Reply className="mr-1" />
+                              Reply
+                          </Button>
+                      </div>
+                    </>
+                  }
+                  {(isReplying || isRoot) &&
+                    (<HiveMimeCommentCreate
+                      postId={comment.postId!}
+                      parentCommentId={comment.id}
+                      onFinished={createFinished}
+                      autoFocus={isReplying}
+                    />)
+                  }
+                  
+                  <InfiniteScroll
+                    dataLength={replies.length}
+                    next={() => repliesQuery.fetchNextPage()}
+                    hasMore={isRoot && hasMoreReplies()}
+                    loader={<p>Loading...</p>}
+                  >
+                    {replies.map(reply => (
+                        <HiveMimeComment key={reply.id} hiveId={hiveId} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} parentComment={comment} />
+                    ))}
+                  </InfiniteScroll>
+
+                  {hasMoreReplies() && (
+                    <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 pb-1 h-auto">
+                        Load replies...
+                    </AsyncButton>
+                  )}
+              </motion.div>}
+            </AnimatePresence>
           </div>
         </div>
       )}

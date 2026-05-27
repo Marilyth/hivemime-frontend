@@ -5,7 +5,7 @@ import { useObservableDraft } from "../../utility/observable-draft";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/lib/contexts";
-import { HiveDto, HiveUserDto, MemberRole, PostPolicy } from "@/lib/Api";
+import { HiveDto, HiveUserDto, MemberRole } from "@/lib/Api";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getRoleRank } from "@/lib/utils";
@@ -68,19 +68,21 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
         <FieldContent className="gap-1">
           <FieldLabel>Who can post</FieldLabel>
           <FieldDescription>
-            Users must be part of the following group to be able to post in this hive.
+            Users must at least be part of the following group to be able to post in this hive.
           </FieldDescription>
         </FieldContent>
 
-        <Select value={hive.settings?.postPolicy ?? ""} onValueChange={(value) => hive.settings!.postPolicy = value as PostPolicy} disabled={!canEdit()}>
+        <Select value={hive.settings?.minRoleToPost ?? ""} onValueChange={(value) => hive.settings!.minRoleToPost = value as MemberRole} disabled={!canEdit()}>
           <SelectTrigger className="max-w-64">
             <SelectValue placeholder="Select a group" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Anyone">Anyone</SelectItem>
-            <SelectItem value="FollowersOnly">Followers</SelectItem>
-            <SelectItem value="ModeratorsOnly">Moderators</SelectItem>
-          </SelectContent>
+            <SelectItem value={MemberRole.Guest}>Anyone</SelectItem>
+            <SelectItem value={MemberRole.Follower}>Followers</SelectItem>
+            <SelectItem value={MemberRole.Moderator}>Moderators</SelectItem>
+            <SelectItem value={MemberRole.Admin}>Admins</SelectItem>
+            <SelectItem value={MemberRole.Creator}>Creator</SelectItem>
+           </SelectContent>
         </Select>
       </Field>
 
