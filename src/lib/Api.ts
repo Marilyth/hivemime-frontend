@@ -343,7 +343,7 @@ export interface PostDto {
   createdAt?: string;
   /** @format double */
   hotness?: number;
-  isApproved?: boolean;
+  approvalStatus?: ApprovalStatus;
   isDraft?: boolean;
 }
 
@@ -829,6 +829,7 @@ export class Api<
         postId?: number;
         /** @format int32 */
         parentCommentId?: number;
+        onlyRoot?: boolean;
       },
       params: RequestParams = {},
     ) =>
@@ -1076,33 +1077,6 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostBrowseOutstandingCreate
-     * @request POST:/api/Post/browseOutstanding
-     * @secure
-     */
-    postBrowseOutstandingCreate: (
-      data: PostPaginationDto,
-      query?: {
-        /** @format int32 */
-        hiveId?: number;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<PostDtoPaginationResultDto, any>({
-        path: `/api/Post/browseOutstanding`,
-        method: "POST",
-        query: query,
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Post
      * @name PostBrowseCreate
      * @request POST:/api/Post/browse
      * @secure
@@ -1114,6 +1088,7 @@ export class Api<
         creatorId?: number;
         /** @format int32 */
         hiveId?: number;
+        approvalStatus?: ApprovalStatus;
       },
       params: RequestParams = {},
     ) =>
@@ -1189,6 +1164,30 @@ export class Api<
       this.request<void, any>({
         path: `/api/Post/delete`,
         method: "DELETE",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostModifyPostPartialUpdate
+     * @request PATCH:/api/Post/modifyPost
+     * @secure
+     */
+    postModifyPostPartialUpdate: (
+      query?: {
+        /** @format int32 */
+        postId?: number;
+        approvalStatus?: ApprovalStatus;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/Post/modifyPost`,
+        method: "PATCH",
         query: query,
         secure: true,
         ...params,

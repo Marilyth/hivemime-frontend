@@ -28,12 +28,12 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
   const [userNameFilter, setUserNameFilter] = useState<string>("");
   const [orderBy, setOrderBy] = useState<HiveUserOrderBy>(HiveUserOrderBy.New);
-  const [debouncedHiveSearchInput, isLoading] = useDebounce(userNameFilter, 300);
+  const [debouncedUserNameFilter, isLoading] = useDebounce(userNameFilter, 300);
 
   const membersQuery = useInfiniteQuery({
-    queryKey: ['hiveUsers', hiveDto.id, approvalStatus, debouncedHiveSearchInput, orderBy],
+    queryKey: ['hiveUsers', hiveDto.id, approvalStatus, debouncedUserNameFilter, orderBy],
     queryFn: async ({ pageParam }) => {
-      const task = api.api.hiveUsersCreate({pageSize: 50, cursor: pageParam, filter: debouncedHiveSearchInput, orderBy: orderBy}, { hiveId: hiveDto.id, status: approvalStatus });
+      const task = api.api.hiveUsersCreate({pageSize: 50, cursor: pageParam, filter: debouncedUserNameFilter, orderBy: orderBy}, { hiveId: hiveDto.id, status: approvalStatus });
       toast.promise(task, {
         loading: 'Loading members...',
         success: 'Members loaded.'
@@ -51,7 +51,7 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-4">
-        <Input placeholder="Filter by username" className="flex-1" value={userNameFilter} onChange={(e) => setUserNameFilter(e.target.value)} />
+        <Input placeholder="Filter by username..." className="flex-1" value={userNameFilter} onChange={(e) => setUserNameFilter(e.target.value)} />
         <Select onValueChange={(value) => setApprovalStatus(value as ApprovalStatus)} defaultValue={approvalStatus}>
           <SelectTrigger>
             <SelectValue placeholder="Filter by approval status" />

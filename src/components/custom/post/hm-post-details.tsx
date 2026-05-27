@@ -7,6 +7,7 @@ import { HiveMimePost } from "@/components/custom/post/hm-post";
 import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
 import { useQueryParam } from "../utility/use-query-param";
 import { api } from "@/lib/contexts";
+import { observable } from "mobx";
 
 export function HiveMimePostDetails() {
   const [postId, setPostId] = useQueryParam("postId");
@@ -23,7 +24,7 @@ export function HiveMimePostDetails() {
     const postId = getPostId();
     const response = await api.api.postGetList({postId: postId});
 
-    setPost(response.data);
+    setPost(observable(response.data));
   }
 
   useEffect(() => {

@@ -31,7 +31,6 @@ const geistMono = Geist_Mono({
 const queryClient = new QueryClient();
 
 const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
-  const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
   const [accentColour, setAccentColour] = useState<string | null>(null);
 
   useEffect(() => {

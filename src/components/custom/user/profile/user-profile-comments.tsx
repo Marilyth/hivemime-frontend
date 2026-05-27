@@ -51,7 +51,7 @@ export function UserProfileComments(props: UserProfileCommentsProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <HiveMimeComment comment={comment} isRoot={false} allowLoadParent={true} />
+              <HiveMimeComment comment={comment} isRoot={false} />
             </CardContent>
           </Card>
         ))}

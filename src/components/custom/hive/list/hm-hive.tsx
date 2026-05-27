@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { HiveMimeExpandableText } from "../../utility/hm-expandable-text";
 import { AsyncButton } from "../../utility/async-button";
-import { Badge } from "@/components/ui/badge";
 import { getRoleColor } from "@/lib/utils";
 
 export type HiveMimeHiveListItemProps = {
@@ -21,7 +20,7 @@ export type HiveMimeHiveListItemProps = {
 
 export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: HiveMimeHiveListItemProps) => {
   const router = useRouter();
-  const hiveFollow = followedHivesStore.followedHives.find(h => h.hive?.id === hive.id);
+  const hiveFollow = followedHivesStore.followedHives.get(hive.id!);
   const isModerator = hiveFollow != null && hiveFollow.role !== MemberRole.Follower;
 
   async function leaveHive() {
@@ -29,7 +28,7 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
     toast.promise(task, {
       loading: 'Leaving hive...',
       success: () =>{
-        followedHivesStore.setFollowedHives(followedHivesStore.followedHives.filter(h => h.id !== hiveFollow!.id));
+        followedHivesStore.removeFollowedHive(hive.id!);
         return "Hive left successfully!";
       }
     });
@@ -42,7 +41,7 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
     await toast.promise(task, {
       loading: 'Joining hive...',
       success: (r) => {
-        followedHivesStore.setFollowedHives([...followedHivesStore.followedHives, r.data]);
+        followedHivesStore.addFollowedHive(r.data);
 
         if (hive.settings?.mustBeApprovedToJoin)
           return "Join request sent! A moderator must approve it.";

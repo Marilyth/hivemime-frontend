@@ -18,7 +18,7 @@ export function HiveSettings() {
   const [hiveId] = useQueryParam("hiveId");
   const [tab, setTab] = useQueryParam("tab", "general");
   const router = useRouter();
-  const currentHiveUser = followedHivesStore.followedHives.find(h => h.hive?.id === Number(hiveId));
+  const currentHiveUser = followedHivesStore.followedHives.get(Number(hiveId));
   const canViewSettings = currentHiveUser != null && (getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));
 
   const hiveData = useQuery({

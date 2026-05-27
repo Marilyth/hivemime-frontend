@@ -16,14 +16,30 @@ class UserStore {
 }
 
 class FollowedHivesStore {
-  followedHives: HiveUserDto[] = [];
+  followedHives: Map<number, HiveUserDto> = new Map();
 
   constructor() {
     makeAutoObservable(this);
   }
 
   setFollowedHives(hives: HiveUserDto[]) {
-    this.followedHives = hives;
+    this.followedHives.clear();
+    
+    hives.forEach(hive => {
+      if (hive.hive?.id != null) {
+        this.followedHives.set(hive.hive.id, hive);
+      }
+    });
+  }
+
+  addFollowedHive(hive: HiveUserDto) {
+    if (hive.hive?.id != null) {
+      this.followedHives.set(hive.hive.id, hive);
+    }
+  }
+
+  removeFollowedHive(hiveId: number) {
+    this.followedHives.delete(hiveId);
   }
 }
 

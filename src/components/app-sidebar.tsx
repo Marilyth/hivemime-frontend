@@ -17,17 +17,11 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { useTheme } from "next-themes"
 import { ThemePicker } from "./custom/utility/hm-theme-picker"
 import { followedHivesStore } from "@/lib/contexts"
+import { observer } from "mobx-react-lite"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const theme = useTheme();
-
-  function toggleTheme() {
-    theme.setTheme(theme.theme === "dark" ? "light" : "dark");
-  }
-
+export const AppSidebar = observer(({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar
       {...props}
@@ -70,10 +64,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            {followedHivesStore.followedHives.map((hive) => (
-              <SidebarMenuItem key={hive.id}>
+            {followedHivesStore.followedHives.values().map((hive) => (
+              <SidebarMenuItem key={hive.hive?.id}>
                 <SidebarMenuButton asChild>
-                  <Link href={`/posts?hiveId=${hive.id}`} className="flex items-center gap-2">
+                  <Link href={`/posts?hiveId=${hive.hive?.id}`} className="flex items-center gap-2">
                     <Users />
                     {hive.hive?.name}
                   </Link>
@@ -88,4 +82,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
     </Sidebar>
   )
-}
+});
