@@ -1,8 +1,6 @@
 "use client"
 
 import { SidebarIcon, Plus } from "lucide-react"
-
-import { SearchForm } from "@/components/search-form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -42,12 +40,9 @@ export function SiteHeader() {
         </Button>
 
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <div className="flex justify-center flex-1">
-          <SearchForm className="max-w-128 w-full" />
-        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className={`${isMobile ? "p-1! h-auto rounded-xl" : ""}`}>
+            <Button variant="outline" className={`ml-auto ${isMobile ? "p-1! h-auto rounded-xl" : ""}`}>
               <Plus className="w-2 h-2" />{isMobile || "Create..."}
             </Button>
           </DropdownMenuTrigger>

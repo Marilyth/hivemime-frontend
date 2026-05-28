@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Api, HiveDto, UserDetailsDto } from "./Api";
+import { Api, HiveUserDto, UserDetailsDto } from "./Api";
 import { makeAutoObservable } from "mobx";
 import { toast } from "sonner";
 
@@ -15,10 +15,33 @@ class UserStore {
   }
 }
 
-type FollowedHivesContextType = {
-  followedHives: HiveDto[];
-  setFollowedHives: React.Dispatch<React.SetStateAction<HiveDto[]>>;
-};
+class FollowedHivesStore {
+  followedHives: Map<number, HiveUserDto> = new Map();
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  setFollowedHives(hives: HiveUserDto[]) {
+    this.followedHives.clear();
+    
+    hives.forEach(hive => {
+      if (hive.hive?.id != null) {
+        this.followedHives.set(hive.hive.id, hive);
+      }
+    });
+  }
+
+  addFollowedHive(hive: HiveUserDto) {
+    if (hive.hive?.id != null) {
+      this.followedHives.set(hive.hive.id, hive);
+    }
+  }
+
+  removeFollowedHive(hiveId: number) {
+    this.followedHives.delete(hiveId);
+  }
+}
 
 type AccentColourContextType = {
   accentColour: string | null;
@@ -26,7 +49,7 @@ type AccentColourContextType = {
 };
 
 export const api = new Api({
-  baseUrl: "https://home.mayiscoding.com/hivemime",
+  baseUrl: "http://localhost:5138",
   securityWorker: (token) =>
     token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
   customFetch: async (input, init) => {
@@ -49,6 +72,6 @@ export const api = new Api({
 });
 
 export const userStore = new UserStore();
+export const followedHivesStore = new FollowedHivesStore();
 
-export const FollowedHivesContext = createContext<FollowedHivesContextType | null>(null);
 export const AccentColourContext = createContext<AccentColourContextType | null>(null);

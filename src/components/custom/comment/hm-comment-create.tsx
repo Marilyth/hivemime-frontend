@@ -38,7 +38,7 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
     <div className={`flex flex-col ${className}`} {...props}
         onFocus={() => setIsFocused(true)}
         onBlur={(e) => setIsFocused(e.currentTarget.contains(e.relatedTarget as Node))} >
-        <Textarea placeholder="Write your comment here..." value={content} onChange={(e) => setContent(e.target.value)} className="mb-2" />
+        <Textarea autoFocus={props.autoFocus} placeholder="Write your comment here..." value={content} onChange={(e) => setContent(e.target.value)} className="mb-2" />
             {isFocused && <div className="flex flex-row gap-2 mb-4">
             <Button variant="outline" onClick={() => onFinished ? onFinished(null) : setContent("")}>
                 Cancel

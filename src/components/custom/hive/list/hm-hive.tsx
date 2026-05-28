@@ -1,10 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { User, FileChartColumn } from "lucide-react"
-import { Api, HiveDto } from "@/lib/Api";
-import { HTMLAttributes, useContext } from "react";
-import { api, FollowedHivesContext } from "@/lib/contexts";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { User, FileChartColumn, Settings } from "lucide-react"
+import { ApprovalStatus, HiveDto, MemberRole } from "@/lib/Api";
+import { HTMLAttributes } from "react";
+import { api, followedHivesStore } from "@/lib/contexts";
 import { observer } from "mobx-react-lite";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { useRouter } from "next/navigation";
@@ -12,21 +12,25 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { HiveMimeExpandableText } from "../../utility/hm-expandable-text";
 import { AsyncButton } from "../../utility/async-button";
+import { getRoleColor } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export type HiveMimeHiveListItemProps = {
   hive: HiveDto;
 } & HTMLAttributes<HTMLDivElement>;
 
-export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveListItemProps) => {
-  const followedHivesContext = useContext(FollowedHivesContext)!;
+export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: HiveMimeHiveListItemProps) => {
   const router = useRouter();
+  const hiveFollow = followedHivesStore.followedHives.get(hive.id!);
+  const isModerator = hiveFollow != null && hiveFollow.role !== MemberRole.Follower;
+  const canJoin = hiveFollow == null || hiveFollow.role === MemberRole.Guest;
 
   async function leaveHive() {
-    const task = api.api.hiveLeaveCreate({ hiveId: hive.id });
+    const task = api.api.hiveLeaveDelete({ followId: hiveFollow!.id });
     toast.promise(task, {
       loading: 'Leaving hive...',
       success: () =>{
-        followedHivesContext.setFollowedHives(followedHivesContext.followedHives.filter(h => h.id !== hive.id));
+        followedHivesStore.removeFollowedHive(hive.id!);
         return "Hive left successfully!";
       }
     });
@@ -36,11 +40,15 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
 
   async function joinHive() {
     const task = api.api.hiveJoinCreate({ hiveId: hive.id });
-    toast.promise(task, {
+    await toast.promise(task, {
       loading: 'Joining hive...',
-      success: () =>{
-        followedHivesContext.setFollowedHives([...followedHivesContext.followedHives, hive]);
-        return "Hive joined successfully!";
+      success: (r) => {
+        followedHivesStore.addFollowedHive(r.data);
+
+        if (hive.settings?.joinRequiresApproval)
+          return "Join request sent! A moderator must approve it.";
+        else
+          return "Hive joined successfully!";
       }
     });
 
@@ -52,43 +60,64 @@ export const HiveMimeHiveListItem = observer(({ hive, ...props }: HiveMimeHiveLi
   }
 
   return (
-    <div {...props}>
-      <Card className="text-sm min-h-56">
-        <CardContent className="flex flex-col gap-3">
-          <div className="flex items-start gap-3">
+    <Card className={`pt-0 text-sm ${className}`} {...props}>
+      <CardHeader className="p-6 flex flex-col border-b bg-muted/50 rounded-t-md">
+        <div className="flex flex-col gap-3 w-full">
+          <div className="flex gap-3 w-full">
             <Button
               variant="link"
-              className="h-auto flex-1 whitespace-normal text-honey-brown break-words p-0 text-left text-lg font-bold line-clamp-2"
+              className="flex-1 h-auto whitespace-normal text-honey-brown break-words p-0 text-left text-lg font-bold line-clamp-2"
               onClick={browseHive}
             >
               {hive.name}
             </Button>
+            
+            {isModerator && <Button
+              className="ml-auto"
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/hives/settings?hiveId=${hive.id}`)}
+            >
+              <Settings/>
+            </Button>}
 
             <AsyncButton
               variant="outline"
               size="sm"
-              className="w-20 flex-shrink-0"
-              onClick={followedHivesContext.followedHives.some(h => h.id === hive.id) ? leaveHive : joinHive}
+              onClick={canJoin ? joinHive : leaveHive}
             >
-              {followedHivesContext.followedHives.some(h => h.id === hive.id) ? "Leave" : "Join"}
+              {canJoin ? (hive.settings?.joinRequiresApproval ? "Request to join" : "Join") : "Leave"}
             </AsyncButton>
           </div>
-
-          <HiveMimeExpandableText className="text-muted-foreground" lines={3}>
-            {hive.description}
-          </HiveMimeExpandableText>
-        </CardContent>
-        <CardFooter className="gap-4 text-muted-foreground mt-auto">
-          <Label>
-            <User className="mr-1 inline-block h-4 w-4" />
-            {hive.followerCount} followers
-          </Label>
-          <Label>
-            <FileChartColumn className="mr-1 inline-block h-4 w-4" />
-            {hive.postCount} posts
-          </Label>
-        </CardFooter>
-      </Card>
-    </div>
+          {hiveFollow != null && (
+            <div className="flex flex-row gap-2">
+              {hiveFollow.approvalStatus != ApprovalStatus.Approved && <Badge variant="outline">
+                {hiveFollow?.approvalStatus}
+              </Badge>}
+              <Badge variant="outline" className={`${getRoleColor(hiveFollow.role!)}`}>
+                {hiveFollow?.role}
+              </Badge>
+            </div>
+          )}
+        </div>
+        
+      </CardHeader>
+        
+      <CardContent className="flex flex-col gap-3">
+        <HiveMimeExpandableText className="text-muted-foreground" lines={3}>
+          {hive.description}
+        </HiveMimeExpandableText>
+      </CardContent>
+      <CardFooter className="gap-4 text-muted-foreground mt-auto">
+        <Label>
+          <User className="mr-1 inline-block h-4 w-4" />
+          {hive.userCount} members
+        </Label>
+        <Label>
+          <FileChartColumn className="mr-1 inline-block h-4 w-4" />
+          {hive.postCount} posts
+        </Label>
+      </CardFooter>
+    </Card>
   );
 });

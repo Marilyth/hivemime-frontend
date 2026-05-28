@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Suspense, useEffect, useState } from "react";
 import { HiveDto } from "@/lib/Api";
-import { AccentColourContext, FollowedHivesContext, userStore } from "@/lib/contexts";
+import { AccentColourContext, userStore } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -31,7 +31,6 @@ const geistMono = Geist_Mono({
 const queryClient = new QueryClient();
 
 const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
-  const [followedHives, setFollowedHives] = useState<HiveDto[]>([]);
   const [accentColour, setAccentColour] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,7 +55,6 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryClientProvider client={queryClient}>
-          <FollowedHivesContext.Provider value={{ followedHives, setFollowedHives }}>
             <AccentColourContext.Provider value={{ accentColour, setAccentColour }}>
               <SidebarProvider>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
@@ -91,7 +89,6 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
               </ThemeProvider>
             </SidebarProvider>
           </AccentColourContext.Provider>
-        </FollowedHivesContext.Provider>
         </QueryClientProvider>
       </body>
     </html>

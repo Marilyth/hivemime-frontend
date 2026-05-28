@@ -1,0 +1,215 @@
+import { observer } from "mobx-react-lite";
+import { useObservableDraft } from "../../utility/observable-draft";
+
+import { toast } from "sonner";
+import { AsyncButton } from "../../utility/async-button";
+import { api } from "@/lib/contexts";
+import { ApprovalStatus, HiveDto, HiveUserDto, HiveUserOrderBy, MemberRole, PaginationCursorDto } from "@/lib/Api";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowUpDown, Gavel, UserRoundPlus, UserRoundX, X } from "lucide-react";
+import { useDebounce } from "../../utility/debounce";
+import { observable } from "mobx";
+import { getRoleColor, getRoleRank } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import Link from "next/link";
+import { UserAvatar } from "../../user/user-avatar";
+
+export interface HiveMembersSettingsProps {
+  hiveDto: HiveDto;
+  currentUser: HiveUserDto;
+}
+
+export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembersSettingsProps) => {
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
+  const [userNameFilter, setUserNameFilter] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<HiveUserOrderBy>(HiveUserOrderBy.New);
+  const [debouncedUserNameFilter, isLoading] = useDebounce(userNameFilter, 300);
+
+  const membersQuery = useInfiniteQuery({
+    queryKey: ['hiveUsers', hiveDto.id, approvalStatus, debouncedUserNameFilter, orderBy],
+    queryFn: async ({ pageParam }) => {
+      const task = api.api.hiveUsersCreate({pageSize: 50, cursor: pageParam, filter: debouncedUserNameFilter, orderBy: orderBy}, { hiveId: hiveDto.id, status: approvalStatus });
+      toast.promise(task, {
+        loading: 'Loading members...',
+        success: 'Members loaded.'
+      });
+
+      const response = await task;
+      return response.data;
+    },
+    initialPageParam: undefined as PaginationCursorDto | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor
+  });
+
+  const members = membersQuery.data?.pages.flatMap(p => p.items) ?? [];
+  
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-row gap-4">
+        <Input placeholder="Filter by username..." className="flex-1" value={userNameFilter} onChange={(e) => setUserNameFilter(e.target.value)} />
+        <Select onValueChange={(value) => setApprovalStatus(value as ApprovalStatus)} defaultValue={approvalStatus}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by approval status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ApprovalStatus.Approved}>Approved</SelectItem>
+            <SelectItem value={ApprovalStatus.Pending}>Pending</SelectItem>
+            <SelectItem value={ApprovalStatus.Rejected}>Rejected</SelectItem>
+            <SelectItem value={ApprovalStatus.Banned}>Banned</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select onValueChange={(value) => setOrderBy(value as HiveUserOrderBy)} defaultValue={orderBy}>
+          <SelectTrigger>
+            <ArrowUpDown />
+            <SelectValue placeholder="Order by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={HiveUserOrderBy.New}>Newest</SelectItem>
+            <SelectItem value={HiveUserOrderBy.Old}>Oldest</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <InfiniteScroll
+        dataLength={members.length}
+        next={membersQuery.fetchNextPage}
+        hasMore={membersQuery.hasNextPage}
+        loader=
+        {
+          <Skeleton className="h-64 w-full rounded-xl my-4">
+            <span className="flex h-full w-full items-center justify-center text-informational">
+              Loading...
+            </span>
+          </Skeleton>
+        }
+        endMessage=
+        {
+          <div className="my-4 text-center">There are no more members!</div>
+        }
+      >
+      <div className="flex flex-col">
+        {members.map((member, index) => (
+          <HiveMember key={index} user={observable(member!)} currentUser={currentUser} />
+        ))}
+      </div>
+    </InfiniteScroll>
+    </div>
+  );
+});
+
+export interface HiveMemberProps {
+  user: HiveUserDto;
+  currentUser: HiveUserDto;
+}
+
+export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
+  const [draft, isDirty, resetChanges, applyChanges] = useObservableDraft(user);
+
+  async function updateMember(){
+    const task = api.api.hiveModifyUserPartialUpdate({ followRequestId: draft.id, approvalStatus: draft.approvalStatus, role: draft.role });
+
+    toast.promise(task, {
+      loading: `Updating member...`,
+      success: `Member updated.`
+    });
+
+    try{
+      await task;
+      applyChanges();
+    } catch (error) {
+      resetChanges();
+    }
+  }
+
+  async function setMemberApprovalStatus(status: ApprovalStatus) {
+    draft.approvalStatus = status;
+    await updateMember();
+  }
+
+  async function setMemberRole(role: MemberRole) {
+    draft.role = role;
+    await updateMember();
+  }
+
+  function canSetToRole(role: MemberRole) {
+    return getRoleRank(user.role!) > 0 &&
+      getRoleRank(currentUser.role!) > getRoleRank(user.role!) &&
+      getRoleRank(currentUser.role!) > getRoleRank(role);
+  }
+
+  function canBan() {
+    return getRoleRank(currentUser.role!) > getRoleRank(user.role!);
+  }
+
+  return (
+    <div className="flex flex-row gap-2 items-center w-full border-t p-2">
+      <UserAvatar user={user.user!} size={48} />
+
+      <div className="flex flex-col mr-auto">
+        <Link href={`/user?id=${user.user?.id}`} className="text-sm text-honey-brown flex-1">
+          {user.user?.username}
+        </Link>
+        <span className="text-sm text-muted-foreground">Joined on {new Date(user.createdAt!).toLocaleDateString()}</span>
+      </div>
+
+      {user.approvalStatus == ApprovalStatus.Approved && (
+        <>
+          {canBan() && (
+            <Tooltip>
+              <TooltipTrigger className="text-sm">
+                <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Banned)}>
+                  <Gavel className="text-red-400" />
+                </AsyncButton>
+              </TooltipTrigger>
+              <TooltipContent>
+                Ban member
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <Select onValueChange={(value) => setMemberRole(value as MemberRole)} defaultValue={user.role}>
+            <SelectTrigger size="sm">
+              <span className={`text-sm ${getRoleColor(user.role!)}`}>
+                {user.role}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className={getRoleColor(MemberRole.Guest)} disabled value={MemberRole.Guest}>Guest</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>Follower</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>Moderator</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>Admin</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Creator)} disabled={!canSetToRole(MemberRole.Creator)} value={MemberRole.Creator}>Creator</SelectItem>
+            </SelectContent>
+          </Select>
+        </>
+      )}
+      {user.approvalStatus != ApprovalStatus.Approved && (
+        <Tooltip>
+          <TooltipTrigger className="text-sm">
+            <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Approved)}>
+              <UserRoundPlus />
+            </AsyncButton>
+          </TooltipTrigger>
+          <TooltipContent>
+            Approve member
+          </TooltipContent>
+        </Tooltip>
+      )}
+      {user.approvalStatus == ApprovalStatus.Pending && (
+        <Tooltip>
+          <TooltipTrigger className="text-sm">
+            <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Rejected)}>
+              <UserRoundX />
+            </AsyncButton>
+          </TooltipTrigger>
+          <TooltipContent>
+            Reject member
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </div>
+  );
+});
