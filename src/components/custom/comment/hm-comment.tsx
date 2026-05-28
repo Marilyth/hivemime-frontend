@@ -133,7 +133,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
   async function banUser() {
     const task = api.api.hiveBanUserPartialUpdate({
       hiveId: Number(hiveId),
-      userId: comment.user?.id!
+      userId: comment.user!.id
     });
 
     toast.promise(task, {

@@ -47,13 +47,13 @@ export const HiveGeneralSettings = observer(({ hiveDto, currentUser }: HiveGener
     <div className="flex flex-col gap-4">
       <Field className="gap-1">
         <FieldLabel>Name</FieldLabel>
-        <FieldDescription>The hive's name.</FieldDescription>
+        <FieldDescription>The hive&apos;s name.</FieldDescription>
         <Input disabled={!canEdit()} value={hive.name!} onChange={(e) => hive.name = e.target.value} autoComplete="off" placeholder="Hive name" />
       </Field>
 
       <Field className="gap-1">
         <FieldLabel>Description</FieldLabel>
-        <FieldDescription>The hive's description.</FieldDescription>
+        <FieldDescription>The hive&apos;s description.</FieldDescription>
         <Textarea disabled={!canEdit()} value={hive.description!} onChange={(e) => hive.description = e.target.value} autoComplete="off" placeholder="Hive description" />
       </Field>
 
