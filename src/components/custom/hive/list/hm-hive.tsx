@@ -43,7 +43,7 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
       success: (r) => {
         followedHivesStore.addFollowedHive(r.data);
 
-        if (hive.settings?.mustBeApprovedToJoin)
+        if (hive.settings?.joinRequiresApproval)
           return "Join request sent! A moderator must approve it.";
         else
           return "Hive joined successfully!";
@@ -85,7 +85,7 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
               disabled={hiveFollow != null && hiveFollow.approvalStatus == ApprovalStatus.Rejected}
               onClick={hiveFollow ? leaveHive : joinHive}
             >
-              {hiveFollow ? (hiveFollow.approvalStatus ? "Leave" : "Abort request") : (hive.settings?.mustBeApprovedToJoin ? "Request to join" : "Join")}
+              {hiveFollow ? (hiveFollow.approvalStatus ? "Leave" : "Abort request") : (hive.settings?.joinRequiresApproval ? "Request to join" : "Join")}
             </AsyncButton>
           </div>
           {hiveFollow != null && (

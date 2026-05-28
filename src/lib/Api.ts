@@ -101,6 +101,7 @@ export interface CategoryDto {
 
 export interface CommentDto {
   user?: UserDto;
+  role?: MemberRole;
   /** @format int32 */
   id?: number;
   /** @format int32 */
@@ -205,20 +206,12 @@ export interface HiveDto {
   postCount?: number;
   /** @format int32 */
   userCount?: number;
-  settings?: HiveOptionsDto;
+  settings?: HiveSettingsDto;
 }
 
 export interface HiveDtoPaginationResultDto {
   items?: HiveDto[] | null;
   nextCursor?: PaginationCursorDto;
-}
-
-export interface HiveOptionsDto {
-  mustBeApprovedToPost?: boolean;
-  mustBeApprovedToJoin?: boolean;
-  /** @format double */
-  minHoneyToPost?: number;
-  minRoleToPost?: MemberRole;
 }
 
 export interface HivePaginationDto {
@@ -227,6 +220,20 @@ export interface HivePaginationDto {
   cursor?: PaginationCursorDto;
   filter?: string | null;
   orderBy?: HiveOrderBy;
+}
+
+export interface HiveSettingsDto {
+  isPrivate?: boolean;
+  joinRequiresApproval?: boolean;
+  /** @format double */
+  minHoneyToJoin?: number;
+  postRequiresApproval?: boolean;
+  /** @format double */
+  minHoneyToPost?: number;
+  minRoleToPost?: MemberRole;
+  /** @format double */
+  minHoneyToComment?: number;
+  minRoleToComment?: MemberRole;
 }
 
 export interface HiveUserDto {
@@ -328,6 +335,7 @@ export interface PollVoteDto {
 export interface PostDto {
   hive?: HiveDto;
   creator?: UserDto;
+  role?: MemberRole;
   /** @format int32 */
   id?: number;
   polls?: PollDto[] | null;
