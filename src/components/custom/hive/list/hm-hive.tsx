@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { HiveMimeExpandableText } from "../../utility/hm-expandable-text";
 import { AsyncButton } from "../../utility/async-button";
 import { getRoleColor } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export type HiveMimeHiveListItemProps = {
   hive: HiveDto;
@@ -22,6 +23,7 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
   const router = useRouter();
   const hiveFollow = followedHivesStore.followedHives.get(hive.id!);
   const isModerator = hiveFollow != null && hiveFollow.role !== MemberRole.Follower;
+  const canJoin = hiveFollow == null || hiveFollow.role === MemberRole.Guest;
 
   async function leaveHive() {
     const task = api.api.hiveLeaveDelete({ followId: hiveFollow!.id });
@@ -82,16 +84,20 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
             <AsyncButton
               variant="outline"
               size="sm"
-              disabled={hiveFollow != null && hiveFollow.approvalStatus == ApprovalStatus.Rejected}
-              onClick={hiveFollow ? leaveHive : joinHive}
+              onClick={canJoin ? joinHive : leaveHive}
             >
-              {hiveFollow ? (hiveFollow.approvalStatus ? "Leave" : "Abort request") : (hive.settings?.joinRequiresApproval ? "Request to join" : "Join")}
+              {canJoin ? (hive.settings?.joinRequiresApproval ? "Request to join" : "Join") : "Leave"}
             </AsyncButton>
           </div>
           {hiveFollow != null && (
-            <span>
-              You are a <span className={`${getRoleColor(hiveFollow.role!)}`}>{hiveFollow?.role}</span> of this hive.
-            </span>
+            <div className="flex flex-row gap-2">
+              {hiveFollow.approvalStatus != ApprovalStatus.Approved && <Badge variant="outline">
+                {hiveFollow?.approvalStatus}
+              </Badge>}
+              <Badge variant="outline" className={`${getRoleColor(hiveFollow.role!)}`}>
+                {hiveFollow?.role}
+              </Badge>
+            </div>
           )}
         </div>
         

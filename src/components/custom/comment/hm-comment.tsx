@@ -1,12 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ApprovalStatus, CommentDto, CommentOrderBy, MemberRole, PaginationCursorDto } from "@/lib/Api";
+import { CommentDto, CommentOrderBy, MemberRole, PaginationCursorDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { HiveMimeCommentCreate } from "./hm-comment-create";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
-import { CircleMinus, CirclePlus, Ellipsis, FileMinus, FilePlus, Reply, Trash2 } from "lucide-react";
+import { CircleMinus, CirclePlus, Ellipsis, FileMinus, FilePlus, Gavel, Reply, Trash2 } from "lucide-react";
 import { HiveMimeExpandableText } from "../utility/hm-expandable-text";
 import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
@@ -15,8 +15,10 @@ import Link from "next/link";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { getRoleRank } from "@/lib/utils";
+import { getEffectiveRole, getRoleColor, getRoleRank } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export interface HiveMimeCommentProps {
   hiveId?: number;
@@ -35,9 +37,16 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const currentHiveUser = followedHivesStore.followedHives.get(Number(hiveId));
+  const currentUserRoleRank = getRoleRank(getEffectiveRole(currentHiveUser?.role, currentHiveUser?.approvalStatus));
+  const commentUserRoleRank = getRoleRank(comment.role ?? MemberRole.Follower);
+
   const canDelete = !isRoot &&
     (comment.user?.id == userStore.user?.id ||
-      (currentHiveUser != null && getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator)));
+      (currentHiveUser != null && currentUserRoleRank >= getRoleRank(MemberRole.Moderator)));
+
+  const canBan = !isRoot &&
+    comment.user?.id != userStore.user?.id &&
+    (currentHiveUser != null && currentUserRoleRank >= getRoleRank(MemberRole.Moderator) && commentUserRoleRank < currentUserRoleRank);
 
   const repliesQuery = useInfiniteQuery({
     queryKey: ['commentReplies', comment.id, textFilter, orderBy],
@@ -121,6 +130,20 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
     await task;
   }
 
+  async function banUser() {
+    const task = api.api.hiveBanUserPartialUpdate({
+      hiveId: Number(hiveId),
+      userId: comment.user?.id!
+    });
+
+    toast.promise(task, {
+      loading: 'Banning user...',
+      success: 'User banned.',
+    });
+
+    await task;
+  }
+
   return (
     <div className="flex flex-col">
       {comment.parentCommentId && !parentComment?.id && (
@@ -147,17 +170,46 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
           <div className="flex flex-col w-full">
             {!isRoot &&
               <div className="flex flex-row gap-1 text-sm text-informational mb-2">
-                <Link href={`/user?id=${comment.user?.id}`} className="font-bold">{comment.user?.username}</Link> • <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="ml-auto" asChild>
-                    <Button variant="ghost" className="h-auto p-0">
-                      <Ellipsis />
-                    </Button>
+                <Link href={`/user?id=${comment.user?.id}`} className="font-bold">
+                  {comment.user?.username}
+                </Link>
+                {comment.isOriginalPoster &&
+                  <Tooltip>
+                    <TooltipTrigger className="text-sm">
+                       <Badge variant="outline" className="text-xs text-honey-brown p-0 px-1">
+                        OP
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      This user created the post
+                    </TooltipContent>
+                  </Tooltip>
+                }
+                {getRoleRank(comment.role!) > getRoleRank(MemberRole.Follower) && (
+                  <Tooltip>
+                    <TooltipTrigger className="text-sm">
+                       <Badge variant="outline" className={`text-xs p-0 px-1 ${getRoleColor(comment.role!)}`}>
+                        {comment.role!}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      This user is a {comment.role!} of the hive
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                • <HiveMimeRelativeTimestamp timestamp={comment.createdAt!} />
+                {(canDelete || canBan) && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="ml-auto" asChild>
+                      <Button variant="ghost" className="h-auto p-0">
+                        <Ellipsis />
+                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     {canDelete && <DropdownMenuItem onSelect={deleteComment}><Trash2 /> Delete</DropdownMenuItem>}
+                    {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> Ban user</DropdownMenuItem>}
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu>)}
               </div>
             }
 

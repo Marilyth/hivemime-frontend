@@ -115,6 +115,7 @@ export interface CommentDto {
   updatedAt?: string | null;
   /** @format int32 */
   replyCount?: number;
+  isOriginalPoster?: boolean;
 }
 
 export interface CommentDtoHoneyDeltaDto {

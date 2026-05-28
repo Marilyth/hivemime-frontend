@@ -8,14 +8,14 @@ import { HiveMimePostVote } from "./vote/hm-post-vote";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Ellipsis, FileMinus, FilePlus, MessageSquare, Trash2, User } from "lucide-react";
+import { Ellipsis, FileMinus, FilePlus, Gavel, MessageSquare, Trash2, User } from "lucide-react";
 import HexWrapper from "../utility/hm-hex-wrapper";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api, followedHivesStore, userStore } from "@/lib/contexts";
 import { toast } from "sonner";
-import { getRoleRank } from "@/lib/utils";
+import { getEffectiveRole, getRoleRank } from "@/lib/utils";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -27,8 +27,13 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   const router = useRouter();
 
   const currentHiveUser = post.hive ? followedHivesStore.followedHives.get(post.hive.id!) : null;
-  const canModify = (currentHiveUser != null && getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));
+  const effectiveRole = getRoleRank(getEffectiveRole(currentHiveUser?.role, currentHiveUser?.approvalStatus));
+  const posterRoleRank = getRoleRank(post.role ?? MemberRole.Follower);
+
+  const canModify = effectiveRole >= getRoleRank(MemberRole.Moderator);
+  const canBan = effectiveRole >= getRoleRank(MemberRole.Moderator) && posterRoleRank < effectiveRole && post.creator?.id !== userStore.user?.id;
   const canDelete = post.creator?.id === userStore.user?.id;
+  
   const showContextMenu = canDelete || canModify;
 
   function toggleResults() {
@@ -45,6 +50,17 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     toast.promise(task, {
       loading: 'Deleting post...',
       success: 'Post deleted.'
+    });
+
+    await task;
+  }
+
+  async function banUser() {
+    const task = api.api.hiveBanUserPartialUpdate({ hiveId: post.hive!.id!, userId: post.creator!.id! });
+
+    toast.promise(task, {
+      loading: 'Banning user...',
+      success: 'User banned from hive.'
     });
 
     await task;
@@ -105,6 +121,7 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
                   {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> Reject</DropdownMenuItem>}
                 </>}
                 {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> Delete</DropdownMenuItem>}
+                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> Ban user</DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
