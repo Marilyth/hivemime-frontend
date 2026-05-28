@@ -1050,7 +1050,7 @@ export class Api<
      * @secure
      */
     hiveCreateCreate: (data: CreateHiveDto, params: RequestParams = {}) =>
-      this.request<HiveDto, any>({
+      this.request<HiveUserDto, any>({
         path: `/api/Hive/create`,
         method: "POST",
         body: data,

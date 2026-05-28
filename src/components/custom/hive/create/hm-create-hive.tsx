@@ -38,8 +38,8 @@ export const HiveMimeHiveCreate = observer(() => {
     toast.promise(task, {
       loading: 'Creating hive...',
       success: (response) => {
-        followedHivesStore.addFollowedHive({ hive: response.data, role: MemberRole.Creator, approvalStatus: ApprovalStatus.Approved, user: userStore.user! });
-        router.push(`/hives/settings?hiveId=${response.data.id}`);
+        followedHivesStore.addFollowedHive(response.data);
+        router.push(`/hives/settings?hiveId=${response.data.hive!.id}`);
 
         return 'Hive created successfully!';
       }
