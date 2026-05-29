@@ -9,8 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { HiveMimePostBrowse } from "../../post/hm-post-browse";
 import { PostOrderBy } from "@/lib/Api";
 import { UserProfileComments } from "./user-profile-comments";
+import { useTranslation } from "react-i18next";
 
 export function UserProfile() {
+  const { t } = useTranslation();
   const [userData, setUserData] = useQueryParam("id", userStore.user?.id!.toString() ?? null);
   const [tab, setTab] = useQueryParam("tab", "posts");
 
@@ -20,7 +22,7 @@ export function UserProfile() {
     queryFn: async () => {
       const task = api.api.userProfileList({ userId: Number(userData) });
       toast.promise(task, {
-        loading: 'Loading user profile...'
+        loading: t("toasts:profile.loadingUser")
       });
 
       const res = await task;
@@ -38,11 +40,11 @@ export function UserProfile() {
       <Tabs defaultValue={tab!} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="posts">
-            Posts
+            {t("settings:profile.posts")}
             <Badge>{data?.postCount}</Badge>
           </TabsTrigger>
           <TabsTrigger value="comments">
-            Comments
+            {t("settings:profile.comments")}
             <Badge>{data?.commentCount}</Badge>
           </TabsTrigger>
         </TabsList>

@@ -2,6 +2,7 @@ import { createContext } from "react";
 import { Api, HiveUserDto, UserDetailsDto } from "./Api";
 import { makeAutoObservable } from "mobx";
 import { toast } from "sonner";
+import i18n from "./i18n";
 
 class UserStore {
   user: UserDetailsDto | null = null;
@@ -66,7 +67,7 @@ export const api = new Api({
       return response;
     }
     
-    toast.error(data.error ?? "Request failed", { closeButton: true, duration: Infinity, richColors: true });
+    toast.error(data.error ?? i18n.t("toasts:requestFailed"), { closeButton: true, duration: Infinity, richColors: true });
     throw new Error(`Request failed with status ${response.status}`);
   },
 });

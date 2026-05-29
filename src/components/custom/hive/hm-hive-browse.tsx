@@ -6,8 +6,10 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { HiveMimeHiveListItem } from "./list/hm-hive";
 import { api } from "@/lib/contexts";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 export default function HiveMimeHiveBrowse() {
+  const { t } = useTranslation();
   const data = useInfiniteQuery({
     queryKey: ['hives'],
     queryFn: async ({ pageParam }) => {
@@ -29,13 +31,13 @@ export default function HiveMimeHiveBrowse() {
       {
         <Skeleton className="h-64 w-full rounded-xl my-4">
           <span className="flex h-full w-full items-center justify-center text-informational">
-            Loading...
+            {t("common:loading")}
           </span>
         </Skeleton>
       }
       endMessage=
       {
-        <div className="my-4 text-center">There are no more hives! Consider creating your own.</div>
+        <div className="my-4 text-center">{t("hives:browse.noMoreHives")}</div>
       }
     >
       <div className="flex justify-center flex-row flex-wrap gap-4">

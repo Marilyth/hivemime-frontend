@@ -1,0 +1,73 @@
+{
+  "browse": {
+    "noMoreHives": "There are no more hives! Consider creating your own."
+  },
+  "create": {
+    "title": "Create new hive",
+    "name": "Name",
+    "description": "Description",
+    "namePlaceholder": "Politics",
+    "descriptionPlaceholder": "A community to discuss world politics."
+  },
+  "card": {
+    "requestToJoin": "Request to join",
+    "join": "Join",
+    "leave": "Leave",
+    "members": "{{count}} members",
+    "members_one": "{{count}} member",
+    "posts": "{{count}} posts",
+    "posts_one": "{{count}} post"
+  },
+  "settings": {
+    "title": "Hive Settings",
+    "browsePosts": "Browse posts",
+    "general": "General",
+    "rules": "Rules",
+    "members": "Members",
+    "loading": "Loading hive data...",
+    "noPermission": "You do not have permission to view these settings.",
+    "generalSection": {
+      "name": "Name",
+      "description": "Description",
+      "nameDescription": "The hive's name.",
+      "descriptionDescription": "The hive's description.",
+      "namePlaceholder": "Hive name",
+      "descriptionPlaceholder": "Hive description"
+    },
+    "rulesSection": {
+      "visibility": "Visibility",
+      "visibilityDescription": "Control who can see and join this hive.",
+      "privateHive": "Private hive",
+      "privateHiveDescription": "Only members can view this hive, and it will not show up when browsing hives.",
+      "requireApprovalToJoin": "Require approval to join",
+      "requireApprovalToJoinDescription": "Users must be approved before they can join this hive.",
+      "honeyRequiredToJoin": "Honey required to join",
+      "honeyRequiredToJoinDescription": "Users must have at least <honey/> to join this hive.",
+      "posting": "Posting",
+      "postingDescription": "Control who can create posts in this hive.",
+      "requireApprovalToPost": "Require approval to post",
+      "requireApprovalToPostDescription": "Posts must be approved before they can be published in this hive.",
+      "honeyRequiredToPost": "Honey required to post",
+      "honeyRequiredToPostDescription": "Users must have at least <honey/> to post in this hive.",
+      "whoCanPost": "Who can post",
+      "whoCanPostDescription": "Users must at least be part of the following group to post in this hive.",
+      "commenting": "Commenting",
+      "commentingDescription": "Control who can comment on posts in this hive.",
+      "honeyRequiredToComment": "Honey required to comment",
+      "honeyRequiredToCommentDescription": "Users must have at least <honey/> to comment in this hive.",
+      "whoCanComment": "Who can comment",
+      "whoCanCommentDescription": "Users must at least be part of the following group to comment in this hive.",
+      "selectGroup": "Select a group"
+    },
+    "membersSection": {
+      "filterByUsername": "Filter by username...",
+      "filterByApprovalStatus": "Filter by approval status",
+      "orderBy": "Order by",
+      "noMoreMembers": "There are no more members!",
+      "joinedOn": "Joined on {{date}}",
+      "banMember": "Ban member",
+      "approveMember": "Approve member",
+      "rejectMember": "Reject member"
+    }
+  }
+}

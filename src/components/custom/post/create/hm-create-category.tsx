@@ -14,6 +14,7 @@ import { useState } from "react";
 import { CirclePicker } from "react-color";
 import { colorHexToNumber, mutedColors, mutedColorsList, numberToColorHex } from "@/lib/colors";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogPortal, DialogTitle } from "../../../ui/dialog";
+import { useTranslation } from "react-i18next";
 
 
 interface HiveMimeCreateCategoryProps {
@@ -27,6 +28,7 @@ export interface HiveMimeCreateCategoriesProps {
 }
 
 export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCategoriesProps) => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] =  useState<CategoryDto | null>(null);
 
   function moveCategory(oldIndex: number, newIndex: number) {
@@ -43,7 +45,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
   }
 
   function addCategory() {
-    poll.categories?.push({ name: `Category ${poll.categories!.length + 1}`, description: "", color: colorHexToNumber(mutedColors.honeyBrown) });
+    poll.categories?.push({ name: t("posts:create.defaultCategoryName", { index: poll.categories!.length + 1 }), description: "", color: colorHexToNumber(mutedColors.honeyBrown) });
   }
 
   return (
@@ -51,7 +53,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
       <Dialog open={selectedCategory != null} onOpenChange={() => setSelectedCategory(null)}>
         <DialogContent className="gap-2 w-auto">
           <DialogHeader>
-            <DialogTitle>Pick a color for <span className="text-honey-brown">{selectedCategory?.name}</span></DialogTitle>
+            <DialogTitle>{t("posts:create.pickColorFor", { name: selectedCategory?.name })}</DialogTitle>
           </DialogHeader>
           <CirclePicker
             color={numberToColorHex(selectedCategory?.color ?? 0)}
@@ -96,7 +98,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
       </div>
 
       <Button variant="outline" onClick={addCategory}>
-        <Plus />Add category
+        <Plus />{t("posts:create.addCategory")}
       </Button>
     </div>
   );

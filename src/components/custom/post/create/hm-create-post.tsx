@@ -21,10 +21,12 @@ import { HiveSelection } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
 import { api } from "@/lib/contexts";
+import { useTranslation } from "react-i18next";
 
 export const mediaFiles = observable.map<string, File>()
 
 export const HiveMimeCreatePost = observer(() => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
@@ -94,7 +96,7 @@ export const HiveMimeCreatePost = observer(() => {
     // Create post draft.
     const task = api.api.postCreateCreate(post);
     toast.promise(task, {
-      loading: 'Submitting post...'
+      loading: t("toasts:post.submitting")
     });
 
     const response = await task;
@@ -123,7 +125,7 @@ export const HiveMimeCreatePost = observer(() => {
 
         const uploadTasks = Promise.all([mainUploadTask, thumbUploadTask]);
         toast.promise(uploadTasks, {
-          loading: `Uploading media for candidate "${candidate.name}"...`
+          loading: t("toasts:post.uploadingMedia", { name: candidate.name })
         });
 
         await uploadTasks;
@@ -133,8 +135,8 @@ export const HiveMimeCreatePost = observer(() => {
     // Publish post.
     const publishTask = api.api.postPublishPartialUpdate({ postId: response.data.id });
     toast.promise(publishTask, {
-      loading: 'Publishing post...',
-      success: 'Post published successfully!',
+      loading: t("toasts:post.publishing"),
+      success: t("toasts:post.published"),
     });
 
     await publishTask;
@@ -145,7 +147,7 @@ export const HiveMimeCreatePost = observer(() => {
   return (
     <Card className="py-4 text-foreground">
   <CardHeader>
-    <h2 className="text-2xl font-bold">Create new post</h2>
+    <h2 className="text-2xl font-bold">{t("posts:create.title")}</h2>
   </CardHeader>
 
   <CardContent>
@@ -155,7 +157,7 @@ export const HiveMimeCreatePost = observer(() => {
 
         {/* Polls */}
         <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
-          <Label className="font-bold">Polls</Label>
+          <Label className="font-bold">{t("posts:create.polls")}</Label>
           <AnimatePresence>
             {post.polls!.map((poll, index) => (
               <motion.div layout key={getReferenceId(poll)}>
@@ -180,15 +182,15 @@ export const HiveMimeCreatePost = observer(() => {
           </AnimatePresence>
 
           <Button variant="outline" onClick={addPoll} className="mt-2">
-            <Plus /> Add poll
+            <Plus /> {t("posts:create.addPoll")}
           </Button>
           <Label className="text-muted-foreground text-sm mt-1">
-            * Multiple polls help <Label className="text-honey-brown">visualize correlations</Label> between them.
+            {t("posts:create.correlationsHint")}
           </Label>
         </div>
 
         <AsyncButton className="self-start ml-auto" onClick={submitPost}>
-          Submit
+          {t("common:submit")}
         </AsyncButton>
       </div>
     ) : (

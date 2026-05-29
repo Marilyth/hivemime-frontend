@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, HTMLAttributes, ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 
 type HiveMimeExpandableTextProps = {
@@ -9,6 +10,7 @@ type HiveMimeExpandableTextProps = {
 } & HTMLAttributes<HTMLDivElement>;
 
 export function HiveMimeExpandableText({ children, lines, className, ...props }: HiveMimeExpandableTextProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [needsClamp, setNeedsClamp] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -33,7 +35,7 @@ export function HiveMimeExpandableText({ children, lines, className, ...props }:
         <Button variant="link" size="sm" className="p-0 h-auto"
           onClick={() => setExpanded(x => !x)}
         >
-          {expanded ? "Show less" : "Read more"}
+          {expanded ? t("common:showLess") : t("common:readMore")}
         </Button>
       )}
     </div>

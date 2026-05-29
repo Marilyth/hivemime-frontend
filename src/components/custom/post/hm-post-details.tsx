@@ -8,8 +8,10 @@ import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
 import { useQueryParam } from "../utility/use-query-param";
 import { api } from "@/lib/contexts";
 import { observable } from "mobx";
+import { useTranslation } from "react-i18next";
 
 export function HiveMimePostDetails() {
+  const { t } = useTranslation();
   const [postId, setPostId] = useQueryParam("postId");
   const [post, setPost] = useState<PostDto | null>(null);
 
@@ -36,7 +38,7 @@ export function HiveMimePostDetails() {
       {!post ? (
         <Skeleton className="h-64 w-full rounded-xl my-4">
           <span className="flex h-full w-full items-center justify-center text-informational">
-            Loading...
+            {t("common:loading")}
           </span>
         </Skeleton>
       ) : (

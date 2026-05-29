@@ -9,6 +9,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../../utility/hm-draggable";
 import { observable, reaction } from "mobx";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMimeRankPollVoteProps {
   poll: PollDto;
@@ -16,6 +17,7 @@ export interface HiveMimeRankPollVoteProps {
 }
 
 export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankPollVoteProps) => {
+  const { t } = useTranslation();
   const state = useRef(observable({
     rankedCandidates: [] as CombinedPollCandidate[],
     unrankedCandidates: poll.candidates!.map((candidate, index) => ({
@@ -53,7 +55,7 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-informational text-sm">Please rank the candidates in order of preference.</span>
+      <span className="text-informational text-sm">{t("posts:vote.rankInstruction")}</span>
 
       <LayoutGroup>
         {state.rankedCandidates.map((candidate) => (

@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ValueOperator } from "./query-builder";
 import { ApprovalStatus, MemberRole } from "./Api";
+import i18n from "./i18n";
 
 const ids = new WeakMap();
 
@@ -23,15 +24,15 @@ export function deepCopy<T>(obj: T): T {
 export function valueOperatorToInlineString(operator: ValueOperator) {
   switch (operator) {
     case ValueOperator.Equals:
-      return "equal to";
+      return i18n.t("enums:valueOperator.equals");
     case ValueOperator.Greater:
-      return "greater than";
+      return i18n.t("enums:valueOperator.greater");
     case ValueOperator.GreaterEquals:
-      return "greater than or equal to";
+      return i18n.t("enums:valueOperator.greaterEquals");
     case ValueOperator.Less:
-      return "less than";
+      return i18n.t("enums:valueOperator.less");
     case ValueOperator.LessEquals:
-      return "less than or equal to";
+      return i18n.t("enums:valueOperator.lessEquals");
     default:
       return operator;
   }

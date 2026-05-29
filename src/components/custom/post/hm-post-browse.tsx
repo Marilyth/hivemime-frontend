@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "../utility/debounce";
 import { Card } from "@/components/ui/card";
 import { observable } from "mobx";
+import { useTranslation } from "react-i18next";
 
 
 interface HiveMimePostBrowseProps {
@@ -25,6 +26,7 @@ interface HiveMimePostBrowseProps {
 }
 
 export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
+  const { t } = useTranslation();
   const [orderBy, setOrderBy] = useState<PostOrderBy>(props.orderBy ?? PostOrderBy.Hot);
   const [postFilter, setPostFilter] = useState<string>("");
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
@@ -72,26 +74,26 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
       
       <Card className="p-0">
         <div className="flex flex-row gap-4 p-4 rounded-lg">
-          <Input placeholder="Filter by title..." className="flex-1" value={postFilter} onChange={(e) => setPostFilter(e.target.value)} />
+          <Input placeholder={t("posts:browse.filterByTitle")} className="flex-1" value={postFilter} onChange={(e) => setPostFilter(e.target.value)} />
           {canSeeStatusFilter && <Select onValueChange={(value) => setApprovalStatus(value as ApprovalStatus)} defaultValue={approvalStatus}>
             <SelectTrigger>
-              <SelectValue placeholder="Filter by approval status" />
+              <SelectValue placeholder={t("posts:browse.filterByApprovalStatus")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ApprovalStatus.Approved}>Approved</SelectItem>
-              <SelectItem value={ApprovalStatus.Pending}>Pending</SelectItem>
-              <SelectItem value={ApprovalStatus.Rejected}>Rejected</SelectItem>
+              <SelectItem value={ApprovalStatus.Approved}>{t("enums:approvalStatus.approved")}</SelectItem>
+              <SelectItem value={ApprovalStatus.Pending}>{t("enums:approvalStatus.pending")}</SelectItem>
+              <SelectItem value={ApprovalStatus.Rejected}>{t("enums:approvalStatus.rejected")}</SelectItem>
             </SelectContent>
           </Select>}
           <Select onValueChange={(value) => setOrderBy(value as PostOrderBy)} defaultValue={orderBy}>
             <SelectTrigger>
               <ArrowUpDown />
-              <SelectValue placeholder="Order by" />
+              <SelectValue placeholder={t("posts:browse.orderBy")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={PostOrderBy.Hot}>Hot</SelectItem>
-              <SelectItem value={PostOrderBy.New}>Newest</SelectItem>
-              <SelectItem value={PostOrderBy.Old}>Oldest</SelectItem>
+              <SelectItem value={PostOrderBy.Hot}>{t("enums:postOrder.hot")}</SelectItem>
+              <SelectItem value={PostOrderBy.New}>{t("enums:postOrder.newest")}</SelectItem>
+              <SelectItem value={PostOrderBy.Old}>{t("enums:postOrder.oldest")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -105,13 +107,13 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
         {
           <Skeleton className="h-64 w-full rounded-xl my-4">
             <span className="flex h-full w-full items-center justify-center text-informational">
-              Loading...
+              {t("common:loading")}
             </span>
           </Skeleton>
         }
         endMessage=
         {
-          <div className="my-4 text-center">You reached the end of your feed!</div>
+          <div className="my-4 text-center">{t("posts:browse.endOfFeed")}</div>
         }
       >
         <div className="flex flex-col gap-4">

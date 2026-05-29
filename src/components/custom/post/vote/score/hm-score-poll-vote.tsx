@@ -1,6 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
+import { useTranslation } from "react-i18next";
 import { PollDto, PollVoteDto } from "@/lib/Api";
 import { HiveMimeScorePollVoteCandidate } from "./hm-score-poll-vote-candidate";
 
@@ -10,9 +11,11 @@ export interface HiveMimePickScoringPollProps {
 }
 
 export const HiveMimeScorePollVote = observer(({ poll, pollVotes }: HiveMimePickScoringPollProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-informational text-sm">Please score the candidates between {poll.minValue} and {poll.maxValue}.</span>
+      <span className="text-informational text-sm">{t("posts:vote.scoreInstruction", { minValue: poll.minValue, maxValue: poll.maxValue })}</span>
         {poll.candidates!.map((candidate, index) => (
           <HiveMimeScorePollVoteCandidate key={index} vote={pollVotes.candidates![index]} candidate={candidate} poll={poll} />
         ))}

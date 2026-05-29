@@ -5,12 +5,14 @@ import { Progress } from "@/components/ui/progress";
 import { honeyToLevel } from "@/lib/utils";
 import HexWrapper from "../../utility/hm-hex-wrapper";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface UserProfileHeaderProps {
   user: UserProfileDto;
 }
 
 export function UserProfileHeader(props: UserProfileHeaderProps) {
+  const { t } = useTranslation();
   const currentLevel = Math.floor(honeyToLevel(props.user.honey!));
   const currentLevelProgress =
     (honeyToLevel(props.user.honey!) - currentLevel) * 100;
@@ -46,7 +48,7 @@ export function UserProfileHeader(props: UserProfileHeaderProps) {
         <div className="flex items-center gap-2 pr-2">
           <Progress value={currentLevelProgress} className="h-2 flex-1 rounded-full" />
           <span className="text-xs text-muted-foreground whitespace-nowrap">
-            Lv. {currentLevel}
+            {t("settings:profile.level", { level: currentLevel })}
           </span>
         </div>
       </div>

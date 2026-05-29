@@ -7,6 +7,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../../utility/hm-draggable";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryPollVoteCandidateDialog, HiveMimeCategoryPollVoteCategoryDialog } from "./hm-category-poll-vote-dialog";
 import { HiveMimeCategoryTagBox, HiveMimePickCandidate } from "./hm-category-poll-vote-category";
 
@@ -16,6 +17,7 @@ export interface HiveMimeCategoryPollVoteProps {
 }
 
 export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeCategoryPollVoteProps) => {
+  const { t } = useTranslation();
   const [openedCandidate, setOpenedCandidate] = useState<CombinedPollCandidate | null>(null);
   const [openedCategory, setOpenedCategory] = useState<CategoryDto | null>(null);
 
@@ -48,7 +50,7 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
           category={openedCategory}
           onClose={() => setOpenedCategory(null)} />
 
-        <span className="text-informational text-sm">Please add categories to the candidates.</span>
+        <span className="text-informational text-sm">{t("posts:vote.categoryInstruction")}</span>
 
         <div className="flex flex-wrap gap-2 mb-4">
           {poll.categories!.map((category, index) => (

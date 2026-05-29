@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react-lite";
 import { PostDto, PostResultDto } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ interface HiveMimePostResultProps {
 }
 
 export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveMimePostResultProps) => {
+  const { t } = useTranslation();
   const [results, setResults] = useState<PostResultDto | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const queryBuilder: VoteQueryGroup = useMemo(() => 
@@ -45,14 +47,14 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
         <div className="border rounded-md">
           <div className="flex justify-between items-center border-b bg-muted/30 px-2">
             <span className="font-semibold">
-              Results 
+              {t("posts:result.results")}
               <span className="font-normal text-sm text-muted-foreground ml-2">
-                {(post.voteCount ?? 0).toLocaleString()} votes
+                {t("posts:result.votes", { count: post.voteCount ?? 0 })}
               </span>
             </span>
             <Button variant="link" onClick={() => setFilterOpen(true)}>
               <Filter />
-              Filter votes
+              {t("posts:result.filterVotes")}
             </Button>
           </div>
           
@@ -67,7 +69,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
           {footer}
           <Button variant="outline" className="ml-auto text-muted-foreground" onClick={requestVote}>
             <Vote />
-            Vote
+            {t("posts:vote.vote")}
           </Button>
         </div>
       </div>

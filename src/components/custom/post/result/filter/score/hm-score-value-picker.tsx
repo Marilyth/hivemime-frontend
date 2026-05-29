@@ -7,12 +7,15 @@ import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface HiveMimeFilterConditionScoreValuePickerProps {
     currentItem: VoteQuery;
 }
 
 export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
+    const { t } = useTranslation();
+
     useEffect(() => {
         if (currentItem.value != null)
             return;
@@ -37,7 +40,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
         <div className="flex-col gap-2">
             <HiveMimeBulletItem>
                 <span className="text-sm text-muted-foreground">
-                    This condition
+                    {t("posts:filter.thisCondition")}
                     <Select
                         value={currentItem.isNegated ? "true" : "false"}
                         onValueChange={(value) => setNegation(value === "true")}
@@ -46,18 +49,18 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            <SelectItem value="false">must</SelectItem>
-                            <SelectItem value="true">must not</SelectItem>
+                            <SelectItem value="false">{t("enums:match.must")}</SelectItem>
+                            <SelectItem value="true">{t("enums:match.mustNot")}</SelectItem>
                         </SelectContent>
                     </Select>
-                    match
+                    {t("posts:filter.match")}
                 </span>
             </HiveMimeBulletItem>
 
             <HiveMimeBulletItem className="gap-2">
                 <div className="flex flex-col gap-4">
                     <div className="text-sm text-muted-foreground">
-                        Candidate&apos;s score was
+                        {t("posts:filter.scoreWas")}
                         <Select
                             value={currentItem.valueOperator!}
                             onValueChange={(value) => setOperator(value as ValueOperator)}
@@ -91,9 +94,16 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
 });
 
 export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
+    const { t } = useTranslation();
+
     return (
         <Label>
-            {currentItem.candidate?.name} score {currentItem.isNegated ? " not" : ""} {currentItem.valueOperator!} {currentItem.value}
+            {t("posts:filter.scoreViewer", {
+                name: currentItem.candidate?.name,
+                negation: currentItem.isNegated ? " not" : "",
+                operator: currentItem.valueOperator!,
+                value: currentItem.value,
+            })}
         </Label>
     );
 });

@@ -14,12 +14,14 @@ import { HiveMimeExpandableText } from "../../utility/hm-expandable-text";
 import { AsyncButton } from "../../utility/async-button";
 import { getRoleColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 export type HiveMimeHiveListItemProps = {
   hive: HiveDto;
 } & HTMLAttributes<HTMLDivElement>;
 
 export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: HiveMimeHiveListItemProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const hiveFollow = followedHivesStore.followedHives.get(hive.id!);
   const isModerator = hiveFollow != null && hiveFollow.role !== MemberRole.Follower;
@@ -28,10 +30,10 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
   async function leaveHive() {
     const task = api.api.hiveLeaveDelete({ followId: hiveFollow!.id });
     toast.promise(task, {
-      loading: 'Leaving hive...',
+      loading: t("toasts:hive.leaving"),
       success: () =>{
         followedHivesStore.removeFollowedHive(hive.id!);
-        return "Hive left successfully!";
+        return t("toasts:hive.left");
       }
     });
 
@@ -41,14 +43,14 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
   async function joinHive() {
     const task = api.api.hiveJoinCreate({ hiveId: hive.id });
     await toast.promise(task, {
-      loading: 'Joining hive...',
+      loading: t("toasts:hive.joining"),
       success: (r) => {
         followedHivesStore.addFollowedHive(r.data);
 
         if (hive.settings?.joinRequiresApproval)
-          return "Join request sent! A moderator must approve it.";
+          return t("toasts:hive.joinRequestSent");
         else
-          return "Hive joined successfully!";
+          return t("toasts:hive.joined");
       }
     });
 
@@ -86,16 +88,16 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
               size="sm"
               onClick={canJoin ? joinHive : leaveHive}
             >
-              {canJoin ? (hive.settings?.joinRequiresApproval ? "Request to join" : "Join") : "Leave"}
+              {canJoin ? (hive.settings?.joinRequiresApproval ? t("hives:card.requestToJoin") : t("hives:card.join")) : t("hives:card.leave")}
             </AsyncButton>
           </div>
           {hiveFollow != null && (
             <div className="flex flex-row gap-2">
               {hiveFollow.approvalStatus != ApprovalStatus.Approved && <Badge variant="outline">
-                {hiveFollow?.approvalStatus}
+                {t(`enums:approvalStatus.${hiveFollow.approvalStatus!.toLowerCase()}`)}
               </Badge>}
               <Badge variant="outline" className={`${getRoleColor(hiveFollow.role!)}`}>
-                {hiveFollow?.role}
+                {t(`enums:memberRole.${hiveFollow.role!.toLowerCase()}`)}
               </Badge>
             </div>
           )}
@@ -111,11 +113,11 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
       <CardFooter className="gap-4 text-muted-foreground mt-auto">
         <Label>
           <User className="mr-1 inline-block h-4 w-4" />
-          {hive.userCount} members
+          {t("hives:card.members", { count: hive.userCount })}
         </Label>
         <Label>
           <FileChartColumn className="mr-1 inline-block h-4 w-4" />
-          {hive.postCount} posts
+          {t("hives:card.posts", { count: hive.postCount })}
         </Label>
       </CardFooter>
     </Card>

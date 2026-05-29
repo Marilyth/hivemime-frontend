@@ -9,12 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowUpDown, LucideMessagesSquare } from "lucide-react";
 import { useState } from "react";
 import { useDebounce } from "../utility/debounce";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMimeCommentBrowseProps {
   post: PostDto;
 }
 
 export const HiveMimeCommentBrowse = observer(({ post }: HiveMimeCommentBrowseProps) => {
+  const { t } = useTranslation();
   const [textFilter, setTextFilter] = useState<string>("");
   const [debouncedTextFilter, isLoading] = useDebounce(textFilter, 300);
   const [orderBy, setOrderBy] = useState<CommentOrderBy>(CommentOrderBy.New);
@@ -24,20 +26,20 @@ export const HiveMimeCommentBrowse = observer(({ post }: HiveMimeCommentBrowsePr
       <CardHeader className="border-b gap-4">
         <CardTitle>
           <div className="flex flex-row gap-2 items-center">
-            <LucideMessagesSquare className="h-4 w-4 text-muted-foreground" /> Comments
+            <LucideMessagesSquare className="h-4 w-4 text-muted-foreground" /> {t("comments:browse.title")}
           </div>
         </CardTitle>
         <div className="flex flex-row gap-4 rounded-lg">
-          <Input placeholder="Filter by text..." className="flex-1" value={textFilter} onChange={(e) => setTextFilter(e.target.value)} />
+          <Input placeholder={t("comments:browse.filterByText")} className="flex-1" value={textFilter} onChange={(e) => setTextFilter(e.target.value)} />
           <Select onValueChange={(value) => setOrderBy(value as CommentOrderBy)} defaultValue={orderBy}>
             <SelectTrigger>
               <ArrowUpDown />
-              <SelectValue placeholder="Order by" />
+              <SelectValue placeholder={t("comments:browse.orderBy")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={CommentOrderBy.Best}>Best</SelectItem>
-              <SelectItem value={CommentOrderBy.New}>Newest</SelectItem>
-              <SelectItem value={CommentOrderBy.Old}>Oldest</SelectItem>
+              <SelectItem value={CommentOrderBy.Best}>{t("enums:commentOrder.best")}</SelectItem>
+              <SelectItem value={CommentOrderBy.New}>{t("enums:commentOrder.newest")}</SelectItem>
+              <SelectItem value={CommentOrderBy.Old}>{t("enums:commentOrder.oldest")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

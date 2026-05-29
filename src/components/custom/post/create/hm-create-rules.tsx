@@ -1,8 +1,11 @@
+"use client";
+
 import { observer } from "mobx-react-lite";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { Select, SelectContent, SelectItem, SelectValue } from "../../../ui/select";
 import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
 import { HiveMimeCreatePollProps } from "./hm-create-choice-poll";
+import { Trans, useTranslation } from "react-i18next";
 
 
 export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProps) =>  {
@@ -17,20 +20,25 @@ export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProp
 
   return (
     <HiveMimeBulletItem>
-        The user has to vote for at least
-        <Select
-          value={props.poll.minVotes!.toString()}
-          onValueChange={updateMinVotes}>
-          <HiveMimeInlineSelectTrigger>
-              <SelectValue />
-          </HiveMimeInlineSelectTrigger>
-          <SelectContent>
-            {[...Array(props.poll.candidates?.length ?? 0).keys()].map(i => (
-              <SelectItem key={i} value={(i + 1).toString()}>{i + 1}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        candidates.
+      <Trans
+        i18nKey="posts:create.rules.minVotes"
+        components={{
+          select: (
+            <Select
+              value={props.poll.minVotes!.toString()}
+              onValueChange={updateMinVotes}>
+              <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+              </HiveMimeInlineSelectTrigger>
+              <SelectContent>
+                {[...Array(props.poll.candidates?.length ?? 0).keys()].map(i => (
+                  <SelectItem key={i} value={(i + 1).toString()}>{i + 1}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ),
+        }}
+      />
     </HiveMimeBulletItem>
   );
 });
@@ -38,40 +46,52 @@ export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProp
 export const HiveMimeCreateMaxvoteRule = observer((props: HiveMimeCreatePollProps) =>  {
   return (
     <HiveMimeBulletItem>
-        The user can vote for up to
-        <Select
-          value={props.poll.maxVotes!.toString()}
-          onValueChange={(value) => props.poll.maxVotes = Number(value)}>
-          <HiveMimeInlineSelectTrigger>
-              <SelectValue />
-          </HiveMimeInlineSelectTrigger>
-          <SelectContent>
-            {[...Array(props.poll.candidates!.length - props.poll.minVotes! + 1).keys()].map(i => (
-              <SelectItem key={i} value={(props.poll.minVotes! + i).toString()}>{props.poll.minVotes! + i}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        candidates.
+      <Trans
+        i18nKey="posts:create.rules.maxVotes"
+        components={{
+          select: (
+            <Select
+              value={props.poll.maxVotes!.toString()}
+              onValueChange={(value) => props.poll.maxVotes = Number(value)}>
+              <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+              </HiveMimeInlineSelectTrigger>
+              <SelectContent>
+                {[...Array(props.poll.candidates!.length - props.poll.minVotes! + 1).keys()].map(i => (
+                  <SelectItem key={i} value={(props.poll.minVotes! + i).toString()}>{props.poll.minVotes! + i}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ),
+        }}
+      />
     </HiveMimeBulletItem>
   );
 });
 
 export const HiveMimeCreateShuffleRule = observer((props: HiveMimeCreatePollProps) =>  {
+  const { t } = useTranslation();
+
   return (
     <HiveMimeBulletItem>
-        The candidates
-        <Select
-          value={props.poll.isShuffled ? "true" : "false"}
-          onValueChange={(value) => props.poll.isShuffled = value === "true"}>
-          <HiveMimeInlineSelectTrigger>
-              <SelectValue />
-          </HiveMimeInlineSelectTrigger>
-          <SelectContent>
-              <SelectItem value="true">are</SelectItem>
-              <SelectItem value="false">are not</SelectItem>
-          </SelectContent>
-        </Select>
-        shuffled for the user.
+      <Trans
+        i18nKey="posts:create.rules.shuffle"
+        components={{
+          select: (
+            <Select
+              value={props.poll.isShuffled ? "true" : "false"}
+              onValueChange={(value) => props.poll.isShuffled = value === "true"}>
+              <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+              </HiveMimeInlineSelectTrigger>
+              <SelectContent>
+                  <SelectItem value="true">{t("enums:shuffle.are")}</SelectItem>
+                  <SelectItem value="false">{t("enums:shuffle.areNot")}</SelectItem>
+              </SelectContent>
+            </Select>
+          ),
+        }}
+      />
     </HiveMimeBulletItem>
   );
 });

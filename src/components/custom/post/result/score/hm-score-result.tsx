@@ -2,6 +2,7 @@ import { AnimatedBackground } from "@/components/custom/utility/hm-animated-back
 import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 import { CandidateDto, PollDto, PollResultDto } from "@/lib/Api";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
 import { HiveMimeViewCandidate } from "../../hm-candidate";
 
@@ -12,6 +13,7 @@ export interface HiveMimeScoreResultProps {
 }
 
 export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
+  const { t } = useTranslation();
   const span = props.poll.maxValue! - props.poll.minValue!;
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(null);
 
@@ -24,7 +26,7 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
         />
 
         <span className="text-sm text-informational">
-            You can see the <span className="font-medium text-honey-brown">vote distribution</span> of a candidate <span className="font-medium text-honey-brown">by clicking</span> on it.
+            {t("posts:result.distributionHint")}
         </span>
         {props.pollResult?.candidates!.map((candidate, index) => {
             const candidateValue = candidate.voterAmount! > 0 ? candidate.averageScore! : 0;
@@ -45,7 +47,7 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
                             <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {Number(candidateValue.toFixed(2))}
                                 <div className="text-muted-foreground">
-                                    {candidate.voterAmount} votes
+                                    {t("posts:result.votes", { count: candidate.voterAmount })}
                                 </div>
                             </div>
                         </div>
@@ -58,6 +60,7 @@ export function HiveMimeScoreResult(props: HiveMimeScoreResultProps) {
 }
 
 export function HiveMimeScoreDistributionResult(props: HiveMimeDistributionResultTypeProps) {
+  const { t } = useTranslation();
   const totalVotes = props.candidateResult.reduce((sum, candidate) => sum + candidate.score!, 0);
   const span = props.poll.maxValue! - props.poll.minValue!;
   const stepSize = Math.ceil((span + 1) / 10.0);
@@ -77,12 +80,12 @@ export function HiveMimeScoreDistributionResult(props: HiveMimeDistributionResul
                     <AnimatedBackground percentage={percentage} />
                     <div className="flex flex-col gap-0 relative">
                         <div className="relative flex flex-row gap-2 items-center">
-                            <span className="font-medium">{stepStart} - {stepStart + stepSize - 1}</span>
+                            <span className="font-medium">{t("posts:result.scoreRange", { start: stepStart, end: stepStart + stepSize - 1 })}</span>
 
                             <div className="flex flex-col items-end text-muted-foreground ml-auto text-sm">
                                 {Number(percentage.toFixed(2))}%
                                 <div className="text-muted-foreground">
-                                    {stepScore} votes
+                                    {t("posts:result.votes", { count: stepScore })}
                                 </div>
                             </div>
                         </div>

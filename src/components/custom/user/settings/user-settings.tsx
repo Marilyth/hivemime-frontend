@@ -5,22 +5,24 @@ import { Settings } from "lucide-react";
 import { UserAccountSettings } from "./user-account-settings";
 import { UserPrivacySettings } from "./user-privacy-settings";
 import { useQueryParam } from "../../utility/use-query-param";
+import { useTranslation } from "react-i18next";
 
 export function UserSettings() {
+  const { t } = useTranslation();
   const [tab, setTab] = useQueryParam("tab", "account");
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex flex-row items-center gap-2">
-          <Settings className="text-muted-foreground" /> User Settings
+          <Settings className="text-muted-foreground" /> {t("settings:user.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue={tab!} onValueChange={setTab}>
           <TabsList>
-            <TabsTrigger value="account">Account</TabsTrigger>
-            <TabsTrigger value="privacy">Privacy</TabsTrigger>
+            <TabsTrigger value="account">{t("settings:user.account")}</TabsTrigger>
+            <TabsTrigger value="privacy">{t("settings:user.privacy")}</TabsTrigger>
           </TabsList>
           <TabsContent value="account" className="mt-4">
             <UserAccountSettings />

@@ -1,6 +1,7 @@
 import { AnimatedBackground } from "@/components/custom/utility/hm-animated-background";
 import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 import { PollResultDto } from "@/lib/Api";
+import { useTranslation } from "react-i18next";
 import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
@@ -9,6 +10,7 @@ export interface HiveMimeChoiceResultProps {
 }
 
 export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
+  const { t } = useTranslation();
   const totalScore = props.pollResult!.candidates!.reduce((sum, candidate) => sum + candidate.voterAmount!, 0);
 
   return (
@@ -28,7 +30,7 @@ export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
                             <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {Number(percentage.toFixed(2))}%
                                 <div className="text-muted-foreground">
-                                    {candidate.voterAmount} votes
+                                    {t("posts:result.votes", { count: candidate.voterAmount })}
                                 </div>
                             </div>
                         </div>

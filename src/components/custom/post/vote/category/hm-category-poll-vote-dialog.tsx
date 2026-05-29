@@ -1,6 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
+import { useTranslation } from "react-i18next";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../../ui/dialog";
 import { HiveMimeHoverCard } from "../../../utility/hm-hover-card";
@@ -17,6 +18,8 @@ export interface HiveMimeCategoryPollVoteCandidateDialogProps {
 }
 
 export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, candidate, onClose }: HiveMimeCategoryPollVoteCandidateDialogProps) => {
+  const { t } = useTranslation();
+
   function isSelected(category: CategoryDto) {
     return candidate?.vote.value == category?.value;
   }
@@ -36,9 +39,9 @@ export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, c
     <Dialog open={candidate != null} onOpenChange={() => onClose()}>
       <DialogContent className="gap-2">
         <DialogHeader>
-          <DialogTitle>Pick a category for <span className="text-honey-brown">{candidate?.candidate.name}</span></DialogTitle>
+          <DialogTitle>{t("posts:vote.pickCategoryFor", { name: candidate?.candidate.name })}</DialogTitle>
           <DialogDescription>
-            Please pick a category to assign the candidate to.
+            {t("posts:vote.pickCategoryDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -60,6 +63,8 @@ export interface HiveMimeCategoryPollVoteCategoryDialogProps {
 }
 
 export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, category, onClose }: HiveMimeCategoryPollVoteCategoryDialogProps) => {
+  const { t } = useTranslation();
+
   function isSelected(candidate: CombinedPollCandidate) {
     return candidate.vote.value === category?.value;
   }
@@ -79,9 +84,9 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
     <Dialog open={category != null} onOpenChange={() => onClose()}>
       <DialogContent className="gap-2">
         <DialogHeader>
-          <DialogTitle>Pick candidates for <span className="text-honey-brown">{category?.name}</span></DialogTitle>
+          <DialogTitle>{t("posts:vote.pickCandidatesFor", { name: category?.name })}</DialogTitle>
           <DialogDescription>
-            Please pick candidates to assign the category to.
+            {t("posts:vote.pickCandidatesDescription")}
           </DialogDescription>
         </DialogHeader>
 

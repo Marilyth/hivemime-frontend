@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 import { useState } from "react";
 import { HiveMimeCommentCreate } from "./hm-comment-create";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
-import { CircleMinus, CirclePlus, Ellipsis, FileMinus, FilePlus, Gavel, Reply, Trash2 } from "lucide-react";
+import { CircleMinus, CirclePlus, Ellipsis, Gavel, Reply, Trash2 } from "lucide-react";
 import { HiveMimeExpandableText } from "../utility/hm-expandable-text";
 import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import { getEffectiveRole, getRoleColor, getRoleRank } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMimeCommentProps {
   hiveId?: number;
@@ -31,6 +32,7 @@ export interface HiveMimeCommentProps {
 }
 
 export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedReplies, parentComment, textFilter, orderBy }: HiveMimeCommentProps) => {
+  const { t } = useTranslation();
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [loadedParentComment, setLoadedParentComment] = useState<CommentDto | null>(null);
   const [createdReplies, setCreatedReplies] = useState<CommentDto[]>([]);
@@ -62,8 +64,8 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
         onlyRoot: !textFilter
       });
       toast.promise(task, {
-        loading: 'Loading comments...',
-        success: 'Comments loaded.'
+        loading: t("toasts:comment.loading"),
+        success: t("toasts:comment.loaded")
       });
 
       const response = await task;
@@ -90,8 +92,8 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
 
     const task = api.api.commentGetList({ commentId: comment.parentCommentId });
     toast.promise(task, {
-      loading: 'Loading parent comment...',
-      success: 'Parent comment loaded.'
+      loading: t("toasts:comment.loadingParent"),
+      success: t("toasts:comment.parentLoaded")
     });
     const response = await task;
 
@@ -123,8 +125,8 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
     const task = api.api.commentDeleteDelete({ commentId: comment.id! });
 
     toast.promise(task, {
-      loading: 'Deleting comment...',
-      success: 'Comment deleted.',
+      loading: t("toasts:comment.deleting"),
+      success: t("toasts:comment.deleted"),
     });
 
     await task;
@@ -137,8 +139,8 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
     });
 
     toast.promise(task, {
-      loading: 'Banning user...',
-      success: 'User banned.',
+      loading: t("toasts:ban.banningUser"),
+      success: t("toasts:ban.userBanned"),
     });
 
     await task;
@@ -149,7 +151,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
       {comment.parentCommentId && !parentComment?.id && (
         !loadedParentComment ? (
         <AsyncButton variant="link" size="sm" onClick={loadParentComment} className="self-start p-0 h-auto mb-2">
-            Load parent comment...
+            {t("comments:item.loadParentComment")}
         </AsyncButton>
         ) : (
           <HiveMimeComment hiveId={hiveId} comment={loadedParentComment} isRoot={false} prefetchedReplies={getNextPrefetchedReplies()} />
@@ -177,11 +179,11 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                   <Tooltip>
                     <TooltipTrigger className="text-sm">
                        <Badge variant="outline" className="text-xs text-honey-brown p-0 px-1">
-                        OP
+                        {t("comments:item.opBadge")}
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      This user created the post
+                      {t("comments:item.postCreatorTooltip")}
                     </TooltipContent>
                   </Tooltip>
                 }
@@ -189,11 +191,11 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                   <Tooltip>
                     <TooltipTrigger className="text-sm">
                        <Badge variant="outline" className={`text-xs p-0 px-1 ${getRoleColor(comment.role!)}`}>
-                        {comment.role!}
+                        {t(`enums:memberRole.${comment.role!.toLowerCase()}`)}
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      This user is a {comment.role!} of the hive
+                      {t("comments:item.hiveRoleTooltip", { role: t(`enums:memberRole.${comment.role!.toLowerCase()}`) })}
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -206,8 +208,8 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                       </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {canDelete && <DropdownMenuItem onSelect={deleteComment}><Trash2 /> Delete</DropdownMenuItem>}
-                    {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> Ban user</DropdownMenuItem>}
+                    {canDelete && <DropdownMenuItem onSelect={deleteComment}><Trash2 /> {t("comments:item.delete")}</DropdownMenuItem>}
+                    {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> {t("comments:item.banUser")}</DropdownMenuItem>}
                   </DropdownMenuContent>
                 </DropdownMenu>)}
               </div>
@@ -228,7 +230,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                       <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
                           <Button variant="ghost" size="sm" onClick={() => setIsReplying(true)} className="p-1!">
                               <Reply className="mr-1" />
-                              Reply
+                              {t("comments:item.reply")}
                           </Button>
                       </div>
                     </>
@@ -246,7 +248,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                     dataLength={replies.length}
                     next={() => repliesQuery.fetchNextPage()}
                     hasMore={isRoot && hasMoreReplies()}
-                    loader={<p>Loading...</p>}
+                    loader={<p>{t("common:loading")}</p>}
                   >
                     {replies.map(reply => (
                         <HiveMimeComment key={reply.id} hiveId={hiveId} comment={reply} isRoot={false} prefetchedReplies={prefetchedReplies} parentComment={comment} />
@@ -255,7 +257,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
 
                   {hasMoreReplies() && (
                     <AsyncButton variant="link" size="sm" onClick={() => repliesQuery.fetchNextPage()} className="self-start p-0 pb-1 h-auto">
-                        Load replies...
+                        {t("comments:item.loadReplies")}
                     </AsyncButton>
                   )}
               </motion.div>}

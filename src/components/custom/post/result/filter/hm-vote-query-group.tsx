@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { HiveMimeDraggable } from "@/components/custom/utility/hm-draggable";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ type HiveMimeVoteQueryGroupProps = {
 };
 
 export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem, onMoved }: HiveMimeVoteQueryGroupProps) => {
+    const { t } = useTranslation();
     const newAncestors: VoteQueryGroup[] = useMemo(() => [...ancestors, group], [ancestors, group]);
 
     function setLeftOperator(value: BooleanOperator) {
@@ -79,8 +81,8 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            <SelectItem value={BooleanOperator.And}>And</SelectItem>
-                            <SelectItem value={BooleanOperator.Or}>Or</SelectItem>
+                            <SelectItem value={BooleanOperator.And}>{t("enums:queryOperator.and")}</SelectItem>
+                            <SelectItem value={BooleanOperator.Or}>{t("enums:queryOperator.or")}</SelectItem>
                         </SelectContent>
                     </Select>
                 )}

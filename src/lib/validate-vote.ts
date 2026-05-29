@@ -1,12 +1,12 @@
-import { error } from "console";
 import { PollDto, PollVoteDto, PostVoteDto } from "./Api";
+import i18n from "./i18n";
 
 export function validatePickPost(postPolls: PollDto[], postVotes: PostVoteDto): string[] {
     const errors: string[] = [];
 
     postPolls.forEach((poll, index) => {
         const vote = postVotes.polls![index];
-        errors.push(...validatePickPoll(poll, vote).map(e => `Poll ${index + 1}: ${e}`));
+        errors.push(...validatePickPoll(poll, vote).map(e => i18n.t("validation:pollPrefix", { index: index + 1, message: e })));
     });
 
     return errors;
@@ -19,22 +19,22 @@ export function validatePickPoll(poll: PollDto, vote: PollVoteDto): string[] {
     const voteCount = voteValues!.filter(c => c != null).length;
 
     if (voteCount == 0 && !poll.isOptional){
-        errors.push("You must vote for this poll.");
+        errors.push(i18n.t("validation:vote.required"));
         return errors;
     }
 
     if (voteCount < poll.minVotes!)
-        errors.push(`You must vote for at least ${poll.minVotes} candidates.`);
+        errors.push(i18n.t("validation:vote.minCandidates", { minVotes: poll.minVotes }));
 
     if (voteCount > poll.maxVotes!)
-        errors.push(`You must vote for no more than ${poll.maxVotes} candidates.`);
+        errors.push(i18n.t("validation:vote.maxCandidates", { maxVotes: poll.maxVotes }));
 
     for (const value of voteValues) {
         if (value != null) {
             if (value < poll.minValue!)
-                errors.push(`Your candidate's value can not be smaller than ${poll.minValue}.`);
+                errors.push(i18n.t("validation:vote.valueTooSmall", { minValue: poll.minValue }));
             if (value > poll.maxValue!)
-                errors.push(`Your candidate's value can not be larger than ${poll.maxValue}.`);
+                errors.push(i18n.t("validation:vote.valueTooLarge", { maxValue: poll.maxValue }));
         }
     }
 
