@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/
 import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vote-category";
 import { Label } from "@/components/ui/label";
 
@@ -12,6 +13,8 @@ interface HiveMimeFilterConditionCategoryValuePickerProps {
 }
 
 export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+    const { t } = useTranslation();
+
     useEffect(() => {
         if (currentItem.value != null)
             return;
@@ -32,7 +35,7 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
         <div className="flex-col gap-2">
             <HiveMimeBulletItem>
                 <span className="text-sm text-muted-foreground">
-                    This condition
+                    {t("posts:filter.thisCondition")}
                     <Select
                         value={currentItem.isNegated ? "true" : "false"}
                         onValueChange={(value) => setNegation(value === "true")}
@@ -41,18 +44,18 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            <SelectItem value="false">must</SelectItem>
-                            <SelectItem value="true">must not</SelectItem>
+                            <SelectItem value="false">{t("enums:match.must")}</SelectItem>
+                            <SelectItem value="true">{t("enums:match.mustNot")}</SelectItem>
                         </SelectContent>
                     </Select>
-                    match
+                    {t("posts:filter.match")}
                 </span>
             </HiveMimeBulletItem>
 
             <HiveMimeBulletItem className="gap-2">
                 <div className="flex flex-col gap-4">
                     <div className="text-sm text-muted-foreground">
-                        Candidate was categorized as 
+                        {t("posts:filter.categorizedAs")}
                         
                         <Select
                             value={currentItem.value?.toString() ?? "none"}
@@ -67,7 +70,7 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                                         <HiveMimeCategoryTag category={category} />
                                     </SelectItem>
                                 ))}
-                                <SelectItem value="none">Nothing</SelectItem>
+                                <SelectItem value="none">{t("enums:rankFilter.nothing")}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -78,14 +81,18 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
 });
 
 export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+    const { t } = useTranslation();
+
     return (
         <Label>
-            {currentItem.candidate?.name} is {currentItem.isNegated ? "not " : ""} 
-            {currentItem.value == null ? "uncategorized" : 
+            {t(currentItem.isNegated ? "posts:filter.notCategorized" : "posts:filter.categorizedAsViewer", { name: currentItem.candidate?.name })}{" "}
+            {currentItem.value == null
+                ? t("posts:filter.uncategorized")
+                : (
                 <span className="inline-block align-middle">
                     <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
                 </span>
-            }
+            )}
         </Label>
     );
 });

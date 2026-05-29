@@ -16,6 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { api, followedHivesStore, userStore } from "@/lib/contexts";
 import { toast } from "sonner";
 import { getEffectiveRole, getRoleRank } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -23,6 +24,7 @@ export interface HiveMimePostProps {
 }
 
 export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) => {
+  const { t } = useTranslation();
   const [resultsVisible, setResultsVisible] = useState<boolean>(showResults || false);
   const router = useRouter();
 
@@ -48,8 +50,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     const task = api.api.postDeleteDelete({ postId: post.id! });
     
     toast.promise(task, {
-      loading: 'Deleting post...',
-      success: 'Post deleted.'
+      loading: t("toasts:post.deleting"),
+      success: t("toasts:post.deleted")
     });
 
     await task;
@@ -59,8 +61,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     const task = api.api.hiveBanUserPartialUpdate({ hiveId: post.hive!.id!, userId: post.creator!.id! });
 
     toast.promise(task, {
-      loading: 'Banning user...',
-      success: 'User banned from hive.'
+      loading: t("toasts:ban.banningUser"),
+      success: t("toasts:ban.userBannedFromHive")
     });
 
     await task;
@@ -70,8 +72,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
     const task = api.api.postModifyPostPartialUpdate({ postId: post.id!, approvalStatus });
 
     toast.promise(task, {
-      loading: 'Modifying post...',
-      success: 'Post modified.'
+      loading: t("toasts:post.modifying"),
+      success: t("toasts:post.modified")
     });
 
     post.approvalStatus = approvalStatus;
@@ -100,11 +102,11 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
         <CardTitle className="text-informational text-sm flex flex-row">
           <span>
             {post.hive ? <Button className="p-0 h-auto" variant="link"
-              onClick={() => router.push(`/posts?hiveId=${post.hive!.id}`)}>{post.hive.name}</Button> : "Private"} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
+              onClick={() => router.push(`/posts?hiveId=${post.hive!.id}`)}>{post.hive.name}</Button> : t("common:private")} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
           </span>
           {post.approvalStatus !== "Approved" && (
             <Badge variant="destructive" className="ml-2">
-              {post.approvalStatus}
+              {t(`enums:approvalStatus.${post.approvalStatus!.toLowerCase()}`)}
             </Badge>
           )}
           {showContextMenu && (
@@ -117,11 +119,11 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
               <DropdownMenuContent>
                 {canModify &&
                 <>
-                  {post.approvalStatus != ApprovalStatus.Approved && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Approved)}><FilePlus /> Approve</DropdownMenuItem>}
-                  {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> Reject</DropdownMenuItem>}
+                  {post.approvalStatus != ApprovalStatus.Approved && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Approved)}><FilePlus /> {t("posts:card.approve")}</DropdownMenuItem>}
+                  {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> {t("posts:card.reject")}</DropdownMenuItem>}
                 </>}
-                {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> Delete</DropdownMenuItem>}
-                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> Ban user</DropdownMenuItem>}
+                {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> {t("posts:card.delete")}</DropdownMenuItem>}
+                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> {t("posts:card.banUser")}</DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

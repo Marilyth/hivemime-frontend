@@ -1,0 +1,88 @@
+{
+  "visibility": {
+    "private": "private",
+    "public": "public"
+  },
+  "approvalStatus": {
+    "approved": "Approved",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "banned": "Banned"
+  },
+  "postOrder": {
+    "hot": "Hot",
+    "newest": "Newest",
+    "oldest": "Oldest"
+  },
+  "commentOrder": {
+    "best": "Best",
+    "newest": "Newest",
+    "oldest": "Oldest"
+  },
+  "memberOrder": {
+    "newest": "Newest",
+    "oldest": "Oldest"
+  },
+  "queryOperator": {
+    "and": "And",
+    "or": "Or"
+  },
+  "selection": {
+    "selected": "selected",
+    "notSelected": "not selected"
+  },
+  "match": {
+    "must": "must",
+    "mustNot": "must not"
+  },
+  "valueOperator": {
+    "equals": "equal to",
+    "greater": "greater than",
+    "greaterEquals": "greater than or equal to",
+    "less": "less than",
+    "lessEquals": "less than or equal to"
+  },
+  "shuffle": {
+    "are": "are",
+    "areNot": "are not"
+  },
+  "memberRole": {
+    "anyone": "Anyone",
+    "followers": "Followers",
+    "moderators": "Moderators",
+    "admins": "Admins",
+    "creator": "Creator",
+    "guest": "Guest",
+    "follower": "Follower",
+    "moderator": "Moderator",
+    "admin": "Admin"
+  },
+  "pollType": {
+    "choice": "Choice",
+    "score": "Score",
+    "rank": "Rank",
+    "category": "Category"
+  },
+  "pollTypeDescription": {
+    "choice": "The user has to pick one or more out of several candidates.",
+    "score": "The user has to assign each candidate a numerical value within a specified range.",
+    "rank": "The user has to rank the candidates in order of preference. (E.g. top 10 lists)",
+    "category": "The user has to assign a category to each candidate. (E.g. tier lists)"
+  },
+  "rankFilter": {
+    "nothing": "Nothing"
+  },
+  "chartType": {
+    "bar": "Bar",
+    "column": "Column",
+    "pie": "Pie",
+    "doughnut": "Doughnut",
+    "halfDoughnut": "HalfDoughnut",
+    "line": "Line",
+    "smoothLine": "SmoothLine",
+    "area": "Area",
+    "scatter": "Scatter",
+    "world": "World",
+    "calendar": "Calendar"
+  }
+}

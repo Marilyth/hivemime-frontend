@@ -12,6 +12,7 @@ import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inli
 import { HiveMimeDraggable, OnDroppedArgs } from "@/components/custom/utility/hm-draggable";
 import { getReferenceId } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 
 type HiveMimeVoteQueryProps = {
@@ -23,6 +24,7 @@ type HiveMimeVoteQueryProps = {
 };
 
 export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved }: HiveMimeVoteQueryProps) => {
+    const { t } = useTranslation();
     const pollMapping: {
         [key in PollType]: React.ReactElement;
     } = {
@@ -94,8 +96,8 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
-                                <SelectItem value={BooleanOperator.And}>And</SelectItem>
-                                <SelectItem value={BooleanOperator.Or}>Or</SelectItem>
+                                <SelectItem value={BooleanOperator.And}>{t("enums:queryOperator.and")}</SelectItem>
+                                <SelectItem value={BooleanOperator.Or}>{t("enums:queryOperator.or")}</SelectItem>
                             </SelectContent>
                         </Select>
                     )}

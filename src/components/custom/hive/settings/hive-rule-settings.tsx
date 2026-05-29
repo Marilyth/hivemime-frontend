@@ -9,6 +9,7 @@ import { HiveDto, HiveUserDto, MemberRole } from "@/lib/Api";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getRoleRank } from "@/lib/utils";
+import { Trans, useTranslation } from "react-i18next";
 
 export interface HiveRuleSettingsProps {
   hiveDto: HiveDto;
@@ -16,13 +17,14 @@ export interface HiveRuleSettingsProps {
 }
 
 export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSettingsProps) => {
+  const { t } = useTranslation();
   const [hive, isDirty, resetChanges, applyChanges] = useObservableDraft(hiveDto);
 
   async function saveSettings() {
     const task = api.api.hiveUpdatePartialUpdate(hive);
     toast.promise(task, {
-      loading: "Saving your settings...",
-      success: "Your settings have been saved."
+      loading: t("toasts:settings.saving"),
+      success: t("toasts:settings.saved")
     });
 
     applyChanges();
@@ -35,17 +37,17 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
   return (
     <div className="flex flex-col gap-4">
       <FieldSet className="gap-2">
-        <FieldLegend className="my-2">Visibility</FieldLegend>
+        <FieldLegend className="my-2">{t("hives:settings.rulesSection.visibility")}</FieldLegend>
         <FieldDescription>
-          Control who can see and join this hive.
+          {t("hives:settings.rulesSection.visibilityDescription")}
         </FieldDescription>
 
         <FieldGroup className="bg-muted p-2 border-1 rounded-md gap-4">
           <Field orientation="horizontal">
             <FieldContent className="gap-1">
-              <FieldLabel>Private hive</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.privateHive")}</FieldLabel>
               <FieldDescription>
-                Only members can view this hive, and it will not show up when browsing hives.
+                {t("hives:settings.rulesSection.privateHiveDescription")}
               </FieldDescription>
             </FieldContent>
             <Switch
@@ -57,9 +59,9 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
           <Field orientation="horizontal">
             <FieldContent className="gap-1">
-              <FieldLabel>Require approval to join</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.requireApprovalToJoin")}</FieldLabel>
               <FieldDescription>
-                Users must be approved before they can join this hive.
+                {t("hives:settings.rulesSection.requireApprovalToJoinDescription")}
               </FieldDescription>
             </FieldContent>
             <Switch
@@ -71,13 +73,14 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
           <Field>
             <FieldContent className="gap-1">
-              <FieldLabel>Honey required to join</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.honeyRequiredToJoin")}</FieldLabel>
               <FieldDescription>
-                Users must have at least{" "}
-                <span className="text-honey-brown">
-                  🍯 {hive.settings?.minHoneyToJoin ?? 0}
-                </span>{" "}
-                to join this hive.
+                <Trans
+                  i18nKey="hives:settings.rulesSection.honeyRequiredToJoinDescription"
+                  components={{
+                    honey: <span className="text-honey-brown">🍯 {hive.settings?.minHoneyToJoin ?? 0}</span>
+                  }}
+                />
               </FieldDescription>
             </FieldContent>
             <Input
@@ -92,17 +95,17 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
       </FieldSet>
 
       <FieldSet className="gap-2">
-        <FieldLegend className="my-2">Posting</FieldLegend>
+        <FieldLegend className="my-2">{t("hives:settings.rulesSection.posting")}</FieldLegend>
         <FieldDescription>
-          Control who can create posts in this hive.
+          {t("hives:settings.rulesSection.postingDescription")}
         </FieldDescription>
 
         <FieldGroup className="bg-muted p-2 border-1 rounded-md gap-4">
           <Field orientation="horizontal">
             <FieldContent className="gap-1">
-              <FieldLabel>Require approval to post</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.requireApprovalToPost")}</FieldLabel>
               <FieldDescription>
-                Posts must be approved before they can be published in this hive.
+                {t("hives:settings.rulesSection.requireApprovalToPostDescription")}
               </FieldDescription>
             </FieldContent>
             <Switch
@@ -114,13 +117,14 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
           <Field>
             <FieldContent className="gap-1">
-              <FieldLabel>Honey required to post</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.honeyRequiredToPost")}</FieldLabel>
               <FieldDescription>
-                Users must have at least{" "}
-                <span className="text-honey-brown">
-                  🍯 {hive.settings?.minHoneyToPost ?? 0}
-                </span>{" "}
-                to post in this hive.
+                <Trans
+                  i18nKey="hives:settings.rulesSection.honeyRequiredToPostDescription"
+                  components={{
+                    honey: <span className="text-honey-brown">🍯 {hive.settings?.minHoneyToPost ?? 0}</span>
+                  }}
+                />
               </FieldDescription>
             </FieldContent>
             <Input
@@ -134,9 +138,9 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
           <Field>
             <FieldContent className="gap-1">
-              <FieldLabel>Who can post</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.whoCanPost")}</FieldLabel>
               <FieldDescription>
-                Users must at least be part of the following group to post in this hive.
+                {t("hives:settings.rulesSection.whoCanPostDescription")}
               </FieldDescription>
             </FieldContent>
 
@@ -146,14 +150,14 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
               disabled={!canEdit()}
             >
               <SelectTrigger className="max-w-64">
-                <SelectValue placeholder="Select a group" />
+                <SelectValue placeholder={t("hives:settings.rulesSection.selectGroup")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={MemberRole.Guest}>Anyone</SelectItem>
-                <SelectItem value={MemberRole.Follower}>Followers</SelectItem>
-                <SelectItem value={MemberRole.Moderator}>Moderators</SelectItem>
-                <SelectItem value={MemberRole.Admin}>Admins</SelectItem>
-                <SelectItem value={MemberRole.Creator}>Creator</SelectItem>
+                <SelectItem value={MemberRole.Guest}>{t("enums:memberRole.anyone")}</SelectItem>
+                <SelectItem value={MemberRole.Follower}>{t("enums:memberRole.followers")}</SelectItem>
+                <SelectItem value={MemberRole.Moderator}>{t("enums:memberRole.moderators")}</SelectItem>
+                <SelectItem value={MemberRole.Admin}>{t("enums:memberRole.admins")}</SelectItem>
+                <SelectItem value={MemberRole.Creator}>{t("enums:memberRole.creator")}</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -161,21 +165,22 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
       </FieldSet>
 
       <FieldSet className="gap-2">
-        <FieldLegend className="my-2">Commenting</FieldLegend>
+        <FieldLegend className="my-2">{t("hives:settings.rulesSection.commenting")}</FieldLegend>
         <FieldDescription>
-          Control who can comment on posts in this hive.
+          {t("hives:settings.rulesSection.commentingDescription")}
         </FieldDescription>
 
         <FieldGroup className="bg-muted p-2 border-1 rounded-md gap-4">
           <Field>
             <FieldContent className="gap-1">
-              <FieldLabel>Honey required to comment</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.honeyRequiredToComment")}</FieldLabel>
               <FieldDescription>
-                Users must have at least{" "}
-                <span className="text-honey-brown">
-                  🍯 {hive.settings?.minHoneyToComment ?? 0}
-                </span>{" "}
-                to comment in this hive.
+                <Trans
+                  i18nKey="hives:settings.rulesSection.honeyRequiredToCommentDescription"
+                  components={{
+                    honey: <span className="text-honey-brown">🍯 {hive.settings?.minHoneyToComment ?? 0}</span>
+                  }}
+                />
               </FieldDescription>
             </FieldContent>
             <Input
@@ -189,9 +194,9 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
           <Field>
             <FieldContent className="gap-1">
-              <FieldLabel>Who can comment</FieldLabel>
+              <FieldLabel>{t("hives:settings.rulesSection.whoCanComment")}</FieldLabel>
               <FieldDescription>
-                Users must at least be part of the following group to comment in this hive.
+                {t("hives:settings.rulesSection.whoCanCommentDescription")}
               </FieldDescription>
             </FieldContent>
 
@@ -201,14 +206,14 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
               disabled={!canEdit()}
             >
               <SelectTrigger className="max-w-64">
-                <SelectValue placeholder="Select a group" />
+                <SelectValue placeholder={t("hives:settings.rulesSection.selectGroup")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={MemberRole.Guest}>Anyone</SelectItem>
-                <SelectItem value={MemberRole.Follower}>Followers</SelectItem>
-                <SelectItem value={MemberRole.Moderator}>Moderators</SelectItem>
-                <SelectItem value={MemberRole.Admin}>Admins</SelectItem>
-                <SelectItem value={MemberRole.Creator}>Creator</SelectItem>
+                <SelectItem value={MemberRole.Guest}>{t("enums:memberRole.anyone")}</SelectItem>
+                <SelectItem value={MemberRole.Follower}>{t("enums:memberRole.followers")}</SelectItem>
+                <SelectItem value={MemberRole.Moderator}>{t("enums:memberRole.moderators")}</SelectItem>
+                <SelectItem value={MemberRole.Admin}>{t("enums:memberRole.admins")}</SelectItem>
+                <SelectItem value={MemberRole.Creator}>{t("enums:memberRole.creator")}</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -217,10 +222,10 @@ export const HiveRuleSettings = observer(({ hiveDto, currentUser }: HiveRuleSett
 
       <div className="self-end flex flex-row gap-2 mt-2">
         <Button variant="outline" disabled={!isDirty()} onClick={resetChanges}>
-          Reset
+          {t("common:reset")}
         </Button>
         <Button onClick={saveSettings} disabled={!isDirty()}>
-          Save
+          {t("common:save")}
         </Button>
       </div>
     </div>

@@ -1,4 +1,9 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
+
 export const HiveMimeRelativeTimestamp = ({ timestamp }: { timestamp: string }) => {
+  const { t } = useTranslation();
   const date = new Date(timestamp);
   if (isNaN(date.getTime())) return "";
 
@@ -13,19 +18,19 @@ export const HiveMimeRelativeTimestamp = ({ timestamp }: { timestamp: string }) 
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
 
-  const format = (v: number, unit: string) => `${v} ${unit}${v !== 1 ? "s" : ""}`;
+  const format = (v: number, singularKey: string, pluralKey: string) =>
+    `${v} ${t(v !== 1 ? pluralKey : singularKey)}`;
+
   let result = "";
 
-  if (years) result = format(years, "year");
-  else if (months) result = format(months, "month");
-  else if (weeks) result = format(weeks, "week");
-  else if (days) result = format(days, "day");
-  else if (hours) result = format(hours, "hour");
-  else if (minutes) result = format(minutes, "minute");
-  else result = format(seconds, "second");
+  if (years) result = format(years, "settings:timestamp.year", "settings:timestamp.years");
+  else if (months) result = format(months, "settings:timestamp.month", "settings:timestamp.months");
+  else if (weeks) result = format(weeks, "settings:timestamp.week", "settings:timestamp.weeks");
+  else if (days) result = format(days, "settings:timestamp.day", "settings:timestamp.days");
+  else if (hours) result = format(hours, "settings:timestamp.hour", "settings:timestamp.hours");
+  else if (minutes) result = format(minutes, "settings:timestamp.minute", "settings:timestamp.minutes");
+  else result = format(seconds, "settings:timestamp.second", "settings:timestamp.seconds");
 
-  if (diff < 0) result = `in ${result}`;
-  else result = `${result} ago`;
-  
-  return result;
+  if (diff < 0) return t("settings:timestamp.in", { time: result });
+  return t("settings:timestamp.ago", { time: result });
 };

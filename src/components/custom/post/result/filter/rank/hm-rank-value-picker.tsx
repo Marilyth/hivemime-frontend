@@ -7,12 +7,15 @@ import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface HiveMimeFilterConditionRankValuePickerProps {
     currentItem: VoteQuery;
 }
 
 export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
+    const { t } = useTranslation();
+
     useEffect(() => {
         if (currentItem.value != null)
             return;
@@ -37,7 +40,7 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
         <div className="flex-col gap-2">
             <HiveMimeBulletItem>
                 <span className="text-sm text-muted-foreground">
-                    This condition
+                    {t("posts:filter.thisCondition")}
                     <Select
                         value={currentItem.isNegated ? "true" : "false"}
                         onValueChange={(value) => setNegation(value === "true")}
@@ -46,18 +49,18 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            <SelectItem value="false">must</SelectItem>
-                            <SelectItem value="true">must not</SelectItem>
+                            <SelectItem value="false">{t("enums:match.must")}</SelectItem>
+                            <SelectItem value="true">{t("enums:match.mustNot")}</SelectItem>
                         </SelectContent>
                     </Select>
-                    match
+                    {t("posts:filter.match")}
                 </span>
             </HiveMimeBulletItem>
 
             <HiveMimeBulletItem className="gap-2">
                 <div className="flex flex-col gap-4">
                     <div className="text-sm text-muted-foreground">
-                        Candidate&apos;s rank was
+                        {t("posts:filter.rankWas")}
                         <Select
                             value={currentItem.valueOperator!}
                             onValueChange={(value) => setOperator(value as ValueOperator)}
@@ -89,7 +92,7 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
                                     </SelectItem>)
                                 )}
                                 <SelectItem key="none" value="none">
-                                    Nothing
+                                    {t("enums:rankFilter.nothing")}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -101,9 +104,18 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem }:
 });
 
 export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem }: HiveMimeFilterConditionRankValuePickerProps) => {
+    const { t } = useTranslation();
+
     return (
         <Label>
-            {currentItem.candidate?.name} rank {currentItem.isNegated ? "not" : ""} {currentItem.valueOperator!} {currentItem.value == null ? "unranked" : hiveMimeRankIcon(Number(currentItem.poll!.maxValue! - currentItem.value) + 1)}
+            {t("posts:filter.rankViewer", {
+                name: currentItem.candidate?.name,
+                negation: currentItem.isNegated ? " not" : "",
+                operator: currentItem.valueOperator!,
+            })}{" "}
+            {currentItem.value == null
+                ? t("posts:filter.unranked")
+                : hiveMimeRankIcon(Number(currentItem.poll!.maxValue! - currentItem.value) + 1)}
         </Label>
     );
 });

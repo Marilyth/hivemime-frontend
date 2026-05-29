@@ -20,8 +20,11 @@ import Link from "next/link"
 import { ThemePicker } from "./custom/utility/hm-theme-picker"
 import { followedHivesStore } from "@/lib/contexts"
 import { observer } from "mobx-react-lite"
+import { useTranslation } from "react-i18next"
 
 export const AppSidebar = observer(({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const { t } = useTranslation();
+
   return (
     <Sidebar
       {...props}
@@ -30,23 +33,23 @@ export const AppSidebar = observer(({ ...props }: React.ComponentProps<typeof Si
         <SidebarHeader>
           <div className="flex flex-col gap-4 items-center">
             <div className="relative h-24 w-24">
-              <img src="/HiveMimeIcon.png" alt="HiveMime Logo" style={{ objectFit: "contain" }} />
+              <img src="/HiveMimeIcon.png" alt={t("nav:logoAlt")} style={{ objectFit: "contain" }} />
             </div>
             <div className="flex text-2xl font-bold">
-              <span className="text-honey-brown">Hive</span>
-              <span className="text-honey-yellow">Mime</span>
+              <span className="text-honey-brown">{t("nav:brandHive")}</span>
+              <span className="text-honey-yellow">{t("nav:brandMime")}</span>
             </div>
           </div>
         </SidebarHeader>
 
          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Posts</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav:posts")}</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href={"/posts"} className="flex items-center gap-2">
                   <TrendingUp />
-                  Popular
+                  {t("nav:popular")}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -54,13 +57,13 @@ export const AppSidebar = observer(({ ...props }: React.ComponentProps<typeof Si
         </SidebarGroup>
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Hives</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav:hives")}</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href={"/hives"} className="flex items-center gap-2">
                   <Search />
-                  Browse
+                  {t("nav:browse")}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

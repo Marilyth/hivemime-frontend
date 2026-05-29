@@ -6,6 +6,7 @@ import { HiveMimeCategoryTag } from "../../vote/category/hm-category-poll-vote-c
 import { numberToColorHex } from "@/lib/colors";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
@@ -15,6 +16,7 @@ export interface HiveMimeCategoryResultProps {
 }
 
 export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
+  const { t } = useTranslation();
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(null);
 
   return (
@@ -25,7 +27,7 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
             onClose={() => setSelectedCandidate(null)}
         />
         <span className="text-sm text-informational">
-            You can see the <span className="text-honey-brown">vote distribution</span> of a candidate <span className="text-honey-brown">by clicking</span> on it.
+            {t("posts:result.distributionHint")}
         </span>
         {props.pollResult?.candidates!.toSorted((a, b) => {
             if (a.majorityVote == null && b.majorityVote == null) return 0;
@@ -60,7 +62,7 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
                                     {category && <HiveMimeCategoryTag category={category} />}
                                 </span>
                                 <div className="text-muted-foreground">
-                                    {candidate.voterAmount} votes
+                                    {t("posts:result.votes", { count: candidate.voterAmount })}
                                 </div>
                             </div>
                         </div>
@@ -73,6 +75,7 @@ export function HiveMimeCategoryResult(props: HiveMimeCategoryResultProps) {
 }
 
 export function HiveMimeCategoryDistributionResult(props: HiveMimeDistributionResultTypeProps) {
+  const { t } = useTranslation();
   const totalVotes = props.candidateResult.reduce((sum, candidate) => sum + candidate.score!, 0);
   const span = props.poll.maxValue! - props.poll.minValue! + 1;
 
@@ -102,7 +105,7 @@ export function HiveMimeCategoryDistributionResult(props: HiveMimeDistributionRe
                                 {Number(percentage.toFixed(2))}%
                                 
                                 <div className="flex flex-row gap-2 items-center text-sm text-muted-foreground">
-                                    {bucketScore} votes
+                                    {t("posts:result.votes", { count: bucketScore })}
                                 </div>
                             </div>
                         </div>

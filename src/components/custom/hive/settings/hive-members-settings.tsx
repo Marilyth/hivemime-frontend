@@ -11,13 +11,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpDown, Gavel, UserRoundPlus, UserRoundX, X } from "lucide-react";
+import { ArrowUpDown, Gavel, UserRoundPlus, UserRoundX } from "lucide-react";
 import { useDebounce } from "../../utility/debounce";
 import { observable } from "mobx";
 import { getRoleColor, getRoleRank } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import Link from "next/link";
 import { UserAvatar } from "../../user/user-avatar";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMembersSettingsProps {
   hiveDto: HiveDto;
@@ -25,6 +26,7 @@ export interface HiveMembersSettingsProps {
 }
 
 export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembersSettingsProps) => {
+  const { t } = useTranslation();
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
   const [userNameFilter, setUserNameFilter] = useState<string>("");
   const [orderBy, setOrderBy] = useState<HiveUserOrderBy>(HiveUserOrderBy.New);
@@ -35,8 +37,8 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
     queryFn: async ({ pageParam }) => {
       const task = api.api.hiveUsersCreate({pageSize: 50, cursor: pageParam, filter: debouncedUserNameFilter, orderBy: orderBy}, { hiveId: hiveDto.id, status: approvalStatus });
       toast.promise(task, {
-        loading: 'Loading members...',
-        success: 'Members loaded.'
+        loading: t("toasts:hive.loadingMembers"),
+        success: t("toasts:hive.membersLoaded")
       });
 
       const response = await task;
@@ -51,26 +53,26 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-4">
-        <Input placeholder="Filter by username..." className="flex-1" value={userNameFilter} onChange={(e) => setUserNameFilter(e.target.value)} />
+        <Input placeholder={t("hives:settings.membersSection.filterByUsername")} className="flex-1" value={userNameFilter} onChange={(e) => setUserNameFilter(e.target.value)} />
         <Select onValueChange={(value) => setApprovalStatus(value as ApprovalStatus)} defaultValue={approvalStatus}>
           <SelectTrigger>
-            <SelectValue placeholder="Filter by approval status" />
+            <SelectValue placeholder={t("hives:settings.membersSection.filterByApprovalStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ApprovalStatus.Approved}>Approved</SelectItem>
-            <SelectItem value={ApprovalStatus.Pending}>Pending</SelectItem>
-            <SelectItem value={ApprovalStatus.Rejected}>Rejected</SelectItem>
-            <SelectItem value={ApprovalStatus.Banned}>Banned</SelectItem>
+            <SelectItem value={ApprovalStatus.Approved}>{t("enums:approvalStatus.approved")}</SelectItem>
+            <SelectItem value={ApprovalStatus.Pending}>{t("enums:approvalStatus.pending")}</SelectItem>
+            <SelectItem value={ApprovalStatus.Rejected}>{t("enums:approvalStatus.rejected")}</SelectItem>
+            <SelectItem value={ApprovalStatus.Banned}>{t("enums:approvalStatus.banned")}</SelectItem>
           </SelectContent>
         </Select>
         <Select onValueChange={(value) => setOrderBy(value as HiveUserOrderBy)} defaultValue={orderBy}>
           <SelectTrigger>
             <ArrowUpDown />
-            <SelectValue placeholder="Order by" />
+            <SelectValue placeholder={t("hives:settings.membersSection.orderBy")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={HiveUserOrderBy.New}>Newest</SelectItem>
-            <SelectItem value={HiveUserOrderBy.Old}>Oldest</SelectItem>
+            <SelectItem value={HiveUserOrderBy.New}>{t("enums:memberOrder.newest")}</SelectItem>
+            <SelectItem value={HiveUserOrderBy.Old}>{t("enums:memberOrder.oldest")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -82,13 +84,13 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
         {
           <Skeleton className="h-64 w-full rounded-xl my-4">
             <span className="flex h-full w-full items-center justify-center text-informational">
-              Loading...
+              {t("common:loading")}
             </span>
           </Skeleton>
         }
         endMessage=
         {
-          <div className="my-4 text-center">There are no more members!</div>
+          <div className="my-4 text-center">{t("hives:settings.membersSection.noMoreMembers")}</div>
         }
       >
       <div className="flex flex-col">
@@ -107,14 +109,15 @@ export interface HiveMemberProps {
 }
 
 export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
+  const { t } = useTranslation();
   const [draft, isDirty, resetChanges, applyChanges] = useObservableDraft(user);
 
   async function updateMember(){
     const task = api.api.hiveModifyUserPartialUpdate({ followRequestId: draft.id, approvalStatus: draft.approvalStatus, role: draft.role });
 
     toast.promise(task, {
-      loading: `Updating member...`,
-      success: `Member updated.`
+      loading: t("toasts:hive.updatingMember"),
+      success: t("toasts:hive.memberUpdated")
     });
 
     try{
@@ -153,7 +156,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
         <Link href={`/user?id=${user.user?.id}`} className="text-sm text-honey-brown flex-1">
           {user.user?.username}
         </Link>
-        <span className="text-sm text-muted-foreground">Joined on {new Date(user.createdAt!).toLocaleDateString()}</span>
+        <span className="text-sm text-muted-foreground">{t("hives:settings.membersSection.joinedOn", { date: new Date(user.createdAt!).toLocaleDateString() })}</span>
       </div>
 
       {user.approvalStatus == ApprovalStatus.Approved && (
@@ -166,22 +169,22 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
                 </AsyncButton>
               </TooltipTrigger>
               <TooltipContent>
-                Ban member
+                {t("hives:settings.membersSection.banMember")}
               </TooltipContent>
             </Tooltip>
           )}
           <Select onValueChange={(value) => setMemberRole(value as MemberRole)} defaultValue={user.role}>
             <SelectTrigger size="sm">
               <span className={`text-sm ${getRoleColor(user.role!)}`}>
-                {user.role}
+                {t(`enums:memberRole.${user.role!.toLowerCase()}`)}
               </span>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem className={getRoleColor(MemberRole.Guest)} disabled value={MemberRole.Guest}>Guest</SelectItem>
-              <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>Follower</SelectItem>
-              <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>Moderator</SelectItem>
-              <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>Admin</SelectItem>
-              <SelectItem className={getRoleColor(MemberRole.Creator)} disabled={!canSetToRole(MemberRole.Creator)} value={MemberRole.Creator}>Creator</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Guest)} disabled value={MemberRole.Guest}>{t("enums:memberRole.guest")}</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Follower)} disabled={!canSetToRole(MemberRole.Follower)} value={MemberRole.Follower}>{t("enums:memberRole.follower")}</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Moderator)} disabled={!canSetToRole(MemberRole.Moderator)} value={MemberRole.Moderator}>{t("enums:memberRole.moderator")}</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Admin)} disabled={!canSetToRole(MemberRole.Admin)} value={MemberRole.Admin}>{t("enums:memberRole.admin")}</SelectItem>
+              <SelectItem className={getRoleColor(MemberRole.Creator)} disabled={!canSetToRole(MemberRole.Creator)} value={MemberRole.Creator}>{t("enums:memberRole.creator")}</SelectItem>
             </SelectContent>
           </Select>
         </>
@@ -194,7 +197,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
             </AsyncButton>
           </TooltipTrigger>
           <TooltipContent>
-            Approve member
+            {t("hives:settings.membersSection.approveMember")}
           </TooltipContent>
         </Tooltip>
       )}
@@ -206,7 +209,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
             </AsyncButton>
           </TooltipTrigger>
           <TooltipContent>
-            Reject member
+            {t("hives:settings.membersSection.rejectMember")}
           </TooltipContent>
         </Tooltip>
       )}

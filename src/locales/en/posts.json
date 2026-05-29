@@ -1,0 +1,99 @@
+{
+  "browse": {
+    "filterByTitle": "Filter by title...",
+    "filterByApprovalStatus": "Filter by approval status",
+    "orderBy": "Order by",
+    "endOfFeed": "You reached the end of your feed!"
+  },
+  "card": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "delete": "Delete",
+    "banUser": "Ban user"
+  },
+  "vote": {
+    "results": "Results",
+    "vote": "Vote",
+    "choiceInstruction": "Please pick between {{minVotes}} and {{maxVotes}} options.",
+    "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
+    "rankInstruction": "Please rank the candidates in order of preference.",
+    "categoryInstruction": "Please add categories to the candidates.",
+    "pickCategoryFor": "Pick a category for {{name}}",
+    "pickCategoryDescription": "Please pick a category to assign the candidate to.",
+    "pickCandidatesFor": "Pick candidates for {{name}}",
+    "pickCandidatesDescription": "Please pick candidates to assign the category to."
+  },
+  "result": {
+    "results": "Results",
+    "votes": "{{count}} votes",
+    "votes_one": "{{count}} vote",
+    "filterVotes": "Filter votes",
+    "distributionHint": "You can see the vote distribution of a candidate by clicking on it.",
+    "distributionTitle": "Vote distribution for {{name}}",
+    "distributionDescription": "This is how users voted on each of the options for the candidate.",
+    "scoreRange": "{{start}} - {{end}}"
+  },
+  "create": {
+    "title": "Create new post",
+    "polls": "Polls",
+    "addPoll": "Add poll",
+    "correlationsHint": "* Multiple polls help visualize correlations between them.",
+    "choosePollType": "Choose the type of poll you wish to create.",
+    "pollTitle": "Poll title",
+    "pollTitlePlaceholder": "Give your poll a title.",
+    "description": "Description",
+    "descriptionPlaceholder": "Optionally, add a description.",
+    "createCategories": "Create categories for the users to assign the candidates to.",
+    "createCandidates": "Create candidates for the users to vote for.",
+    "configureRules": "Configure the poll rules by adjusting the underlined values.",
+    "candidateNamePlaceholder": "Candidate name...",
+    "addCandidate": "Add candidate",
+    "addCategory": "Add category",
+    "pickColorFor": "Pick a color for {{name}}",
+    "defaultCandidateName": "Candidate {{index}}",
+    "defaultCategoryName": "Category {{index}}",
+    "hiveSelection": {
+      "thisIsA": "This is a",
+      "post": "post.",
+      "postedInto": "It will be posted into",
+      "selectHive": "Select hive",
+      "searchHives": "Search hives...",
+      "noHivesFound": "No hives found."
+    },
+    "rules": {
+      "minVotes": "The user has to vote for at least <select/> candidates.",
+      "maxVotes": "The user can vote for up to <select/> candidates.",
+      "shuffle": "The candidates <select/> shuffled for the user.",
+      "minScore": "The minimum score is <select/>.",
+      "maxScore": "The maximum score is <select/>."
+    },
+    "scoring": {
+      "minScore": "The minimum score is",
+      "maxScore": "The maximum score is"
+    }
+  },
+  "filter": {
+    "title": "Filter votes",
+    "description": "Add conditions to filter out votes you don't want to see.",
+    "reorderHint": "You can drag & drop your conditions to re-order and group them up.",
+    "addCondition": "Add condition",
+    "createCondition": "Create condition",
+    "pickCandidate": "Pick a candidate to create a condition for.",
+    "adjustCondition": "Adjust the condition for {{pollTitle}}: {{candidateName}}.",
+    "candidateWas": "Candidate was",
+    "candidateSelected": "{{name}} selected",
+    "candidateNotSelected": "{{name}} not selected",
+    "thisCondition": "This condition",
+    "match": "match",
+    "scoreWas": "Candidate's score was",
+    "rankWas": "Candidate's rank was",
+    "categorizedAs": "Candidate was categorized as",
+    "rankNot": "{{name}} rank not {{operator}} {{value}}",
+    "unranked": "unranked",
+    "notCategorized": "{{name}} is not",
+    "uncategorized": "uncategorized",
+    "categorizedAsViewer": "{{name}} is",
+    "scoreViewer": "{{name}} score{{negation}} {{operator}} {{value}}",
+    "rankViewer": "{{name}} rank{{negation}} {{operator}}"
+  }
+}

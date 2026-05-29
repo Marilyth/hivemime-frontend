@@ -1,0 +1,72 @@
+{
+  "requestFailed": "Request failed",
+  "auth": {
+    "loggingIn": "Logging in...",
+    "loggedInAs": "Logged in as {{username}}!",
+    "loginFailed": "Failed to log in."
+  },
+  "emailVerification": {
+    "sending": "Sending verification email...",
+    "sent": "Email sent. Please also check your spam folder.",
+    "failed": "Failed to send verification email. Please try again."
+  },
+  "settings": {
+    "saving": "Saving your settings...",
+    "saved": "Your settings have been saved."
+  },
+  "post": {
+    "submitting": "Submitting post...",
+    "uploadingMedia": "Uploading media for candidate \"{{name}}\"...",
+    "publishing": "Publishing post...",
+    "published": "Post published successfully!",
+    "deleting": "Deleting post...",
+    "deleted": "Post deleted.",
+    "modifying": "Modifying post...",
+    "modified": "Post modified."
+  },
+  "vote": {
+    "submitting": "Submitting your vote...",
+    "submitted": "Your vote has been submitted!"
+  },
+  "hive": {
+    "creating": "Creating hive...",
+    "created": "Hive created successfully!",
+    "leaving": "Leaving hive...",
+    "left": "Hive left successfully!",
+    "joining": "Joining hive...",
+    "joinRequestSent": "Join request sent! A moderator must approve it.",
+    "joined": "Hive joined successfully!",
+    "loadingMembers": "Loading members...",
+    "membersLoaded": "Members loaded.",
+    "updatingMember": "Updating member...",
+    "memberUpdated": "Member updated."
+  },
+  "comment": {
+    "creating": "Creating comment...",
+    "created": "Comment created successfully!",
+    "loading": "Loading comments...",
+    "loaded": "Comments loaded.",
+    "loadingParent": "Loading parent comment...",
+    "parentLoaded": "Parent comment loaded.",
+    "deleting": "Deleting comment...",
+    "deleted": "Comment deleted."
+  },
+  "ban": {
+    "banningUser": "Banning user...",
+    "userBannedFromHive": "User banned from hive.",
+    "userBanned": "User banned."
+  },
+  "profile": {
+    "loadingUser": "Loading user profile..."
+  },
+  "image": {
+    "notAnImage": "Selected file is not an image.",
+    "compressing": "Compressing image...",
+    "compressFailed": "Failed to compress image.",
+    "invalidUrl": "Invalid URL.",
+    "fetchFailed": "Failed to fetch image from URL.",
+    "urlNotImage": "URL does not point to an image.",
+    "clipboardEmpty": "Clipboard is empty.",
+    "noImageInClipboard": "No image found in clipboard."
+  }
+}

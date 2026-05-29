@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useTranslation } from "react-i18next";
 
 interface UserProfileCommentsProps {
   user: UserProfileDto;
 }
 
 export function UserProfileComments(props: UserProfileCommentsProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const data = useInfiniteQuery({
@@ -20,7 +22,7 @@ export function UserProfileComments(props: UserProfileCommentsProps) {
     queryFn: async ({ pageParam }) => {
       const task = api.api.commentBrowseCreate({ pageSize: 20, cursor: pageParam }, { userId: props.user.id! });
       toast.promise(task, {
-        loading: 'Loading comments...'
+        loading: t("toasts:comment.loading")
       });
 
       const response = await task;
@@ -35,8 +37,8 @@ export function UserProfileComments(props: UserProfileCommentsProps) {
   return (
     <InfiniteScroll
       hasMore={data.hasNextPage}
-      loader={<p>Loading...</p>}
-      endMessage={<p className="text-center">No more comments.</p>}
+      loader={<p>{t("common:loading")}</p>}
+      endMessage={<p className="text-center">{t("comments:profile.noMoreComments")}</p>}
       next={() => data.fetchNextPage()}
       dataLength={comments.length}>
       <div className="flex flex-col items-center gap-2 w-full">
@@ -44,7 +46,7 @@ export function UserProfileComments(props: UserProfileCommentsProps) {
           <Card key={comment.id} className="w-full">
             <CardHeader>
               <CardTitle>
-                Commented on post
+                {t("comments:profile.commentedOnPost")}
                 <Button variant="link" className="p-0 px-2 h-auto" onClick={() => router.push(`/posts/view?postId=${comment.postId}`)}>
                   #{comment.postId}
                 </Button>

@@ -7,8 +7,10 @@ import { AsyncButton } from "./custom/utility/async-button";
 import { observer } from "mobx-react-lite";
 import { userStore } from "@/lib/contexts";
 import { reaction } from "mobx";
+import { useTranslation } from "react-i18next";
 
 export const NotificationBanner = observer(() => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Notification[]>([]);
   const [hasSentVerificationEmail, setHasSentVerificationEmail] = useState<boolean>(false);
 
@@ -21,10 +23,10 @@ export const NotificationBanner = observer(() => {
         if (!firebaseUser?.emailVerified && firebaseUser?.email) {
             messages.push({
                 type: NotificationType.WARNING,
-                title: "Email verification",
-                message: "Please verify your email to access all features.",
+                title: t("auth:emailVerification.title"),
+                message: t("auth:emailVerification.message"),
                 actionButton: {
-                    label: hasSentVerificationEmail ? "Reload" : "Send email",
+                    label: hasSentVerificationEmail ? t("auth:emailVerification.reload") : t("auth:emailVerification.sendEmail"),
                     onClick: async () => {
                       if (hasSentVerificationEmail) {
                         setHasSentVerificationEmail(false);
@@ -34,12 +36,12 @@ export const NotificationBanner = observer(() => {
                       else {
                         const task = sendVerificationEmail();
                         toast.promise(task, {
-                          loading: "Sending verification email...",
+                          loading: t("toasts:emailVerification.sending"),
                           success: () =>{
                             setHasSentVerificationEmail(true);
-                            return "Email sent. Please also check your spam folder."
+                            return t("toasts:emailVerification.sent");
                           },
-                          error: "Failed to send verification email. Please try again."
+                          error: t("toasts:emailVerification.failed")
                         });
 
                         await task;

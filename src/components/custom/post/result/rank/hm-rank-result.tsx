@@ -4,6 +4,7 @@ import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
 import { CandidateDto, PollDto, PollResultDto } from "@/lib/Api";
 import { HiveMimeDistributionResult, HiveMimeDistributionResultTypeProps } from "../hm-candidate-distribution";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
@@ -13,6 +14,7 @@ export interface HiveMimeRankResultProps {
 }
 
 export function HiveMimeRankResult(props: HiveMimeRankResultProps) {
+  const { t } = useTranslation();
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(null);
 
   return (
@@ -24,7 +26,7 @@ export function HiveMimeRankResult(props: HiveMimeRankResultProps) {
         />
 
         <span className="text-sm text-informational">
-            You can see the <span className="font-medium text-honey-brown">vote distribution</span> of a candidate <span className="font-medium text-honey-brown">by clicking</span> on it.
+            {t("posts:result.distributionHint")}
         </span>
 
         {props.pollResult?.candidates!.toSorted((a, b) => b.averageScore! - a.averageScore!).map((candidate, index) => {
@@ -45,7 +47,7 @@ export function HiveMimeRankResult(props: HiveMimeRankResultProps) {
                             <div className="flex flex-col items-end text-muted-foreground ml-auto">
                                 {hiveMimeRankIcon(index + 1)}
                                 <div className="text-muted-foreground">
-                                    {candidate.voterAmount} votes
+                                    {t("posts:result.votes", { count: candidate.voterAmount })}
                                 </div>
                             </div>
                         </div>
@@ -58,6 +60,7 @@ export function HiveMimeRankResult(props: HiveMimeRankResultProps) {
 }
 
 export function HiveMimeRankDistributionResult(props: HiveMimeDistributionResultTypeProps) {
+  const { t } = useTranslation();
   const totalVotes = props.candidateResult.reduce((sum, candidate) => sum + candidate.score!, 0);
   const span = props.poll.maxValue! - props.poll.minValue! + 1;
 
@@ -82,7 +85,7 @@ export function HiveMimeRankDistributionResult(props: HiveMimeDistributionResult
                             <div className="flex flex-col items-end text-muted-foreground ml-auto text-sm">
                                 {Number(percentage.toFixed(2))}%
                                 <div className="text-muted-foreground">
-                                    {bucketScore} votes
+                                    {t("posts:result.votes", { count: bucketScore })}
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,6 @@
 import { PollDto, CandidateDto, CandidateDistributionDto, Api, PollType } from "@/lib/Api";
 import { ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { HiveMimeScoreDistributionResult } from "./score/hm-score-result";
 import { HiveMimeRankDistributionResult } from "./rank/hm-rank-result";
@@ -18,12 +19,13 @@ export interface HiveMimeDistributionResultProps {
 }
 
 export function HiveMimeDistributionResult(props: HiveMimeDistributionResultProps) {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [candidateDistribution, setCandidateDistribution] = useState<CandidateDistributionDto[] | null>(null);
 
   const pollMapping: { [key in PollType]: ReactNode } =
   {
-    [PollType.Choice]: <div>Empty</div>,
+    [PollType.Choice]: <div>{t("common:empty")}</div>,
     [PollType.Score]: <HiveMimeScoreDistributionResult poll={props.poll} candidateResult={candidateDistribution!} />,
     [PollType.Rank]: <HiveMimeRankDistributionResult poll={props.poll} candidateResult={candidateDistribution!} />,
     [PollType.Category]: <HiveMimeCategoryDistributionResult poll={props.poll} candidateResult={candidateDistribution!} />,
@@ -55,13 +57,13 @@ export function HiveMimeDistributionResult(props: HiveMimeDistributionResultProp
         <Dialog open={props.candidate !== null} onOpenChange={props.onClose}>
             <DialogContent>
             <DialogTitle>
-                Vote distribution for <span className="text-honey-brown">{props.candidate?.name}</span>
+                {t("posts:result.distributionTitle", { name: props.candidate?.name })}
             </DialogTitle>
             <span className="leading-tight">
-                This is how users voted on each of the options for the candidate.
+                {t("posts:result.distributionDescription")}
             </span>
                 {isLoading ? (
-                    <div>Loading...</div>
+                    <div>{t("common:loading")}</div>
                 ) : (
                     candidateDistribution !== null && pollMapping[props.poll.pollType!]
                 )}

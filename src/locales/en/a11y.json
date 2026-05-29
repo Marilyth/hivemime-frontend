@@ -1,0 +1,15 @@
+{
+  "breadcrumb": "breadcrumb",
+  "more": "More",
+  "close": "Close",
+  "previousSlide": "Previous slide",
+  "nextSlide": "Next slide",
+  "toggleSidebar": "Toggle Sidebar",
+  "sidebar": "Sidebar",
+  "sidebarDescription": "Displays the mobile sidebar.",
+  "loading": "Loading",
+  "toggleTheme": "Toggle theme",
+  "fullResolutionPreview": "Full resolution preview",
+  "carousel": "carousel",
+  "slide": "slide"
+}

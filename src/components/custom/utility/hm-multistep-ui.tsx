@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/utils"
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/button";
 import { Progress } from "../../ui/progress";
 import { Label } from "@/components/ui/label";
@@ -53,10 +56,12 @@ export function HiveMimeMultiStep({
   onStepFinished,
   onFinished,
   onCancelled,
-  stepLabel = "Step",
+  stepLabel,
   showProgress = true,
   ...props
 }: HiveMimeMultiStepProps) {
+  const { t } = useTranslation();
+  const resolvedStepLabel = stepLabel ?? t("common:step");
   const steps = React.Children.toArray(children) as React.ReactElement<HiveMimeStepProps>[];
   const totalSteps = steps.length;
   const [currentStep, setCurrentStep] = React.useState(0);
@@ -98,13 +103,13 @@ export function HiveMimeMultiStep({
             disabled={currentStep == 0 && !canCancel}
             onClick={() => advanceStep(-1)}
           >
-            {currentStep === 0 ? "Cancel" : "Back"}
+            {currentStep === 0 ? t("common:cancel") : t("common:back")}
           </Button>
 
           {showProgress && (
             <div className="flex flex-col flex-1 mx-2 gap-1">
               <Label>
-                <span>{stepLabel}</span>
+                <span>{resolvedStepLabel}</span>
                 <span className="ml-auto">{currentStep + 1}/{totalSteps}</span>
               </Label>
               <Progress value={Math.round(((currentStep + 1) / totalSteps) * 100)} className="black" />
@@ -115,7 +120,7 @@ export function HiveMimeMultiStep({
             onClick={() => advanceStep(1)}
             disabled={!steps[currentStep]?.props.canContinue}
           >
-            {currentStep === totalSteps - 1 ? "Finish" : "Next"}
+            {currentStep === totalSteps - 1 ? t("common:finish") : t("common:next")}
           </Button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { ChartBar, Vote } from "lucide-react";
 import { observable, reaction, toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Button } from "../../../ui/button";
 import { HiveMimeListPoll } from "./hm-poll-vote";
@@ -18,6 +19,7 @@ interface HiveMimePostVoteProps {
 }
 
 export const HiveMimePostVote = observer(({ post, requestResults, footer }: HiveMimePostVoteProps) => {
+  const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
   const [postVote, setPostVote] = useState<PostVoteDto>(() => (observable({
     postId: post.id!,
@@ -48,8 +50,8 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
   {
     const task = api.api.postVoteCreate(postVote);
     toast.promise(task, {
-      loading: 'Submitting your vote...',
-      success: 'Your vote has been submitted!'
+      loading: t("toasts:vote.submitting"),
+      success: t("toasts:vote.submitted"),
     });
     await task;
 
@@ -78,11 +80,11 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
         {footer}
         <Button variant="outline" className="ml-auto text-muted-foreground" onClick={requestResults}>
           <ChartBar />
-          Results
+          {t("posts:vote.results")}
         </Button>
         <AsyncButton variant="default" disabled={!isValid} onClick={submitVote}>
           <Vote />
-          Vote
+          {t("posts:vote.vote")}
         </AsyncButton>
       </div>
     </div>

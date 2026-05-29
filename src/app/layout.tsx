@@ -17,6 +17,8 @@ import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { observer } from "mobx-react-lite";
+import "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +33,7 @@ const geistMono = Geist_Mono({
 const queryClient = new QueryClient();
 
 const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation();
   const [accentColour, setAccentColour] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,7 +52,7 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/HiveMimeIcon.png" />
-        <title>HiveMime</title>
+        <title>{t("common:appTitle")}</title>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -73,7 +76,7 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
                         <div className="flex justify-center">
                           <div className="w-full max-w-183 gap-4">
                             {!userStore.user ?
-                              (<div>Loading...</div>) :
+                              (<div>{t("common:loading")}</div>) :
                               (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
                                 {children}
                               </div>)

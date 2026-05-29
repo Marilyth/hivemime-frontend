@@ -1,8 +1,11 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import imageCompression from "browser-image-compression";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Clipboard, Edit, Eye, FolderOpen, Image, Save, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +51,7 @@ export function ImageViewer(props: ImageViewerProps) {
 }
 
 export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
+  const { t } = useTranslation();
   const [thumbFile, setThumbFile] = useState<File | null>(thumb ?? null);
   const [fullResFile, setFullResFile] = useState<File | null>(src ?? null);
 
@@ -63,7 +67,7 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
       return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Selected file is not an image.");
+      toast.error(t("toasts:image.notAnImage"));
       return;
     }
 
@@ -93,8 +97,8 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
     }
 
     toast.promise(compressor(), {
-      loading: "Compressing image...",
-      error: "Failed to compress image."
+      loading: t("toasts:image.compressing"),
+      error: t("toasts:image.compressFailed"),
     });
   }
 
@@ -110,20 +114,20 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
 
   async function handleUrl(url: string) {
     if(!url || !url.startsWith("http")) {
-      toast.error("Invalid URL.");
+      toast.error(t("toasts:image.invalidUrl"));
       return;
     }
     
     const response = await fetch(url);
     if (!response.ok) {
-      toast.error("Failed to fetch image from URL.");
+      toast.error(t("toasts:image.fetchFailed"));
       return;
     }
 
     const blob = await response.blob();
 
     if (!blob.type.startsWith("image/")) {
-      toast.error("URL does not point to an image.");
+      toast.error(t("toasts:image.urlNotImage"));
       return;
     }
 
@@ -135,7 +139,7 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
     const clipboardItems = await navigator.clipboard.read();
 
     if (clipboardItems.length === 0) {
-      toast.error("Clipboard is empty.");
+      toast.error(t("toasts:image.clipboardEmpty"));
       return;
     }
 
@@ -158,7 +162,7 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
       return;
     }
 
-    toast.error("No image found in clipboard.");
+    toast.error(t("toasts:image.noImageInClipboard"));
   }
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -193,7 +197,7 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
       return;
     }
 
-    toast.error("No image found in clipboard.");
+    toast.error(t("toasts:image.noImageInClipboard"));
   }
 
   useEffect(() => {
@@ -229,33 +233,33 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
               <Image className="text-informational" />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Add image</p>
+              <p>{t("settings:image.addImage")}</p>
             </TooltipContent>
           </Tooltip>
         }
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit image</DialogTitle>
+          <DialogTitle>{t("settings:image.editImage")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-2">
           {!previewUrl && (
             <div className="flex flex-col gap-2 border-dashed border-1 rounded-md p-4" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
               <Image className="w-16 h-16 text-border mx-auto" />
-              <span className="mx-auto text-muted-foreground">Drag an image here</span>
+              <span className="mx-auto text-muted-foreground">{t("settings:image.dragImageHere")}</span>
 
               <div className="flex items-center gap-4 text-muted-foreground">
                 <FieldSeparator className="flex-1" />
-                <span className="text-sm text-muted-foreground">OR</span>
+                <span className="text-sm text-muted-foreground">{t("common:or")}</span>
                 <FieldSeparator className="flex-1" />
               </div>
               
               <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-                <FolderOpen className="text-honey-brown" />Pick a file
+                <FolderOpen className="text-honey-brown" />{t("settings:image.pickFile")}
               </Button>
               <Button variant="outline" onClick={handleClipboard}>
-                <Clipboard className="text-honey-brown" />Paste from clipboard
+                <Clipboard className="text-honey-brown" />{t("settings:image.pasteFromClipboard")}
               </Button>
               <Input type="file" accept="image/*" ref={fileInputRef} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} className="hidden" />
             </div>) ||
@@ -275,22 +279,22 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
             <>
               <div className="flex flex-row items-center gap-1 flex-wrap">
                 <Badge variant="outline">
-                  {fullResFile ? (fullResFile.size / 1024).toFixed(2) + " KB" : "N/A"}
+                  {fullResFile ? (fullResFile.size / 1024).toFixed(2) + " KB" : t("common:notAvailable")}
                 </Badge>
                 <Badge variant="outline">
-                  {fullResFile ? new Date(fullResFile.lastModified).toLocaleDateString() : "N/A"}
+                  {fullResFile ? new Date(fullResFile.lastModified).toLocaleDateString() : t("common:notAvailable")}
                 </Badge>
               </div>
 
-              {fullResUrl && <img src={fullResUrl} alt="Full resolution preview" className="w-fit h-fit rounded-md border" />}
+              {fullResUrl && <img src={fullResUrl} alt={t("a11y:fullResolutionPreview")} className="w-fit h-fit rounded-md border" />}
             </>
           )}
         </div>
 
         <DialogFooter>
           <div className="flex flex-row items-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-            <Button onClick={saveChanges} disabled={src == fullResFile}><Save /> Save</Button>
+            <Button variant="outline" onClick={() => setIsOpen(false)}>{t("common:cancel")}</Button>
+            <Button onClick={saveChanges} disabled={src == fullResFile}><Save /> {t("common:save")}</Button>
           </div>
         </DialogFooter>
       </DialogContent>

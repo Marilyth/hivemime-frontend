@@ -13,12 +13,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryParam } from "../../utility/use-query-param";
 import { api } from "@/lib/contexts";
 import { useDebounce } from "../../utility/debounce";
+import { useTranslation } from "react-i18next";
 
 export interface HiveMimeHiveSelectionProps {
   post: CreatePostDto;
 }
 
 export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
+  const { t } = useTranslation();
   const [hiveIdQueryParam, setHiveIdQueryParam] = useQueryParam("hiveId", undefined);
   const [hiveSearchInput, setHiveSearchInput] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -57,26 +59,26 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
   return (
     <div>
       <HiveMimeBulletItem>
-        This is a
+        {t("posts:create.hiveSelection.thisIsA")}
         <Select value={props.post.hiveId == undefined ? "private" : "public"} onValueChange={(v) => setPrivacy(v === "private")}>
           <HiveMimeInlineSelectTrigger>
             <SelectValue />
           </HiveMimeInlineSelectTrigger>
           <SelectContent>
-            <SelectItem value="private">private</SelectItem>
-            <SelectItem value="public">public</SelectItem>
+            <SelectItem value="private">{t("enums:visibility.private")}</SelectItem>
+            <SelectItem value="public">{t("enums:visibility.public")}</SelectItem>
           </SelectContent>
         </Select>
-        post.
+        {t("posts:create.hiveSelection.post")}
       </HiveMimeBulletItem>
 
       {props.post.hiveId != undefined && (
         <HiveMimeBulletItem>
-          It will be posted into
+          {t("posts:create.hiveSelection.postedInto")}
           <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger className="px-1 py-0 h-auto mx-1.5 border-b border-honey-brown ml-2 text-honey-brown">
               <div className="flex items-center gap-1">
-                {hiveData.data?.name ?? "Select hive"}
+                {hiveData.data?.name ?? t("posts:create.hiveSelection.selectHive")}
                 <ChevronDownIcon className="size-3" />
               </div>
             </PopoverTrigger>
@@ -85,7 +87,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
               <InputGroup>
                 <InputGroupInput
                   ref={inputRef}
-                  placeholder="Search hives..."
+                  placeholder={t("posts:create.hiveSelection.searchHives")}
                   value={hiveSearchInput}
                   onChange={(e) => setHiveSearchInput(e.target.value)}
                 />
@@ -96,10 +98,10 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
 
               <SelectSeparator className="my-2" />
 
-              {isLoading && <div>Loading...</div>}
+              {isLoading && <div>{t("common:loading")}</div>}
 
               {!isLoading && (hiveSearchData.data?.items?.length ?? 0) == 0 && (
-                <div>No hives found.</div>
+                <div>{t("posts:create.hiveSelection.noHivesFound")}</div>
               )}
 
               {!isLoading && hiveSearchData.data?.items?.map((s) => (

@@ -26,8 +26,10 @@ import { useRouter } from "next/navigation"
 import { observer } from "mobx-react-lite"
 import { reaction } from "mobx"
 import { UserAvatar } from "./user-avatar"
+import { useTranslation } from "react-i18next"
 
 export const UserOptions = observer(() => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [currentFirebaseUser, setCurrentFirebaseUser] = useState<User | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
@@ -69,9 +71,9 @@ export const UserOptions = observer(() => {
 
         if (!user) {
           toast.promise(autoLogIn(), {
-            loading: "Logging in...",
-            success: (u) => `Logged in as ${u.username}!`,
-            error: "Failed to log in.",
+            loading: t("toasts:auth.loggingIn"),
+            success: (u) => t("toasts:auth.loggedInAs", { username: u.username }),
+            error: t("toasts:auth.loginFailed"),
           });
         }
       },
@@ -85,7 +87,7 @@ export const UserOptions = observer(() => {
     <div>
       <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
         <DialogContent>
-          <DialogTitle>Log in</DialogTitle>
+          <DialogTitle>{t("auth:login.title")}</DialogTitle>
           <LoginForm />
         </DialogContent>
       </Dialog>
@@ -95,7 +97,7 @@ export const UserOptions = observer(() => {
           variant="link"
           onClick={() => setIsLoginDialogOpen(true)}
         >
-          Log in
+          {t("auth:login.title")}
         </Button>
       :
         <DropdownMenu>
@@ -108,22 +110,22 @@ export const UserOptions = observer(() => {
             sideOffset={4}
           >
             <div className="text-muted-foreground text-sm mb-2 px-2 py-2">
-              Hello, {userStore?.user?.username}!
+              {t("auth:userOptions.greeting", { username: userStore?.user?.username })}
             </div>
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => router.push("/user?userId=" + userStore.user?.id)}>
                 <User2 />
-                Profile
+                {t("auth:userOptions.profile")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push("/user/settings")}>
                 <Settings />
-                Settings
+                {t("auth:userOptions.settings")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <SelectSeparator />
             <DropdownMenuItem onClick={logOutSession}>
               <LogOut />
-              Log out
+              {t("auth:userOptions.logOut")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

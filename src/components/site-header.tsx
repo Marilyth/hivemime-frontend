@@ -11,8 +11,10 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { NotificationBanner } from "./notification-banner"
 import { useQueryParam } from "./custom/utility/use-query-param"
 import { LevelBanner } from "./level-banner"
+import { useTranslation } from "react-i18next"
 
 export function SiteHeader() {
+  const { t } = useTranslation();
   const { toggleSidebar } = useSidebar();
   const router = useRouter();
   const [hiveId, setHiveId] = useQueryParam("hiveId");
@@ -43,16 +45,16 @@ export function SiteHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className={`ml-auto ${isMobile ? "p-1! h-auto rounded-xl" : ""}`}>
-              <Plus className="w-2 h-2" />{isMobile || "Create..."}
+              <Plus className="w-2 h-2" />{isMobile || t("nav:create")}
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => navigateWithHive("/posts/create")}>
-              New post
+              {t("nav:newPost")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigateWithHive("/hives/create")}>
-              New hive
+              {t("nav:newHive")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

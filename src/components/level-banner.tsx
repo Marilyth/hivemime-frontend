@@ -6,6 +6,7 @@ import { reaction } from "mobx";
 import { honeyToLevel } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Progress } from "./ui/progress";
+import { useTranslation } from "react-i18next";
 
 interface LevelBannerProps {
   animationDuration?: number;
@@ -13,6 +14,7 @@ interface LevelBannerProps {
 }
 
 export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration = 3000 }: LevelBannerProps) => {
+  const { t } = useTranslation();
   const [showPopup, setShowPopup] = useState(false);
   const [honeyGained, setHoneyGained] = useState<number>(0);
   const [currentLevel, setCurrentLevel] = useState<number>(0);
@@ -79,12 +81,12 @@ export const LevelBanner = observer(({ animationDuration = 1500, bannerDuration 
           <Alert className="bg-card">
             <AlertDescription className="flex flex-col gap-2">
               <span>
-                You gained <span className="font-bold text-honey-brown">🍯 {honeyGained.toFixed(2)}</span> honey!
+                {t("settings:levelBanner.gainedHoney", { amount: honeyGained.toFixed(2) })}
               </span>
               <div className="flex flex-row gap-2 text-muted-foreground items-center">
                 <Progress className="[&>div]:transition-none" value={currentProgress} />
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  Lv. {currentLevel}
+                  {t("settings:profile.level", { level: currentLevel })}
                 </span>
               </div>
             </AlertDescription>

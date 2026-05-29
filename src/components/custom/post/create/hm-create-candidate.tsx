@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { mediaFiles } from "./hm-create-post";
 import { ImageEditor } from "../../utility/image-viewer";
 import { reaction } from "mobx";
+import { useTranslation } from "react-i18next";
 
 
 interface HiveMimeCreateCandidateProps {
@@ -24,8 +25,10 @@ export interface HiveMimeCreateCandidatesProps {
 }
 
 export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandidatesProps) => {
+  const { t } = useTranslation();
+
   function addCandidate() {
-    poll.candidates!.push({ name: `Candidate ${poll.candidates!.length + 1}`, description: "" });
+    poll.candidates!.push({ name: t("posts:create.defaultCandidateName", { index: poll.candidates!.length + 1 }), description: "" });
   }
 
   function handleCandidateCountChanged(current: number, previous: number) {
@@ -70,7 +73,7 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
         ))}
 
         <Button variant="outline" onClick={addCandidate} className="w-full">
-          <Plus />Add candidate
+          <Plus />{t("posts:create.addCandidate")}
         </Button>
       </AnimatePresence>
     </div>
@@ -79,6 +82,8 @@ export const HiveMimeCreateCandidates = observer(({ poll }: HiveMimeCreateCandid
 
 
 export const HiveMimeCreateCandidate = observer(({ candidates, candidate }: HiveMimeCreateCandidateProps) => {
+  const { t } = useTranslation();
+
   function handleFileChange(file: File | null, thumbnail: File | null) {
     if (!file || !thumbnail) {
       mediaFiles.delete(getReferenceId(candidate));
@@ -103,7 +108,7 @@ export const HiveMimeCreateCandidate = observer(({ candidates, candidate }: Hive
         <ImageEditor src={mediaFiles.get(getReferenceId(candidate))} thumb={mediaFiles.get(getReferenceId(candidate) + "-thumb")} onChange={handleFileChange}></ImageEditor>
       </InputGroupAddon>
 
-      <InputGroupInput placeholder="Candidate name..." value={candidate.name!} onChange={(e) => candidate.name = e.target.value} />
+      <InputGroupInput placeholder={t("posts:create.candidateNamePlaceholder")} value={candidate.name!} onChange={(e) => candidate.name = e.target.value} />
 
       <InputGroupAddon align="inline-end">
         <Button variant="ghost"

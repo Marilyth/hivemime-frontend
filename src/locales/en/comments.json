@@ -1,0 +1,25 @@
+{
+  "browse": {
+    "title": "Comments",
+    "filterByText": "Filter by text...",
+    "orderBy": "Order by"
+  },
+  "create": {
+    "placeholder": "Write your comment here...",
+    "post": "Post"
+  },
+  "item": {
+    "reply": "Reply",
+    "loadParentComment": "Load parent comment...",
+    "loadReplies": "Load replies...",
+    "delete": "Delete",
+    "banUser": "Ban user",
+    "opBadge": "OP",
+    "postCreatorTooltip": "This user created the post",
+    "hiveRoleTooltip": "This user is a {{role}} of the hive"
+  },
+  "profile": {
+    "commentedOnPost": "Commented on post",
+    "noMoreComments": "No more comments."
+  }
+}

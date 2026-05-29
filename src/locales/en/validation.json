@@ -1,0 +1,29 @@
+{
+  "pollPrefix": "Poll {{index}}: {{message}}",
+  "poll": {
+    "noType": "No poll type was selected.",
+    "noCandidates": "A poll must have at least one candidate.",
+    "noTitle": "A poll must have a title.",
+    "minVotes": "A poll must allow at least 1 vote.",
+    "maxVotesLessThanMin": "Max votes must be greater than min votes.",
+    "choiceMinCandidates": "A choice poll must have at least two candidates.",
+    "scoreStepValue": "A scoring poll must have a step value higher than 0.",
+    "categoryMinCategories": "A categorization poll must have at least two categories."
+  },
+  "vote": {
+    "required": "You must vote for this poll.",
+    "minCandidates": "You must vote for at least {{minVotes}} candidates.",
+    "maxCandidates": "You must vote for no more than {{maxVotes}} candidates.",
+    "valueTooSmall": "Your candidate's value can not be smaller than {{minValue}}.",
+    "valueTooLarge": "Your candidate's value can not be larger than {{maxValue}}."
+  },
+  "hive": {
+    "nameTooShort": "Hive names must be at least 3 characters long.",
+    "nameTooShortSettings": "Hive name must be at least 3 characters long."
+  },
+  "user": {
+    "usernameTooShort": "Username must be at least 3 characters long.",
+    "tooYoung": "You must be at least 13 years old.",
+    "tooOld": "You can't be more than 130 years old."
+  }
+}

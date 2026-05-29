@@ -1,0 +1,2439 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "hivemime-backend",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/Comment/get": {
+      "get": {
+        "tags": [
+          "Comment"
+        ],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Comment/create": {
+      "post": {
+        "tags": [
+          "Comment"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoHoneyDeltaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoHoneyDeltaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoHoneyDeltaDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Comment/edit": {
+      "patch": {
+        "tags": [
+          "Comment"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCommentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCommentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Comment/delete": {
+      "delete": {
+        "tags": [
+          "Comment"
+        ],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Comment/browse": {
+      "post": {
+        "tags": [
+          "Comment"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "parentCommentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "onlyRoot",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentPaginationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentPaginationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentPaginationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoPaginationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoPaginationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentDtoPaginationResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/get": {
+      "get": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "hiveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/joined": {
+      "get": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HiveUserDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HiveUserDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HiveUserDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/join": {
+      "post": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "hiveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/users": {
+      "post": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "hiveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ApprovalStatus"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveUserPaginationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveUserPaginationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveUserPaginationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDtoPaginationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDtoPaginationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveUserDtoPaginationResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/modifyUser": {
+      "patch": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "followRequestId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "approvalStatus",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ApprovalStatus"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MemberRole"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Hive/banUser": {
+      "patch": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "hiveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Hive/leave": {
+      "delete": {
+        "tags": [
+          "Hive"
+        ],
+        "parameters": [
+          {
+            "name": "followId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Hive/browse": {
+      "post": {
+        "tags": [
+          "Hive"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HivePaginationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HivePaginationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HivePaginationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDtoPaginationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDtoPaginationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDtoPaginationResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/create": {
+      "post": {
+        "tags": [
+          "Hive"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHiveDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHiveDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Hive/update": {
+      "patch": {
+        "tags": [
+          "Hive"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HiveDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/get": {
+      "get": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/browse": {
+      "post": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "creatorId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "hiveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "approvalStatus",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ApprovalStatus"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPaginationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPaginationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPaginationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoPaginationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoPaginationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoPaginationResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/publish": {
+      "patch": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoHoneyDeltaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoHoneyDeltaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDtoHoneyDeltaDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/create": {
+      "post": {
+        "tags": [
+          "Post"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadPostDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadPostDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadPostDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/delete": {
+      "delete": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Post/modifyPost": {
+      "patch": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "approvalStatus",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ApprovalStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Post/results": {
+      "get": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/distribution": {
+      "get": {
+        "tags": [
+          "Post"
+        ],
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDistributionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDistributionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CandidateDistributionDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Post/vote": {
+      "post": {
+        "tags": [
+          "Post"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVoteDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVoteDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanHoneyDeltaDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanHoneyDeltaDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BooleanHoneyDeltaDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/merge": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "previousJwt",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/browse": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPaginationDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPaginationDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPaginationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoPaginationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoPaginationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoPaginationResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/profile": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/login": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/update": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDetailsDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDetailsDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDetailsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApprovalStatus": {
+        "enum": [
+          "Pending",
+          "Approved",
+          "Rejected",
+          "Banned"
+        ],
+        "type": "string"
+      },
+      "BooleanHoneyDeltaDto": {
+        "type": "object",
+        "properties": {
+          "honeyDelta": {
+            "type": "number",
+            "format": "double"
+          },
+          "dto": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CandidateDistributionDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CandidateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CandidateVoteDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CommentDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
+          },
+          "role": {
+            "$ref": "#/components/schemas/MemberRole"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "postId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentCommentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "replyCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CommentDtoHoneyDeltaDto": {
+        "type": "object",
+        "properties": {
+          "honeyDelta": {
+            "type": "number",
+            "format": "double"
+          },
+          "dto": {
+            "$ref": "#/components/schemas/CommentDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CommentDtoPaginationResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommentDto"
+            },
+            "nullable": true
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CommentOrderBy": {
+        "enum": [
+          "New",
+          "Old",
+          "Best"
+        ],
+        "type": "string"
+      },
+      "CommentPaginationDto": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          },
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderBy": {
+            "$ref": "#/components/schemas/CommentOrderBy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCandidateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "media": {
+            "$ref": "#/components/schemas/UploadMediaRequestDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCommentDto": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentCommentId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateHiveDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePollDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "media": {
+            "$ref": "#/components/schemas/UploadMediaRequestDto"
+          },
+          "isShuffled": {
+            "type": "boolean"
+          },
+          "isOptional": {
+            "type": "boolean"
+          },
+          "minValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stepValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "minVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pollType": {
+            "$ref": "#/components/schemas/PollType"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateCandidateDto"
+            },
+            "nullable": true
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateCategoryDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePostDto": {
+        "type": "object",
+        "properties": {
+          "hiveId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreatePollDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EditCommentDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newContent": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/HiveSettingsDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveDtoPaginationResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HiveDto"
+            },
+            "nullable": true
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveOrderBy": {
+        "enum": [
+          "New",
+          "Old",
+          "Users"
+        ],
+        "type": "string"
+      },
+      "HivePaginationDto": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          },
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderBy": {
+            "$ref": "#/components/schemas/HiveOrderBy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveSettingsDto": {
+        "type": "object",
+        "properties": {
+          "isPrivate": {
+            "type": "boolean"
+          },
+          "joinRequiresApproval": {
+            "type": "boolean"
+          },
+          "minHoneyToJoin": {
+            "type": "number",
+            "format": "double"
+          },
+          "postRequiresApproval": {
+            "type": "boolean"
+          },
+          "minHoneyToPost": {
+            "type": "number",
+            "format": "double"
+          },
+          "minRoleToPost": {
+            "$ref": "#/components/schemas/MemberRole"
+          },
+          "minHoneyToComment": {
+            "type": "number",
+            "format": "double"
+          },
+          "minRoleToComment": {
+            "$ref": "#/components/schemas/MemberRole"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hive": {
+            "$ref": "#/components/schemas/HiveDto"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
+          },
+          "approvalStatus": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          },
+          "role": {
+            "$ref": "#/components/schemas/MemberRole"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveUserDtoPaginationResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HiveUserDto"
+            },
+            "nullable": true
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HiveUserOrderBy": {
+        "enum": [
+          "New",
+          "Old"
+        ],
+        "type": "string"
+      },
+      "HiveUserPaginationDto": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          },
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderBy": {
+            "$ref": "#/components/schemas/HiveUserOrderBy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberRole": {
+        "enum": [
+          "Guest",
+          "Follower",
+          "Moderator",
+          "Admin",
+          "Creator"
+        ],
+        "type": "string"
+      },
+      "PaginationCursorDto": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollCandidateResultDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "voterAmount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "majorityVote": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "majorityRatio": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "isShuffled": {
+            "type": "boolean"
+          },
+          "isOptional": {
+            "type": "boolean"
+          },
+          "minValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stepValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "minVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pollType": {
+            "$ref": "#/components/schemas/PollType"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateDto"
+            },
+            "nullable": true
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollResultDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "isShuffled": {
+            "type": "boolean"
+          },
+          "isOptional": {
+            "type": "boolean"
+          },
+          "minValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stepValue": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "minVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pollType": {
+            "$ref": "#/components/schemas/PollType"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollCandidateResultDto"
+            },
+            "nullable": true
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollType": {
+        "enum": [
+          "Choice",
+          "Score",
+          "Rank",
+          "Category"
+        ],
+        "type": "string"
+      },
+      "PollVoteDto": {
+        "type": "object",
+        "properties": {
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CandidateVoteDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostDto": {
+        "type": "object",
+        "properties": {
+          "hive": {
+            "$ref": "#/components/schemas/HiveDto"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/UserDto"
+          },
+          "role": {
+            "$ref": "#/components/schemas/MemberRole"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollDto"
+            },
+            "nullable": true
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "voteCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hotness": {
+            "type": "number",
+            "format": "double"
+          },
+          "approvalStatus": {
+            "$ref": "#/components/schemas/ApprovalStatus"
+          },
+          "isDraft": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostDtoHoneyDeltaDto": {
+        "type": "object",
+        "properties": {
+          "honeyDelta": {
+            "type": "number",
+            "format": "double"
+          },
+          "dto": {
+            "$ref": "#/components/schemas/PostDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostDtoPaginationResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostDto"
+            },
+            "nullable": true
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostOrderBy": {
+        "enum": [
+          "New",
+          "Old",
+          "Hot"
+        ],
+        "type": "string"
+      },
+      "PostPaginationDto": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          },
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderBy": {
+            "$ref": "#/components/schemas/PostOrderBy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostResultDto": {
+        "type": "object",
+        "properties": {
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollResultDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostVoteDto": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollVoteDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadCandidateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mediaUploadUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadMediaRequestDto": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "nullable": true
+          },
+          "contentLength": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailContentLength": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadPollDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mediaUploadUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UploadCandidateDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UploadPostDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UploadPollDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDetailsDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "honey": {
+            "type": "number",
+            "format": "double"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "settings": {
+            "$ref": "#/components/schemas/UserSettingsDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "honey": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDtoPaginationResultDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            },
+            "nullable": true
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserOrderBy": {
+        "enum": [
+          "New",
+          "Old",
+          "Honey",
+          "Name"
+        ],
+        "type": "string"
+      },
+      "UserPaginationDto": {
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/PaginationCursorDto"
+          },
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderBy": {
+            "$ref": "#/components/schemas/UserOrderBy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "honey": {
+            "type": "number",
+            "format": "double"
+          },
+          "postCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLogin": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserSettingsDto": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "shareDateOnVote": {
+            "type": "boolean"
+          },
+          "shareCountryOnVote": {
+            "type": "boolean"
+          },
+          "shareAgeOnVote": {
+            "type": "boolean"
+          },
+          "protectVoteOnFilter": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Please enter a valid token.",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Comment"
+    },
+    {
+      "name": "Hive"
+    },
+    {
+      "name": "Post"
+    },
+    {
+      "name": "User"
+    }
+  ]
+}

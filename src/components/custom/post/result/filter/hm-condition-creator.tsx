@@ -3,6 +3,7 @@ import { PollType, PostDto } from "@/lib/Api";
 import { VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { HiveMimeFilterConditionChoiceValuePicker } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionCandidatePicker } from "./hm-candidate-picker";
 import { HiveMimeFilterConditionScoreValuePicker } from "./score/hm-score-value-picker";
@@ -17,6 +18,7 @@ interface HiveMimeVoteQueryDialogProps {
 }
 
 export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, onFinished }: HiveMimeVoteQueryDialogProps) => {
+    const { t } = useTranslation();
     const item = useMemo(() => currentItem ?? new VoteQuery(), [currentItem]);
 
     const pollMapping: {
@@ -37,7 +39,7 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
                 <HiveMimeStep canContinue={true}>
                     <div>
                         <div className="text-sm text-muted-foreground mb-4">
-                            Adjust the condition for <span className="font-bold">{item?.poll?.title}</span>: <span className="font-bold">{item?.candidate?.name}</span>.
+                            {t("posts:filter.adjustCondition", { pollTitle: item?.poll?.title, candidateName: item?.candidate?.name })}
                         </div>
                         {item.poll?.pollType && pollMapping[item.poll.pollType]}
                     </div>

@@ -4,6 +4,7 @@ import { VoteQuery, VoteQueryGroup } from "@/lib/query-builder";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { HiveMimeVoteQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
@@ -19,6 +20,7 @@ interface HiveMimePostResultFilterProps {
 }
 
 export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFinished }: HiveMimePostResultFilterProps) => {
+    const { t } = useTranslation();
     const [showCreator, setShowCreator] = useState(false);
 
     function handleFinished(newQuery: VoteQuery | null) {
@@ -35,18 +37,18 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
                 {showCreator ?
                     <div className="flex flex-col">
                         <span className="text-lg font-semibold">
-                            Create condition
+                            {t("posts:filter.createCondition")}
                         </span>
 
                         <HiveMimeFilterConditionCreator post={post} onFinished={handleFinished} />
                     </div> :
                     <div className="flex flex-col">
                         <span className="text-lg font-semibold">
-                            Filter votes
+                            {t("posts:filter.title")}
                         </span>
 
                         <span className="text-sm text-muted-foreground mb-4">
-                            Add conditions to filter out votes you don&apos;t want to see.
+                            {t("posts:filter.description")}
                         </span>
 
                         <LayoutGroup>
@@ -59,13 +61,13 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
 
                         {builder.children.length > 1 &&
                             <HiveMimeBulletItem className="mb-2">
-                                <span className="text-muted-foreground text-sm">You can <span className="text-honey-brown">drag & drop</span> your conditions to re-order and group them up.</span>
+                                <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
                             </HiveMimeBulletItem>
                         }
 
                         <Button variant="outline" onClick={() => setShowCreator(true)}>
                             <Plus />
-                            Add condition
+                            {t("posts:filter.addCondition")}
                         </Button>
                     </div>
                 }

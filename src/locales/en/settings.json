@@ -1,0 +1,67 @@
+{
+  "user": {
+    "title": "User Settings",
+    "account": "Account",
+    "privacy": "Privacy",
+    "displayName": "Display name",
+    "displayNameDescription": "Your public facing name that will be shown to other users.",
+    "displayNamePlaceholder": "Your name",
+    "birthday": "Birthday",
+    "birthdayDescription": "Your age group will be counted in auto polls.",
+    "country": "Country",
+    "countryDescription": "Your country will be counted in auto polls.",
+    "countryPlaceholder": "Select your country",
+    "autoPolls": "Auto polls",
+    "autoPollsDescription": "Automatically create polls about your age group and country. You can opt out of each poll individually.",
+    "ageGroup": "Age group",
+    "ageGroupDescription": "Your age group will be counted.",
+    "countryPoll": "Country",
+    "countryPollDescription": "Your country will be counted.",
+    "dateOfVote": "Date of vote",
+    "dateOfVoteDescription": "The date of your vote will be counted.",
+    "protectVotes": "Protect votes from filtering",
+    "protectVotesDescription": "Prevent other users from filtering out your votes in poll results."
+  },
+  "profile": {
+    "posts": "Posts",
+    "comments": "Comments",
+    "level": "Lv. {{level}}"
+  },
+  "theme": {
+    "pickTheme": "Pick a theme",
+    "changeTheme": "Change theme",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "accentColour": "Accent colour",
+    "resetAccentColour": "Reset accent colour"
+  },
+  "image": {
+    "addImage": "Add image",
+    "editImage": "Edit image",
+    "dragImageHere": "Drag an image here",
+    "pickFile": "Pick a file",
+    "pasteFromClipboard": "Paste from clipboard"
+  },
+  "timestamp": {
+    "in": "in {{time}}",
+    "ago": "{{time}} ago",
+    "year": "year",
+    "years": "years",
+    "month": "month",
+    "months": "months",
+    "week": "week",
+    "weeks": "weeks",
+    "day": "day",
+    "days": "days",
+    "hour": "hour",
+    "hours": "hours",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds"
+  },
+  "levelBanner": {
+    "gainedHoney": "You gained 🍯 {{amount}} honey!"
+  }
+}

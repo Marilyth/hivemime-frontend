@@ -6,6 +6,7 @@ import { CandidateDto, PollDto, PostDto } from "@/lib/Api";
 import { VoteQuery } from "@/lib/query-builder";
 import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
+import { useTranslation } from "react-i18next";
 import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 
@@ -15,6 +16,7 @@ interface HiveMimeFilterConditionCandidatePickerProps {
 }
 
 export const HiveMimeFilterConditionCandidatePicker = observer(({ post, currentItem }: HiveMimeFilterConditionCandidatePickerProps) => {
+    const { t } = useTranslation();
     const stepContext = useHiveMimeStep();
 
     function onCandidatePicked(poll: PollDto, candidate: CandidateDto) {
@@ -33,7 +35,7 @@ export const HiveMimeFilterConditionCandidatePicker = observer(({ post, currentI
     return (
         <div className="flex-col gap-2">
             <div className="text-sm text-muted-foreground mb-4">
-                Pick a candidate to create a condition for.
+                {t("posts:filter.pickCandidate")}
             </div>
 
             <div className="border rounded">
