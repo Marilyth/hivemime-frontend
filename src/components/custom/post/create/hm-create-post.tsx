@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
-import { CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
+import { CreateHiveDto, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { Button } from "../../../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Label } from "@radix-ui/react-label";
@@ -20,8 +20,9 @@ import { HiveMimeDraggable } from "../../utility/hm-draggable";
 import { HiveSelection } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
-import { api } from "@/lib/contexts";
+import { api, followedHivesStore } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
+import { FieldSeparator } from "@/components/ui/field";
 
 export const mediaFiles = observable.map<string, File>()
 
@@ -31,6 +32,8 @@ export const HiveMimeCreatePost = observer(() => {
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
   const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
   const [hiveId, setHiveId] = useQueryParam("hiveId", undefined);
+
+  const createHive = useRef<CreateHiveDto>(observable({ title: null, description: "" }));
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [], hiveId: hiveId ? Number(hiveId) : undefined }));
   const post = postRef.current;
 
@@ -93,6 +96,20 @@ export const HiveMimeCreatePost = observer(() => {
     if (!canSubmitPost())
       return;
 
+    // Handle new hive creation.
+    if (post.hiveId === -1) {
+      post.hiveId = undefined;
+      const task = api.api.hiveCreateCreate(createHive.current);
+
+      toast.promise(task, {
+        loading: t("toasts:hive.creating"),
+      });
+
+      const response = await task;
+      post.hiveId = response.data.id;
+      followedHivesStore.addFollowedHive(response.data);
+    }
+
     // Create post draft.
     const task = api.api.postCreateCreate(post);
     toast.promise(task, {
@@ -145,64 +162,65 @@ export const HiveMimeCreatePost = observer(() => {
   }
 
   return (
-    <Card className="py-4 text-foreground">
-  <CardHeader>
-    <h2 className="text-2xl font-bold">{t("posts:create.title")}</h2>
-  </CardHeader>
+    <div>
+      <Card className="py-4 text-foreground">
+        <CardHeader>
+          <h2 className="text-2xl font-bold">{t("posts:create.title")}</h2>
+        </CardHeader>
 
-  <CardContent>
-    {selectedPoll == null ? (
-      <div className="flex flex-col gap-4">
-        <HiveSelection post={post} />
+        <CardContent className="flex flex-col gap-4">
+          <HiveSelection post={post} newHive={createHive.current} />
+          <FieldSeparator />
+          {selectedPoll == null ? (
+            <div className="flex flex-col gap-4">
+              {/* Polls */}
+              <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
+                <Label className="font-bold">{t("posts:create.polls")}</Label>
+                <AnimatePresence>
+                  {post.polls!.map((poll, index) => (
+                    <motion.div layout key={getReferenceId(poll)}>
+                      <HiveMimeDraggable isDraggable isDropArea isSticky data={poll} dataList={post.polls!} allowedZones={['top', 'bottom']} className="flex flex-row gap-1">
+                        <HiveMimeHoverCard className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <HiveMimePollTypeIcon answerType={poll.pollType} className="text-honey-brown w-8" />
+                            <Label className="flex-1 break-words break-all">{poll.title}</Label>
+                          </div>
+                        </HiveMimeHoverCard>
+                        <Button variant="ghost" onClick={() => editPoll(index)}>
+                          <Edit />
+                        </Button>
+                        <Button variant="ghost"
+                          className="text-muted-foreground hover:text-red-400"
+                          onClick={() => removePoll(index)}>
+                            <Trash2 />
+                        </Button>
+                      </HiveMimeDraggable>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
 
-        {/* Polls */}
-        <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
-          <Label className="font-bold">{t("posts:create.polls")}</Label>
-          <AnimatePresence>
-            {post.polls!.map((poll, index) => (
-              <motion.div layout key={getReferenceId(poll)}>
-                <HiveMimeDraggable isDraggable isDropArea isSticky data={poll} dataList={post.polls!} allowedZones={['top', 'bottom']} className="flex flex-row gap-1">
-                  <HiveMimeHoverCard className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <HiveMimePollTypeIcon answerType={poll.pollType} className="text-honey-brown w-8" />
-                      <Label className="flex-1 break-words break-all">{poll.title}</Label>
-                    </div>
-                  </HiveMimeHoverCard>
-                  <Button variant="ghost" onClick={() => editPoll(index)}>
-                    <Edit />
-                  </Button>
-                  <Button variant="ghost"
-                    className="text-muted-foreground hover:text-red-400"
-                    onClick={() => removePoll(index)}>
-                      <Trash2 />
-                  </Button>
-                </HiveMimeDraggable>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                <Button variant="outline" onClick={addPoll} className="mt-2">
+                  <Plus /> {t("posts:create.addPoll")}
+                </Button>
+                <Label className="text-muted-foreground text-sm mt-1">
+                  {t("posts:create.correlationsHint")}
+                </Label>
+              </div>
 
-          <Button variant="outline" onClick={addPoll} className="mt-2">
-            <Plus /> {t("posts:create.addPoll")}
-          </Button>
-          <Label className="text-muted-foreground text-sm mt-1">
-            {t("posts:create.correlationsHint")}
-          </Label>
-        </div>
-
-        <AsyncButton className="self-start ml-auto" onClick={submitPost}>
-          {t("common:submit")}
-        </AsyncButton>
-      </div>
-    ) : (
-      <HiveMimeCreatePoll
-        poll={selectedPoll!}
-        canCancel={post.polls!.length >= 1}
-        onCancelled={() => cancelPoll()}
-        onFinished={() => finishPoll()}
-      />
-    )}
-  </CardContent>
-</Card>
-
+              <AsyncButton className="self-start ml-auto" onClick={submitPost}>
+                {t("common:submit")}
+              </AsyncButton>
+            </div>
+          ) : (
+            <HiveMimeCreatePoll
+              poll={selectedPoll!}
+              canCancel={post.polls!.length >= 1}
+              onCancelled={() => cancelPoll()}
+              onFinished={() => finishPoll()}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 });

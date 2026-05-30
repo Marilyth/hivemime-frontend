@@ -53,12 +53,15 @@
     "defaultCandidateName": "Candidate {{index}}",
     "defaultCategoryName": "Category {{index}}",
     "hiveSelection": {
-      "thisIsA": "This is a",
-      "post": "post.",
+      "thisIsA": "This is a <select/> post.",
       "postedInto": "It will be posted into",
       "selectHive": "Select hive",
       "searchHives": "Search hives...",
-      "noHivesFound": "No hives found."
+      "noHivesFound": "No hives found.",
+      "createNewHiveWithName": "Create a new hive",
+      "honeyRequiredToPost": "You need at least <honey/> to post here.",
+      "roleRequiredToPost": "You need to be at least <role/> to post here.",
+      "loginRequiredToPost": "You need to be logged in and verified to post in public."
     },
     "rules": {
       "minVotes": "The user has to vote for at least <select/> candidates.",

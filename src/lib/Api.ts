@@ -414,6 +414,7 @@ export interface UserDetailsDto {
   username?: string | null;
   /** @format double */
   honey?: number;
+  isVerified?: boolean;
   /** @format date-time */
   dateOfBirth?: string | null;
   settings?: UserSettingsDto;
@@ -427,6 +428,7 @@ export interface UserDto {
   createdAt?: string;
   /** @format double */
   honey?: number;
+  isVerified?: boolean;
 }
 
 export interface UserDtoPaginationResultDto {
