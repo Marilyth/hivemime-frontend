@@ -148,7 +148,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
 
             {hiveData.data && (
               <>
-                {getRoleRank(effectiveRole) < getRoleRank(MemberRole.Moderator) && hiveData.data.settings?.minHoneyToPost! > 0 &&
+                {getRoleRank(effectiveRole) < getRoleRank(MemberRole.Moderator) && hiveData.data.settings!.minHoneyToPost! > 0 &&
                 <div className="flex flex-row gap-2 items-center">
                   {userStore.user!.honey! >= hiveData.data.settings!.minHoneyToPost! ? (
                     <SquareCheck className="text-green-500 size-4" />
@@ -162,7 +162,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
                     }}
                   />
                 </div>}
-                {getRoleRank(hiveData.data.settings?.minRoleToPost!) > 0 &&
+                {getRoleRank(hiveData.data.settings!.minRoleToPost!) > 0 &&
                 <div className="flex flex-row gap-2 items-center">
                   {getRoleRank(effectiveRole) >= getRoleRank(hiveData.data.settings!.minRoleToPost!) ? (
                     <SquareCheck className="text-green-500 size-4" />
@@ -173,7 +173,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
                     i18nKey="posts:create.hiveSelection.roleRequiredToPost"
                     components={{
                       role: <span className={`${getRoleColor(hiveData.data.settings!.minRoleToPost!)}`}>
-                        {t(`enums:memberRole.${hiveData.data.settings!.minRoleToPost?.toLowerCase()}`)}
+                        {t(`enums:memberRole.${hiveData.data.settings!.minRoleToPost!.toLowerCase()}`)}
                       </span>
                     }}
                   />
