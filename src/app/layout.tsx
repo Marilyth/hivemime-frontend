@@ -73,11 +73,11 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
                           <SiteHeader />
                         </Suspense>
 
-                        <div className="flex justify-center">
+                        <div className="flex justify-center z-10">
                           <div className="w-full max-w-183 gap-4">
                             {!userStore.user ?
                               (<div>{t("common:loading")}</div>) :
-                              (<div className="flex flex-1 flex-col gap-4 py-4 z-0 px-2">
+                              (<div className="flex flex-1 flex-col gap-4 py-4 px-2">
                                 {children}
                               </div>)
                             }

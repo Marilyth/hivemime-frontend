@@ -69,7 +69,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
   const posts = data.data?.pages.flatMap(p => p.items!) ?? [];
 
   return (
-    <div className="flex flex-col gap-2 mb-4 z-10">
+    <div className="flex flex-col gap-2 mb-4">
       {hiveInformation.data && <HiveMimeHiveListItem hive={hiveInformation.data} className="mb-8" />}
       
       <Card className="p-0">

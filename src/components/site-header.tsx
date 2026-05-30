@@ -30,7 +30,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="z-10 sticky top-0 flex flex-col shrink-0 items-center gap-2">
+    <header className="z-20 sticky top-0 flex flex-col shrink-0 items-center gap-2">
       <div className="flex h-(--header-height) w-full items-center gap-2 px-4 bg-sidebar backdrop-blur-sm border-b">
         <Button
           className="h-8 w-8"
