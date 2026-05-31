@@ -19,7 +19,7 @@ export function HiveMimePostDetails() {
     if (!postId)
       throw new Error("postId is required");
 
-    return Number(postId);
+    return postId;
   }
 
   async function fetchPostAsync() {

@@ -17,6 +17,8 @@ import { Trans, useTranslation } from "react-i18next";
 import { getEffectiveRole, getRoleColor, getRoleRank } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+export const NEW_HIVE_ID_SENTINEL = "__new_hive__";
+
 export interface HiveMimeHiveSelectionProps {
   post: CreatePostDto;
   newHive: CreateHiveDto;
@@ -34,7 +36,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
 
   const hiveData = useQuery({
     queryKey: ["hive", props.post.hiveId],
-    enabled: props.post.hiveId !== undefined && props.post.hiveId! > 0,
+    enabled: props.post.hiveId !== undefined && props.post.hiveId !== NEW_HIVE_ID_SENTINEL,
     queryFn: async () => {
       const res = await api.api.hiveGetList({ hiveId: props.post.hiveId! });
       return res.data;
@@ -52,10 +54,10 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
   function setPrivacy(val: boolean) {
     props.post.hiveId = val ?
       undefined :
-      hiveIdQueryParam ? Number(hiveIdQueryParam) : -1;
+      hiveIdQueryParam ?? NEW_HIVE_ID_SENTINEL;
   }
 
-  function setHiveId(id: number) {
+  function setHiveId(id: string) {
     setIsPopoverOpen(false);
     props.post.hiveId = id;
     props.newHive.name = null;
@@ -63,7 +65,7 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
   
   function setNewHive() {
     setIsPopoverOpen(false);
-    props.post.hiveId = -1;
+    props.post.hiveId = NEW_HIVE_ID_SENTINEL;
     props.newHive.name = hiveSearchInput;
   }
 

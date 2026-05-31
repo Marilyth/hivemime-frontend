@@ -21,8 +21,8 @@ import { useTranslation } from "react-i18next";
 
 interface HiveMimePostBrowseProps {
   orderBy?: PostOrderBy;
-  hiveId?: number;
-  userId?: number;
+  hiveId?: string;
+  userId?: string;
 }
 
 export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
@@ -32,7 +32,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
   const [debouncedPostFilter, isLoading] = useDebounce(postFilter, 300);
 
-  const currentHiveUser = followedHivesStore.followedHives.get(Number(props.hiveId));
+  const currentHiveUser = props.hiveId ? followedHivesStore.followedHives.get(props.hiveId) : undefined;
   const canSeeStatusFilter = currentHiveUser != null && (getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));
 
   const hiveInformation = useQuery({

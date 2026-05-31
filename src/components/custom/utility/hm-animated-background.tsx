@@ -1,28 +1,36 @@
-import { mutedColors } from "@/lib/colors";
+import { mutedColors, mutedColorsList } from "@/lib/colors";
 import { motion } from "framer-motion";
 
 
 export interface AnimatedBackgroundProps {
     orientation?: "horizontal" | "vertical";
-    percentage: number;
     delay?: number;
-    colorStart?: string;
-    colorEnd?: string;
+    colorSegments?: ColorSegment[];
 }
 
-export function AnimatedBackground({ orientation = "horizontal", percentage, delay = 0, colorStart = mutedColors.honeyBrown + "77", colorEnd = mutedColors.honeyBrown + "20" }: AnimatedBackgroundProps) {
+export interface ColorSegment {
+    color: string;
+    startAtPercentage: number;
+}
+
+export function AnimatedBackground({ orientation = "horizontal", delay = 0, colorSegments }: AnimatedBackgroundProps) {
     const gradientDirection = orientation === "horizontal" ? "to right" : "to top";
+    
+    function getGradientString(initial: boolean): string {
+        return colorSegments!.map(segment => `${segment.color} ${initial ? 0 : segment.startAtPercentage}%`).join(', ');
+    }
+
     return (
         <motion.div
             className="absolute inset-0 rounded-md"
             initial={{ 
-                background: `linear-gradient(${gradientDirection}, ${colorStart} 0%, ${colorEnd} 0%, transparent 0%, transparent 100%)`
+                background: `linear-gradient(${gradientDirection}, ${getGradientString(true)}, transparent 0%)`
             }}
             animate={{ 
-                background: `linear-gradient(${gradientDirection}, ${colorStart} 0%, ${colorEnd} ${percentage}%, transparent 0%, transparent 100%)`
+                background: `linear-gradient(${gradientDirection}, ${getGradientString(false)}, transparent 0%)`
             }}
             transition={{
-                duration: 1.0,
+                duration: 0.5,
                 delay: delay,
                 ease: "easeOut",
             }}

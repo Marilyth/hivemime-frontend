@@ -11,8 +11,8 @@ export default function Page() {
   
   return (
     <HiveMimePostBrowse
-      hiveId={hiveId ? Number(hiveId) : undefined}
-      userId={userId ? Number(userId) : undefined}
+      hiveId={hiveId ?? undefined}
+      userId={userId ?? undefined}
       orderBy={orderBy as PostOrderBy} />
   );
 }

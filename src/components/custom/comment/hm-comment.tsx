@@ -22,7 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useTranslation } from "react-i18next";
 
 export interface HiveMimeCommentProps {
-  hiveId?: number;
+  hiveId?: string;
   comment: CommentDto;
   prefetchedReplies?: CommentDto[];
   isRoot: boolean;
@@ -38,7 +38,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
   const [createdReplies, setCreatedReplies] = useState<CommentDto[]>([]);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-  const currentHiveUser = followedHivesStore.followedHives.get(Number(hiveId));
+  const currentHiveUser = hiveId ? followedHivesStore.followedHives.get(hiveId) : undefined;
   const currentUserRoleRank = getRoleRank(getEffectiveRole(currentHiveUser?.role, currentHiveUser?.approvalStatus));
   const commentUserRoleRank = getRoleRank(comment.role ?? MemberRole.Follower);
 
@@ -134,7 +134,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
 
   async function banUser() {
     const task = api.api.hiveBanUserPartialUpdate({
-      hiveId: Number(hiveId),
+      hiveId: hiveId,
       userId: comment.user!.id
     });
 

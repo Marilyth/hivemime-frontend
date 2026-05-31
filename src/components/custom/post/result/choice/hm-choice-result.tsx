@@ -1,43 +1,21 @@
-import { AnimatedBackground } from "@/components/custom/utility/hm-animated-background";
-import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
-import { PollResultDto } from "@/lib/Api";
 import { useTranslation } from "react-i18next";
-import { HiveMimeViewCandidate } from "../../hm-candidate";
+import { useQuery } from "@tanstack/react-query";
+import { HiveMimePollResultProps as HiveMimePollCandidateResultProps } from "../hm-poll-result";
+import { api } from "@/lib/contexts";
+import { SumChart } from "../charts/hm-sum-chart";
 
 
-export interface HiveMimeChoiceResultProps {
-    pollResult: PollResultDto;
-}
-
-export function HiveMimeChoiceResult(props: HiveMimeChoiceResultProps) {
-  const { t } = useTranslation();
-  const totalScore = props.pollResult!.candidates!.reduce((sum, candidate) => sum + candidate.voterAmount!, 0);
+export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
+  const data = useQuery({
+    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryFn: async () => {
+      const r = await api.api.postSumResultList({ pollId: props.poll.id!, filter: props.filter });
+      return r.data;
+    },
+    staleTime: 1000 * 60 * 5
+  });
 
   return (
-    <div className="flex flex-col gap-2">
-        {props.pollResult?.candidates!.map((candidate, index) => {
-            const percentage = totalScore > 0 ? (candidate.voterAmount! / totalScore) * 100 : 0;
-            return (
-                <HiveMimeHoverCard 
-                    key={candidate.id} 
-                    className="p-2 rounded-md relative overflow-hidden"
-                >
-                    <AnimatedBackground percentage={percentage} />
-                    <div className="flex flex-col gap-0 relative">
-                        <div className="relative flex flex-row gap-2 items-center">
-                            <HiveMimeViewCandidate candidate={candidate} />
-
-                            <div className="flex flex-col items-end text-muted-foreground ml-auto">
-                                {Number(percentage.toFixed(2))}%
-                                <div className="text-muted-foreground">
-                                    {t("posts:result.votes", { count: candidate.voterAmount })}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </HiveMimeHoverCard>
-            );
-        })}
-    </div>
+    <SumChart data={data.data!} poll={props.poll} showPercentage showVotes />
   );
 }
