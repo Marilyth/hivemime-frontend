@@ -6,7 +6,9 @@ import { observer } from "mobx-react-lite";
 import { ReactNode } from "react";
 import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { getReferenceId } from "@/lib/utils";
-import { HiveMimeChoiceResult } from "./choice/hm-choice-result";
+import { HiveMimeChoiceResult } from "./hm-choice-result";
+import { HiveMimeScoreResult } from "./hm-score-result";
+import { HiveMimeCategoryResult } from "./hm-category-result";
 
 export interface HiveMimePollResultProps {
   poll: PollDto;
@@ -17,9 +19,9 @@ export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResult
   const pollMapping: { [key in PollType]: ReactNode } =
   {
     [PollType.Choice]: <HiveMimeChoiceResult poll={poll} filter={filter} />,
-    [PollType.Score]: <span>Score result not implemented yet</span>,
+    [PollType.Score]: <HiveMimeScoreResult poll={poll} filter={filter} />,
     [PollType.Rank]: <span>Rank result not implemented yet</span>,
-    [PollType.Category]: <span>Category result not implemented yet</span>,
+    [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
   };
 
   return (

@@ -71,6 +71,8 @@ export interface BooleanHoneyDeltaDto {
 export interface CandidateDistributionResultDto {
   /** @format uuid */
   id?: string;
+  /** @format int32 */
+  voteCount?: number;
   distribution?: CandidationDistributionResultValueDto[] | null;
 }
 
@@ -106,6 +108,8 @@ export interface CandidateDto {
 }
 
 export interface CandidateStatisticsResultDto {
+  /** @format int32 */
+  voteCount?: number;
   /** @format uuid */
   id?: string;
   /** @format double */
@@ -118,6 +122,8 @@ export interface CandidateStatisticsResultDto {
   q3?: number;
   /** @format double */
   max?: number;
+  /** @format double */
+  average?: number;
 }
 
 export interface CandidateStatisticsResultDtoPollResultDto {
@@ -146,8 +152,8 @@ export interface CandidateStatisticsResultDtoPollResultDto {
 export interface CandidateSumResultDto {
   /** @format uuid */
   id?: string;
-  /** @format double */
-  totalScore?: number;
+  /** @format int32 */
+  voteCount?: number;
 }
 
 export interface CandidateSumResultDtoPollResultDto {
@@ -184,7 +190,7 @@ export interface CandidationDistributionResultValueDto {
   /** @format double */
   value?: number;
   /** @format int32 */
-  count?: number;
+  voteCount?: number;
 }
 
 export interface CategoryDto {
