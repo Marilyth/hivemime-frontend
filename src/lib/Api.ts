@@ -83,7 +83,6 @@ export interface CandidateDistributionResultDtoPollResultDto {
   mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -108,10 +107,10 @@ export interface CandidateDto {
 }
 
 export interface CandidateStatisticsResultDto {
-  /** @format int32 */
-  voteCount?: number;
   /** @format uuid */
   id?: string;
+  /** @format int32 */
+  voteCount?: number;
   /** @format double */
   min?: number;
   /** @format double */
@@ -133,7 +132,6 @@ export interface CandidateStatisticsResultDtoPollResultDto {
   mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -154,6 +152,8 @@ export interface CandidateSumResultDto {
   id?: string;
   /** @format int32 */
   voteCount?: number;
+  /** @format int32 */
+  sum?: number;
 }
 
 export interface CandidateSumResultDtoPollResultDto {
@@ -163,7 +163,6 @@ export interface CandidateSumResultDtoPollResultDto {
   mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -273,7 +272,6 @@ export interface CreatePollDto {
   description?: string | null;
   media?: UploadMediaRequestDto;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -379,7 +377,6 @@ export interface PollDto {
   mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */

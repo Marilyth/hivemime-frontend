@@ -26,12 +26,11 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
       </div>
     );
 
-  const totalVotes = data.data.candidates!.reduce((sum, d) => sum + d.voteCount!, 0);
-
   return (
     <div className="flex flex-col gap-2">
-      {data.data.candidates!.map((d, i) => {
-        const ratio = totalVotes > 0 ? (d.voteCount! / totalVotes) : 0;
+      {props.poll.candidates!.map((d, i) => {
+        const resultCandidate = data.data!.candidates!.find(rc => rc.id === d.id);
+        const ratio = resultCandidate ? (resultCandidate.sum! / resultCandidate.voteCount!) : 0;
         const candidate = props.poll.candidates!.find(c => c.id === d.id);
 
         return (
@@ -40,16 +39,17 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
           >
             <AnimatedBackground colorSegments={[
               { color: mutedColors.honeyBrown + "77", startAt: 0 },
-              { color: mutedColors.honeyBrown + "20", startAt: ratio }
+              { color: mutedColors.honeyBrown + "20", startAt: ratio },
+              { color: "transparent", startAt: ratio }
             ]} />
             <div className="flex flex-col gap-0 relative">
               <div className="relative flex flex-row gap-2 items-center">
                 <HiveMimeViewCandidate candidate={candidate!} />
 
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
-                  {Number(ratio.toFixed(2))}%
+                  {Number((ratio * 100).toFixed(2))}%
                   <div className="text-muted-foreground">
-                    {t("posts:result.votes", { count: d.voteCount })}
+                    {t("posts:result.votes", { count: resultCandidate ? resultCandidate.sum : 0 })}
                   </div>
                 </div>
               </div>

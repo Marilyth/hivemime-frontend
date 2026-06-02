@@ -9,6 +9,7 @@ import { getReferenceId } from "@/lib/utils";
 import { HiveMimeChoiceResult } from "./hm-choice-result";
 import { HiveMimeScoreResult } from "./hm-score-result";
 import { HiveMimeCategoryResult } from "./hm-category-result";
+import { HiveMimeRankResult } from "./hm-rank-result";
 
 export interface HiveMimePollResultProps {
   poll: PollDto;
@@ -20,7 +21,7 @@ export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResult
   {
     [PollType.Choice]: <HiveMimeChoiceResult poll={poll} filter={filter} />,
     [PollType.Score]: <HiveMimeScoreResult poll={poll} filter={filter} />,
-    [PollType.Rank]: <span>Rank result not implemented yet</span>,
+    [PollType.Rank]: <HiveMimeRankResult poll={poll} filter={filter} />,
     [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
   };
 

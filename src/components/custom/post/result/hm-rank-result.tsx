@@ -10,9 +10,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { CandidateDistributionResultDto, CandidateDto, PollDto } from "@/lib/Api";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { hiveMimeRankIcon, hiveMimeRankIconColor } from "../../utility/hm-rank-icon";
 
 
-export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) {
+export function HiveMimeRankResult(props: HiveMimePollCandidateResultProps) {
   const data = useQuery({
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
@@ -29,28 +30,44 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
       </div>
     );
 
+  const rankResultCandidates = props.poll.candidates!.map(c => {
+    const candidateResult = data.data!.candidates!.find(rc => rc.id === c.id);
+    const score = candidateResult ? candidateResult.distribution?.reduce((sum, d) => sum + (d.voteCount! * (1 + props.poll.maxValue! - d.value!)), 0) : 0;
+    
+    return {
+      candidate: c,
+      candidateResult: candidateResult!,
+      score: score!
+    };
+  }).sort((a, b) => b.score! - a.score!);
+
+  const totalScore = rankResultCandidates.reduce((sum, c) => sum + c.score!, 0);
+
   return (
     <div className="flex flex-col gap-2">
-      {props.poll.candidates!.map((c, i) => {
-        const candidateResult = data.data!.candidates!.find(rc => rc.id === c.id);
-        return <HiveMimeCategoryCandidateResult key={c.id} candidate={c} candidateResult={candidateResult!} poll={props.poll}  />;
+      {rankResultCandidates!.map((c, i) => {
+        return <HiveMimeCategoryRankResult key={c.candidate.id} candidate={c.candidate} candidateResult={c.candidateResult}
+        totalScore={totalScore} score={c.score} rank={i + 1} poll={props.poll} />;
       })}
     </div>
   );
 }
 
-interface HiveMimeCategoryCandidateResultProps {
+interface HiveMimeCategoryRankResultProps {
   candidate: CandidateDto;
   candidateResult: CandidateDistributionResultDto;
+  totalScore: number;
+  score: number;
+  rank: number;
   poll: PollDto;
 }
 
-function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultProps) {
+function HiveMimeCategoryRankResult(props: HiveMimeCategoryRankResultProps) {
   const { t } = useTranslation();
   const resultCandidate = props.candidateResult;
-  const winningDistribution = resultCandidate?.distribution?.reduce((prev, current) => (prev.voteCount! >= current.voteCount!) ? prev : current)
-  const category = winningDistribution ? props.poll.categories!.find(cat => cat.value === winningDistribution?.value) : null;
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const color = hiveMimeRankIconColor(props.rank);
+  const ratio = props.totalScore > 0 ? (props.score / props.totalScore) : 0;
 
   return (
     <Accordion key={props.candidate.id} type="single" collapsible className="border-1 rounded-md overflow-hidden"
@@ -58,22 +75,22 @@ function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultP
       <AccordionItem value="candidate">
         <AccordionTrigger className="relative p-0 pl-2 py-1">
           <AnimatePresence>
-            {winningDistribution && !isAccordionOpen &&
+            {!isAccordionOpen &&
               <motion.div
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0 }} className="absolute inset-0">
                 <AnimatedBackground colorSegments={[
                   {
-                    color: numberToColorHex(category!.color!) + "77",
+                    color: color + "77",
                     startAt: 0
                   },
                   {
-                    color: numberToColorHex(category!.color!) + "20",
-                    startAt: (winningDistribution.voteCount! / resultCandidate!.voteCount!)
+                    color: color + "20",
+                    startAt: ratio
                   },
                   {
                     color: "transparent",
-                    startAt: (winningDistribution.voteCount! / resultCandidate!.voteCount!)
+                    startAt: ratio
                   }
                 ]} />
               </motion.div>
@@ -84,28 +101,30 @@ function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultP
             <HiveMimeViewCandidate candidate={props.candidate} />
             
             <div className="flex flex-col items-end text-muted-foreground ml-auto">
-              {category && <HiveMimeCategoryTag category={category} />}
+               {hiveMimeRankIcon(props.rank)}
 
               <div className="text-muted-foreground">
-                {t("posts:result.votes", { count: resultCandidate?.voteCount ?? 0 })}
+                {t("posts:result.score", { score: props.score })} 
               </div>
             </div>
           </div>
         </AccordionTrigger>
         <AccordionContent className="border-t-1 flex flex-col gap-1 py-2">
-          {props.poll.categories!.map(cat => {
-            const distribution = resultCandidate?.distribution?.find(d => d.value === cat.value);
+          {[...Array(props.poll.maxValue!).keys()].map(value => {
+            const rank = value + 1;
+            const distribution = resultCandidate?.distribution?.find(d => d.value === rank);
             const ratio = distribution ? (distribution.voteCount! / resultCandidate!.voteCount!) : 0;
+            const color = hiveMimeRankIconColor(rank);
 
             return (
-              <div key={cat.value} className="relative flex flex-row gap-2 items-center overflow-hidden px-2">
+              <div key={value} className="relative flex flex-row gap-2 items-center overflow-hidden px-2">
                 <AnimatedBackground colorSegments={[
                   {
-                    color: numberToColorHex(cat.color!) + "77",
+                    color: color + "77",
                     startAt: 0
                   },
                   {
-                    color: numberToColorHex(cat.color!) + "20",
+                    color: color + "20",
                     startAt: ratio
                   },
                   {
@@ -114,9 +133,9 @@ function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultP
                   }
                 ]} />
 
-                <HiveMimeCategoryTag category={cat} />
+                <span className="w-6 text-center">{hiveMimeRankIcon(rank)}</span>
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
-                  {Number((ratio * 100).toFixed(2))}%
+                  {t("posts:result.votes", { count: distribution?.voteCount ?? 0 })}
                 </div>
               </div>
             );

@@ -28,7 +28,7 @@ export function AnimatedBackground({ delay = 0.25, colorSegments }: AnimatedBack
 
     return (
         <motion.div
-            className="absolute inset-0 rounded-md"
+            className="absolute inset-0"
             style={{
                 background: `linear-gradient(${gradientDirection}, ${getGradientString()})`
             }}

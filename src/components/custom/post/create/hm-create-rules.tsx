@@ -31,8 +31,8 @@ export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProp
                   <SelectValue />
               </HiveMimeInlineSelectTrigger>
               <SelectContent>
-                {[...Array(props.poll.candidates?.length ?? 0).keys()].map(i => (
-                  <SelectItem key={i} value={(i + 1).toString()}>{i + 1}</SelectItem>
+                {[...Array(1 + (props.poll.candidates?.length ?? 0)).keys()].map(i => (
+                  <SelectItem key={i} value={(i).toString()}>{i.toString()}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -44,6 +44,8 @@ export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProp
 });
 
 export const HiveMimeCreateMaxvoteRule = observer((props: HiveMimeCreatePollProps) =>  {
+  const effectiveMinVotes = Math.max(1, props.poll.minVotes!);
+
   return (
     <HiveMimeBulletItem>
       <Trans
@@ -54,11 +56,11 @@ export const HiveMimeCreateMaxvoteRule = observer((props: HiveMimeCreatePollProp
               value={props.poll.maxVotes!.toString()}
               onValueChange={(value) => props.poll.maxVotes = Number(value)}>
               <HiveMimeInlineSelectTrigger>
-                  <SelectValue />
+                <SelectValue />
               </HiveMimeInlineSelectTrigger>
               <SelectContent>
-                {[...Array(props.poll.candidates!.length - props.poll.minVotes! + 1).keys()].map(i => (
-                  <SelectItem key={i} value={(props.poll.minVotes! + i).toString()}>{props.poll.minVotes! + i}</SelectItem>
+                {[...Array(props.poll.candidates!.length - effectiveMinVotes + 1).keys()].map(i => (
+                  <SelectItem key={i} value={(effectiveMinVotes + i).toString()}>{(effectiveMinVotes + i).toString()}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

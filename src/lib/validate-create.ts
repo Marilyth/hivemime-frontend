@@ -41,10 +41,10 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
     if (poll.title == undefined || poll.title == null || poll.title!.trim() === "")
         errors.push(i18n.t("validation:poll.noTitle"));
 
-    if (poll.minVotes! < 1)
+    if (poll.minVotes! < 0)
         errors.push(i18n.t("validation:poll.minVotes"));
 
-    if (poll.maxVotes! < poll.minVotes! && poll.maxVotes! != -1)
+    if (poll.maxVotes! < poll.minVotes! || poll.maxVotes! < 1)
         errors.push(i18n.t("validation:poll.maxVotesLessThanMin"));
 
     return errors;
