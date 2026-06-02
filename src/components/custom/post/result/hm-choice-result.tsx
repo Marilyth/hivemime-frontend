@@ -48,9 +48,6 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
 
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
                   {Number((ratio * 100).toFixed(2))}%
-                  <div className="text-muted-foreground">
-                    {t("posts:result.votes", { count: resultCandidate ? resultCandidate.sum : 0 })}
-                  </div>
                 </div>
               </div>
             </div>

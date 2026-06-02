@@ -101,8 +101,6 @@ function HiveMimeCategoryRankResult(props: HiveMimeCategoryRankResultProps) {
             <HiveMimeViewCandidate candidate={props.candidate} />
             
             <div className="flex flex-col items-end text-muted-foreground ml-auto">
-               {hiveMimeRankIcon(props.rank)}
-
               <div className="text-muted-foreground">
                 {t("posts:result.score", { score: props.score })} 
               </div>

@@ -55,10 +55,6 @@ export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
 
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
                   {d.median}
-                  
-                  <div className="text-muted-foreground">
-                    {t("posts:result.votes", { count: d.voteCount })}
-                  </div>
                 </div>
               </div>
             </div>
