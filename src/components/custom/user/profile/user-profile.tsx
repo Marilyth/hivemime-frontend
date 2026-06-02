@@ -20,7 +20,7 @@ export function UserProfile() {
     queryKey: ["userProfile", userData],
     enabled: userData !== null,
     queryFn: async () => {
-      const task = api.api.userProfileList({ userId: Number(userData) });
+      const task = api.api.userProfileList({ userId: userData ?? undefined });
       toast.promise(task, {
         loading: t("toasts:profile.loadingUser")
       });
@@ -49,7 +49,7 @@ export function UserProfile() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="posts" className="mt-4">
-          <HiveMimePostBrowse orderBy={PostOrderBy.New} userId={Number(userData)} />
+          <HiveMimePostBrowse orderBy={PostOrderBy.New} userId={userData ?? undefined} />
         </TabsContent>
         <TabsContent value="comments" className="mt-4">
           {data && <UserProfileComments user={data} />}

@@ -22,9 +22,11 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
   const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
   const [postVote, setPostVote] = useState<PostVoteDto>(() => (observable({
-    postId: post.id!,
+    Id: post.id!,
     polls: (post.polls || []).map(poll => ({
-      candidates: (poll.candidates || []).map(() => ({
+      Id: poll.id!,
+      candidates: (poll.candidates || []).map(candidate => ({
+        Id: candidate.id!,
         value: null,
       })),
     })),

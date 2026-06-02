@@ -1,4 +1,4 @@
-import { PollDto, PollVoteDto, PostVoteDto } from "./Api";
+import { PollDto, PollType, PollVoteDto, PostVoteDto } from "./Api";
 import i18n from "./i18n";
 
 export function validatePickPost(postPolls: PollDto[], postVotes: PostVoteDto): string[] {
@@ -16,12 +16,7 @@ export function validatePickPoll(poll: PollDto, vote: PollVoteDto): string[] {
     const errors: string[] = [];
 
     const voteValues = vote.candidates!.map(c => c.value);
-    const voteCount = voteValues!.filter(c => c != null).length;
-
-    if (voteCount == 0 && !poll.isOptional){
-        errors.push(i18n.t("validation:vote.required"));
-        return errors;
-    }
+    const voteCount = voteValues!.filter(c => c != null && (poll.pollType != PollType.Choice || c != 0)).length;
 
     if (voteCount < poll.minVotes!)
         errors.push(i18n.t("validation:vote.minCandidates", { minVotes: poll.minVotes }));

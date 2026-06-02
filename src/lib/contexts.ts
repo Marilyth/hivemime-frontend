@@ -17,7 +17,7 @@ class UserStore {
 }
 
 class FollowedHivesStore {
-  followedHives: Map<number, HiveUserDto> = new Map();
+  followedHives: Map<string, HiveUserDto> = new Map();
 
   constructor() {
     makeAutoObservable(this);
@@ -39,7 +39,7 @@ class FollowedHivesStore {
     }
   }
 
-  removeFollowedHive(hiveId: number) {
+  removeFollowedHive(hiveId: string) {
     this.followedHives.delete(hiveId);
   }
 }
@@ -57,17 +57,37 @@ export const api = new Api({
     const response = await fetch(input, init);
 
     const responseText = await response.clone().text();
-    const data = await responseText ? JSON.parse(responseText) : null;
+    let data: unknown = null;
+
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = null;
+      }
+    }
 
     if (response.ok)
     {
-      if (data?.honeyDelta)
-        userStore.user!.honey += data.honeyDelta;
+      const honeyDelta = (data as { honeyDelta?: number } | null)?.honeyDelta;
+      if (honeyDelta && userStore.user)
+        userStore.user.honey = (userStore.user.honey ?? 0) + honeyDelta;
+
+      if (data != null) {
+        const headers = new Headers(response.headers);
+        headers.delete("content-length");
+        return new Response(JSON.stringify(data), {
+          status: response.status,
+          statusText: response.statusText,
+          headers,
+        });
+      }
 
       return response;
     }
     
-    toast.error(data.error ?? i18n.t("toasts:requestFailed"), { closeButton: true, duration: Infinity, richColors: true });
+    const errorMessage = (data as { error?: string } | null)?.error;
+    toast.error(errorMessage ?? i18n.t("toasts:requestFailed"), { closeButton: true, duration: Infinity, richColors: true });
     throw new Error(`Request failed with status ${response.status}`);
   },
 });

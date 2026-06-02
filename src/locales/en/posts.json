@@ -25,6 +25,8 @@
   },
   "result": {
     "results": "Results",
+    "score": "{{score}} points",
+    "score_one": "{{score}} point",
     "votes": "{{count}} votes",
     "votes_one": "{{count}} vote",
     "filterVotes": "Filter votes",

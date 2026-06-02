@@ -17,7 +17,7 @@ import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { deepCopy, getReferenceId } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiveMimeDraggable } from "../../utility/hm-draggable";
-import { HiveSelection } from "./hm-hive-selection";
+import { HiveSelection, NEW_HIVE_ID_SENTINEL } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
 import { api, followedHivesStore } from "@/lib/contexts";
@@ -34,7 +34,7 @@ export const HiveMimeCreatePost = observer(() => {
   const [hiveId, setHiveId] = useQueryParam("hiveId", undefined);
 
   const createHive = useRef<CreateHiveDto>(observable({ title: null, description: "" }));
-  const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [], hiveId: hiveId ? Number(hiveId) : undefined }));
+  const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [], hiveId: hiveId ?? undefined }));
   const post = postRef.current;
 
   if (post.polls!.length === 0 && selectedPoll == null) {
@@ -97,7 +97,7 @@ export const HiveMimeCreatePost = observer(() => {
       return;
 
     // Handle new hive creation.
-    if (post.hiveId === -1) {
+    if (post.hiveId === NEW_HIVE_ID_SENTINEL) {
       post.hiveId = undefined;
       const task = api.api.hiveCreateCreate(createHive.current);
 
@@ -106,7 +106,7 @@ export const HiveMimeCreatePost = observer(() => {
       });
 
       const response = await task;
-      post.hiveId = response.data.id;
+      post.hiveId = response.data.hive!.id;
       followedHivesStore.addFollowedHive(response.data);
     }
 

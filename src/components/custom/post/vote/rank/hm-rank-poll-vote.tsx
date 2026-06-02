@@ -34,7 +34,7 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
     }
 
     for (let i = 0; i < state.rankedCandidates.length; i++) {
-      state.rankedCandidates[i].vote.value = poll.maxValue! - i;
+      state.rankedCandidates[i].vote.value = i + 1;
     }
   }
 

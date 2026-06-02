@@ -11,8 +11,8 @@ import { api } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
 
 export type HiveMimeCommentCreateProps = HTMLAttributes<HTMLDivElement> & {
-  postId: number;
-  parentCommentId?: number;
+  postId: string;
+  parentCommentId?: string;
   onFinished?: (comment: CommentDto | null) => void;
 };
 

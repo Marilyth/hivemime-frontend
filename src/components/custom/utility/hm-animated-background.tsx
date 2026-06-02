@@ -1,31 +1,67 @@
-import { mutedColors } from "@/lib/colors";
 import { motion } from "framer-motion";
 
 
 export interface AnimatedBackgroundProps {
-    orientation?: "horizontal" | "vertical";
-    percentage: number;
     delay?: number;
-    colorStart?: string;
-    colorEnd?: string;
+    colorSegments: ColorSegment[];
 }
 
-export function AnimatedBackground({ orientation = "horizontal", percentage, delay = 0, colorStart = mutedColors.honeyBrown + "77", colorEnd = mutedColors.honeyBrown + "20" }: AnimatedBackgroundProps) {
-    const gradientDirection = orientation === "horizontal" ? "to right" : "to top";
+export interface ColorSegment {
+    color: string;
+    startAt: number;
+    tickProps?: TickProperties;
+}
+
+export interface TickProperties {
+    width?: number;
+    height?: number;
+}
+
+export function AnimatedBackground({ delay = 0.25, colorSegments }: AnimatedBackgroundProps) {
+    const gradientDirection = "to right";
+    const lineSegments = colorSegments.filter(segment => segment.tickProps);
+    const gradientSegments = colorSegments.filter(segment => !segment.tickProps);
+    
+    function getGradientString(): string {
+        return gradientSegments.map(segment => `${segment.color} ${segment.startAt * 100}%`).join(', ');
+    }
+
     return (
         <motion.div
-            className="absolute inset-0 rounded-md"
-            initial={{ 
-                background: `linear-gradient(${gradientDirection}, ${colorStart} 0%, ${colorEnd} 0%, transparent 0%, transparent 100%)`
+            className="absolute inset-0"
+            style={{
+                background: `linear-gradient(${gradientDirection}, ${getGradientString()})`
+            }}
+            initial={{
+                opacity: 0,
             }}
             animate={{ 
-                background: `linear-gradient(${gradientDirection}, ${colorStart} 0%, ${colorEnd} ${percentage}%, transparent 0%, transparent 100%)`
+                opacity: 1,
             }}
             transition={{
-                duration: 1.0,
+                duration: 0.5,
                 delay: delay,
                 ease: "easeOut",
             }}
-        />
+        >
+            {lineSegments.map((segment, index) => {
+                const effectiveHeight = segment.tickProps?.height ?? 1;
+                const effectiveWidth = segment.tickProps?.width ?? 0.01;
+
+                return (
+                    <div
+                        key={index}
+                        className="absolute inset-0"
+                        style={{
+                            left: `${segment.startAt * 100}%`,
+                            top: `${(1 - effectiveHeight) * 100}%`,
+                            background: segment.color,
+                            width: `${effectiveWidth * 100}%`,
+                            height: `${effectiveHeight * 100}%`,
+                        }}
+                    />
+                );
+            })}
+        </motion.div>
     );
 }

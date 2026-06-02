@@ -20,13 +20,13 @@ export function HiveSettings() {
   const [hiveId] = useQueryParam("hiveId");
   const [tab, setTab] = useQueryParam("tab", "general");
   const router = useRouter();
-  const currentHiveUser = followedHivesStore.followedHives.get(Number(hiveId));
+  const currentHiveUser = hiveId ? followedHivesStore.followedHives.get(hiveId) : undefined;
   const canViewSettings = currentHiveUser != null && (getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));
 
   const hiveData = useQuery({
     queryKey: ["hive", hiveId],
     queryFn: async () => {
-      const res = await api.api.hiveGetList({ hiveId: Number(hiveId) });
+      const res = await api.api.hiveGetList({ hiveId: hiveId ?? undefined });
       return observable(res.data);
     }
   });

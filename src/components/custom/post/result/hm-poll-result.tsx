@@ -1,30 +1,28 @@
 "use client";
 
-import { PollDto, PollResultDto, PollType } from "@/lib/Api";
+import { PollDto, PollType } from "@/lib/Api";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
-import { ChartType } from "@/lib/view-models";
 import { ReactNode } from "react";
 import { AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { getReferenceId } from "@/lib/utils";
-import { HiveMimeChoiceResult } from "./choice/hm-choice-result";
-import { HiveMimeScoreResult } from "./score/hm-score-result";
-import { HiveMimeRankResult } from "./rank/hm-rank-result";
-import { HiveMimeCategoryResult } from "./category/hm-category-result";
+import { HiveMimeChoiceResult } from "./hm-choice-result";
+import { HiveMimeScoreResult } from "./hm-score-result";
+import { HiveMimeCategoryResult } from "./hm-category-result";
+import { HiveMimeRankResult } from "./hm-rank-result";
 
-export type HiveMimePollResultProps =   {
+export interface HiveMimePollResultProps {
   poll: PollDto;
-  pollResult?: PollResultDto;
-  chartType?: ChartType;
+  filter?: string;
 }
 
-export const HiveMimePollResult = observer(({ poll, pollResult, chartType }: HiveMimePollResultProps) => {
+export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResultProps) => {
   const pollMapping: { [key in PollType]: ReactNode } =
   {
-    [PollType.Choice]: <HiveMimeChoiceResult pollResult={pollResult!} />,
-    [PollType.Score]: <HiveMimeScoreResult pollResult={pollResult!} poll={poll} />,
-    [PollType.Rank]: <HiveMimeRankResult pollResult={pollResult!} poll={poll} />,
-    [PollType.Category]: <HiveMimeCategoryResult pollResult={pollResult!} poll={poll} />,
+    [PollType.Choice]: <HiveMimeChoiceResult poll={poll} filter={filter} />,
+    [PollType.Score]: <HiveMimeScoreResult poll={poll} filter={filter} />,
+    [PollType.Rank]: <HiveMimeRankResult poll={poll} filter={filter} />,
+    [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
   };
 
   return (

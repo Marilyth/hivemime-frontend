@@ -68,29 +68,133 @@ export interface BooleanHoneyDeltaDto {
   dto?: boolean;
 }
 
-export interface CandidateDistributionDto {
+export interface CandidateDistributionResultDto {
+  /** @format uuid */
+  id?: string;
   /** @format int32 */
-  value?: number;
+  voteCount?: number;
+  distribution?: CandidationDistributionResultValueDto[] | null;
+}
+
+export interface CandidateDistributionResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  isShuffled?: boolean;
   /** @format int32 */
-  score?: number;
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateDistributionResultDto[] | null;
+  categories?: CategoryDto[] | null;
 }
 
 export interface CandidateDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   name?: string | null;
   description?: string | null;
   mediaKeys?: string[] | null;
 }
 
+export interface CandidateStatisticsResultDto {
+  /** @format uuid */
+  id?: string;
+  /** @format int32 */
+  voteCount?: number;
+  /** @format double */
+  min?: number;
+  /** @format double */
+  q1?: number;
+  /** @format double */
+  median?: number;
+  /** @format double */
+  q3?: number;
+  /** @format double */
+  max?: number;
+  /** @format double */
+  average?: number;
+}
+
+export interface CandidateStatisticsResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  isShuffled?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateStatisticsResultDto[] | null;
+  categories?: CategoryDto[] | null;
+}
+
+export interface CandidateSumResultDto {
+  /** @format uuid */
+  id?: string;
+  /** @format int32 */
+  voteCount?: number;
+  /** @format int32 */
+  sum?: number;
+}
+
+export interface CandidateSumResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  isShuffled?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateSumResultDto[] | null;
+  categories?: CategoryDto[] | null;
+}
+
 export interface CandidateVoteDto {
+  /** @format uuid */
+  id?: string;
   /** @format int32 */
   value?: number | null;
 }
 
-export interface CategoryDto {
+export interface CandidationDistributionResultValueDto {
+  /** @format double */
+  value?: number;
   /** @format int32 */
-  id?: number;
+  voteCount?: number;
+}
+
+export interface CategoryDto {
+  /** @format uuid */
+  id?: string;
   name?: string | null;
   description?: string | null;
   /** @format int32 */
@@ -102,12 +206,12 @@ export interface CategoryDto {
 export interface CommentDto {
   user?: UserDto;
   role?: MemberRole;
-  /** @format int32 */
-  id?: number;
-  /** @format int32 */
-  postId?: number;
-  /** @format int32 */
-  parentCommentId?: number | null;
+  /** @format uuid */
+  id?: string;
+  /** @format uuid */
+  postId?: string;
+  /** @format uuid */
+  parentCommentId?: string | null;
   content?: string | null;
   /** @format date-time */
   createdAt?: string;
@@ -151,10 +255,10 @@ export interface CreateCategoryDto {
 }
 
 export interface CreateCommentDto {
-  /** @format int32 */
-  postId?: number;
-  /** @format int32 */
-  parentCommentId?: number | null;
+  /** @format uuid */
+  postId?: string;
+  /** @format uuid */
+  parentCommentId?: string | null;
   content?: string | null;
 }
 
@@ -168,7 +272,6 @@ export interface CreatePollDto {
   description?: string | null;
   media?: UploadMediaRequestDto;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -185,20 +288,20 @@ export interface CreatePollDto {
 }
 
 export interface CreatePostDto {
-  /** @format int32 */
-  hiveId?: number | null;
+  /** @format uuid */
+  hiveId?: string | null;
   polls?: CreatePollDto[] | null;
 }
 
 export interface EditCommentDto {
-  /** @format int32 */
-  commentId?: number;
+  /** @format uuid */
+  commentId?: string;
   newContent?: string | null;
 }
 
 export interface HiveDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   name?: string | null;
   description?: string | null;
   /** @format date-time */
@@ -238,8 +341,8 @@ export interface HiveSettingsDto {
 }
 
 export interface HiveUserDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   hive?: HiveDto;
   user?: UserDto;
   approvalStatus?: ApprovalStatus;
@@ -263,34 +366,17 @@ export interface HiveUserPaginationDto {
 
 export interface PaginationCursorDto {
   cursor?: string | null;
-  /** @format int32 */
-  id?: number;
-}
-
-export interface PollCandidateResultDto {
-  /** @format int32 */
-  id?: number;
-  name?: string | null;
-  description?: string | null;
-  mediaKeys?: string[] | null;
-  /** @format int32 */
-  voterAmount?: number;
-  /** @format double */
-  averageScore?: number | null;
-  /** @format int32 */
-  majorityVote?: number | null;
-  /** @format double */
-  majorityRatio?: number | null;
+  /** @format uuid */
+  id?: string;
 }
 
 export interface PollDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   title?: string | null;
   mediaKeys?: string[] | null;
   description?: string | null;
   isShuffled?: boolean;
-  isOptional?: boolean;
   /** @format int32 */
   minValue?: number;
   /** @format int32 */
@@ -306,30 +392,9 @@ export interface PollDto {
   categories?: CategoryDto[] | null;
 }
 
-export interface PollResultDto {
-  /** @format int32 */
-  id?: number;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  isShuffled?: boolean;
-  isOptional?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  pollType?: PollType;
-  candidates?: PollCandidateResultDto[] | null;
-  categories?: CategoryDto[] | null;
-}
-
 export interface PollVoteDto {
+  /** @format uuid */
+  id?: string;
   candidates?: CandidateVoteDto[] | null;
 }
 
@@ -337,8 +402,8 @@ export interface PostDto {
   hive?: HiveDto;
   creator?: UserDto;
   role?: MemberRole;
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   polls?: PollDto[] | null;
   /** @format int32 */
   commentCount?: number;
@@ -371,19 +436,15 @@ export interface PostPaginationDto {
   orderBy?: PostOrderBy;
 }
 
-export interface PostResultDto {
-  polls?: PollResultDto[] | null;
-}
-
 export interface PostVoteDto {
-  /** @format int32 */
-  postId?: number;
+  /** @format uuid */
+  id?: string;
   polls?: PollVoteDto[] | null;
 }
 
 export interface UploadCandidateDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   mediaUploadUrls?: string[] | null;
 }
 
@@ -396,21 +457,21 @@ export interface UploadMediaRequestDto {
 }
 
 export interface UploadPollDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   mediaUploadUrls?: string[] | null;
   candidates?: UploadCandidateDto[] | null;
 }
 
 export interface UploadPostDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   polls?: UploadPollDto[] | null;
 }
 
 export interface UserDetailsDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   username?: string | null;
   /** @format double */
   honey?: number;
@@ -421,8 +482,8 @@ export interface UserDetailsDto {
 }
 
 export interface UserDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   username?: string | null;
   /** @format date-time */
   createdAt?: string;
@@ -445,8 +506,8 @@ export interface UserPaginationDto {
 }
 
 export interface UserProfileDto {
-  /** @format int32 */
-  id?: number;
+  /** @format uuid */
+  id?: string;
   username?: string | null;
   /** @format double */
   honey?: number;
@@ -741,8 +802,8 @@ export class Api<
      */
     commentGetList: (
       query?: {
-        /** @format int32 */
-        commentId?: number;
+        /** @format uuid */
+        commentId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -806,8 +867,8 @@ export class Api<
      */
     commentDeleteDelete: (
       query?: {
-        /** @format int32 */
-        commentId?: number;
+        /** @format uuid */
+        commentId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -830,12 +891,12 @@ export class Api<
     commentBrowseCreate: (
       data: CommentPaginationDto,
       query?: {
-        /** @format int32 */
-        userId?: number;
-        /** @format int32 */
-        postId?: number;
-        /** @format int32 */
-        parentCommentId?: number;
+        /** @format uuid */
+        userId?: string;
+        /** @format uuid */
+        postId?: string;
+        /** @format uuid */
+        parentCommentId?: string;
         onlyRoot?: boolean;
       },
       params: RequestParams = {},
@@ -861,8 +922,8 @@ export class Api<
      */
     hiveGetList: (
       query?: {
-        /** @format int32 */
-        hiveId?: number;
+        /** @format uuid */
+        hiveId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -885,8 +946,8 @@ export class Api<
      */
     hiveJoinedList: (
       query?: {
-        /** @format int32 */
-        userId?: number;
+        /** @format uuid */
+        userId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -909,8 +970,8 @@ export class Api<
      */
     hiveJoinCreate: (
       query?: {
-        /** @format int32 */
-        hiveId?: number;
+        /** @format uuid */
+        hiveId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -934,8 +995,8 @@ export class Api<
     hiveUsersCreate: (
       data: HiveUserPaginationDto,
       query?: {
-        /** @format int32 */
-        hiveId?: number;
+        /** @format uuid */
+        hiveId?: string;
         status?: ApprovalStatus;
       },
       params: RequestParams = {},
@@ -961,8 +1022,8 @@ export class Api<
      */
     hiveModifyUserPartialUpdate: (
       query?: {
-        /** @format int32 */
-        followRequestId?: number;
+        /** @format uuid */
+        followRequestId?: string;
         approvalStatus?: ApprovalStatus;
         role?: MemberRole;
       },
@@ -986,10 +1047,10 @@ export class Api<
      */
     hiveBanUserPartialUpdate: (
       query?: {
-        /** @format int32 */
-        userId?: number;
-        /** @format int32 */
-        hiveId?: number;
+        /** @format uuid */
+        userId?: string;
+        /** @format uuid */
+        hiveId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1011,8 +1072,8 @@ export class Api<
      */
     hiveLeaveDelete: (
       query?: {
-        /** @format int32 */
-        followId?: number;
+        /** @format uuid */
+        followId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1091,8 +1152,8 @@ export class Api<
      */
     postGetList: (
       query?: {
-        /** @format int32 */
-        postId?: number;
+        /** @format uuid */
+        postId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1116,10 +1177,10 @@ export class Api<
     postBrowseCreate: (
       data: PostPaginationDto,
       query?: {
-        /** @format int32 */
-        creatorId?: number;
-        /** @format int32 */
-        hiveId?: number;
+        /** @format uuid */
+        creatorId?: string;
+        /** @format uuid */
+        hiveId?: string;
         approvalStatus?: ApprovalStatus;
       },
       params: RequestParams = {},
@@ -1145,8 +1206,8 @@ export class Api<
      */
     postPublishPartialUpdate: (
       query?: {
-        /** @format int32 */
-        postId?: number;
+        /** @format uuid */
+        postId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1188,8 +1249,8 @@ export class Api<
      */
     postDeleteDelete: (
       query?: {
-        /** @format int32 */
-        postId?: number;
+        /** @format uuid */
+        postId?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -1211,8 +1272,8 @@ export class Api<
      */
     postModifyPostPartialUpdate: (
       query?: {
-        /** @format int32 */
-        postId?: number;
+        /** @format uuid */
+        postId?: string;
         approvalStatus?: ApprovalStatus;
       },
       params: RequestParams = {},
@@ -1229,20 +1290,20 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostResultsList
-     * @request GET:/api/Post/results
+     * @name PostSumResultList
+     * @request GET:/api/Post/sumResult
      * @secure
      */
-    postResultsList: (
+    postSumResultList: (
       query?: {
-        /** @format int32 */
-        postId?: number;
+        /** @format uuid */
+        pollId?: string;
         filter?: string;
       },
       params: RequestParams = {},
     ) =>
-      this.request<PostResultDto, any>({
-        path: `/api/Post/results`,
+      this.request<CandidateSumResultDtoPollResultDto, any>({
+        path: `/api/Post/sumResult`,
         method: "GET",
         query: query,
         secure: true,
@@ -1254,20 +1315,45 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostDistributionList
-     * @request GET:/api/Post/distribution
+     * @name PostStatisticsResultList
+     * @request GET:/api/Post/statisticsResult
      * @secure
      */
-    postDistributionList: (
+    postStatisticsResultList: (
       query?: {
-        /** @format int32 */
-        candidateId?: number;
+        /** @format uuid */
+        pollId?: string;
         filter?: string;
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateDistributionDto[], any>({
-        path: `/api/Post/distribution`,
+      this.request<CandidateStatisticsResultDtoPollResultDto, any>({
+        path: `/api/Post/statisticsResult`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostDistributionResultList
+     * @request GET:/api/Post/distributionResult
+     * @secure
+     */
+    postDistributionResultList: (
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateDistributionResultDtoPollResultDto, any>({
+        path: `/api/Post/distributionResult`,
         method: "GET",
         query: query,
         secure: true,
@@ -1362,8 +1448,8 @@ export class Api<
      */
     userProfileList: (
       query?: {
-        /** @format int32 */
-        userId?: number;
+        /** @format uuid */
+        userId?: string;
       },
       params: RequestParams = {},
     ) =>

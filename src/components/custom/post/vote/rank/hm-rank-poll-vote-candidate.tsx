@@ -21,7 +21,7 @@ export const HiveMimeRankPollVoteCandidate = observer(({ combined, poll, onClick
 
   return (
     <HiveMimeHoverCard className={`flex flex-row items-center cursor-pointer ${isRanked() ? 'bg-honey-brown/20' : 'hover:text-honey-brown'}`} onClick={onClick}>
-      {isRanked() && <span className="w-6 font-light text-informational">{hiveMimeRankIcon(poll.maxValue! - combined.vote.value! + 1)}</span>}
+      {isRanked() && <span className="w-6 font-light text-informational">{hiveMimeRankIcon(combined.vote.value!)}</span>}
       <motion.div layout><HiveMimeViewCandidate candidate={combined.candidate} /></motion.div>
     </HiveMimeHoverCard>
   );
