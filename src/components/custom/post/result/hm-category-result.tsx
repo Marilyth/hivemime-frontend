@@ -24,7 +24,7 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
           props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
         }
       }
-      
+
       return r.data;
     },
     staleTime: 1000 * 60 * 5
@@ -47,7 +47,7 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
       candidateResult: candidateResult!,
       winningDistribution: winningDistribution
     };
-  }).sort((a, b) => (a.winningDistribution?.value ?? 0) - (b.winningDistribution?.value ?? 0) ||
+  }).sort((a, b) => (a.winningDistribution?.value ?? 9999) - (b.winningDistribution?.value ?? 9999) ||
                     (b.winningDistribution?.voteCount ?? 0) - (a.winningDistribution?.voteCount ?? 0));
 
   return (

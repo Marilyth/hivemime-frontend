@@ -10,7 +10,7 @@ export function HiveMimeViewCandidate({ candidate, className, ...props }: HiveMi
   const src = candidate.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"));
 
   return (
-    <div className={`flex flex-row gap-2 items-center ${className}`} {...props}>
+    <div className={`flex flex-row gap-2 items-center ${candidate.isCustom ? "text-muted-foreground" : ""} ${className}`} {...props}>
       {thumbnail && <ImageViewer src={src} alt={candidate.name!} thumb={thumbnail} />}
       <span className="font-medium">{candidate.name}</span>
     </div>
