@@ -1,14 +1,12 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { PollDto, PollVoteDto } from "@/lib/Api";
+import { CandidateVoteDto, PollDto, PollVoteDto } from "@/lib/Api";
 import { HiveMimeRankPollVoteCandidate } from "./hm-rank-poll-vote-candidate";
-import { useEffect, useRef, useState } from "react";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
-import { HiveMimeDraggable } from "../../../utility/hm-draggable";
-import { observable, reaction } from "mobx";
+import { HiveMimeDraggable, OnDroppedArgs } from "../../../utility/hm-draggable";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
@@ -20,51 +18,60 @@ export interface HiveMimeRankPollVoteProps {
 
 export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankPollVoteProps) => {
   const { t } = useTranslation();
-  const state = useRef(observable({
-    rankedCandidates: [] as CombinedPollCandidate[],
-    unrankedCandidates: poll.candidates!.map((candidate, index) => ({
-      candidate: candidate,
-      vote: pollVotes.candidates![index]
-    }))
-  })).current;
 
   function rerankCandidates() {
-    for (const candidate of state.unrankedCandidates) {
-      if (candidate.vote.value != null) {
-        candidate.vote.value = null;
-      }
-    }
+    let isRanked = true;
 
-    for (let i = 0; i < state.rankedCandidates.length; i++) {
-      state.rankedCandidates[i].vote.value = i + 1;
+    for (let i = 0; i < pollVotes.candidates!.length; i++) {
+      const candidate = pollVotes.candidates![i];
+
+      if (!isRanked) {
+        candidate.value = null;
+        continue;
+      }
+
+      if (candidate.value != null)
+        candidate.value = i + 1;
+
+      else
+        isRanked = false;
     }
   }
 
   function triggerRank(candidate: CombinedPollCandidate) {
-    if (candidate.vote.value == null) {
-      const index = state.unrankedCandidates.findIndex(c => c === candidate);
-      state.unrankedCandidates.splice(index, 1);
-      state.rankedCandidates.push(candidate);
-    }
-    else {
-      const index = state.rankedCandidates.findIndex(c => c === candidate);
-      state.rankedCandidates.splice(index, 1);
-      state.unrankedCandidates.push(candidate);
-    }
+    const currentIndex = pollVotes.candidates!.findIndex(c => c === candidate.vote);
+    pollVotes.candidates!.splice(currentIndex, 1);
+
+    const rankedEndIndex = pollVotes.candidates!.findIndex(c => c.value == null);
+
+    candidate.vote.value = candidate.vote.value == null ? 1 : null;
+
+    if (rankedEndIndex === -1)
+      pollVotes.candidates!.push(candidate.vote);
+    else
+      pollVotes.candidates!.splice(rankedEndIndex, 0, candidate.vote);
 
     rerankCandidates();
   }
 
   function removeCustomCandidate(candidate: CombinedPollCandidate) {
-    const uIndex = state.unrankedCandidates.findIndex(c => c === candidate);
-    if (uIndex !== -1)
-      state.unrankedCandidates.splice(uIndex, 1);
+    const voteIndex = pollVotes.candidates!.findIndex(c => c.name === candidate.vote.name);
+    pollVotes.candidates!.splice(voteIndex, 1);
 
-    const rIndex = state.rankedCandidates.findIndex(c => c === candidate);
-    if (rIndex !== -1)
-      state.rankedCandidates.splice(rIndex, 1);
+    const index = poll.candidates!.findIndex(c => c.name === candidate.candidate.name);
+    poll.candidates!.splice(index, 1);
 
-    candidate.vote.value = null;
+    rerankCandidates();
+  }
+
+  function onDrop(args: OnDroppedArgs) {
+    const originalCandidate = args.draggableData as CandidateVoteDto;
+    const currentIndex = pollVotes.candidates!.findIndex(c => c.name === originalCandidate.name);
+    
+    for (let i = 0; i <= currentIndex; i++)
+      pollVotes.candidates![i].value = 1;
+
+    rerankCandidates();
   }
 
   return (
@@ -72,35 +79,29 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
       <span className="text-informational text-sm">{t("posts:vote.rankInstruction")}</span>
 
       <LayoutGroup>
-        {state.rankedCandidates.map((candidate) => (
-          <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-            <HiveMimeDraggable dropAreaName={getReferenceId(poll)} onDropped={rerankCandidates} draggableOnArea={[getReferenceId(poll)]} isDraggable isDropArea isSticky data={candidate} dataList={state.rankedCandidates} allowedZones={['top', 'bottom']}>
-              <HiveMimeRankPollVoteCandidate combined={candidate} poll={poll}
-                onClick={() => triggerRank(candidate)}
-              />
-              {candidate.candidate.isCustom &&
-                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(candidate)}>
-                  <Trash2 />
-                </Button>
-              }
-            </HiveMimeDraggable>
-          </motion.div>
-        ))}
+        {pollVotes.candidates!.map((candidate) => {
+          const combinedCandidate = {candidate: poll.candidates!.find(c => c.name === candidate.name)!, vote: candidate} as CombinedPollCandidate;
 
-        {state.unrankedCandidates.map((candidate) => (
-          <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-            <HiveMimeDraggable draggableOnArea={[getReferenceId(poll)]} isDraggable isSticky data={candidate} dataList={state.unrankedCandidates}>
-              <HiveMimeRankPollVoteCandidate combined={candidate} poll={poll}
-                onClick={() => triggerRank(candidate)}
-              />
-              {candidate.candidate.isCustom &&
-                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(candidate)}>
-                  <Trash2 />
-                </Button>
-              }
-            </HiveMimeDraggable>
-          </motion.div>
-        ))}
+          if (!combinedCandidate.candidate)
+            return null;
+
+          return (
+            <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
+              <HiveMimeDraggable dropAreaName={getReferenceId(poll)} onDropped={onDrop} draggableOnArea={[getReferenceId(poll)]} isDraggable isDropArea isSticky data={candidate}
+                dataList={pollVotes.candidates!} allowedZones={['top', 'bottom']} className="flex flex-row gap-2">
+                <div className="flex-1">
+                  <HiveMimeRankPollVoteCandidate combined={combinedCandidate} poll={poll}
+                    onClick={() => triggerRank(combinedCandidate)}
+                  />
+                </div>
+                {combinedCandidate.candidate.isCustom &&
+                  <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(combinedCandidate)}>
+                    <Trash2 />
+                  </Button>
+                }
+              </HiveMimeDraggable>
+            </motion.div>
+          )})}
       </LayoutGroup>
     </div>
   );

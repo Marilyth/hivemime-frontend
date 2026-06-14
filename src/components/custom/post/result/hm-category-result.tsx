@@ -17,6 +17,14 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
       const r = await api.api.postDistributionResultList({ pollId: props.poll.id!, filter: props.filter });
+      const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
+
+      for (const candidateResult of r.data.candidates!) {
+        if (!existingCandidateIds.has(candidateResult.id!)) {
+          props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
+        }
+      }
+      
       return r.data;
     },
     staleTime: 1000 * 60 * 5

@@ -6,6 +6,7 @@ import { mutedColors } from "@/lib/colors";
 import { HiveMimeViewCandidate } from "../hm-candidate";
 import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
+import { CandidateDto } from "@/lib/Api";
 
 
 export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
@@ -14,6 +15,14 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
       const r = await api.api.postSumResultList({ pollId: props.poll.id!, filter: props.filter });
+      const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
+
+      for (const candidateResult of r.data.candidates!) {
+        if (!existingCandidateIds.has(candidateResult.id!)) {
+          props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
+        }
+      }
+      
       return r.data;
     },
     staleTime: 1000 * 60 * 5
@@ -28,10 +37,9 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      {props.poll.candidates!.map((d, i) => {
-        const resultCandidate = data.data!.candidates!.find(rc => rc.id === d.id);
+      {props.poll.candidates!.filter(c => !c.isCustom).map((candidate, i) => {
+        const resultCandidate = data.data!.candidates!.find(rc => rc.id === candidate.id);
         const ratio = resultCandidate ? (resultCandidate.sum! / resultCandidate.voteCount!) : 0;
-        const candidate = props.poll.candidates!.find(c => c.id === d.id);
 
         return (
           <HiveMimeHoverCard key={i}
@@ -45,6 +53,32 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
             <div className="flex flex-col gap-0 relative">
               <div className="relative flex flex-row gap-2 items-center">
                 <HiveMimeViewCandidate candidate={candidate!} />
+
+                <div className="flex flex-col items-end text-muted-foreground ml-auto">
+                  {Number((ratio * 100).toFixed(2))}%
+                </div>
+              </div>
+            </div>
+          </HiveMimeHoverCard>
+        );
+      })}
+
+      {data.data!.candidates!.filter(c => c.isCustom).map((resultCandidate, i) => {
+        const pollCandidate = { id: resultCandidate.id, name: resultCandidate.name, mediaKeys: [] } as CandidateDto;
+        const ratio = resultCandidate.sum! / resultCandidate.voteCount!;
+
+        return (
+          <HiveMimeHoverCard key={i}
+            className="p-2 rounded-md relative overflow-hidden"
+          >
+            <AnimatedBackground colorSegments={[
+              { color: mutedColors.honeyBrown + "77", startAt: 0 },
+              { color: mutedColors.honeyBrown + "20", startAt: ratio },
+              { color: "transparent", startAt: ratio }
+            ]} />
+            <div className="flex flex-col gap-0 relative">
+              <div className="relative flex flex-row gap-2 items-center">
+                <HiveMimeViewCandidate candidate={pollCandidate!} />
 
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
                   {Number((ratio * 100).toFixed(2))}%

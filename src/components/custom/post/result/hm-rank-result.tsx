@@ -2,10 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { HiveMimePollResultProps as HiveMimePollCandidateResultProps } from "./hm-poll-result";
 import { api } from "@/lib/contexts";
 import { HiveMimeViewCandidate } from "../hm-candidate";
-import { numberToColorHex } from "@/lib/colors";
 import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
-import { HiveMimeCategoryTag } from "../vote/category/hm-category-poll-vote-category";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CandidateDistributionResultDto, CandidateDto, PollDto } from "@/lib/Api";
 import { useState } from "react";
@@ -18,6 +16,14 @@ export function HiveMimeRankResult(props: HiveMimePollCandidateResultProps) {
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
       const r = await api.api.postDistributionResultList({ pollId: props.poll.id!, filter: props.filter });
+      const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
+
+      for (const candidateResult of r.data.candidates!) {
+        if (!existingCandidateIds.has(candidateResult.id!)) {
+          props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
+        }
+      }
+
       return r.data;
     },
     staleTime: 1000 * 60 * 5

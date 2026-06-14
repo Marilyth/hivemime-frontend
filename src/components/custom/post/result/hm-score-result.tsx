@@ -6,6 +6,7 @@ import { HiveMimeViewCandidate } from "../hm-candidate";
 import { mutedColors } from "@/lib/colors";
 import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
+import { CandidateDto } from "@/lib/Api";
 
 export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
   const { t } = useTranslation();
@@ -13,6 +14,14 @@ export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
       const r = await api.api.postStatisticsResultList({ pollId: props.poll.id!, filter: props.filter });
+      const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
+
+      for (const candidateResult of r.data.candidates!) {
+        if (!existingCandidateIds.has(candidateResult.id!)) {
+          props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
+        }
+      }
+
       return r.data;
     },
     staleTime: 1000 * 60 * 5

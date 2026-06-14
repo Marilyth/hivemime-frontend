@@ -24,14 +24,5 @@ export function validatePickPoll(poll: PollDto, vote: PollVoteDto): string[] {
     if (voteCount > poll.maxVotes!)
         errors.push(i18n.t("validation:vote.maxCandidates", { maxVotes: poll.maxVotes }));
 
-    for (const value of voteValues) {
-        if (value != null) {
-            if (value < poll.minValue!)
-                errors.push(i18n.t("validation:vote.valueTooSmall", { minValue: poll.minValue }));
-            if (value > poll.maxValue!)
-                errors.push(i18n.t("validation:vote.valueTooLarge", { maxValue: poll.maxValue }));
-        }
-    }
-
     return errors;
 }

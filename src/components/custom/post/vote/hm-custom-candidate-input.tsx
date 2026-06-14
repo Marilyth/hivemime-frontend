@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PollDto, PollVoteDto, PollType } from "@/lib/Api";
 import { api } from "@/lib/contexts";
 import { useQuery } from "@tanstack/react-query";
@@ -42,14 +42,22 @@ export const CustomCandidateInput = ({ poll, pollVote }: CustomCandidateInputPro
     }
 
     let candidateValue: number | null = null;
+    let insertIndex = poll.candidates!.length;
+
     if (poll.pollType === PollType.Choice)
       candidateValue = 1;
 
     else if (poll.pollType === PollType.Rank)
-      candidateValue = pollVote.candidates!.filter(c => c.value != null).length + 1;
+    {
+      const rankEndIndex = pollVote.candidates!.findIndex(c => c.value == null);
+      candidateValue = (rankEndIndex === -1 ? pollVote.candidates!.length : rankEndIndex) + 1;
 
-    poll.candidates!.push({ name: value, id: undefined, description: "", isCustom: true });
-    pollVote.candidates!.push({ name: value,
+      if (rankEndIndex !== -1)
+        insertIndex = rankEndIndex;
+    }
+
+    poll.candidates!.splice(insertIndex, 0, { name: value, id: undefined, description: "", isCustom: true });
+    pollVote.candidates!.splice(insertIndex, 0, { name: value,
       id: null,
       value: candidateValue });
 
