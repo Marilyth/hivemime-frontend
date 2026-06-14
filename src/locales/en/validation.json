@@ -5,7 +5,7 @@
     "noCandidates": "A poll must have at least one candidate.",
     "noTitle": "A poll must have a title.",
     "minVotes": "A poll must allow at least 1 vote.",
-    "maxVotesLessThanMin": "Max votes must be greater than min votes.",
+    "maxVotesLessThanOne": "Max votes must be greater than 0.",
     "choiceMinCandidates": "A choice poll must have at least two candidates.",
     "scoreStepValue": "A scoring poll must have a step value higher than 0.",
     "categoryMinCategories": "A categorization poll must have at least two categories."

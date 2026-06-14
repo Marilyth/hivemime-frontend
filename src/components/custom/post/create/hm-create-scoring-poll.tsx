@@ -3,7 +3,7 @@
 import { observer } from "mobx-react-lite";
 import { HiveMimeInlineInput } from "../../utility/hm-embedded-input";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
-import { HiveMimeCreateMaxvoteRule, HiveMimeCreateMinvoteRule, HiveMimeCreateShuffleRule } from "./hm-create-rules";
+import { HiveMimeCreateCustomCandidatesRule, HiveMimeCreateMaxvoteRule, HiveMimeCreateMinvoteRule, HiveMimeCreateShuffleRule } from "./hm-create-rules";
 import { HiveMimeCreatePollProps } from "./hm-create-choice-poll";
 import { Trans } from "react-i18next";
 
@@ -35,6 +35,7 @@ export const HiveMimeCreateScoringRules = observer((props: HiveMimeCreatePollPro
         />
       </HiveMimeBulletItem>
 
+      <HiveMimeCreateCustomCandidatesRule poll={props.poll} />
       <HiveMimeCreateMinvoteRule poll={props.poll} />
       <HiveMimeCreateMaxvoteRule poll={props.poll} />
       <HiveMimeCreateShuffleRule poll={props.poll} />

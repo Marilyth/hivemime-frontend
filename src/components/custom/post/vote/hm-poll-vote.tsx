@@ -14,6 +14,7 @@ import { validatePickPoll } from "@/lib/validate-vote";
 import { HiveMimeStateIcon } from "../../utility/hm-state-icon";
 import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
+import { CustomCandidateInput } from "./hm-custom-candidate-input";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
@@ -23,6 +24,7 @@ export type HiveMimeListPollProps =   {
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
   const [state, setState] = useState<"nothing" | "indeterminate" | "finished" | "error">("nothing");
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+
   const pollMapping: { [key in PollType]: ReactNode } =
   {
     [PollType.Choice]: <HiveMimeChoicePollVote poll={poll} pollVotes={pollVote} />,
@@ -59,8 +61,10 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-4 flex flex-col gap-2 bg-card " >
-          <span className="text-muted-foreground">{poll.description}</span>
-          {pollMapping[poll.pollType!]}
+        <span className="text-muted-foreground">{poll.description}</span>
+        {pollMapping[poll.pollType!]}
+
+        <CustomCandidateInput poll={poll} pollVote={pollVote} />
 
         <div>
           {errorMessages.length > 0 && (

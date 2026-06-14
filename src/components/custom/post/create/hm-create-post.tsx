@@ -67,6 +67,7 @@ export const HiveMimeCreatePost = observer(() => {
     setSelectedPollIndex(-1);
     setSelectedPoll(observable({ title: "", description: "", candidates: [], categories: [],
                        minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
+                       allowedCustomCandidateCount: 0, shuffleCandidates: false,
                        pollType: undefined }));
   }
 

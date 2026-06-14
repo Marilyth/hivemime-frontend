@@ -10,6 +10,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryPollVoteCandidateDialog, HiveMimeCategoryPollVoteCategoryDialog } from "./hm-category-poll-vote-dialog";
 import { HiveMimeCategoryTagBox, HiveMimePickCandidate } from "./hm-category-poll-vote-category";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export interface HiveMimeCategoryPollVoteProps {
   poll: PollDto;
@@ -35,6 +37,17 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
   function getCandidatesCategory(candidate: CombinedPollCandidate) {
     const category = poll.categories!.find(category => category.value === candidate.vote.value);
     return category ?? null;
+  }
+
+  function removeCustomCandidate(index: number) {
+    poll.candidates!.splice(index, 1);
+    pollVotes.candidates!.splice(index, 1);
+
+    setCombinedCandidates(prev => {
+      const copy = [...prev];
+      copy.splice(index, 1);
+      return copy;
+    });
   }
 
   return (
@@ -71,7 +84,7 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
 
         {combinedCandidates.map((candidate, index) => (
           <div key={getReferenceId(candidate)} >
-            <motion.div layout layoutId={getReferenceId(candidate)} className="flex flex-row">
+            <motion.div layout layoutId={getReferenceId(candidate)} className="flex flex-row gap-2">
               <div className="flex-1">
                 <HiveMimeDraggable
                   draggableOnArea={[`${getReferenceId(poll)}_category`]}
@@ -84,6 +97,12 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
                   <HiveMimePickCandidate candidate={candidate} category={getCandidatesCategory(candidate)} />
                 </HiveMimeDraggable>
               </div>
+
+              {candidate.candidate.isCustom &&
+                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(index)}>
+                  <Trash2 />
+                </Button>
+              }
             </motion.div>
           </div>
         ))}

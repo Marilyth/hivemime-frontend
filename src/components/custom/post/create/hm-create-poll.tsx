@@ -15,6 +15,7 @@ import { HiveMimeCreateCandidates } from "./hm-create-candidate";
 import { Label } from "@radix-ui/react-label";
 import { HiveMimeCreateCategories } from "./hm-create-category";
 import { useTranslation } from "react-i18next";
+import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -31,6 +32,8 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
     [PollType.Rank]: <HiveMimeCreateRankingRules poll={props.poll} />,
     [PollType.Category]: <HiveMimeCreateCategorizationRules poll={props.poll} />,
   };
+
+  const errors = validateCreatePoll(props.poll);
 
   return (
     <div className="flex flex-col gap-8">
@@ -63,7 +66,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
-        <HiveMimeStep canContinue={props.poll.candidates!.length > 0 && props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
+        <HiveMimeStep canContinue={props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col">
               <Label className="text-sm text-muted-foreground">{t("posts:create.createCandidates")}</Label>
@@ -72,10 +75,18 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </div>
         </HiveMimeStep>
 
-        <HiveMimeStep canContinue={validateCreatePoll(props.poll).length === 0}>
+        <HiveMimeStep canContinue={errors.length === 0}>
           <div className="flex flex-col gap-4">
             <Label className="text-sm text-muted-foreground mb-2">{t("posts:create.configureRules")}</Label>
             {pollMapping[props.poll.pollType!]}
+
+            {errors.length > 0 && <div className="flex flex-col">
+              {errors.map((error, index) => (
+                <HiveMimeBulletItem key={index} className="text-red-400">
+                  {error}
+                </HiveMimeBulletItem>
+              ))}
+            </div>}
           </div>
         </HiveMimeStep>
       </HiveMimeMultiStep>

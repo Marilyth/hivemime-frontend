@@ -10,6 +10,8 @@ import { getReferenceId } from "@/lib/utils";
 import { HiveMimeDraggable } from "../../../utility/hm-draggable";
 import { observable, reaction } from "mobx";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export interface HiveMimeRankPollVoteProps {
   poll: PollDto;
@@ -53,6 +55,18 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
     rerankCandidates();
   }
 
+  function removeCustomCandidate(candidate: CombinedPollCandidate) {
+    const uIndex = state.unrankedCandidates.findIndex(c => c === candidate);
+    if (uIndex !== -1)
+      state.unrankedCandidates.splice(uIndex, 1);
+
+    const rIndex = state.rankedCandidates.findIndex(c => c === candidate);
+    if (rIndex !== -1)
+      state.rankedCandidates.splice(rIndex, 1);
+
+    candidate.vote.value = null;
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <span className="text-informational text-sm">{t("posts:vote.rankInstruction")}</span>
@@ -60,11 +74,15 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
       <LayoutGroup>
         {state.rankedCandidates.map((candidate) => (
           <motion.div key={getReferenceId(candidate)} layoutId={getReferenceId(candidate)}>
-            <HiveMimeDraggable dropAreaName={getReferenceId(poll)} onDropped={rerankCandidates} draggableOnArea={[getReferenceId(poll)]} isDraggable isDropArea isSticky data={candidate} dataList={state.rankedCandidates}
-              allowedZones={['top', 'bottom']}>
+            <HiveMimeDraggable dropAreaName={getReferenceId(poll)} onDropped={rerankCandidates} draggableOnArea={[getReferenceId(poll)]} isDraggable isDropArea isSticky data={candidate} dataList={state.rankedCandidates} allowedZones={['top', 'bottom']}>
               <HiveMimeRankPollVoteCandidate combined={candidate} poll={poll}
                 onClick={() => triggerRank(candidate)}
               />
+              {candidate.candidate.isCustom &&
+                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(candidate)}>
+                  <Trash2 />
+                </Button>
+              }
             </HiveMimeDraggable>
           </motion.div>
         ))}
@@ -75,6 +93,11 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
               <HiveMimeRankPollVoteCandidate combined={candidate} poll={poll}
                 onClick={() => triggerRank(candidate)}
               />
+              {candidate.candidate.isCustom &&
+                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(candidate)}>
+                  <Trash2 />
+                </Button>
+              }
             </HiveMimeDraggable>
           </motion.div>
         ))}
