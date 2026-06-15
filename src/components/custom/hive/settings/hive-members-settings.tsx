@@ -37,8 +37,7 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
     queryFn: async ({ pageParam }) => {
       const task = api.api.hiveUsersCreate({pageSize: 50, cursor: pageParam, filter: debouncedUserNameFilter, orderBy: orderBy}, { hiveId: hiveDto.id, status: approvalStatus });
       toast.promise(task, {
-        loading: t("toasts:hive.loadingMembers"),
-        success: t("toasts:hive.membersLoaded")
+        loading: t("toasts:hive.loadingMembers")
       });
 
       const response = await task;
@@ -116,8 +115,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
     const task = api.api.hiveModifyUserPartialUpdate({ followRequestId: draft.id, approvalStatus: draft.approvalStatus, role: draft.role });
 
     toast.promise(task, {
-      loading: t("toasts:hive.updatingMember"),
-      success: t("toasts:hive.memberUpdated")
+      loading: t("toasts:hive.updatingMember")
     });
 
     try{

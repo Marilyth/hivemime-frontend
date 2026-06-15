@@ -64,8 +64,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
         onlyRoot: !textFilter
       });
       toast.promise(task, {
-        loading: t("toasts:comment.loading"),
-        success: t("toasts:comment.loaded")
+        loading: t("toasts:comment.loading")
       });
 
       const response = await task;
@@ -92,8 +91,7 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
 
     const task = api.api.commentGetList({ commentId: comment.parentCommentId });
     toast.promise(task, {
-      loading: t("toasts:comment.loadingParent"),
-      success: t("toasts:comment.parentLoaded")
+      loading: t("toasts:comment.loadingParent")
     });
     const response = await task;
 

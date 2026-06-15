@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PostDto } from "@/lib/Api";
 import { HiveMimePost } from "@/components/custom/post/hm-post";
 import { HiveMimeCommentBrowse } from "../comment/hm-comment-browse";
 import { useQueryParam } from "../utility/use-query-param";
 import { api } from "@/lib/contexts";
-import { observable } from "mobx";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 
 export function HiveMimePostDetails() {
   const { t } = useTranslation();
   const [postId, setPostId] = useQueryParam("postId");
-  const [post, setPost] = useState<PostDto | null>(null);
 
   function getPostId() {
     if (!postId)
@@ -22,20 +19,18 @@ export function HiveMimePostDetails() {
     return postId;
   }
 
-  async function fetchPostAsync() {
-    const postId = getPostId();
-    const response = await api.api.postGetList({postId: postId});
-
-    setPost(observable(response.data));
-  }
-
-  useEffect(() => {
-    fetchPostAsync();
-  }, [postId]);
+  const { data } = useQuery({
+      queryKey: ["post", getPostId()],
+      queryFn: async () => {
+        const response = await api.api.postGetList({ postId: getPostId() });
+        return response.data;
+      },
+      enabled: postId != null
+  });
 
   return (
     <div>
-      {!post ? (
+      {!data ? (
         <Skeleton className="h-64 w-full rounded-xl my-4">
           <span className="flex h-full w-full items-center justify-center text-informational">
             {t("common:loading")}
@@ -43,8 +38,8 @@ export function HiveMimePostDetails() {
         </Skeleton>
       ) : (
         <div className="flex flex-col gap-6">
-          <HiveMimePost post={post} />
-          <HiveMimeCommentBrowse post={post} />
+          <HiveMimePost post={data} />
+          <HiveMimeCommentBrowse post={data} />
         </div>
       )}
     </div>

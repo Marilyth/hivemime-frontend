@@ -153,8 +153,7 @@ export const HiveMimeCreatePost = observer(() => {
     // Publish post.
     const publishTask = api.api.postPublishPartialUpdate({ postId: response.data.id });
     toast.promise(publishTask, {
-      loading: t("toasts:post.publishing"),
-      success: t("toasts:post.published"),
+      loading: t("toasts:post.publishing")
     });
 
     await publishTask;
