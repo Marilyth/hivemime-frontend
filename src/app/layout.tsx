@@ -62,32 +62,32 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
               <SidebarProvider>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
                   <div className="[--header-height:calc(--spacing(14))] w-full min-h-screen">
-                  <SidebarProvider className="flex flex-col">
-                    <div className="flex flex-1">
-                      <AppSidebar className="backdrop-blur-sm" />
-                      <SidebarInset>
-                        <CombGenerator distances={[8, 4, 2]}
-                          color={accentColour ?? mutedColors.honeyBrown} />
+                    <SidebarProvider className="flex flex-col">
+                      <div className="flex flex-1">
+                        <AppSidebar className="backdrop-blur-sm" />
+                        <SidebarInset>
+                          <CombGenerator distances={[8, 4, 2]}
+                            color={accentColour ?? mutedColors.honeyBrown} />
 
-                        <Suspense>
-                          <SiteHeader />
-                        </Suspense>
+                          <Suspense>
+                            <SiteHeader />
+                          </Suspense>
 
-                        <div className="flex justify-center z-10">
-                          <div className="w-full max-w-183 gap-4">
-                            {!userStore.user ?
-                              (<div>{t("common:loading")}</div>) :
-                              (<div className="flex flex-1 flex-col gap-4 py-4 px-2">
-                                {children}
-                              </div>)
-                            }
+                          <div className="flex justify-center z-10">
+                            <div className="w-full max-w-183 gap-4">
+                              {!userStore.user ?
+                                (<div>{t("common:loading")}</div>) :
+                                (<div className="py-4 px-2">
+                                  {children}
+                                </div>)
+                              }
+                            </div>
                           </div>
-                        </div>
-                        <Toaster position="bottom-right" />
-                      </SidebarInset>
-                    </div>
+                          <Toaster position="bottom-right" />
+                        </SidebarInset>
+                      </div>
 
-                  </SidebarProvider>
+                    </SidebarProvider>
                 </div>
               </ThemeProvider>
             </SidebarProvider>

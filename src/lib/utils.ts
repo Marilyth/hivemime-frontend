@@ -86,3 +86,22 @@ export function getEffectiveRole(role: MemberRole | null | undefined, approvalSt
 
   return role;
 }
+
+export function normalize(s: string, allowWhitespace: boolean): string {
+  if (!s || !s.trim()) return "";
+
+  let result = "";
+  let isLastSpace = false;
+
+  for (const c of s.toLowerCase()) {
+    if (/[a-z0-9]/.test(c)) {
+      result += c;
+      isLastSpace = false;
+    } else if (/\s/.test(c) && allowWhitespace && !isLastSpace) {
+      result += " ";
+      isLastSpace = true;
+    }
+  }
+
+  return result.trim();
+}

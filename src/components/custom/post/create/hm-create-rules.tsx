@@ -31,7 +31,7 @@ export const HiveMimeCreateMinvoteRule = observer((props: HiveMimeCreatePollProp
                   <SelectValue />
               </HiveMimeInlineSelectTrigger>
               <SelectContent>
-                {[...Array(1 + (props.poll.candidates?.length ?? 0)).keys()].map(i => (
+                {[...Array(1 + (props.poll.candidates!.length + props.poll.allowedCustomCandidateCount!)).keys()].map(i => (
                   <SelectItem key={i} value={(i).toString()}>{i.toString()}</SelectItem>
                 ))}
               </SelectContent>
@@ -59,7 +59,7 @@ export const HiveMimeCreateMaxvoteRule = observer((props: HiveMimeCreatePollProp
                 <SelectValue />
               </HiveMimeInlineSelectTrigger>
               <SelectContent>
-                {[...Array(props.poll.candidates!.length - effectiveMinVotes + 1).keys()].map(i => (
+                {[...Array(props.poll.candidates!.length + props.poll.allowedCustomCandidateCount! - effectiveMinVotes + 1).keys()].map(i => (
                   <SelectItem key={i} value={(effectiveMinVotes + i).toString()}>{(effectiveMinVotes + i).toString()}</SelectItem>
                 ))}
               </SelectContent>
@@ -95,5 +95,40 @@ export const HiveMimeCreateShuffleRule = observer((props: HiveMimeCreatePollProp
         }}
       />
     </HiveMimeBulletItem>
+  );
+});
+
+export const HiveMimeCreateCustomCandidatesRule = observer((props: HiveMimeCreatePollProps) =>  {
+  const { t } = useTranslation();
+
+  function setAllowedCustomCandidateCount(value: string) {
+    props.poll.allowedCustomCandidateCount = Number(value);
+
+    const maxVotesUpperBound = props.poll.candidates!.length + props.poll.allowedCustomCandidateCount!;
+
+    if (maxVotesUpperBound < props.poll.minVotes!) {
+      props.poll.minVotes = maxVotesUpperBound;
+    }
+
+    if (maxVotesUpperBound < props.poll.maxVotes!) {
+      props.poll.maxVotes = maxVotesUpperBound;
+    }
+  }
+
+  return (
+      <HiveMimeBulletItem>
+        <Trans i18nKey="posts:create.customCandidateCount" components={{ count:
+          <Select value={props.poll.allowedCustomCandidateCount?.toString()} onValueChange={setAllowedCustomCandidateCount}>
+            <HiveMimeInlineSelectTrigger>
+              <SelectValue />
+            </HiveMimeInlineSelectTrigger>
+            <SelectContent>
+              {[0, 1, 2, 3, 4, 5].map(i => (
+                <SelectItem key={i} value={i.toString()}>{i.toString()}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        }} />
+      </HiveMimeBulletItem>
   );
 });

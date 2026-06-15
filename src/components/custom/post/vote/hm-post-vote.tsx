@@ -22,11 +22,12 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
   const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
   const [postVote, setPostVote] = useState<PostVoteDto>(() => (observable({
-    Id: post.id!,
+    id: post.id!,
     polls: (post.polls || []).map(poll => ({
-      Id: poll.id!,
+      id: poll.id!,
       candidates: (poll.candidates || []).map(candidate => ({
-        Id: candidate.id!,
+        id: candidate.id!,
+        name: candidate.name,
         value: null,
       })),
     })),
@@ -52,8 +53,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
   {
     const task = api.api.postVoteCreate(postVote);
     toast.promise(task, {
-      loading: t("toasts:vote.submitting"),
-      success: t("toasts:vote.submitted"),
+      loading: t("toasts:vote.submitting")
     });
     await task;
 
@@ -72,7 +72,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion type="single" collapsible className="border rounded-md">
+      <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
         {post.polls!.map((poll, index) => (
           <HiveMimeListPoll key={index} poll={poll} pollVote={postVote.polls![index]} />
         ))}

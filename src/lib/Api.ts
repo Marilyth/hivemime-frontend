@@ -71,6 +71,8 @@ export interface BooleanHoneyDeltaDto {
 export interface CandidateDistributionResultDto {
   /** @format uuid */
   id?: string;
+  name?: string | null;
+  isCustom?: boolean;
   /** @format int32 */
   voteCount?: number;
   distribution?: CandidationDistributionResultValueDto[] | null;
@@ -82,6 +84,8 @@ export interface CandidateDistributionResultDtoPollResultDto {
   title?: string | null;
   mediaKeys?: string[] | null;
   description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
   isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
@@ -103,12 +107,15 @@ export interface CandidateDto {
   id?: string;
   name?: string | null;
   description?: string | null;
+  isCustom?: boolean;
   mediaKeys?: string[] | null;
 }
 
 export interface CandidateStatisticsResultDto {
   /** @format uuid */
   id?: string;
+  name?: string | null;
+  isCustom?: boolean;
   /** @format int32 */
   voteCount?: number;
   /** @format double */
@@ -131,6 +138,8 @@ export interface CandidateStatisticsResultDtoPollResultDto {
   title?: string | null;
   mediaKeys?: string[] | null;
   description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
   isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
@@ -150,6 +159,8 @@ export interface CandidateStatisticsResultDtoPollResultDto {
 export interface CandidateSumResultDto {
   /** @format uuid */
   id?: string;
+  name?: string | null;
+  isCustom?: boolean;
   /** @format int32 */
   voteCount?: number;
   /** @format int32 */
@@ -162,6 +173,8 @@ export interface CandidateSumResultDtoPollResultDto {
   title?: string | null;
   mediaKeys?: string[] | null;
   description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
   isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
@@ -180,7 +193,8 @@ export interface CandidateSumResultDtoPollResultDto {
 
 export interface CandidateVoteDto {
   /** @format uuid */
-  id?: string;
+  id?: string | null;
+  name?: string | null;
   /** @format int32 */
   value?: number | null;
 }
@@ -276,6 +290,8 @@ export interface CreatePollDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
   /** @format double */
   stepValue?: number | null;
   /** @format int32 */
@@ -376,6 +392,8 @@ export interface PollDto {
   title?: string | null;
   mediaKeys?: string[] | null;
   description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
   isShuffled?: boolean;
   /** @format int32 */
   minValue?: number;
@@ -1354,6 +1372,31 @@ export class Api<
     ) =>
       this.request<CandidateDistributionResultDtoPollResultDto, any>({
         path: `/api/Post/distributionResult`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostCustomCandidateSuggestionsList
+     * @request GET:/api/Post/customCandidateSuggestions
+     * @secure
+     */
+    postCustomCandidateSuggestionsList: (
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+        query?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateDto[], any>({
+        path: `/api/Post/customCandidateSuggestions`,
         method: "GET",
         query: query,
         secure: true,

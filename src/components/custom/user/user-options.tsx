@@ -72,7 +72,6 @@ export const UserOptions = observer(() => {
         if (!user) {
           toast.promise(autoLogIn(), {
             loading: t("toasts:auth.loggingIn"),
-            success: (u) => t("toasts:auth.loggedInAs", { username: u.username }),
             error: t("toasts:auth.loginFailed"),
           });
         }

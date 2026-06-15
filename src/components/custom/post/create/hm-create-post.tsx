@@ -67,6 +67,7 @@ export const HiveMimeCreatePost = observer(() => {
     setSelectedPollIndex(-1);
     setSelectedPoll(observable({ title: "", description: "", candidates: [], categories: [],
                        minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
+                       allowedCustomCandidateCount: 0, shuffleCandidates: false,
                        pollType: undefined }));
   }
 
@@ -152,8 +153,7 @@ export const HiveMimeCreatePost = observer(() => {
     // Publish post.
     const publishTask = api.api.postPublishPartialUpdate({ postId: response.data.id });
     toast.promise(publishTask, {
-      loading: t("toasts:post.publishing"),
-      success: t("toasts:post.published"),
+      loading: t("toasts:post.publishing")
     });
 
     await publishTask;
@@ -190,7 +190,7 @@ export const HiveMimeCreatePost = observer(() => {
                           <Edit />
                         </Button>
                         <Button variant="ghost"
-                          className="text-muted-foreground hover:text-red-400"
+                          className="text-muted-foreground hover:text-failure"
                           onClick={() => removePoll(index)}>
                             <Trash2 />
                         </Button>

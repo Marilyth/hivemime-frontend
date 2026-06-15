@@ -14,7 +14,8 @@
   "vote": {
     "results": "Results",
     "vote": "Vote",
-    "choiceInstruction": "Please pick between {{minVotes}} and {{maxVotes}} options.",
+    "addCustomCandidate": "Add custom candidate...",
+    "choiceInstruction": "Please pick between {{minVotes}} and {{maxVotes}} candidates.",
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
@@ -47,6 +48,7 @@
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the users to assign the candidates to.",
     "createCandidates": "Create candidates for the users to vote for.",
+    "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
     "candidateNamePlaceholder": "Candidate name...",
     "addCandidate": "Add candidate",

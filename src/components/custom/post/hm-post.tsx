@@ -1,7 +1,7 @@
 "use client";
 
 import { ApprovalStatus, MemberRole, PostDto } from "@/lib/Api";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { HiveMimePostResult } from "./result/hm-post-result";
 import { HiveMimePostVote } from "./vote/hm-post-vote";
@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api, followedHivesStore, userStore } from "@/lib/contexts";
 import { toast } from "sonner";
-import { getEffectiveRole, getRoleRank } from "@/lib/utils";
+import { getEffectiveRole, getReferenceId, getRoleRank } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
+import { createViewModel } from "mobx-utils";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -37,6 +39,10 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   const canDelete = post.creator?.id === userStore.user?.id;
   
   const showContextMenu = canDelete || canModify;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const [resultPost, setResultPost] = useState<PostDto>(() => createViewModel(post));
+  const [votePost, setVotePost] = useState<PostDto>(() => createViewModel(post));
 
   function toggleResults() {
     setResultsVisible(prev => !prev);
@@ -97,43 +103,54 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   </div>);
 
   return (
-    <Card className="py-4">
-      <CardHeader>
-        <CardTitle className="text-informational text-sm flex flex-row">
-          <span>
-            {post.hive ? <Button className="p-0 h-auto" variant="link"
-              onClick={() => router.push(`/posts?hiveId=${post.hive!.id}`)}>{post.hive.name}</Button> : t("common:private")} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
-          </span>
-          {post.approvalStatus !== "Approved" && (
-            <Badge variant="destructive" className="ml-2">
-              {t(`enums:approvalStatus.${post.approvalStatus!.toLowerCase()}`)}
-            </Badge>
-          )}
-          {showContextMenu && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="ml-auto" asChild>
-                <Button variant="ghost" className="h-auto p-0">
-                  <Ellipsis />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {canModify &&
-                <>
-                  {post.approvalStatus != ApprovalStatus.Approved && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Approved)}><FilePlus /> {t("posts:card.approve")}</DropdownMenuItem>}
-                  {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> {t("posts:card.reject")}</DropdownMenuItem>}
-                </>}
-                {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> {t("posts:card.delete")}</DropdownMenuItem>}
-                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> {t("posts:card.banUser")}</DropdownMenuItem>}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {!resultsVisible ?
-          <HiveMimePostVote post={post} requestResults={toggleResults} footer={footer} /> :
-          <HiveMimePostResult post={post} requestVote={toggleResults} footer={footer} />}
-      </CardContent>
-    </Card>
+    <AnimatePresence initial={false} mode="wait">
+      <motion.div
+        key={getReferenceId(post) + resultsVisible}
+        layout
+        ref={cardRef}
+        initial={{ opacity: 0, x: -90, height: cardRef.current ? cardRef.current.clientHeight : "auto" }}
+        animate={{opacity: 1, x: 0, height: "auto", transition: { type: "spring", stiffness: 300, damping: 12 } }}
+        exit={{ opacity: 0, x: 90, transition: { duration: 0.2 } }}
+      >
+        <Card className="py-4">
+          <CardHeader>
+            <CardTitle className="text-informational text-sm flex flex-row">
+              <span>
+                {post.hive ? <Button className="p-0 h-auto" variant="link"
+                  onClick={() => router.push(`/posts?hiveId=${post.hive!.id}`)}>{post.hive.name}</Button> : t("common:private")} • <HiveMimeRelativeTimestamp timestamp={post.createdAt!} />
+              </span>
+              {post.approvalStatus !== "Approved" && (
+                <Badge variant="destructive" className="ml-2">
+                  {t(`enums:approvalStatus.${post.approvalStatus!.toLowerCase()}`)}
+                </Badge>
+              )}
+              {showContextMenu && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="ml-auto" asChild>
+                    <Button variant="ghost" className="h-auto p-0">
+                      <Ellipsis />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {canModify &&
+                    <>
+                      {post.approvalStatus != ApprovalStatus.Approved && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Approved)}><FilePlus /> {t("posts:card.approve")}</DropdownMenuItem>}
+                      {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> {t("posts:card.reject")}</DropdownMenuItem>}
+                    </>}
+                    {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> {t("posts:card.delete")}</DropdownMenuItem>}
+                    {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-failure" /> {t("posts:card.banUser")}</DropdownMenuItem>}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!resultsVisible ?
+              <HiveMimePostVote post={votePost} requestResults={toggleResults} footer={footer} /> :
+              <HiveMimePostResult post={resultPost} requestVote={toggleResults} footer={footer} />}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </AnimatePresence>
   );
 });

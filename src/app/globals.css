@@ -105,7 +105,7 @@
 @theme inline {
   --color-muted-rose: rgb(184, 98, 115);
   --color-muted-purple: rgb(150, 115, 165);
-  --color-muted-green: rgb(150, 210, 148);
+  --color-muted-green: rgb(125, 173, 123);
   --color-muted-orange: rgb(235, 156, 92);
   --color-muted-gray: rgb(169, 169, 169);
   --color-muted-blue: rgb(131, 161, 205);
@@ -116,6 +116,9 @@
   --color-muted-red: rgb(203, 76, 78);
   --color-honey-brown: var(--honey-brown);
   --color-honey-yellow: var(--honey-yellow);
+  --color-success: rgb(125, 173, 123);
+  --color-warning: rgb(235, 156, 92);
+  --color-failure: rgb(203, 76, 78);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

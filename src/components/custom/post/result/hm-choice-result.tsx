@@ -6,6 +6,7 @@ import { mutedColors } from "@/lib/colors";
 import { HiveMimeViewCandidate } from "../hm-candidate";
 import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
+import { CandidateDto } from "@/lib/Api";
 
 
 export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
@@ -14,6 +15,14 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
       const r = await api.api.postSumResultList({ pollId: props.poll.id!, filter: props.filter });
+      const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
+
+      for (const candidateResult of r.data.candidates!) {
+        if (!existingCandidateIds.has(candidateResult.id!)) {
+          props.poll.candidates!.push({ id: candidateResult.id, name: candidateResult.name, isCustom: true } as CandidateDto);
+        }
+      }
+
       return r.data;
     },
     staleTime: 1000 * 60 * 5
@@ -28,10 +37,9 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      {props.poll.candidates!.map((d, i) => {
-        const resultCandidate = data.data!.candidates!.find(rc => rc.id === d.id);
+      {props.poll.candidates!.map((candidate, i) => {
+        const resultCandidate = data.data!.candidates!.find(rc => rc.id === candidate.id);
         const ratio = resultCandidate ? (resultCandidate.sum! / resultCandidate.voteCount!) : 0;
-        const candidate = props.poll.candidates!.find(c => c.id === d.id);
 
         return (
           <HiveMimeHoverCard key={i}

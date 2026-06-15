@@ -11,9 +11,9 @@ import { HiveMimeCategoryPollVote } from "./category/hm-category-poll-vote";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getReferenceId } from "@/lib/utils";
 import { validatePickPoll } from "@/lib/validate-vote";
-import { HiveMimeStateIcon } from "../../utility/hm-state-icon";
 import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
+import { CustomCandidateInput } from "./hm-custom-candidate-input";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
@@ -23,6 +23,7 @@ export type HiveMimeListPollProps =   {
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
   const [state, setState] = useState<"nothing" | "indeterminate" | "finished" | "error">("nothing");
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+
   const pollMapping: { [key in PollType]: ReactNode } =
   {
     [PollType.Choice]: <HiveMimeChoicePollVote poll={poll} pollVotes={pollVote} />,
@@ -30,6 +31,17 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Rank]: <HiveMimeRankPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
   };
+
+  function getStateColour(){
+    switch (state) {
+      case "finished":
+          return "text-success";
+      case "error":
+          return "text-failure";
+      default:
+          return "text-muted-foreground";
+    }
+  }
 
   function validatePostVote()
   {
@@ -49,22 +61,23 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
   return (
     <AccordionItem value={getReferenceId(poll)} className="border-b last:border-b-0">
-      <AccordionTrigger className="bg-card rounded-none p-2">
+      <AccordionTrigger className="rounded-none p-2">
         <div className="flex flex-row gap-4 font-bold items-center">
           <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-honey-brown w-6 h-6 self-start" />
-          <span className="text-muted-foreground font-bold">
+          <span className={`${getStateColour()} font-bold`}>
             {poll.title}
           </span>
-          <HiveMimeStateIcon state={state} shape="none" />
         </div>
       </AccordionTrigger>
-      <AccordionContent className="p-4 flex flex-col gap-2 bg-card " >
-          <span className="text-muted-foreground">{poll.description}</span>
-          {pollMapping[poll.pollType!]}
+      <AccordionContent className="p-4 flex flex-col gap-2" >
+        <span className="text-muted-foreground">{poll.description}</span>
+        {pollMapping[poll.pollType!]}
+
+        <CustomCandidateInput poll={poll} pollVote={pollVote} />
 
         <div>
           {errorMessages.length > 0 && (
-            <HiveMimeBulletItem className="pl-1 text-red-400">
+            <HiveMimeBulletItem className="pl-1 text-failure">
               {errorMessages.map((error, index) => (
                 <div key={index}>
                   {error}

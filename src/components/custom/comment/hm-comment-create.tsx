@@ -24,8 +24,7 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
   async function createComment() {
     const task = api.api.commentCreateCreate({ postId, parentCommentId, content });
     toast.promise(task, {
-      loading: t("toasts:comment.creating"),
-      success: t("toasts:comment.created")
+      loading: t("toasts:comment.creating")
     });
 
     const response = await task;

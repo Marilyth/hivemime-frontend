@@ -30,31 +30,21 @@ export const HiveMimeHiveListItem = observer(({ hive, className, ...props }: Hiv
   async function leaveHive() {
     const task = api.api.hiveLeaveDelete({ followId: hiveFollow!.id });
     toast.promise(task, {
-      loading: t("toasts:hive.leaving"),
-      success: () =>{
-        followedHivesStore.removeFollowedHive(hive.id!);
-        return t("toasts:hive.left");
-      }
+      loading: t("toasts:hive.leaving")
     });
 
     await task;
+    followedHivesStore.removeFollowedHive(hive.id!);
   }
 
   async function joinHive() {
     const task = api.api.hiveJoinCreate({ hiveId: hive.id });
     await toast.promise(task, {
-      loading: t("toasts:hive.joining"),
-      success: (r) => {
-        followedHivesStore.addFollowedHive(r.data);
-
-        if (hive.settings?.joinRequiresApproval)
-          return t("toasts:hive.joinRequestSent");
-        else
-          return t("toasts:hive.joined");
-      }
+      loading: t("toasts:hive.joining")
     });
 
-    await task;
+    const response = await task;
+    followedHivesStore.addFollowedHive(response.data);
   }
 
   function browseHive() {

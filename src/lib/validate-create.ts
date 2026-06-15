@@ -17,6 +17,7 @@ export function validatePostTitle(post: CreatePostDto): string[] {
 
 export function validateCreatePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
+    const candidateCount = poll.candidates!.length + poll.allowedCustomCandidateCount!;
 
     switch (poll.pollType) {
         case PollType.Choice:
@@ -35,27 +36,20 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
             errors.push(i18n.t("validation:poll.noType"));
     }
 
-    if (!poll.candidates || poll.candidates.length < 1)
+    if (candidateCount < 1)
         errors.push(i18n.t("validation:poll.noCandidates"));
 
     if (poll.title == undefined || poll.title == null || poll.title!.trim() === "")
         errors.push(i18n.t("validation:poll.noTitle"));
 
-    if (poll.minVotes! < 0)
-        errors.push(i18n.t("validation:poll.minVotes"));
-
-    if (poll.maxVotes! < poll.minVotes! || poll.maxVotes! < 1)
-        errors.push(i18n.t("validation:poll.maxVotesLessThanMin"));
+    if (poll.maxVotes! < 1)
+        errors.push(i18n.t("validation:poll.maxVotesLessThanOne"));
 
     return errors;
 }
 
 function validateChoicePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
-
-    if (!poll.candidates || poll.candidates.length < 2) {
-        errors.push(i18n.t("validation:poll.choiceMinCandidates"));
-    }
 
     return errors;
 }

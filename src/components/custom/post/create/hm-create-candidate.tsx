@@ -112,7 +112,7 @@ export const HiveMimeCreateCandidate = observer(({ candidates, candidate }: Hive
 
       <InputGroupAddon align="inline-end">
         <Button variant="ghost"
-          className="text-muted-foreground hover:text-red-400 p-1! h-auto"
+          className="text-muted-foreground hover:text-failure p-1! h-auto"
           onClick={() => candidates.splice(candidates.indexOf(candidate), 1)}>
             <Trash2 />
         </Button>

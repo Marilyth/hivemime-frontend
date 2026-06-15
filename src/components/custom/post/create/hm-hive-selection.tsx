@@ -141,9 +141,9 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
           <div className="mt-2 ml-4 text-muted-foreground">
             {!userStore.user?.isVerified && <div className="flex flex-row gap-2 items-center">
               {userStore.user?.isVerified ? (
-                <SquareCheck className="text-green-500 size-4" />
+                <SquareCheck className="text-success size-4" />
               ) : (
-                <SquareX className="text-red-400 size-4" />
+                <SquareX className="text-failure size-4" />
               )}
               {t("posts:create.hiveSelection.loginRequiredToPost")}
             </div>}
@@ -153,9 +153,9 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
                 {getRoleRank(effectiveRole) < getRoleRank(MemberRole.Moderator) && hiveData.data.settings!.minHoneyToPost! > 0 &&
                 <div className="flex flex-row gap-2 items-center">
                   {userStore.user!.honey! >= hiveData.data.settings!.minHoneyToPost! ? (
-                    <SquareCheck className="text-green-500 size-4" />
+                    <SquareCheck className="text-success size-4" />
                   ) : (
-                    <SquareX className="text-red-400 size-4" />
+                    <SquareX className="text-failure size-4" />
                   )}
                   <Trans
                     i18nKey="posts:create.hiveSelection.honeyRequiredToPost"
@@ -167,9 +167,9 @@ export const HiveSelection = observer((props: HiveMimeHiveSelectionProps) => {
                 {getRoleRank(hiveData.data.settings!.minRoleToPost!) > 0 &&
                 <div className="flex flex-row gap-2 items-center">
                   {getRoleRank(effectiveRole) >= getRoleRank(hiveData.data.settings!.minRoleToPost!) ? (
-                    <SquareCheck className="text-green-500 size-4" />
+                    <SquareCheck className="text-success size-4" />
                   ) : (
-                    <SquareX className="text-red-400 size-4" />
+                    <SquareX className="text-failure size-4" />
                   )}
                   <Trans
                     i18nKey="posts:create.hiveSelection.roleRequiredToPost"
