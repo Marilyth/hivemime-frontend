@@ -72,7 +72,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion type="single" collapsible className="border rounded-md">
+      <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
         {post.polls!.map((poll, index) => (
           <HiveMimeListPoll key={index} poll={poll} pollVote={postVote.polls![index]} />
         ))}

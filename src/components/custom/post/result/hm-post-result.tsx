@@ -31,8 +31,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
     <div>
       <HiveMimePostResultFilter post={post} builder={queryBuilder} isOpen={filterOpen} onFinished={filterFinished} />
       <div className="flex flex-col gap-4">
-        <div className="border rounded-md">
-          <div className="flex justify-between items-center border-b bg-muted/30 px-2">
+          <div className="flex justify-between items-center px-2">
             <span className="font-semibold">
               {t("posts:result.results")}
               <span className="font-normal text-sm text-muted-foreground ml-2">
@@ -45,12 +44,11 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
             </Button>
           </div>
           
-          <Accordion type="single" collapsible>
+          <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
             {post.polls!.map((poll, index) => (
               <HiveMimePollResult key={index} poll={poll} filter={queryBuilder.toString()} />
             ))}
           </Accordion>
-        </div>
 
         <div className="flex flex-row gap-2 w-full">
           {footer}

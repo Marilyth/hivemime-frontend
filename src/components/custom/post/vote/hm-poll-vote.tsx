@@ -11,7 +11,6 @@ import { HiveMimeCategoryPollVote } from "./category/hm-category-poll-vote";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { getReferenceId } from "@/lib/utils";
 import { validatePickPoll } from "@/lib/validate-vote";
-import { HiveMimeStateIcon } from "../../utility/hm-state-icon";
 import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CustomCandidateInput } from "./hm-custom-candidate-input";
@@ -35,14 +34,12 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
   function getStateColour(){
     switch (state) {
-      case "indeterminate":
-          return "text-muted-foreground";
       case "finished":
           return "text-success";
       case "error":
           return "text-failure";
       default:
-          return "";
+          return "text-muted-foreground";
     }
   }
 
@@ -64,7 +61,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
   return (
     <AccordionItem value={getReferenceId(poll)} className="border-b last:border-b-0">
-      <AccordionTrigger className="bg-card rounded-none p-2">
+      <AccordionTrigger className="rounded-none p-2">
         <div className="flex flex-row gap-4 font-bold items-center">
           <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-honey-brown w-6 h-6 self-start" />
           <span className={`${getStateColour()} font-bold`}>
@@ -72,7 +69,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
           </span>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="p-4 flex flex-col gap-2 bg-card " >
+      <AccordionContent className="p-4 flex flex-col gap-2" >
         <span className="text-muted-foreground">{poll.description}</span>
         {pollMapping[poll.pollType!]}
 
