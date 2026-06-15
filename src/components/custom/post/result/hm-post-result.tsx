@@ -31,24 +31,24 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
     <div>
       <HiveMimePostResultFilter post={post} builder={queryBuilder} isOpen={filterOpen} onFinished={filterFinished} />
       <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center px-2">
-            <span className="font-semibold">
-              {t("posts:result.results")}
-              <span className="font-normal text-sm text-muted-foreground ml-2">
-                {t("posts:result.votes", { count: post.voteCount ?? 0 })}
-              </span>
+        <div className="flex justify-between items-center px-2 rounded-md">
+          <span className="font-semibold">
+            {t("posts:result.results")}
+            <span className="font-normal text-sm text-muted-foreground ml-2">
+              {t("posts:result.votes", { count: post.voteCount ?? 0 })}
             </span>
-            <Button variant="link" onClick={() => setFilterOpen(true)}>
-              <Filter />
-              {t("posts:result.filterVotes")}
-            </Button>
-          </div>
-          
-          <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
-            {post.polls!.map((poll, index) => (
-              <HiveMimePollResult key={index} poll={poll} filter={queryBuilder.toString()} />
-            ))}
-          </Accordion>
+          </span>
+          <Button variant="link" onClick={() => setFilterOpen(true)}>
+            <Filter />
+            {t("posts:result.filterVotes")}
+          </Button>
+        </div>
+        
+        <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
+          {post.polls!.map((poll, index) => (
+            <HiveMimePollResult key={index} poll={poll} filter={queryBuilder.toString()} />
+          ))}
+        </Accordion>
 
         <div className="flex flex-row gap-2 w-full">
           {footer}

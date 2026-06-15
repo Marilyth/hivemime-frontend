@@ -23,9 +23,9 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
   const [openedCandidate, setOpenedCandidate] = useState<CombinedPollCandidate | null>(null);
   const [openedCategory, setOpenedCategory] = useState<CategoryDto | null>(null);
 
-  const combinedCandidates = poll.candidates!.map((candidate, index) => ({
-    candidate: candidate,
-    vote: pollVotes.candidates![index]
+  const combinedCandidates = pollVotes.candidates!.map((candidate, index) => ({
+    candidate: poll.candidates![index],
+    vote: candidate,
   }));
 
   function assignCandidateToCategory(candidate: CombinedPollCandidate, category: CategoryDto) {
@@ -73,31 +73,28 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
         ))}
       </div>
 
-      <LayoutGroup>
-          {combinedCandidates.map((candidate, index) => (
-            <motion.div key={getReferenceId(candidate)} layout layoutId={getReferenceId(candidate)} className="flex flex-row gap-2">
-              <div className="flex-1">
-                <HiveMimeDraggable
-                  draggableOnArea={[`${getReferenceId(poll)}_category`]}
-                  dropAreaName={[`${getReferenceId(poll)}_candidate`]}
-                  isDropArea
-                  isDraggable
-                  data={candidate}
-                  onDropped={data => assignCandidateToCategory(data.dropAreaData as CombinedPollCandidate, data.draggableData as CategoryDto)}
-                  onClick={() => setOpenedCandidate(candidate)}>
-                  <HiveMimePickCandidate candidate={candidate} category={getCandidatesCategory(candidate)} />
-                </HiveMimeDraggable>
-              </div>
+      {combinedCandidates.map((candidate, index) => (
+        <div key={getReferenceId(candidate)} className="flex flex-row gap-2">
+          <div className="flex-1">
+            <HiveMimeDraggable
+              draggableOnArea={[`${getReferenceId(poll)}_category`]}
+              dropAreaName={[`${getReferenceId(poll)}_candidate`]}
+              isDropArea
+              isDraggable
+              data={candidate}
+              onDropped={data => assignCandidateToCategory(data.dropAreaData as CombinedPollCandidate, data.draggableData as CategoryDto)}
+              onClick={() => setOpenedCandidate(candidate)}>
+              <HiveMimePickCandidate candidate={candidate} category={getCandidatesCategory(candidate)} />
+            </HiveMimeDraggable>
+          </div>
 
-              {candidate.candidate.isCustom &&
-                <Button variant="ghost" className="p-0 h-auto text-failure" onClick={() => removeCustomCandidate(index)}>
-                  <Trash2 />
-                </Button>
-              }
-            </motion.div>
-          ))}
-      </LayoutGroup>
-      
+          {candidate.candidate.isCustom &&
+            <Button variant="ghost" className="p-0 h-auto text-failure" onClick={() => removeCustomCandidate(index)}>
+              <Trash2 />
+            </Button>
+          }
+        </div>
+      ))}
     </div>
   );
 });

@@ -19,7 +19,7 @@ export const CustomCandidateInput = ({ poll, pollVote }: CustomCandidateInputPro
   const { t } = useTranslation();
   const [value, setValue] = useState<string>("");
   const [debouncedInput, isLoading] = useDebounce(value, 300);
-  const canAddCustomCandidate = poll.allowedCustomCandidateCount! > poll.candidates?.filter(c => c.isCustom).length!;
+  const canAddCustomCandidate = poll.allowedCustomCandidateCount! > poll.candidates!.filter(c => c.isCustom).length!;
 
   const { data } = useQuery({
     queryKey: ["customCandidates", poll.id, debouncedInput],
