@@ -86,7 +86,7 @@ export const HiveMimeCreateCategories = observer(({ poll }: HiveMimeCreateCatego
                           <Brush />
                       </Button>
                       <Button variant="ghost"
-                        className="text-muted-foreground hover:text-red-400"
+                        className="text-muted-foreground hover:text-failure"
                         onClick={() => removeCategory(index)}>
                           <Trash2 />
                       </Button>

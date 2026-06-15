@@ -82,7 +82,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
 
             {errors.length > 0 && <div className="flex flex-col">
               {errors.map((error, index) => (
-                <HiveMimeBulletItem key={index} className="text-red-400">
+                <HiveMimeBulletItem key={index} className="text-failure">
                   {error}
                 </HiveMimeBulletItem>
               ))}

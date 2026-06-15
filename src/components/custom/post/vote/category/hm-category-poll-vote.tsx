@@ -90,7 +90,7 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
               </div>
 
               {candidate.candidate.isCustom &&
-                <Button variant="ghost" className="p-0 h-auto text-red-400" onClick={() => removeCustomCandidate(index)}>
+                <Button variant="ghost" className="p-0 h-auto text-failure" onClick={() => removeCustomCandidate(index)}>
                   <Trash2 />
                 </Button>
               }

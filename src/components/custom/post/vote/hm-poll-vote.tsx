@@ -33,6 +33,19 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
   };
 
+  function getStateColour(){
+    switch (state) {
+      case "indeterminate":
+          return "text-muted-foreground";
+      case "finished":
+          return "text-success";
+      case "error":
+          return "text-failure";
+      default:
+          return "";
+    }
+  }
+
   function validatePostVote()
   {
     const errors = validatePickPoll(poll, pollVote);
@@ -54,10 +67,9 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
       <AccordionTrigger className="bg-card rounded-none p-2">
         <div className="flex flex-row gap-4 font-bold items-center">
           <HiveMimePollTypeIcon answerType={poll.pollType!} className="text-honey-brown w-6 h-6 self-start" />
-          <span className="text-muted-foreground font-bold">
+          <span className={`${getStateColour()} font-bold`}>
             {poll.title}
           </span>
-          <HiveMimeStateIcon state={state} shape="none" />
         </div>
       </AccordionTrigger>
       <AccordionContent className="p-4 flex flex-col gap-2 bg-card " >
@@ -68,7 +80,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
 
         <div>
           {errorMessages.length > 0 && (
-            <HiveMimeBulletItem className="pl-1 text-red-400">
+            <HiveMimeBulletItem className="pl-1 text-failure">
               {errorMessages.map((error, index) => (
                 <div key={index}>
                   {error}

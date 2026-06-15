@@ -38,6 +38,9 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   
   const showContextMenu = canDelete || canModify;
 
+  const [resultPost, setResultPost] = useState<PostDto>(() => structuredClone(post));
+  const [votePost, setVotePost] = useState<PostDto>(() => structuredClone(post));
+
   function toggleResults() {
     setResultsVisible(prev => !prev);
   }
@@ -123,7 +126,7 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
                   {post.approvalStatus != ApprovalStatus.Rejected && <DropdownMenuItem onSelect={() => modifyPost(ApprovalStatus.Rejected)}><FileMinus /> {t("posts:card.reject")}</DropdownMenuItem>}
                 </>}
                 {canDelete && <DropdownMenuItem onSelect={deletePost}><Trash2 /> {t("posts:card.delete")}</DropdownMenuItem>}
-                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-red-400" /> {t("posts:card.banUser")}</DropdownMenuItem>}
+                {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-failure" /> {t("posts:card.banUser")}</DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -131,8 +134,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
       </CardHeader>
       <CardContent>
         {!resultsVisible ?
-          <HiveMimePostVote post={post} requestResults={toggleResults} footer={footer} /> :
-          <HiveMimePostResult post={post} requestVote={toggleResults} footer={footer} />}
+          <HiveMimePostVote post={votePost} requestResults={toggleResults} footer={footer} /> :
+          <HiveMimePostResult post={resultPost} requestVote={toggleResults} footer={footer} />}
       </CardContent>
     </Card>
   );

@@ -190,7 +190,7 @@ export const HiveMimeCreatePost = observer(() => {
                           <Edit />
                         </Button>
                         <Button variant="ghost"
-                          className="text-muted-foreground hover:text-red-400"
+                          className="text-muted-foreground hover:text-failure"
                           onClick={() => removePoll(index)}>
                             <Trash2 />
                         </Button>

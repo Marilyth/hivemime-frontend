@@ -163,7 +163,7 @@ export const HiveMember = observer(({ user, currentUser }: HiveMemberProps) => {
             <Tooltip>
               <TooltipTrigger className="text-sm">
                 <AsyncButton variant="ghost" onClick={() => setMemberApprovalStatus(ApprovalStatus.Banned)}>
-                  <Gavel className="text-red-400" />
+                  <Gavel className="text-failure" />
                 </AsyncButton>
               </TooltipTrigger>
               <TooltipContent>
