@@ -7,6 +7,7 @@ import { useQueryParam } from "../utility/use-query-param";
 import { api } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { observable } from "mobx";
 
 export function HiveMimePostDetails() {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ export function HiveMimePostDetails() {
       queryKey: ["post", getPostId()],
       queryFn: async () => {
         const response = await api.api.postGetList({ postId: getPostId() });
-        return response.data;
+        return observable(response.data);
       },
       enabled: postId != null
   });

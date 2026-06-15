@@ -60,7 +60,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
         creatorId: props.userId,
         approvalStatus: approvalStatus
       });
-      return response.data;
+      return observable(response.data);
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as PaginationCursorDto | undefined
@@ -103,6 +103,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
         dataLength={posts.length}
         next={() => data.fetchNextPage()}
         hasMore={data.hasNextPage}
+        className="overflow-visible!"
         loader=
         {
           <Skeleton className="h-64 w-full rounded-xl my-4">
@@ -111,25 +112,13 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
             </span>
           </Skeleton>
         }
-        endMessage=
-        {
-          <div className="my-4 text-center">{t("posts:browse.endOfFeed")}</div>
-        }
       >
         <div className="flex flex-col gap-4">
-          <AnimatePresence initial={false} mode="popLayout">
-            {posts.map((post, index) => (
-              <motion.div
-                key={getReferenceId(post)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.3, delay: 0.3 } }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <HiveMimePost key={index} post={observable(post)} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {posts.map((post, index) => (
+            <div key={getReferenceId(post)}>
+              <HiveMimePost key={index} post={post} />
+            </div>
+          ))}
         </div>
       </InfiniteScroll>
     </div>

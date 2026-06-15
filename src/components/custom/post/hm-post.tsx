@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { getEffectiveRole, getReferenceId, getRoleRank } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
+import { createViewModel } from "mobx-utils";
 
 export interface HiveMimePostProps {
   post: PostDto;
@@ -40,8 +41,8 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   const showContextMenu = canDelete || canModify;
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [resultPost, setResultPost] = useState<PostDto>(() => structuredClone(post));
-  const [votePost, setVotePost] = useState<PostDto>(() => structuredClone(post));
+  const [resultPost, setResultPost] = useState<PostDto>(() => createViewModel(post));
+  const [votePost, setVotePost] = useState<PostDto>(() => createViewModel(post));
 
   function toggleResults() {
     setResultsVisible(prev => !prev);
