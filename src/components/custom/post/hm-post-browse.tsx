@@ -60,7 +60,11 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
         creatorId: props.userId,
         approvalStatus: approvalStatus
       });
-      return response.data;
+      
+      return {
+        ...response.data,
+        items: response.data.items?.map(item => observable(item)),
+      };
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as PaginationCursorDto | undefined
