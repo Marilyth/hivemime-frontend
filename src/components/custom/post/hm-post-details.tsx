@@ -24,7 +24,7 @@ export function HiveMimePostDetails() {
       queryKey: ["post", getPostId()],
       queryFn: async () => {
         const response = await api.api.postGetList({ postId: getPostId() });
-        return response.data;
+        return observable(response.data);
       },
       enabled: postId != null
   });
