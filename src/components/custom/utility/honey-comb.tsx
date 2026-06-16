@@ -1,12 +1,12 @@
 import { ParallaxContainer } from "./parallax-container";
-import { useEffect, useState, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 interface HoneyCombProps {
   combSize: number;
   combMatrix: number[][];
 }
 
-function Hexagon({ size }: { size: number }) {
+const Hexagon = memo(function Hexagon({ size }: { size: number }) {
   const w = size;
   const h = size * 0.866;
 
@@ -24,9 +24,9 @@ function Hexagon({ size }: { size: number }) {
       />
     </svg>
   );
-}
+});
 
-function HoneycombGroup({ combSize, combMatrix }: HoneyCombProps) {
+const HoneycombGroup = memo(function HoneycombGroup({ combSize, combMatrix }: HoneyCombProps) {
   const hexWidth = combSize;
   const hexHeight = combSize * 0.866;
   const xStep = hexWidth * 0.75;
@@ -63,7 +63,7 @@ function HoneycombGroup({ combSize, combMatrix }: HoneyCombProps) {
       ))}
     </div>
   );
-}
+});
 
 interface GeneratorCombs {
   distance: number;
@@ -76,10 +76,15 @@ export interface CombGeneratorProps {
 }
 
 export function CombGenerator({ distances, color }: CombGeneratorProps) {
-  const [combs, setCombs] = useState<GeneratorCombs[]>(distances.map((distance) => ({ distance, combs: [] })));
+  const [combs, setCombs] = useState<GeneratorCombs[]>(() =>
+    distances.map((distance) => ({ distance, combs: [] }))
+  );
+  const combsRef = useRef(combs);
   const lastRenderedScroll = useRef<number | null>(null);
 
-  function generateCombs() {
+  combsRef.current = combs;
+
+  const generateCombs = useCallback(() => {
     const height = window.pageYOffset;
     const stepSize = 600;
 
@@ -89,16 +94,16 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
 
     lastRenderedScroll.current = height;
 
-    for (const gen of combs) {
+    const nextCombs = combsRef.current.map((gen) => {
       const effectiveStep = stepSize / gen.distance;
       const effectiveOffset = height / gen.distance;
       const effectiveEnd = window.innerHeight + effectiveOffset + effectiveStep;
       const effectiveStart = effectiveOffset - effectiveStep;
 
-      gen.combs = gen.combs.filter(comb => comb.y >= effectiveStart && comb.y <= effectiveEnd);
+      let layerCombs = gen.combs.filter(comb => comb.y >= effectiveStart && comb.y <= effectiveEnd);
 
-      const startY = gen.combs.length > 0 ? gen.combs[0].y - effectiveStep : 0;
-      const endY = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].y + effectiveStep : 0;
+      const startY = layerCombs.length > 0 ? layerCombs[0].y - effectiveStep : 0;
+      const endY = layerCombs.length > 0 ? layerCombs[layerCombs.length - 1].y + effectiveStep : 0;
       const combSize = 128 / gen.distance;
       const matrixDimension = 3;
 
@@ -115,37 +120,40 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
         );
 
         return { x, y, props: { combSize, combMatrix } };
-      }
+      };
 
       // Add new combs after the last one.
       for (let y = endY; y <= effectiveEnd; y += effectiveStep) {
-        const lastX = gen.combs.length > 0 ? gen.combs[gen.combs.length - 1].x : 0;
-        gen.combs.push(generateComb(y, lastX));
+        const lastX = layerCombs.length > 0 ? layerCombs[layerCombs.length - 1].x : 0;
+        layerCombs.push(generateComb(y, lastX));
       }
 
       // Add new combs before the first one.
       for (let y = startY; y >= effectiveStart; y -= effectiveStep) {
-        const firstX = gen.combs.length > 0 ? gen.combs[0].x : 0;
-        gen.combs = [generateComb(y, firstX), ...gen.combs];
+        const firstX = layerCombs.length > 0 ? layerCombs[0].x : 0;
+        layerCombs = [generateComb(y, firstX), ...layerCombs];
       }
-    }
 
-    setCombs([...combs]);
-  }
+      return { distance: gen.distance, combs: layerCombs };
+    });
+
+    combsRef.current = nextCombs;
+    setCombs(nextCombs);
+  }, []);
 
   useEffect(() => {
-    window.addEventListener("scroll", generateCombs);
+    window.addEventListener("scroll", generateCombs, { passive: true });
     generateCombs();
 
     return () => {
       window.removeEventListener("scroll", generateCombs);
     };
-  }, []);
+  }, [generateCombs]);
 
   return (
     <div style={{color: color}}>
       <ParallaxContainer className="blur-[4px]" distance={12} style={{ WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden'}}>
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(`
@@ -161,9 +169,9 @@ export function CombGenerator({ distances, color }: CombGeneratorProps) {
       {combs.map((gen) => (
         <ParallaxContainer key={gen.distance} distance={gen.distance} style={{filter: `blur(${gen.distance / 2}px)`, WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden'}}>
           <div className="relative">
-            {gen.combs.map((comb, idx) => (
+            {gen.combs.map((comb) => (
               <div
-                key={idx}
+                key={`${gen.distance}-${comb.y}-${comb.x}`}
                 className="absolute"
                 style={{ left: comb.x, top: comb.y }}
               >
