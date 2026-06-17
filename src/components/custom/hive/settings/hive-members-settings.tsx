@@ -30,7 +30,7 @@ export const HiveMembersSettings = observer(({ hiveDto, currentUser }: HiveMembe
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
   const [userNameFilter, setUserNameFilter] = useState<string>("");
   const [orderBy, setOrderBy] = useState<HiveUserOrderBy>(HiveUserOrderBy.New);
-  const [debouncedUserNameFilter, isLoading] = useDebounce(userNameFilter, 300);
+  const [debouncedUserNameFilter, isLoading] = useDebounce(userNameFilter, 1000);
 
   const membersQuery = useInfiniteQuery({
     queryKey: ['hiveUsers', hiveDto.id, approvalStatus, debouncedUserNameFilter, orderBy],

@@ -18,7 +18,7 @@ export interface HiveMimeCommentBrowseProps {
 export const HiveMimeCommentBrowse = observer(({ post }: HiveMimeCommentBrowseProps) => {
   const { t } = useTranslation();
   const [textFilter, setTextFilter] = useState<string>("");
-  const [debouncedTextFilter, isLoading] = useDebounce(textFilter, 300);
+  const [debouncedTextFilter, isLoading] = useDebounce(textFilter, 1000);
   const [orderBy, setOrderBy] = useState<CommentOrderBy>(CommentOrderBy.New);
 
   return (

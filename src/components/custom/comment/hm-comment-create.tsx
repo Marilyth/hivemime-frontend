@@ -22,12 +22,10 @@ export const HiveMimeCommentCreate = observer(({ postId, parentCommentId, onFini
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   async function createComment() {
-    const task = api.api.commentCreateCreate({ postId, parentCommentId, content });
-    toast.promise(task, {
-      loading: t("toasts:comment.creating")
-    });
-
-    const response = await task;
+    const response = await toast.promise(
+      api.api.commentCreateCreate({ postId, parentCommentId, content }),
+      { loading: t("toasts:comment.creating")})
+    .unwrap();
     
     if (onFinished)
       onFinished(response.data.dto!);
