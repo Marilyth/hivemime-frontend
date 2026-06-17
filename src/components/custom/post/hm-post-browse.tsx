@@ -30,7 +30,7 @@ export function HiveMimePostBrowse(props: HiveMimePostBrowseProps) {
   const [orderBy, setOrderBy] = useState<PostOrderBy>(props.orderBy ?? PostOrderBy.Hot);
   const [postFilter, setPostFilter] = useState<string>("");
   const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(ApprovalStatus.Approved);
-  const [debouncedPostFilter, isLoading] = useDebounce(postFilter, 300);
+  const [debouncedPostFilter, isLoading] = useDebounce(postFilter, 1000);
 
   const currentHiveUser = props.hiveId ? followedHivesStore.followedHives.get(props.hiveId) : undefined;
   const canSeeStatusFilter = currentHiveUser != null && (getRoleRank(currentHiveUser.role!) >= getRoleRank(MemberRole.Moderator));

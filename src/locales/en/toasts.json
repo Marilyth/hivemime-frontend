@@ -1,5 +1,6 @@
 {
   "requestFailed": "Request failed",
+  "requestRetrying": "Too many requests. Retrying in {{seconds}} seconds... (Attempt {{attempt}})",
   "auth": {
     "loggingIn": "Logging in...",
     "loggedInAs": "Logged in as {{username}}!",

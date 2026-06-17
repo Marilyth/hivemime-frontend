@@ -54,7 +54,28 @@ export const api = new Api({
   securityWorker: (token) =>
     token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
   customFetch: async (input, init) => {
-    const response = await fetch(input, init);
+    let response!: Response;
+
+    // Retry if rate limited up to 3 times.
+    for (let attempt = 0; attempt < 1; attempt++) {
+      response = await fetch(input, init);
+
+      if (response.status !== 429)
+        break;
+
+      const retryAfter = Number(response.headers.get("Retry-After")) || 1;
+      const cumulativeWait = retryAfter * (attempt + 1);
+
+      const promise = new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+
+      if (cumulativeWait > 5) {
+        await toast.promise(promise, {
+          loading: i18n.t("toasts:requestRetrying", { attempt: attempt + 1, seconds: retryAfter })
+        }).unwrap();
+      } else {
+        await promise;
+      }
+    }
 
     const responseText = await response.clone().text();
     let data: unknown = null;
@@ -87,7 +108,7 @@ export const api = new Api({
     }
     
     const errorMessage = (data as { error?: string } | null)?.error;
-    toast.error(errorMessage ?? i18n.t("toasts:requestFailed"), { closeButton: true, duration: Infinity, richColors: true });
+    toast.error(errorMessage ?? i18n.t("toasts:requestFailed"), { closeButton: true, duration: 5, richColors: true });
     throw new Error(`Request failed with status ${response.status}`);
   },
 });
