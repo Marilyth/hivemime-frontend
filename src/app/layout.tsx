@@ -11,7 +11,6 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Suspense, useEffect, useState } from "react";
-import { HiveDto } from "@/lib/Api";
 import { AccentColourContext, userStore } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
