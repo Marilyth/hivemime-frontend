@@ -10,7 +10,7 @@ import { CircleMinus, CirclePlus, Ellipsis, Gavel, Reply, Trash2 } from "lucide-
 import { HiveMimeExpandableText } from "../utility/hm-expandable-text";
 import { AsyncButton } from "../utility/async-button";
 import { toast } from "sonner";
-import { api, followedHivesStore, userStore } from "@/lib/contexts";
+import { api, confirmStore, followedHivesStore, userStore } from "@/lib/contexts";
 import Link from "next/link";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -120,6 +120,9 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
   }
 
   async function deleteComment() {
+    if (!await confirmStore.request())
+      return;
+
     const task = api.api.commentDeleteDelete({ commentId: comment.id! });
 
     toast.promise(task, {
@@ -131,6 +134,9 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
   }
 
   async function banUser() {
+    if (!await confirmStore.request())
+      return;
+
     const task = api.api.hiveBanUserPartialUpdate({
       hiveId: hiveId,
       userId: comment.user!.id
@@ -206,8 +212,14 @@ export const HiveMimeComment = observer(({ hiveId, comment, isRoot, prefetchedRe
                       </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {canDelete && <DropdownMenuItem onSelect={deleteComment}><Trash2 /> {t("comments:item.delete")}</DropdownMenuItem>}
-                    {canBan && <DropdownMenuItem onSelect={banUser}><Gavel className="text-failure" /> {t("comments:item.banUser")}</DropdownMenuItem>}
+                    {canDelete &&
+                      <DropdownMenuItem onSelect={deleteComment}><Trash2 />
+                        {t("comments:item.delete")}
+                      </DropdownMenuItem>}
+                    {canBan &&
+                      <DropdownMenuItem onSelect={banUser}>
+                        <Gavel className="text-failure" /> {t("comments:item.banUser")}
+                      </DropdownMenuItem>}
                   </DropdownMenuContent>
                 </DropdownMenu>)}
               </div>

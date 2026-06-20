@@ -22,5 +22,6 @@
   "requiredMarker": "*",
   "appTitle": "HiveMime",
   "aboutGreeting": "Hello about.",
-  "areYouSure": "Are you sure?"
+  "areYouSure": "Are you sure?",
+  "confirmProceed": "Please confirm you want to proceed."
 }

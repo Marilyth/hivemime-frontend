@@ -13,7 +13,7 @@ import HexWrapper from "../utility/hm-hex-wrapper";
 import { HiveMimeRelativeTimestamp } from "../utility/hm-relative-timestamp";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { api, followedHivesStore, userStore } from "@/lib/contexts";
+import { api, confirmStore, followedHivesStore, userStore } from "@/lib/contexts";
 import { toast } from "sonner";
 import { getEffectiveRole, getReferenceId, getRoleRank } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -53,6 +53,9 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   }
 
   async function deletePost() {
+    if (!await confirmStore.request())
+      return;
+
     const task = api.api.postDeleteDelete({ postId: post.id! });
     
     toast.promise(task, {
@@ -64,6 +67,9 @@ export const HiveMimePost = observer(({ post, showResults }: HiveMimePostProps) 
   }
 
   async function banUser() {
+    if (!await confirmStore.request())
+      return;
+    
     const task = api.api.hiveBanUserPartialUpdate({ hiveId: post.hive!.id!, userId: post.creator!.id! });
 
     toast.promise(task, {

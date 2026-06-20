@@ -4,6 +4,40 @@ import { makeAutoObservable } from "mobx";
 import { toast } from "sonner";
 import i18n from "./i18n";
 
+export interface ConfirmProps {
+  title?: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+}
+
+class ConfirmStore {
+  confirmProps: ConfirmProps | null = null;
+  private resolvePromise: ((value: boolean) => void) | null = null;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  request(props?: ConfirmProps): Promise<boolean> {
+    this.confirmProps = props ?? {};
+
+    return new Promise((resolve) => {
+      this.resolvePromise = resolve;
+    });
+  }
+
+  respond(wasConfirmed: boolean) {
+    this.confirmProps = null;
+
+    if (this.resolvePromise) {
+      this.resolvePromise(wasConfirmed);
+      this.resolvePromise = null;
+    }
+  }
+}
+
 class UserStore {
   user: UserDetailsDto | null = null;
 
@@ -115,5 +149,6 @@ export const api = new Api({
 
 export const userStore = new UserStore();
 export const followedHivesStore = new FollowedHivesStore();
+export const confirmStore = new ConfirmStore();
 
 export const AccentColourContext = createContext<AccentColourContextType | null>(null);
