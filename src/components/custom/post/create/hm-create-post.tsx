@@ -20,7 +20,7 @@ import { HiveMimeDraggable } from "../../utility/hm-draggable";
 import { HiveSelection, NEW_HIVE_ID_SENTINEL } from "./hm-hive-selection";
 import { AsyncButton } from "../../utility/async-button";
 import { useQueryParam } from "../../utility/use-query-param";
-import { api, followedHivesStore } from "@/lib/contexts";
+import { api, confirmStore, followedHivesStore } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
 import { FieldSeparator } from "@/components/ui/field";
 
@@ -76,7 +76,10 @@ export const HiveMimeCreatePost = observer(() => {
     setSelectedPoll(null);
   }
 
-  function removePoll(index: number) {
+  async function removePoll(index: number) {
+    if (!await confirmStore.request())
+      return;
+    
     post.polls?.splice(index, 1);
 
     if (index >= selectedPollIndex)

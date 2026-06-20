@@ -11,7 +11,6 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Suspense, useEffect, useState } from "react";
-import { HiveDto } from "@/lib/Api";
 import { AccentColourContext, userStore } from "@/lib/contexts";
 import { CombGenerator } from "@/components/custom/utility/honey-comb";
 import { mutedColors } from "@/lib/colors";
@@ -19,6 +18,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { observer } from "mobx-react-lite";
 import "@/lib/i18n";
 import { useTranslation } from "react-i18next";
+import { ConfirmDialog } from "@/lib/warning";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,6 +84,7 @@ const RootLayout = observer(({ children }: { children: React.ReactNode }) => {
                             </div>
                           </div>
                           <Toaster position="bottom-right" />
+                          <ConfirmDialog />
                         </SidebarInset>
                       </div>
 

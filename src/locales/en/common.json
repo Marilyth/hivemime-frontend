@@ -2,6 +2,7 @@
   "loading": "Loading...",
   "save": "Save",
   "cancel": "Cancel",
+  "confirm": "Confirm",
   "reset": "Reset",
   "create": "Create",
   "submit": "Submit",
@@ -20,5 +21,7 @@
   "showLess": "Show less",
   "requiredMarker": "*",
   "appTitle": "HiveMime",
-  "aboutGreeting": "Hello about."
+  "aboutGreeting": "Hello about.",
+  "areYouSure": "Are you sure?",
+  "confirmProceed": "Please confirm you want to proceed."
 }
