@@ -5,7 +5,7 @@ import { HiveMimeViewCandidate } from "../hm-candidate";
 import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CandidateDistributionResultDto, CandidateDto, PollDto } from "@/lib/Api";
+import { CandidateDto, CandidateRankResultDto, PollDto } from "@/lib/Api";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { hiveMimeRankIcon, hiveMimeRankIconColor } from "../../utility/hm-rank-icon";
@@ -15,7 +15,7 @@ export function HiveMimeRankResult(props: HiveMimePollCandidateResultProps) {
   const data = useQuery({
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
-      const r = await api.api.postDistributionResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postRankResultList({ pollId: props.poll.id!, filter: props.filter });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {
@@ -38,7 +38,7 @@ export function HiveMimeRankResult(props: HiveMimePollCandidateResultProps) {
 
   const rankResultCandidates = props.poll.candidates!.map(c => {
     const candidateResult = data.data!.candidates!.find(rc => rc.id === c.id);
-    const score = candidateResult ? candidateResult.distribution?.reduce((sum, d) => sum + (d.voteCount! * (1 + props.poll.maxValue! - d.value!)), 0) : 0;
+    const score = candidateResult ? candidateResult.distribution?.reduce((sum, d) => sum + (d.voteCount! * (1 + props.poll.maxValue! - d.rank!)), 0) : 0;
     
     return {
       candidate: c,
@@ -61,7 +61,7 @@ export function HiveMimeRankResult(props: HiveMimePollCandidateResultProps) {
 
 interface HiveMimeCategoryRankResultProps {
   candidate: CandidateDto;
-  candidateResult: CandidateDistributionResultDto;
+  candidateResult: CandidateRankResultDto;
   totalScore: number;
   score: number;
   rank: number;
@@ -116,7 +116,7 @@ function HiveMimeCategoryRankResult(props: HiveMimeCategoryRankResultProps) {
         <AccordionContent className="border-t-1 flex flex-col gap-1 py-2">
           {[...Array(props.poll.maxValue!).keys()].map(value => {
             const rank = value + 1;
-            const distribution = resultCandidate?.distribution?.find(d => d.value === rank);
+            const distribution = resultCandidate?.distribution?.find(d => d.rank === rank);
             const ratio = distribution ? (distribution.voteCount! / resultCandidate!.voteCount!) : 0;
             const color = hiveMimeRankIconColor(rank);
 

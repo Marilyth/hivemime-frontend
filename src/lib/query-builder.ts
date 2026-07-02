@@ -62,7 +62,7 @@ export class VoteQuery extends VoteQueryBase {
   poll: PollDto | null = null;
   candidate: CandidateDto | null = null;
   valueOperator: ValueOperator | null = null;
-  value: number | null = null;
+  value: string | null = null;
 
   constructor() {
     super();

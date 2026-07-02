@@ -13,7 +13,7 @@ export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
   const data = useQuery({
     queryKey: ["poll-result", props.poll.id, props.filter],
     queryFn: async () => {
-      const r = await api.api.postStatisticsResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postScoreResultList({ pollId: props.poll.id!, filter: props.filter });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {

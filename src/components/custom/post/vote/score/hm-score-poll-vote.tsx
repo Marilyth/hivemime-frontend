@@ -2,14 +2,15 @@
 
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
-import { PollDto, PollVoteDto } from "@/lib/Api";
+import { PollDto } from "@/lib/Api";
 import { HiveMimeScorePollVoteCandidate } from "./hm-score-poll-vote-candidate";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { UiPollVoteDto } from "@/lib/vote-models";
 
 export interface HiveMimePickScoringPollProps {
   poll: PollDto;
-  pollVotes: PollVoteDto;
+  pollVotes: UiPollVoteDto;
 }
 
 export const HiveMimeScorePollVote = observer(({ poll, pollVotes }: HiveMimePickScoringPollProps) => {

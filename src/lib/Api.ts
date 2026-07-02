@@ -68,17 +68,18 @@ export interface BooleanHoneyDeltaDto {
   dto?: boolean;
 }
 
-export interface CandidateDistributionResultDto {
+export interface CandidateCategoryDistributionResultDto {
   /** @format uuid */
-  id?: string;
-  name?: string | null;
-  isCustom?: boolean;
+  categoryId?: string;
   /** @format int32 */
   voteCount?: number;
-  distribution?: CandidationDistributionResultValueDto[] | null;
 }
 
-export interface CandidateDistributionResultDtoPollResultDto {
+export type CandidateCategoryResultDto = CandidateResultDto & {
+  distribution?: CandidateCategoryDistributionResultDto[] | null;
+};
+
+export interface CandidateCategoryResultDtoPollResultDto {
   /** @format uuid */
   id?: string;
   title?: string | null;
@@ -98,9 +99,42 @@ export interface CandidateDistributionResultDtoPollResultDto {
   /** @format int32 */
   maxVotes?: number;
   pollType?: PollType;
-  candidates?: CandidateDistributionResultDto[] | null;
+  candidates?: CandidateCategoryResultDto[] | null;
   categories?: CategoryDto[] | null;
 }
+
+export type CandidateCategoryVoteDto = CandidateVoteDto & {
+  /** @format uuid */
+  categoryId?: string;
+};
+
+export type CandidateChoiceResultDto = CandidateResultDto & object;
+
+export interface CandidateChoiceResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
+  isShuffled?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateChoiceResultDto[] | null;
+  categories?: CategoryDto[] | null;
+}
+
+export type CandidateChoiceVoteDto = CandidateVoteDto & object;
 
 export interface CandidateDto {
   /** @format uuid */
@@ -111,13 +145,56 @@ export interface CandidateDto {
   mediaKeys?: string[] | null;
 }
 
-export interface CandidateStatisticsResultDto {
+export interface CandidateRankDistributionResultDto {
+  /** @format int32 */
+  rank?: number;
+  /** @format int32 */
+  voteCount?: number;
+}
+
+export type CandidateRankResultDto = CandidateResultDto & {
+  distribution?: CandidateRankDistributionResultDto[] | null;
+};
+
+export interface CandidateRankResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
+  isShuffled?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateRankResultDto[] | null;
+  categories?: CategoryDto[] | null;
+}
+
+export type CandidateRankVoteDto = CandidateVoteDto & {
+  /** @format int32 */
+  rank?: number;
+};
+
+export interface CandidateResultDto {
   /** @format uuid */
   id?: string;
   name?: string | null;
   isCustom?: boolean;
   /** @format int32 */
   voteCount?: number;
+}
+
+export type CandidateScoreResultDto = CandidateResultDto & {
   /** @format double */
   min?: number;
   /** @format double */
@@ -130,9 +207,9 @@ export interface CandidateStatisticsResultDto {
   max?: number;
   /** @format double */
   average?: number;
-}
+};
 
-export interface CandidateStatisticsResultDtoPollResultDto {
+export interface CandidateScoreResultDtoPollResultDto {
   /** @format uuid */
   id?: string;
   title?: string | null;
@@ -152,58 +229,19 @@ export interface CandidateStatisticsResultDtoPollResultDto {
   /** @format int32 */
   maxVotes?: number;
   pollType?: PollType;
-  candidates?: CandidateStatisticsResultDto[] | null;
+  candidates?: CandidateScoreResultDto[] | null;
   categories?: CategoryDto[] | null;
 }
 
-export interface CandidateSumResultDto {
-  /** @format uuid */
-  id?: string;
-  name?: string | null;
-  isCustom?: boolean;
-  /** @format int32 */
-  voteCount?: number;
-  /** @format int32 */
-  sum?: number;
-}
-
-export interface CandidateSumResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
+export type CandidateScoreVoteDto = CandidateVoteDto & {
   /** @format double */
-  stepValue?: number | null;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  pollType?: PollType;
-  candidates?: CandidateSumResultDto[] | null;
-  categories?: CategoryDto[] | null;
-}
+  score?: number;
+};
 
 export interface CandidateVoteDto {
   /** @format uuid */
   id?: string | null;
   name?: string | null;
-  /** @format int32 */
-  value?: number | null;
-}
-
-export interface CandidationDistributionResultValueDto {
-  /** @format double */
-  value?: number;
-  /** @format int32 */
-  voteCount?: number;
 }
 
 export interface CategoryDto {
@@ -213,8 +251,6 @@ export interface CategoryDto {
   description?: string | null;
   /** @format int32 */
   color?: number;
-  /** @format int32 */
-  value?: number;
 }
 
 export interface CommentDto {
@@ -239,20 +275,21 @@ export interface CommentDto {
 export interface CommentDtoHoneyDeltaDto {
   /** @format double */
   honeyDelta?: number;
-  dto?: CommentDto;
+  dto?: CommentDto | UserHistoryCommentDto | null;
 }
 
 export interface CommentDtoPaginationResultDto {
-  items?: CommentDto[] | null;
+  items?: (CommentDto | UserHistoryCommentDto)[] | null;
   nextCursor?: PaginationCursorDto;
 }
 
-export interface CommentPaginationDto {
-  /** @format int32 */
-  pageSize?: number;
-  cursor?: PaginationCursorDto;
+export type CommentPaginationDto = PaginationDto & {
   filter?: string | null;
   orderBy?: CommentOrderBy;
+};
+
+export interface CommentPostDto {
+  title?: string | null;
 }
 
 export interface CreateCandidateDto {
@@ -334,13 +371,10 @@ export interface HiveDtoPaginationResultDto {
   nextCursor?: PaginationCursorDto;
 }
 
-export interface HivePaginationDto {
-  /** @format int32 */
-  pageSize?: number;
-  cursor?: PaginationCursorDto;
+export type HivePaginationDto = PaginationDto & {
   filter?: string | null;
   orderBy?: HiveOrderBy;
-}
+};
 
 export interface HiveSettingsDto {
   isPrivate?: boolean;
@@ -372,18 +406,21 @@ export interface HiveUserDtoPaginationResultDto {
   nextCursor?: PaginationCursorDto;
 }
 
-export interface HiveUserPaginationDto {
-  /** @format int32 */
-  pageSize?: number;
-  cursor?: PaginationCursorDto;
+export type HiveUserPaginationDto = PaginationDto & {
   filter?: string | null;
   orderBy?: HiveUserOrderBy;
-}
+};
 
 export interface PaginationCursorDto {
   cursor?: string | null;
   /** @format uuid */
   id?: string;
+}
+
+export interface PaginationDto {
+  /** @format int32 */
+  pageSize?: number;
+  cursor?: PaginationCursorDto;
 }
 
 export interface PollDto {
@@ -410,10 +447,21 @@ export interface PollDto {
   categories?: CategoryDto[] | null;
 }
 
+export type PollResultDto1 = PollDto & {
+  candidates?: T[] | null;
+};
+
 export interface PollVoteDto {
   /** @format uuid */
   id?: string;
-  candidates?: CandidateVoteDto[] | null;
+  candidates?:
+    | (
+        | CandidateChoiceVoteDto
+        | CandidateScoreVoteDto
+        | CandidateRankVoteDto
+        | CandidateCategoryVoteDto
+      )[]
+    | null;
 }
 
 export interface PostDto {
@@ -422,7 +470,7 @@ export interface PostDto {
   role?: MemberRole;
   /** @format uuid */
   id?: string;
-  polls?: PollDto[] | null;
+  polls?: (PollDto | PollResultDto1)[] | null;
   /** @format int32 */
   commentCount?: number;
   /** @format int32 */
@@ -446,18 +494,24 @@ export interface PostDtoPaginationResultDto {
   nextCursor?: PaginationCursorDto;
 }
 
-export interface PostPaginationDto {
-  /** @format int32 */
-  pageSize?: number;
-  cursor?: PaginationCursorDto;
+export type PostPaginationDto = PaginationDto & {
   filter?: string | null;
   orderBy?: PostOrderBy;
-}
+};
 
 export interface PostVoteDto {
   /** @format uuid */
   id?: string;
   polls?: PollVoteDto[] | null;
+}
+
+export interface T {
+  /** @format uuid */
+  id?: string;
+  name?: string | null;
+  isCustom?: boolean;
+  /** @format int32 */
+  voteCount?: number;
 }
 
 export interface UploadCandidateDto {
@@ -515,13 +569,14 @@ export interface UserDtoPaginationResultDto {
   nextCursor?: PaginationCursorDto;
 }
 
-export interface UserPaginationDto {
-  /** @format int32 */
-  pageSize?: number;
-  cursor?: PaginationCursorDto;
+export type UserHistoryCommentDto = CommentDto & {
+  post?: CommentPostDto;
+};
+
+export type UserPaginationDto = PaginationDto & {
   filter?: string | null;
   orderBy?: UserOrderBy;
-}
+};
 
 export interface UserProfileDto {
   /** @format uuid */
@@ -825,7 +880,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CommentDto, any>({
+      this.request<CommentDto | UserHistoryCommentDto, any>({
         path: `/api/Comment/get`,
         method: "GET",
         query: query,
@@ -865,7 +920,7 @@ export class Api<
       data: EditCommentDto,
       params: RequestParams = {},
     ) =>
-      this.request<CommentDto, any>({
+      this.request<CommentDto | UserHistoryCommentDto, any>({
         path: `/api/Comment/edit`,
         method: "PATCH",
         body: data,
@@ -1308,11 +1363,11 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostSumResultList
-     * @request GET:/api/Post/sumResult
+     * @name PostChoiceResultList
+     * @request GET:/api/Post/choiceResult
      * @secure
      */
-    postSumResultList: (
+    postChoiceResultList: (
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1320,8 +1375,8 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateSumResultDtoPollResultDto, any>({
-        path: `/api/Post/sumResult`,
+      this.request<CandidateChoiceResultDtoPollResultDto, any>({
+        path: `/api/Post/choiceResult`,
         method: "GET",
         query: query,
         secure: true,
@@ -1333,11 +1388,11 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostStatisticsResultList
-     * @request GET:/api/Post/statisticsResult
+     * @name PostScoreResultList
+     * @request GET:/api/Post/scoreResult
      * @secure
      */
-    postStatisticsResultList: (
+    postScoreResultList: (
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1345,8 +1400,8 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateStatisticsResultDtoPollResultDto, any>({
-        path: `/api/Post/statisticsResult`,
+      this.request<CandidateScoreResultDtoPollResultDto, any>({
+        path: `/api/Post/scoreResult`,
         method: "GET",
         query: query,
         secure: true,
@@ -1358,11 +1413,11 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostDistributionResultList
-     * @request GET:/api/Post/distributionResult
+     * @name PostRankResultList
+     * @request GET:/api/Post/rankResult
      * @secure
      */
-    postDistributionResultList: (
+    postRankResultList: (
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1370,8 +1425,33 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateDistributionResultDtoPollResultDto, any>({
-        path: `/api/Post/distributionResult`,
+      this.request<CandidateRankResultDtoPollResultDto, any>({
+        path: `/api/Post/rankResult`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostCategoryResultList
+     * @request GET:/api/Post/categoryResult
+     * @secure
+     */
+    postCategoryResultList: (
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateCategoryResultDtoPollResultDto, any>({
+        path: `/api/Post/categoryResult`,
         method: "GET",
         query: query,
         secure: true,

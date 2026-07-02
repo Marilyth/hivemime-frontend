@@ -21,7 +21,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
             return;
         
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = currentItem.poll!.minValue!;
+        currentItem.value = String(currentItem.poll!.minValue!);
     }, [currentItem]);
 
     function setNegation(value: boolean) {
@@ -29,7 +29,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
     }
 
     function setValue(value: number) {
-        currentItem.value = value;
+        currentItem.value = String(value);
     }
 
     function setOperator(operator: ValueOperator) {
@@ -81,7 +81,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
                     </div>
 
                     <Slider
-                        value={[currentItem.value ?? currentItem.poll!.minValue!]}
+                        value={[Number(currentItem.value ?? currentItem.poll!.minValue!)]}
                         onValueChange={(value) => setValue(value[0])}
                         min={currentItem.poll!.minValue!}
                         max={currentItem.poll!.maxValue!}

@@ -19,10 +19,10 @@ export const HiveMimeFilterConditionChoiceValuePicker = observer(({ currentItem 
             return;
         
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = 1;
+        currentItem.value = "1";
     }, [currentItem]);
 
-    function setValue(value: number) {
+    function setValue(value: string) {
         currentItem.value = value;
     }
 
@@ -32,8 +32,8 @@ export const HiveMimeFilterConditionChoiceValuePicker = observer(({ currentItem 
                 <span className="text-sm text-muted-foreground">
                     {t("posts:filter.candidateWas")}
                     <Select
-                        value={currentItem.value === 1 ? "1" : "0"}
-                        onValueChange={(value) => setValue(Number(value))}
+                        value={currentItem.value === "1" ? "1" : "0"}
+                        onValueChange={(value) => setValue(value)}
                     >
                         <HiveMimeInlineSelectTrigger>
                             <SelectValue />
@@ -54,7 +54,7 @@ export const HiveMimeFilterConditionChoiceValueViewer = observer(({ currentItem 
 
     return (
         <Label>
-            {currentItem.value === 1
+            {currentItem.value === "1"
                 ? t("posts:filter.candidateSelected", { name: currentItem.candidate?.name })
                 : t("posts:filter.candidateNotSelected", { name: currentItem.candidate?.name })}
         </Label>

@@ -1,7 +1,8 @@
-import { PollDto, PollType, PollVoteDto, PostVoteDto } from "./Api";
+import { PollDto, PollType } from "./Api";
 import i18n from "./i18n";
+import { UiPollVoteDto, UiPostVoteDto } from "./vote-models";
 
-export function validatePickPost(postPolls: PollDto[], postVotes: PostVoteDto): string[] {
+export function validatePickPost(postPolls: PollDto[], postVotes: UiPostVoteDto): string[] {
     const errors: string[] = [];
 
     postPolls.forEach((poll, index) => {
@@ -12,11 +13,26 @@ export function validatePickPost(postPolls: PollDto[], postVotes: PostVoteDto): 
     return errors;
 }
 
-export function validatePickPoll(poll: PollDto, vote: PollVoteDto): string[] {
-    const errors: string[] = [];
+function countVotes(poll: PollDto, vote: UiPollVoteDto): number {
+    const candidates = vote.candidates ?? [];
 
-    const voteValues = vote.candidates!.map(c => c.value);
-    const voteCount = voteValues!.filter(c => c != null && (poll.pollType != PollType.Choice || c != 0)).length;
+    switch (poll.pollType) {
+        case PollType.Choice:
+            return candidates.filter(c => c.selected).length;
+        case PollType.Score:
+            return candidates.filter(c => c.score != null).length;
+        case PollType.Rank:
+            return candidates.filter(c => c.rank != null).length;
+        case PollType.Category:
+            return candidates.filter(c => c.categoryId != null).length;
+        default:
+            return 0;
+    }
+}
+
+export function validatePickPoll(poll: PollDto, vote: UiPollVoteDto): string[] {
+    const errors: string[] = [];
+    const voteCount = countVotes(poll, vote);
 
     if (voteCount < poll.minVotes!)
         errors.push(i18n.t("validation:vote.minCandidates", { minVotes: poll.minVotes }));

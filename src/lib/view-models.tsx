@@ -1,8 +1,9 @@
-import { CandidateDto, CandidateVoteDto } from "./Api";
+import { CandidateDto } from "./Api";
+import { UiCandidateVote } from "./vote-models";
 
 export interface CombinedPollCandidate {
   candidate: CandidateDto;
-  vote: CandidateVoteDto;
+  vote: UiCandidateVote;
 }
 
 export enum ChartType {

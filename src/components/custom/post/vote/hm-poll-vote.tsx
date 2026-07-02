@@ -1,6 +1,6 @@
 "use client";
 
-import { PollDto, PollType, PollVoteDto } from "@/lib/Api";
+import { PollDto, PollType } from "@/lib/Api";
 import { ReactNode, useEffect, useState } from "react";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -14,10 +14,11 @@ import { validatePickPoll } from "@/lib/validate-vote";
 import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CustomCandidateInput } from "./hm-custom-candidate-input";
+import { UiPollVoteDto } from "@/lib/vote-models";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
-  pollVote: PollVoteDto;
+  pollVote: UiPollVoteDto;
 }
 
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {

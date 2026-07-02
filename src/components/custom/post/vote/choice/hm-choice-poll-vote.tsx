@@ -2,14 +2,15 @@
 
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
-import { PollDto, PollVoteDto } from "@/lib/Api";
+import { PollDto } from "@/lib/Api";
 import { HiveMimeChoicePollVoteCandidate } from "./hm-choice-poll-vote-candidate";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { UiPollVoteDto } from "@/lib/vote-models";
 
 export interface HiveMimePickMultipleChoicePollProps {
   poll: PollDto;
-  pollVotes: PollVoteDto;
+  pollVotes: UiPollVoteDto;
 }
 
 export const HiveMimeChoicePollVote = observer(({ poll, pollVotes }: HiveMimePickMultipleChoicePollProps) => {
@@ -17,12 +18,11 @@ export const HiveMimeChoicePollVote = observer(({ poll, pollVotes }: HiveMimePic
 
   function selectChoice(index: number) {
     const currentVote = pollVotes.candidates![index];
-    const currentValue = currentVote?.value;
 
-    if (currentValue == 1)
-      currentVote!.value = null;
+    if (currentVote.selected)
+      currentVote.selected = false;
     else
-      currentVote!.value = 1;
+      currentVote.selected = true;
   }
 
   function removeCustomCandidate(index: number) {

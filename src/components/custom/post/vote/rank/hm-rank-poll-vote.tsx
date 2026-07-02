@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { CandidateVoteDto, PollDto, PollVoteDto } from "@/lib/Api";
+import { PollDto } from "@/lib/Api";
 import { HiveMimeRankPollVoteCandidate } from "./hm-rank-poll-vote-candidate";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { LayoutGroup, motion } from "framer-motion";
@@ -10,10 +10,11 @@ import { HiveMimeDraggable, OnDroppedArgs } from "../../../utility/hm-draggable"
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { UiCandidateVote, UiPollVoteDto } from "@/lib/vote-models";
 
 export interface HiveMimeRankPollVoteProps {
   poll: PollDto;
-  pollVotes: PollVoteDto;
+  pollVotes: UiPollVoteDto;
 }
 
 export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankPollVoteProps) => {
@@ -26,12 +27,12 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
       const candidate = pollVotes.candidates![i];
 
       if (!isRanked) {
-        candidate.value = null;
+        candidate.rank = undefined;
         continue;
       }
 
-      if (candidate.value != null)
-        candidate.value = i + 1;
+      if (candidate.rank != null)
+        candidate.rank = i + 1;
 
       else
         isRanked = false;
@@ -42,9 +43,9 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
     const currentIndex = pollVotes.candidates!.findIndex(c => c === candidate.vote);
     pollVotes.candidates!.splice(currentIndex, 1);
 
-    const rankedEndIndex = pollVotes.candidates!.findIndex(c => c.value == null);
+    const rankedEndIndex = pollVotes.candidates!.findIndex(c => c.rank == null);
 
-    candidate.vote.value = candidate.vote.value == null ? 1 : null;
+    candidate.vote.rank = candidate.vote.rank == null ? 1 : undefined;
 
     if (rankedEndIndex === -1)
       pollVotes.candidates!.push(candidate.vote);
@@ -65,11 +66,11 @@ export const HiveMimeRankPollVote = observer(({ poll, pollVotes }: HiveMimeRankP
   }
 
   function onDrop(args: OnDroppedArgs) {
-    const originalCandidate = args.draggableData as CandidateVoteDto;
+    const originalCandidate = args.draggableData as UiCandidateVote;
     const currentIndex = pollVotes.candidates!.findIndex(c => c.name === originalCandidate.name);
     
     for (let i = 0; i <= currentIndex; i++)
-      pollVotes.candidates![i].value = 1;
+      pollVotes.candidates![i].rank = 1;
 
     rerankCandidates();
   }

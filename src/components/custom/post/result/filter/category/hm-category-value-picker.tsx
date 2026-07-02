@@ -20,14 +20,14 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
             return;
 
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = currentItem.poll!.minValue!;
+        currentItem.value = currentItem.poll!.categories![0].id!;
     }, [currentItem]);
 
     function setNegation(value: boolean) {
         currentItem.isNegated = value;
     }
 
-    function setValue(value: number | null) {
+    function setValue(value: string | null) {
         currentItem.value = value;
     }
 
@@ -59,14 +59,14 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                         
                         <Select
                             value={currentItem.value?.toString() ?? "none"}
-                            onValueChange={(value) => setValue(value === "none" ? null : Number(value))}
+                            onValueChange={(value) => setValue(value === "none" ? null : value)}
                         >
                             <HiveMimeInlineSelectTrigger>
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
                                 {currentItem.poll!.categories!.map((category) => (
-                                    <SelectItem key={category.id} value={category.value!.toString()}>
+                                    <SelectItem key={category.id} value={category.id!}>
                                         <HiveMimeCategoryTag category={category} />
                                     </SelectItem>
                                 ))}
@@ -90,7 +90,7 @@ export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentIte
                 ? t("posts:filter.uncategorized")
                 : (
                 <span className="inline-block align-middle">
-                    <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
+                    <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.id === currentItem.value)!} />
                 </span>
             )}
         </Label>

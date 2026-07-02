@@ -21,7 +21,7 @@ export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, c
   const { t } = useTranslation();
 
   function isSelected(category: CategoryDto) {
-    return candidate?.vote.value == category?.value;
+    return candidate?.vote.categoryId === category?.id;
   }
 
   function selectCategory(category: CategoryDto) {
@@ -29,9 +29,9 @@ export const HiveMimeCategoryPollVoteCandidateDialog = observer(({ categories, c
       return;
 
     if (isSelected(category)) {
-      candidate.vote.value = null;
+      candidate.vote.categoryId = undefined;
     } else {
-      candidate.vote.value = category!.value;
+      candidate.vote.categoryId = category.id;
     }
   }
 
@@ -66,7 +66,7 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
   const { t } = useTranslation();
 
   function isSelected(candidate: CombinedPollCandidate) {
-    return candidate.vote.value === category?.value;
+    return candidate.vote.categoryId === category?.id;
   }
 
   function selectCategory(candidate: CombinedPollCandidate) {
@@ -74,9 +74,9 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
       return;
 
     if (isSelected(candidate)) {
-      candidate.vote.value = null;
+      candidate.vote.categoryId = undefined;
     } else {
-      candidate.vote.value = category!.value;
+      candidate.vote.categoryId = category!.id;
     }
   }
 
@@ -100,4 +100,3 @@ export const HiveMimeCategoryPollVoteCategoryDialog = observer(({ candidates, ca
     </Dialog>
   );
 });
-

@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { PollDto, PollVoteDto, PollType } from "@/lib/Api";
+import { PollDto, PollType } from "@/lib/Api";
 import { api } from "@/lib/contexts";
+import { UiCandidateVote, UiPollVoteDto } from "@/lib/vote-models";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { normalize } from "@/lib/utils";
 
 export interface CustomCandidateInputProps {
   poll: PollDto;
-  pollVote: PollVoteDto;
+  pollVote: UiPollVoteDto;
 }
 
 export const CustomCandidateInput = ({ poll, pollVote }: CustomCandidateInputProps) => {
@@ -41,25 +42,23 @@ export const CustomCandidateInput = ({ poll, pollVote }: CustomCandidateInputPro
       return;
     }
 
-    let candidateValue: number | null = null;
+    let voteCandidate: UiCandidateVote = { name: value, id: null };
     let insertIndex = poll.candidates!.length;
 
     if (poll.pollType === PollType.Choice)
-      candidateValue = 1;
+      voteCandidate.selected = true;
 
     else if (poll.pollType === PollType.Rank)
     {
-      const rankEndIndex = pollVote.candidates!.findIndex(c => c.value == null);
-      candidateValue = (rankEndIndex === -1 ? pollVote.candidates!.length : rankEndIndex) + 1;
+      const rankEndIndex = pollVote.candidates!.findIndex(c => c.rank == null);
+      voteCandidate.rank = (rankEndIndex === -1 ? pollVote.candidates!.length : rankEndIndex) + 1;
 
       if (rankEndIndex !== -1)
         insertIndex = rankEndIndex;
     }
 
     poll.candidates!.splice(insertIndex, 0, { name: value, id: undefined, description: "", isCustom: true });
-    pollVote.candidates!.splice(insertIndex, 0, { name: value,
-      id: null,
-      value: candidateValue });
+    pollVote.candidates!.splice(insertIndex, 0, voteCandidate);
 
     setValue("");
   }
