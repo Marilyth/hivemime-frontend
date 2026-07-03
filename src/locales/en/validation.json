@@ -8,14 +8,17 @@
     "maxVotesLessThanOne": "Max votes must be greater than 0.",
     "choiceMinCandidates": "A choice poll must have at least two candidates.",
     "scoreStepValue": "A scoring poll must have a step value higher than 0.",
-    "categoryMinCategories": "A categorization poll must have at least two categories."
+    "categoryMinCategories": "A categorization poll must have at least two categories.",
+    "locateMedia": "A locate poll must have an image for each candidate."
   },
   "vote": {
     "required": "You must vote for this poll.",
     "minCandidates": "You must vote for at least {{minVotes}} candidates.",
     "maxCandidates": "You must vote for no more than {{maxVotes}} candidates.",
     "valueTooSmall": "Your candidate's value can not be smaller than {{minValue}}.",
-    "valueTooLarge": "Your candidate's value can not be larger than {{maxValue}}."
+    "valueTooLarge": "Your candidate's value can not be larger than {{maxValue}}.",
+    "minLocations": "You must pick at least {{minVotes}} locations.",
+    "maxLocations": "You must pick no more than {{maxVotes}} locations."
   },
   "hive": {
     "nameTooShort": "Hive names must be at least 3 characters long.",

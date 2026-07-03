@@ -28,6 +28,7 @@ export enum PollType {
   Score = "Score",
   Rank = "Rank",
   Category = "Category",
+  Locate = "Locate",
 }
 
 export enum MemberRole {
@@ -144,6 +145,58 @@ export interface CandidateDto {
   isCustom?: boolean;
   mediaKeys?: string[] | null;
 }
+
+export interface CandidateLocateDistributionResultDto {
+  /** @format int32 */
+  x?: number;
+  /** @format int32 */
+  y?: number;
+  /** @format double */
+  score?: number;
+  /** @format int32 */
+  voteCount?: number;
+}
+
+export type CandidateLocateResultDto = CandidateResultDto & {
+  /** @format int32 */
+  resolution?: number;
+  distribution?: CandidateLocateDistributionResultDto[] | null;
+};
+
+export interface CandidateLocateResultDtoPollResultDto {
+  /** @format uuid */
+  id?: string;
+  title?: string | null;
+  mediaKeys?: string[] | null;
+  description?: string | null;
+  /** @format int32 */
+  allowedCustomCandidateCount?: number;
+  isShuffled?: boolean;
+  /** @format int32 */
+  minValue?: number;
+  /** @format int32 */
+  maxValue?: number;
+  /** @format double */
+  stepValue?: number | null;
+  /** @format int32 */
+  minVotes?: number;
+  /** @format int32 */
+  maxVotes?: number;
+  pollType?: PollType;
+  candidates?: CandidateLocateResultDto[] | null;
+  categories?: CategoryDto[] | null;
+}
+
+export type CandidateLocateVoteDto = CandidateVoteDto & {
+  /** @format double */
+  left?: number;
+  /** @format double */
+  top?: number;
+  /** @format double */
+  right?: number;
+  /** @format double */
+  bottom?: number;
+};
 
 export interface CandidateRankDistributionResultDto {
   /** @format int32 */
@@ -460,6 +513,7 @@ export interface PollVoteDto {
         | CandidateScoreVoteDto
         | CandidateRankVoteDto
         | CandidateCategoryVoteDto
+        | CandidateLocateVoteDto
       )[]
     | null;
 }
@@ -1452,6 +1506,31 @@ export class Api<
     ) =>
       this.request<CandidateCategoryResultDtoPollResultDto, any>({
         path: `/api/Post/categoryResult`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostLocateResultList
+     * @request GET:/api/Post/locateResult
+     * @secure
+     */
+    postLocateResultList: (
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+        filter?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateLocateResultDtoPollResultDto, any>({
+        path: `/api/Post/locateResult`,
         method: "GET",
         query: query,
         secure: true,

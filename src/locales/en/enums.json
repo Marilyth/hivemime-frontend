@@ -61,13 +61,15 @@
     "choice": "Choice",
     "score": "Score",
     "rank": "Rank",
-    "category": "Category"
+    "category": "Category",
+    "locate": "Locate"
   },
   "pollTypeDescription": {
-    "choice": "The user has to pick one or more out of several candidates.",
-    "score": "The user has to assign each candidate a numerical value within a specified range.",
+    "choice": "The user has to pick candidates.",
+    "score": "The user has to assign numerical values to candidates.",
     "rank": "The user has to rank the candidates in order of preference. (E.g. top 10 lists)",
-    "category": "The user has to assign a category to each candidate. (E.g. tier lists)"
+    "category": "The user has to assign categories to candidates. (E.g. tier lists)",
+    "locate": "The user has to select points or areas in an image."
   },
   "rankFilter": {
     "nothing": "Nothing"

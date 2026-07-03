@@ -46,8 +46,9 @@
     "pollTitlePlaceholder": "Give your poll a title.",
     "description": "Description",
     "descriptionPlaceholder": "Optionally, add a description.",
-    "createCategories": "Create categories for the users to assign the candidates to.",
-    "createCandidates": "Create candidates for the users to vote for.",
+    "createCategories": "Create categories for the user to assign the candidates to.",
+    "createLocateCandidates": "Select the image for the user to pick locations in.",
+    "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
     "candidateNamePlaceholder": "Candidate name...",
@@ -72,7 +73,9 @@
       "maxVotes": "The user can vote for up to <select/> candidates.",
       "shuffle": "The candidates <select/> shuffled for the user.",
       "minScore": "The minimum score is <select/>.",
-      "maxScore": "The maximum score is <select/>."
+      "maxScore": "The maximum score is <select/>.",
+      "minLocations": "The user has to pick at least <select/> locations.",
+      "maxLocations": "The user can pick up to <select/> locations."
     },
     "scoring": {
       "minScore": "The minimum score is",
