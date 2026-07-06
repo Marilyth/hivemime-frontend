@@ -13,7 +13,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { toast } from "sonner";
 import { FieldSeparator } from "@/components/ui/field";
 
-
 export interface ImageViewerProps {
   thumb?: string;
   src?: string;
@@ -43,10 +42,16 @@ export function ImageViewer(props: ImageViewerProps) {
           <DialogHeader>
             <DialogTitle>{props.alt}</DialogTitle>
           </DialogHeader>
-          {props.src && <img src={props.src} alt={props.alt} className="w-fit h-fit rounded-md border" />}
+          <ImageViewerContent src={props.src} alt={props.alt} />
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export function ImageViewerContent(props: ImageViewerProps) {
+  return (
+    props.src && <img src={props.src} alt={props.alt} style={{ pointerEvents: "none" }} className="w-fit h-fit rounded-md border" />
   );
 }
 
