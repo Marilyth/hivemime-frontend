@@ -162,7 +162,7 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
 
   return (
     <div
-      className={cn(`relative inline-block select-none touch-none w-full h-full ${canCreateNewRectangle ? "cursor-crosshair" : "cursor-not-allowed"}`, className)}
+      className={cn(`relative inline-block select-none touch-none w-fit h-fit ${canCreateNewRectangle ? "cursor-crosshair" : "cursor-not-allowed"}`, className)}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
@@ -264,7 +264,7 @@ export const RectangleDisplay = observer((props: LocationProps) => {
                 minHeight={0}
             >
                 {props.rectangle.isSelected() && (
-                    <Button variant="destructive" className="absolute p-0 h-8 w-8 -top-8 -right-10 rounded-full no-drag!" onPointerDown={handleDelete}>
+                    <Button className="absolute p-0 h-8 w-8 -top-8 -right-10 rounded-full no-drag!" onPointerDown={handleDelete}>
                         <Trash2 />
                     </Button>
                 )}

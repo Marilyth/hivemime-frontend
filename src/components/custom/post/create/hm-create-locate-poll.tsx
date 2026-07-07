@@ -6,6 +6,7 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { Trans } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
+import { HiveMimeCreateMaxvoteRule, HiveMimeCreateMinvoteRule, HiveMimeCreateShuffleRule } from "./hm-create-rules";
 
 
 export const HiveMimeCreateLocateRules = observer((props: HiveMimeCreatePollProps) =>  {
@@ -14,15 +15,15 @@ export const HiveMimeCreateLocateRules = observer((props: HiveMimeCreatePollProp
   
   function updateMinLocations(value: string)  {
     const newValue = Number(value);
-    props.poll.minVotes = newValue;
-    if (newValue > props.poll.maxVotes!) {
-      props.poll.maxVotes = newValue;
+    props.poll.minVotesPerCandidate = newValue;
+    if (newValue > props.poll.maxVotesPerCandidate!) {
+      props.poll.maxVotesPerCandidate = newValue;
     }
   }
 
   function updateMaxLocations(value: string)  {
     const newValue = Number(value);
-    props.poll.maxVotes = newValue;
+    props.poll.maxVotesPerCandidate = newValue;
   }
 
   return (
@@ -33,7 +34,7 @@ export const HiveMimeCreateLocateRules = observer((props: HiveMimeCreatePollProp
           components={{
             select: (
               <Select
-                value={props.poll.minVotes!.toString()}
+                value={props.poll.minVotesPerCandidate!.toString()}
                 onValueChange={updateMinLocations}>
                 <HiveMimeInlineSelectTrigger>
                   <SelectValue />
@@ -55,7 +56,7 @@ export const HiveMimeCreateLocateRules = observer((props: HiveMimeCreatePollProp
           components={{
             select: (
               <Select
-                value={props.poll.maxVotes!.toString()}
+                value={props.poll.maxVotesPerCandidate!.toString()}
                 onValueChange={updateMaxLocations}>
                 <HiveMimeInlineSelectTrigger>
                   <SelectValue />

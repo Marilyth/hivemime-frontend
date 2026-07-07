@@ -19,6 +19,7 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
+    "locateInstruction": "Please select a candidate to pick between {{minLocations}} and {{maxLocations}} locations for.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
