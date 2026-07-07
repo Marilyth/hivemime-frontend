@@ -51,7 +51,7 @@ export function ImageViewer(props: ImageViewerProps) {
 
 export function ImageViewerContent(props: ImageViewerProps) {
   return (
-    props.src && <img src={props.src} alt={props.alt} style={{ pointerEvents: "none" }} className="w-fit h-fit rounded-md border" />
+    props.src && <img src={props.src} alt={props.alt} style={{ pointerEvents: "none" }} className="w-fit h-fit rounded-md" />
   );
 }
 

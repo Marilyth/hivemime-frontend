@@ -1,6 +1,7 @@
 import {
   CandidateCategoryVoteDto,
   CandidateChoiceVoteDto,
+  CandidateLocateVoteDto,
   CandidateRankVoteDto,
   CandidateScoreVoteDto,
   PollDto,
@@ -14,7 +15,7 @@ import { UiCandidateVote, UiPostVoteDto } from "./vote-models";
 function serializeCandidateVote(
   poll: PollDto,
   candidate: UiCandidateVote,
-): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | null {
+): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateLocateVoteDto[] | null {
   const base = { id: candidate.id, name: candidate.name };
 
   switch (poll.pollType) {
@@ -34,6 +35,16 @@ function serializeCandidateVote(
       if (!candidate.categoryId) return null;
       return { ...base, categoryId: candidate.categoryId };
 
+    case PollType.Locate:
+      if (!candidate.rectangles || candidate.rectangles.rectangles.length === 0) return null;
+      return candidate.rectangles.rectangles.map((rect) => ({
+        ...base,
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+      }));
+
     default:
       return null;
   }
@@ -50,7 +61,7 @@ export function serializePostVote(post: PostDto, uiVote: UiPostVoteDto): PostVot
 
       return {
         id: pollVote.id,
-        candidates,
+        candidates: candidates.flat(),
       } satisfies PollVoteDto;
     }),
   };

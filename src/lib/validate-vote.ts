@@ -25,6 +25,8 @@ function countVotes(poll: PollDto, vote: UiPollVoteDto): number {
             return candidates.filter(c => c.rank != null).length;
         case PollType.Category:
             return candidates.filter(c => c.categoryId != null).length;
+        case PollType.Locate:
+            return candidates.reduce((count, c) => count + (c.rectangles?.rectangles.length ?? 0), 0);
         default:
             return 0;
     }

@@ -189,13 +189,13 @@ export interface CandidateLocateResultDtoPollResultDto {
 
 export type CandidateLocateVoteDto = CandidateVoteDto & {
   /** @format double */
-  left?: number;
+  x?: number;
   /** @format double */
-  top?: number;
+  y?: number;
   /** @format double */
-  right?: number;
+  width?: number;
   /** @format double */
-  bottom?: number;
+  height?: number;
 };
 
 export interface CandidateRankDistributionResultDto {
