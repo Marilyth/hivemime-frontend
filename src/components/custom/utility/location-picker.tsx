@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { clamp, cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { makeAutoObservable } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -14,11 +15,11 @@ export class LocationRectangle {
   parent: LocationRectangles;
 
   constructor(x: number, y: number, width: number, height: number, parent: LocationRectangles) {
+    this.parent = parent;
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.parent = parent;
 
     makeAutoObservable(this);
   }
@@ -26,15 +27,26 @@ export class LocationRectangle {
   isSelected() {
     return this.parent.selectedRectangle === this;
   }
+
+  makeRelative() {
+    this.x = this.x / this.parent.containerWidth;
+    this.y = this.y / this.parent.containerHeight;
+    this.width = this.width / this.parent.containerWidth;
+    this.height = this.height / this.parent.containerHeight;
+  }
 }
 
 export class LocationRectangles {
   maxRectangles: number;
+  minSize: number = 10;
+  containerWidth: number = 0;
+  containerHeight: number = 0;
   rectangles: LocationRectangle[] = [];
   selectedRectangle: LocationRectangle | null = null;
 
-  constructor(maxRectangles: number = 1) {
+  constructor(maxRectangles: number = 1, minSize: number = 10) {
     this.maxRectangles = maxRectangles;
+    this.minSize = minSize;
     makeAutoObservable(this);
   }
 
@@ -59,6 +71,23 @@ export interface LocationProps {
 export const LocationPicker = observer((props: LocationPickerProps) => {
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const overlayClass = cn(
+    "absolute bg-black/25 pointer-events-none transition-opacity duration-[250ms]",
+    dragging ? "opacity-100" : "opacity-0"
+  );
+
+  let dimLeft = 0;
+  let dimTop = 0;
+  let dimRight = 0;
+  let dimBottom = 0;
+
+  if (dragging) {
+    const currentRect = props.rectangles.rectangles[props.rectangles.rectangles.length - 1];
+    dimLeft = Math.min(currentRect.x, currentRect.x + currentRect.width);
+    dimTop = Math.min(currentRect.y, currentRect.y + currentRect.height);
+    dimRight = Math.max(currentRect.x, currentRect.x + currentRect.width);
+    dimBottom = Math.max(currentRect.y, currentRect.y + currentRect.height);
+  }
 
   function getPosition(e: React.PointerEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -80,7 +109,7 @@ export const LocationPicker = observer((props: LocationPickerProps) => {
     e.currentTarget.setPointerCapture(e.pointerId);
 
     setDragging(true);
-    const newRect = new LocationRectangle(pos.x, pos.y, 0, 0, props.rectangles);
+    const newRect = new LocationRectangle(pos.x, pos.y, 10, 10, props.rectangles);
     props.rectangles.addRectangle(newRect.x, newRect.y, newRect.width, newRect.height);
     props.rectangles.selectedRectangle = null;
   }
@@ -92,10 +121,21 @@ export const LocationPicker = observer((props: LocationPickerProps) => {
     const pos = getPosition(e);
     const currentRect = props.rectangles.rectangles[props.rectangles.rectangles.length - 1];
 
-    const containerRect = containerRef.current?.getBoundingClientRect();
+    const containerRect = containerRef.current!.getBoundingClientRect();
+    props.rectangles.containerWidth = containerRect.width;
+    props.rectangles.containerHeight = containerRect.height;
 
-    currentRect.width = pos.x - currentRect.x;
-    currentRect.height = pos.y - currentRect.y;
+    let newWidth = clamp(pos.x - currentRect.x, -currentRect.x, props.rectangles.containerWidth - currentRect.x);
+    let newHeight = clamp(pos.y - currentRect.y, -currentRect.y, props.rectangles.containerHeight - currentRect.y);
+
+    if (newWidth > -props.rectangles.minSize && newWidth < props.rectangles.minSize)
+      newWidth = newWidth < 0 ? -props.rectangles.minSize : props.rectangles.minSize;
+
+    if (newHeight > -props.rectangles.minSize && newHeight < props.rectangles.minSize)
+      newHeight = newHeight < 0 ? -props.rectangles.minSize : props.rectangles.minSize;
+
+    currentRect.width = newWidth;
+    currentRect.height = newHeight;
   }
 
   function pointerUp(e: React.PointerEvent<HTMLDivElement>) {
@@ -104,8 +144,21 @@ export const LocationPicker = observer((props: LocationPickerProps) => {
 
     e.currentTarget.releasePointerCapture(e.pointerId);
 
-    setDragging(false);
-    props.rectangles.selectedRectangle = props.rectangles.rectangles[props.rectangles.rectangles.length - 1];
+    setDragging(false);;
+
+    // Convert negative width/height to positive and adjust x/y accordingly to avoid RND issues.
+    const currentRect = props.rectangles.rectangles[props.rectangles.rectangles.length - 1];
+    if (currentRect.width < 0) {
+      currentRect.x += currentRect.width;
+      currentRect.width = Math.abs(currentRect.width);
+    }
+
+    if (currentRect.height < 0) {
+      currentRect.y += currentRect.height;
+      currentRect.height = Math.abs(currentRect.height);
+    }
+
+    props.rectangles.selectedRectangle = currentRect;
   }
 
   return (
@@ -116,9 +169,49 @@ export const LocationPicker = observer((props: LocationPickerProps) => {
       onPointerUp={pointerUp}
       ref={containerRef}
     >
-      {dragging && (
-        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
-      )}
+      {/* Top */}
+      <div
+        className={overlayClass}
+        style={{
+          left: 0,
+          top: 0,
+          width: "100%",
+          height: dimTop,
+        }}
+      />
+
+      {/* Left */}
+      <div
+        className={overlayClass}
+        style={{
+          left: 0,
+          top: dimTop,
+          width: dimLeft,
+          height: dimBottom - dimTop,
+        }}
+      />
+
+      {/* Right */}
+      <div
+        className={overlayClass}
+        style={{
+          left: dimRight,
+          top: dimTop,
+          right: 0,
+          height: dimBottom - dimTop,
+        }}
+      />
+
+      {/* Bottom */}
+      <div
+        className={overlayClass}
+        style={{
+          left: 0,
+          top: dimBottom,
+          width: "100%",
+          bottom: 0,
+        }}
+      />
 
       {props.rectangles.rectangles.map((rect, index) => (
         <RectangleDisplay key={index} rectangle={rect} />
@@ -161,13 +254,15 @@ export const RectangleDisplay = observer((props: LocationProps) => {
                     height: Math.abs(props.rectangle.height),
                 }}
                 bounds="parent"
-                className={`${props.rectangle.isSelected() ? 'border border-honey-brown' : ''} rounded-sm bg-honey-brown/25`}
+                className={`border bg-honey-brown/10 border-honey-brown rounded-sm ${props.rectangle.isSelected() && 'bg-honey-brown/25 z-100!'}`}
                 onResizeStop={handleResizeStop}
                 onDragStop={handleDragStop}
                 onPointerDown={handleClick}
+                minWidth={props.rectangle.parent.minSize}
+                minHeight={props.rectangle.parent.minSize}
             >
                 {props.rectangle.isSelected() && (
-                    <Button variant="destructive" className="absolute p-0 h-8 -top-8 -right-12" onClick={handleDelete}>
+                    <Button variant="destructive" className="absolute p-0 h-8 w-8 -top-8 -right-10 rounded-full" onClick={handleDelete}>
                         <Trash2 />
                     </Button>
                 )}
