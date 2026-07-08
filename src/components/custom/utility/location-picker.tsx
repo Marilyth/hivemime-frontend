@@ -27,26 +27,10 @@ export class LocationRectangle {
   isSelected() {
     return this.parent.selectedRectangle === this;
   }
-
-  makeRelative() {
-    this.x = this.x / this.parent.containerWidth;
-    this.y = this.y / this.parent.containerHeight;
-    this.width = this.width / this.parent.containerWidth;
-    this.height = this.height / this.parent.containerHeight;
-  }
-
-  makeAbsolute() {
-    this.x = this.x * this.parent.containerWidth;
-    this.y = this.y * this.parent.containerHeight;
-    this.width = this.width * this.parent.containerWidth;
-    this.height = this.height * this.parent.containerHeight;
-  }
 }
 
 export class LocationRectangles {
   maxRectangles: number;
-  containerWidth: number = 0;
-  containerHeight: number = 0;
   rectangles: LocationRectangle[] = [];
   selectedRectangle: LocationRectangle | null = null;
 
@@ -56,7 +40,7 @@ export class LocationRectangles {
   }
 
   addRectangle(x: number, y: number) {
-    const rect = new LocationRectangle(x, y, 1, 1, this);
+    const rect = new LocationRectangle(x, y, 0, 0, this);
     this.rectangles.push(rect);
   }
 
@@ -76,6 +60,7 @@ export interface LocationProps {
 export const LocationPicker = observer(({ rectangles, children, className, ...props }: LocationPickerProps) => {
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
   const [dragging, setDragging] = useState(false);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const canCreateNewRectangle = rectangles.rectangles.length < rectangles.maxRectangles;
   const overlayClass = cn(
@@ -100,8 +85,8 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     const rect = target.getBoundingClientRect();
 
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
     };
   }
 
@@ -131,10 +116,6 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     e.preventDefault();
 
     const pos = getPosition(e, target);
-    const containerRect = containerRef.current!.getBoundingClientRect();
-
-    rectangles.containerWidth = containerRect.width;
-    rectangles.containerHeight = containerRect.height;
     target.setPointerCapture(e.pointerId);
 
     setDragging(true);
@@ -153,11 +134,8 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     const pos = getPosition(e, target);
     const currentRect = rectangles.rectangles[rectangles.rectangles.length - 1];
 
-    const newWidth = clamp(pos.x - currentRect.x, -currentRect.x, rectangles.containerWidth - currentRect.x);
-    const newHeight = clamp(pos.y - currentRect.y, -currentRect.y, rectangles.containerHeight - currentRect.y);
-    
-    currentRect.width = newWidth;
-    currentRect.height = newHeight;
+    currentRect.width = clamp(pos.x - currentRect.x, -currentRect.x, 1 - currentRect.x);
+    currentRect.height = clamp(pos.y - currentRect.y, -currentRect.y, 1 - currentRect.y);
   }
 
   function pointerUp(e: React.PointerEvent<HTMLDivElement>) {
@@ -168,7 +146,7 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
 
     e.currentTarget.releasePointerCapture(e.pointerId);
 
-    setDragging(false);;
+    setDragging(false);
 
     // Convert negative width/height to positive and adjust x/y accordingly to avoid RND issues.
     const currentRect = rectangles.rectangles[rectangles.rectangles.length - 1];
@@ -187,7 +165,16 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
   
   useEffect(() => {
     const el = containerRef.current!;
-    
+
+    const updateContainerSize = () => {
+      const rect = el.getBoundingClientRect();
+      setContainerSize({ width: rect.width, height: rect.height });
+    };
+
+    updateContainerSize();
+    const resizeObserver = new ResizeObserver(updateContainerSize);
+    resizeObserver.observe(el);
+
     const handleTouchMove = (e: TouchEvent) => {
       if (dragging) {
         e.preventDefault();
@@ -199,6 +186,7 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     });
 
     return () => {
+      resizeObserver.disconnect();
       el.removeEventListener("touchmove", handleTouchMove);
     };
   }, [dragging]);
@@ -222,7 +210,7 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
           left: 0,
           top: 0,
           width: "100%",
-          height: dimTop,
+          height: `${dimTop * 100}%`,
         }}
       />
 
@@ -231,9 +219,9 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
         className={overlayClass}
         style={{
           left: 0,
-          top: dimTop,
-          width: dimLeft,
-          height: dimBottom - dimTop,
+          top: `${dimTop * 100}%`,
+          width: `${dimLeft * 100}%`,
+          height: `${(dimBottom - dimTop) * 100}%`,
         }}
       />
 
@@ -241,10 +229,10 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
       <div
         className={overlayClass}
         style={{
-          left: dimRight,
-          top: dimTop,
+          left: `${dimRight * 100}%`,
+          top: `${dimTop * 100}%`,
           right: 0,
-          height: dimBottom - dimTop,
+          height: `${(dimBottom - dimTop) * 100}%`,
         }}
       />
 
@@ -253,30 +241,40 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
         className={overlayClass}
         style={{
           left: 0,
-          top: dimBottom,
+          top: `${dimBottom * 100}%`,
           width: "100%",
           bottom: 0,
         }}
       />
 
       {rectangles.rectangles.map((rect, index) => (
-        <RectangleDisplay key={index} rectangle={rect} />
+        <RectangleDisplay key={index} rectangle={rect} containerSize={containerSize} />
       ))}
     </div>
   );
 });
 
-export const RectangleDisplay = observer((props: LocationProps) => {
+export const RectangleDisplay = observer((props: LocationProps & { containerSize: { width: number; height: number } }) => {
+    const { width: containerWidth, height: containerHeight } = props.containerSize;
+    const pixelX = props.rectangle.x * containerWidth;
+    const pixelY = props.rectangle.y * containerHeight;
+    const pixelWidth = props.rectangle.width * containerWidth;
+    const pixelHeight = props.rectangle.height * containerHeight;
+
     function handleDragStop(e: MouseEvent, data: DraggableData) {
-        props.rectangle.x = data.x;
-        props.rectangle.y = data.y;
+        if (containerWidth === 0 || containerHeight === 0) return;
+
+        props.rectangle.x = data.x / containerWidth;
+        props.rectangle.y = data.y / containerHeight;
     }
 
     function handleResizeStop(e: MouseEvent | TouchEvent, dir: ResizeDirection, elementRef: HTMLElement, delta: ResizableDelta, position: Position) {
-        props.rectangle.width = elementRef.offsetWidth;
-        props.rectangle.height = elementRef.offsetHeight;
-        props.rectangle.x = position.x;
-        props.rectangle.y = position.y;
+        if (containerWidth === 0 || containerHeight === 0) return;
+
+        props.rectangle.x = position.x / containerWidth;
+        props.rectangle.y = position.y / containerHeight;
+        props.rectangle.width = elementRef.offsetWidth / containerWidth;
+        props.rectangle.height = elementRef.offsetHeight / containerHeight;
     }
 
     function handleClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -292,12 +290,12 @@ export const RectangleDisplay = observer((props: LocationProps) => {
         <>
             <Rnd
                 position={{
-                    x: Math.min(props.rectangle.x, props.rectangle.x + props.rectangle.width),
-                    y: Math.min(props.rectangle.y, props.rectangle.y + props.rectangle.height),
+                    x: Math.min(pixelX, pixelX + pixelWidth),
+                    y: Math.min(pixelY, pixelY + pixelHeight),
                 }}
                 size={{
-                    width: Math.abs(props.rectangle.width),
-                    height: Math.abs(props.rectangle.height),
+                    width: Math.abs(pixelWidth),
+                    height: Math.abs(pixelHeight),
                 }}
                 bounds="parent"
                 className={`border bg-honey-brown/10 border-honey-brown rounded-sm ${props.rectangle.isSelected() && 'bg-honey-brown/25 z-100!'}`}
