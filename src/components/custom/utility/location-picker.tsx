@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import { makeAutoObservable } from "mobx";
 import { observer } from "mobx-react-lite";
 import { ResizeDirection } from "re-resizable";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DraggableData, Position, ResizableDelta, Rnd } from "react-rnd";
 
 export class LocationRectangle {
@@ -74,6 +74,7 @@ export interface LocationProps {
 }
 
 export const LocationPicker = observer(({ rectangles, children, className, ...props }: LocationPickerProps) => {
+  const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const canCreateNewRectangle = rectangles.rectangles.length < rectangles.maxRectangles;
@@ -95,8 +96,8 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     dimBottom = Math.max(currentRect.y, currentRect.y + currentRect.height);
   }
 
-  function getPosition(e: React.PointerEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
+  function getPosition(e: React.PointerEvent<HTMLDivElement>, target: HTMLDivElement) {
+    const rect = target.getBoundingClientRect();
 
     return {
       x: e.clientX - rect.left,
@@ -104,18 +105,37 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
     };
   }
 
-  function pointerDown(e: React.PointerEvent<HTMLDivElement>) {
+  async function pointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    lastPosition.current = { x: e.clientX, y: e.clientY };
+
     if (!canCreateNewRectangle)
       return;
 
+    const target = e.currentTarget;
+
+    // If the user is using touch, they have to imply intent by holding down for a little bit.
+    if (e.pointerType == "touch") {
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      if (lastPosition.current == null)
+        return;
+
+      const dx = Math.abs(e.clientX - lastPosition.current.x);
+      const dy = Math.abs(e.clientY - lastPosition.current.y);
+
+      if (dx * dx + dy * dy > 50) {
+        return;
+      }
+    }
+
     e.preventDefault();
 
-    const pos = getPosition(e);
+    const pos = getPosition(e, target);
     const containerRect = containerRef.current!.getBoundingClientRect();
 
     rectangles.containerWidth = containerRect.width;
     rectangles.containerHeight = containerRect.height;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    target.setPointerCapture(e.pointerId);
 
     setDragging(true);
 
@@ -124,10 +144,13 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
   }
 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    lastPosition.current = { x: e.clientX, y: e.clientY };
+
     if (!dragging)
         return;
 
-    const pos = getPosition(e);
+    const target = e.currentTarget;
+    const pos = getPosition(e, target);
     const currentRect = rectangles.rectangles[rectangles.rectangles.length - 1];
 
     const newWidth = clamp(pos.x - currentRect.x, -currentRect.x, rectangles.containerWidth - currentRect.x);
@@ -138,6 +161,8 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
   }
 
   function pointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    lastPosition.current = null;
+
     if (!dragging)
         return;
 
@@ -159,13 +184,32 @@ export const LocationPicker = observer(({ rectangles, children, className, ...pr
 
     rectangles.selectedRectangle = currentRect;
   }
+  
+  useEffect(() => {
+    const el = containerRef.current!;
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (dragging) {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+
+    return () => {
+      el.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [dragging]);
 
   return (
     <div
-      className={cn(`relative inline-block select-none touch-none w-fit h-fit ${canCreateNewRectangle ? "cursor-crosshair" : "cursor-not-allowed"}`, className)}
+      className={cn(`relative inline-block select-none w-fit h-fit ${canCreateNewRectangle ? "cursor-crosshair" : "cursor-not-allowed"}`, className)}
       onPointerDown={pointerDown}
       onPointerMove={pointerMove}
       onPointerUp={pointerUp}
+      onPointerCancel={pointerUp}
       ref={containerRef}
       {...props}
     >
@@ -264,9 +308,9 @@ export const RectangleDisplay = observer((props: LocationProps) => {
                 minHeight={0}
             >
                 {props.rectangle.isSelected() && (
-                    <Button className="absolute p-0 h-8 w-8 -top-8 -right-10 rounded-full no-drag!" onPointerDown={handleDelete}>
-                        <Trash2 />
-                    </Button>
+                  <Button className="absolute p-0 h-8 w-8 -top-8 -right-10 rounded-full" onPointerUp={handleDelete}>
+                      <Trash2 />
+                  </Button>
                 )}
             </Rnd>
         </>
