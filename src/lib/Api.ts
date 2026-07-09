@@ -93,8 +93,6 @@ export interface CandidateCategoryResultDtoPollResultDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -103,6 +101,12 @@ export interface CandidateCategoryResultDtoPollResultDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateCategoryResultDto[] | null;
   categories?: CategoryDto[] | null;
@@ -128,8 +132,6 @@ export interface CandidateChoiceResultDtoPollResultDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -138,6 +140,12 @@ export interface CandidateChoiceResultDtoPollResultDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateChoiceResultDto[] | null;
   categories?: CategoryDto[] | null;
@@ -171,8 +179,6 @@ export interface CandidateDrawResultDtoPollResultDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -181,6 +187,12 @@ export interface CandidateDrawResultDtoPollResultDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateDrawResultDto[] | null;
   categories?: CategoryDto[] | null;
@@ -224,8 +236,6 @@ export interface CandidateRankResultDtoPollResultDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -234,6 +244,12 @@ export interface CandidateRankResultDtoPollResultDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateRankResultDto[] | null;
   categories?: CategoryDto[] | null;
@@ -281,8 +297,6 @@ export interface CandidateScoreResultDtoPollResultDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -291,6 +305,12 @@ export interface CandidateScoreResultDtoPollResultDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateScoreResultDto[] | null;
   categories?: CategoryDto[] | null;
@@ -392,8 +412,6 @@ export interface CreatePollDto {
   maxValue?: number;
   /** @format int32 */
   allowedCustomCandidateCount?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -402,6 +420,12 @@ export interface CreatePollDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CreateCandidateDto[] | null;
   categories?: CreateCategoryDto[] | null;
@@ -503,8 +527,6 @@ export interface PollDto {
   minValue?: number;
   /** @format int32 */
   maxValue?: number;
-  /** @format double */
-  stepValue?: number | null;
   /** @format int32 */
   minVotes?: number;
   /** @format int32 */
@@ -513,6 +535,12 @@ export interface PollDto {
   minVotesPerCandidate?: number;
   /** @format int32 */
   maxVotesPerCandidate?: number;
+  /** @format int32 */
+  rows?: number | null;
+  /** @format int32 */
+  columns?: number | null;
+  /** @format double */
+  stepValue?: number | null;
   pollType?: PollType;
   candidates?: CandidateDto[] | null;
   categories?: CategoryDto[] | null;
