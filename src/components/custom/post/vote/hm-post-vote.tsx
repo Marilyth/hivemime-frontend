@@ -13,7 +13,7 @@ import { HiveMimeListPoll } from "./hm-poll-vote";
 import { Accordion } from "@/components/ui/accordion";
 import { AsyncButton } from "../../utility/async-button";
 import { api } from "@/lib/contexts";
-import { LocationRectangles } from "../../utility/location-picker";
+import { CellSelection } from "../../utility/draw-picker";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -31,7 +31,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
       candidates: (poll.candidates || []).map(candidate => ({
         id: candidate.id!,
         name: candidate.name,
-        rectangles: new LocationRectangles(poll.maxVotesPerCandidate)
+        rectangles: new CellSelection(poll.maxVotesPerCandidate)
       })),
     })),
   })));

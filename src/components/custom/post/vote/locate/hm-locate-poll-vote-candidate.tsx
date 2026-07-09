@@ -6,7 +6,7 @@ import { UiCandidateVote } from "@/lib/vote-models";
 import { CandidateDto } from "@/lib/Api";
 import { ImageViewerContent } from "@/components/custom/utility/image-viewer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { LocationPicker } from "@/components/custom/utility/location-picker";
+import { CellPicker } from "@/components/custom/utility/draw-picker";
 import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 
 interface HiveMimeLocatePollVoteCandidateProps {
@@ -31,9 +31,9 @@ export const HiveMimeLocatePollVoteCandidate = observer(({ vote, candidate }: Hi
           <DialogHeader>
             <DialogTitle>{candidate.name!}</DialogTitle>
           </DialogHeader>
-          <LocationPicker rectangles={vote.rectangles!}>
+          <CellPicker cellSelection={vote.rectangles!}>
             <ImageViewerContent src={src} alt={candidate.name!} />
-          </LocationPicker>
+          </CellPicker>
         </DialogContent>
       </Dialog>
     </div>

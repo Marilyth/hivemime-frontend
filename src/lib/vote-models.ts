@@ -1,4 +1,4 @@
-import { LocationRectangles } from "@/components/custom/utility/location-picker";
+import { CellSelection } from "@/components/custom/utility/draw-picker";
 import { CandidateVoteDto } from "./Api";
 
 export type UiCandidateVote = CandidateVoteDto & {
@@ -6,7 +6,7 @@ export type UiCandidateVote = CandidateVoteDto & {
   score?: number;
   rank?: number;
   categoryId?: string;
-  rectangles?: LocationRectangles;
+  rectangles?: CellSelection;
 };
 
 export interface UiPollVoteDto {

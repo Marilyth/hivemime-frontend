@@ -28,7 +28,7 @@ export enum PollType {
   Score = "Score",
   Rank = "Rank",
   Category = "Category",
-  Locate = "Locate",
+  Draw = "Draw",
 }
 
 export enum MemberRole {
@@ -145,33 +145,20 @@ export interface CandidateChoiceResultDtoPollResultDto {
 
 export type CandidateChoiceVoteDto = CandidateVoteDto & object;
 
-export interface CandidateDto {
-  /** @format uuid */
-  id?: string;
-  name?: string | null;
-  description?: string | null;
-  isCustom?: boolean;
-  mediaKeys?: string[] | null;
-}
-
-export interface CandidateLocateDistributionResultDto {
+export interface CandidateDrawDistributionResultDto {
   /** @format int32 */
-  x?: number;
-  /** @format int32 */
-  y?: number;
+  cellIndex?: number;
   /** @format double */
-  score?: number;
+  value?: number;
   /** @format int32 */
   voteCount?: number;
 }
 
-export type CandidateLocateResultDto = CandidateResultDto & {
-  /** @format int32 */
-  resolution?: number;
-  distribution?: CandidateLocateDistributionResultDto[] | null;
+export type CandidateDrawResultDto = CandidateResultDto & {
+  distribution?: CandidateDrawDistributionResultDto[] | null;
 };
 
-export interface CandidateLocateResultDtoPollResultDto {
+export interface CandidateDrawResultDtoPollResultDto {
   /** @format uuid */
   id?: string;
   title?: string | null;
@@ -195,20 +182,23 @@ export interface CandidateLocateResultDtoPollResultDto {
   /** @format int32 */
   maxVotesPerCandidate?: number;
   pollType?: PollType;
-  candidates?: CandidateLocateResultDto[] | null;
+  candidates?: CandidateDrawResultDto[] | null;
   categories?: CategoryDto[] | null;
 }
 
-export type CandidateLocateVoteDto = CandidateVoteDto & {
-  /** @format double */
-  x?: number;
-  /** @format double */
-  y?: number;
-  /** @format double */
-  width?: number;
-  /** @format double */
-  height?: number;
+export type CandidateDrawVoteDto = CandidateVoteDto & {
+  /** @format int32 */
+  cellIndex?: number;
 };
+
+export interface CandidateDto {
+  /** @format uuid */
+  id?: string;
+  name?: string | null;
+  description?: string | null;
+  isCustom?: boolean;
+  mediaKeys?: string[] | null;
+}
 
 export interface CandidateRankDistributionResultDto {
   /** @format int32 */
@@ -541,7 +531,7 @@ export interface PollVoteDto {
         | CandidateScoreVoteDto
         | CandidateRankVoteDto
         | CandidateCategoryVoteDto
-        | CandidateLocateVoteDto
+        | CandidateDrawVoteDto
       )[]
     | null;
 }
@@ -1545,11 +1535,11 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostLocateResultList
-     * @request GET:/api/Post/locateResult
+     * @name PostDrawResultList
+     * @request GET:/api/Post/drawResult
      * @secure
      */
-    postLocateResultList: (
+    postDrawResultList: (
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1557,8 +1547,8 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateLocateResultDtoPollResultDto, any>({
-        path: `/api/Post/locateResult`,
+      this.request<CandidateDrawResultDtoPollResultDto, any>({
+        path: `/api/Post/drawResult`,
         method: "GET",
         query: query,
         secure: true,
