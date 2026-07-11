@@ -23,7 +23,13 @@
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
-    "pickCandidatesDescription": "Please pick candidates to assign the category to."
+    "pickCandidatesDescription": "Please pick candidates to assign the category to.",
+    "draw": {
+      "draw": "Draw",
+      "erase": "Erase",
+      "undo": "Undo",
+      "cursorSize": "Cursor size"
+    }
   },
   "result": {
     "results": "Results",

@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
-import { Undo2 } from "lucide-react";
+import { Eraser, PencilLine, Undo2 } from "lucide-react";
 import { makeAutoObservable, reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
@@ -43,11 +44,14 @@ export class CellSelection {
 }
 
 enum CursorMode {
-  Inactive,
-  Pending,
-  Active,
-  Erase,
-  Draw
+  Inactive = "inactive",
+  Pending = "pending",
+  Active = "active"
+}
+
+enum ActionMode {
+  Draw = "draw",
+  Erase = "erase"
 }
 
 export type DrawPickerProps = {
@@ -57,15 +61,17 @@ export type DrawPickerProps = {
 
 export const DrawPicker = observer(({ cellSelection, src, className, ...props }: DrawPickerProps) => {
   const { t } = useTranslation();
-  const outerContainerRef = useRef<HTMLDivElement>(null);
-  const innerContainerRef = useRef<HTMLDivElement>(null);
+  const cardContainerRef = useRef<HTMLDivElement>(null);
+  const outerImageContainerRef = useRef<HTMLDivElement>(null);
+  const innerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
-  const [dragging, setDragging] = useState(false);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [renderedSize, setRenderedSize] = useState({ width: 0, height: 0 });
+  const [actionMode, setActionMode] = useState<ActionMode>(ActionMode.Draw);
   const [cursorMode, setCursorMode] = useState(CursorMode.Inactive);
+  const [cursorSize, setCursorSize] = useState(1);
   const cursorModeRef = useRef(CursorMode.Inactive);
   const undoStack = useRef<{ value: number }[][]>([]);
 
@@ -99,17 +105,24 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
     setCursorMode(mode);
   }
 
-  function triggerCell(cellIndex: number) {
-    if (cursorModeRef.current === CursorMode.Draw) {
-      cellSelection.activate(cellIndex);
-    } else if (cursorModeRef.current === CursorMode.Erase) {
-      cellSelection.deactivate(cellIndex);
+  function triggerCell(row: number, col: number) {
+    for (let r = row - Math.floor(cursorSize / 2); r <= row + Math.floor(cursorSize / 2); r++)
+    for (let c = col - Math.floor(cursorSize / 2); c <= col + Math.floor(cursorSize / 2); c++)
+    {
+      if (r < 0 || r >= cellSelection.rows || c < 0 || c >= cellSelection.cols)
+        continue;
+
+      const cellIndex = r * cellSelection.cols + c;
+
+      if (actionMode === ActionMode.Draw) {
+        cellSelection.activate(cellIndex);
+      } else if (actionMode === ActionMode.Erase) {
+        cellSelection.deactivate(cellIndex);
+      }
     }
   }
 
-  function getCellIndex(clientX: number, clientY: number) {
-    const rect = innerContainerRef.current!.getBoundingClientRect();
-
+  function getCell(clientX: number, clientY: number, rect: DOMRect) {
     const relativeCoordinates = {
       x: (clientX - rect.left) / rect.width,
       y: (clientY - rect.top) / rect.height,
@@ -118,11 +131,12 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
     const col = Math.floor(relativeCoordinates.x * cellSelection.cols);
     const row = Math.floor(relativeCoordinates.y * cellSelection.rows);
 
-    return row * cellSelection.cols + col;
+    return { row, col, cellIndex: row * cellSelection.cols + col };
   }
 
   async function pointerDown(e: React.PointerEvent<HTMLDivElement>) {
     lastPosition.current = { x: e.clientX, y: e.clientY };
+    const rect = e.currentTarget.getBoundingClientRect();
 
     // If the user is using touch, they have to imply intent by holding down for a little bit.
     if (e.pointerType == "touch") {
@@ -143,13 +157,13 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
 
     e.preventDefault();
 
-    const cell = getCellIndex(e.clientX, e.clientY);
+    const cell = getCell(e.clientX, e.clientY, rect);
     undoStack.current.push(cellSelection.cells.map(cell => ({ value: cell.value })));
 
-    updateCursorMode(cellSelection.cells[cell].value === 0 ? CursorMode.Draw : CursorMode.Erase);
-    triggerCell(cell);
+    // setActionMode(cellSelection.cells[cell.cellIndex].value === 0 ? ActionMode.Draw : ActionMode.Erase);
 
-    setDragging(true);
+    updateCursorMode(CursorMode.Active);
+    triggerCell(cell.row, cell.col);
   }
 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -158,13 +172,13 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
 
     const isPressing = (e.buttons & 1) === 1;
 
-    if (!isPressing)
-      setDragging(false);
+    if (!isPressing || cursorModeRef.current !== CursorMode.Active) {
+      updateCursorMode(CursorMode.Inactive);
+      return;
+    }
 
-    if (!dragging || !isPressing)
-        return;
-
-    const cell = getCellIndex(e.clientX, e.clientY);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cell = getCell(e.clientX, e.clientY, rect);
 
     // Also interpolate between the last position and the current position to trigger all cells in between.
     if (previousPosition) {
@@ -177,31 +191,26 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
       for (let i = 0; i < distance; i += 1) {
         const intermediateX = previousPosition.x + stepX * i;
         const intermediateY = previousPosition.y + stepY * i;
-        const intermediateCell = getCellIndex(intermediateX, intermediateY);
-        triggerCell(intermediateCell);
+        const intermediateCell = getCell(intermediateX, intermediateY, rect);
+        triggerCell(intermediateCell.row, intermediateCell.col);
       }
     }
 
-    triggerCell(cell);
+    triggerCell(cell.row, cell.col);
   }
 
   function pointerUp(e: React.PointerEvent<HTMLDivElement>) {
     lastPosition.current = null;
     updateCursorMode(CursorMode.Inactive);
-
-    if (!dragging)
-        return;
-
-    setDragging(false);
   }
   
   function resize(){
     // We have to calculate the image's size to best fit the container ourselves.
     // object-contain does not tell us the rendered image dimensions.
-    if (!outerContainerRef.current || !imgRef.current)
+    if (!outerImageContainerRef.current || !imgRef.current)
       return;
 
-    const {width, height} = { width: outerContainerRef.current.clientWidth, height: outerContainerRef.current.clientHeight };
+    const {width, height} = { width: outerImageContainerRef.current.clientWidth, height: outerImageContainerRef.current.clientHeight };
     const {imgWidth, imgHeight} = { imgWidth: imgRef.current.naturalWidth, imgHeight: imgRef.current.naturalHeight };
 
     const widthOverflow = imgWidth / (width ? width : imgWidth);
@@ -215,10 +224,10 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
   }
 
   useEffect(() => {
-    const el = outerContainerRef.current!;
+    const el = outerImageContainerRef.current!;
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (dragging) {
+      if (cursorModeRef.current === CursorMode.Active) {
         e.preventDefault();
       }
     };
@@ -230,15 +239,15 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
     return () => {
       el.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [dragging]);
+  }, [cursorMode]);
 
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) => {
       resize();
     });
 
-    if (outerContainerRef.current) {
-      observer.observe(outerContainerRef.current);
+    if (cardContainerRef.current) {
+      observer.observe(cardContainerRef.current);
     }
 
     resize();
@@ -246,29 +255,48 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
   }, [imageSize]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
-      <div className="w-full h-6 flex flex-row items-center justify-end gap-2">
+    <div ref={cardContainerRef} className="w-full h-full flex flex-col gap-2">
+      <div className="w-full flex flex-row flex-wrap items-center justify-end gap-2 border border-border rounded-md p-2 bg-card">
+        {/** ActionMode */}
+        <Button variant={actionMode === ActionMode.Draw ? "default" : "outline"} onClick={() => setActionMode(ActionMode.Draw)}>
+          <PencilLine className="w-4 h-4" />
+        </Button>
+        <Button variant={actionMode === ActionMode.Erase ? "default" : "outline"} onClick={() => setActionMode(ActionMode.Erase)}>
+          <Eraser className="w-4 h-4" />
+        </Button>
+
+        {/** CursorSize */}
+        <Select onValueChange={(v) => setCursorSize(Number(v))} defaultValue={cursorSize.toString()}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1"><div className="w-1 h-1 rounded-full bg-foreground" /> 1x1</SelectItem>
+            <SelectItem value="3"><div className="w-2 h-2 rounded-full bg-foreground" /> 3x3</SelectItem>
+            <SelectItem value="5"><div className="w-3 h-3 rounded-full bg-foreground" /> 5x5</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/** Undo */}
         <Button variant="outline" onClick={undo} disabled={undoStack.current.length === 0}>
-          <Undo2 className="w-4 h-4" /> {t("a11y:undo")}
+          <Undo2 className="w-4 h-4" />
         </Button>
       </div>
       <div
-        className="w-full h-full select-none"
-        ref={outerContainerRef}
+        className="relative w-full h-full overflow-hidden select-none"
+        ref={outerImageContainerRef}
         {...props}
       >
-        <div style={{ width: renderedSize.width, height: renderedSize.height }}
-          ref={innerContainerRef}
-          onPointerDown={pointerDown}
-          onPointerMove={pointerMove}
-          onPointerUp={pointerUp}
-          onPointerCancel={pointerUp}
-          className={cn(`relative ${canTurnOnCells ? "cursor-crosshair" : "cursor-not-allowed"}`, className)}>
-          <img ref={imgRef} src={src} alt="Draw Picker"
-            className="block w-full h-full object-contain"
-            onLoad={() => setImageSize({ width: imgRef.current!.naturalWidth, height: imgRef.current!.naturalHeight })}
-          />
-          <CellCanvas cellSelection={cellSelection} />
+        <img ref={imgRef} src={src} alt="Draw Picker"
+          className="h-full w-full object-contain"
+          onLoad={() => setImageSize({ width: imgRef.current!.naturalWidth, height: imgRef.current!.naturalHeight })}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <CellCanvas cellSelection={cellSelection} style={{ height: renderedSize.height, width: renderedSize.width }}
+            onPointerDown={pointerDown}
+            onPointerMove={pointerMove}
+            onPointerUp={pointerUp}
+            onPointerCancel={pointerUp}/>
         </div>
       </div>
     </div>
@@ -281,9 +309,9 @@ export type CellCanvasProps = {
   cellColor?: string;
   gridWidth?: number;
   showTooltip?: boolean;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
-export const CellCanvas = observer(({ cellSelection, cellColor = mutedColors.honeyBrown + "AA", gridWidth = 1, showTooltip }: CellCanvasProps) => {
+export const CellCanvas = observer(({ cellSelection, cellColor = mutedColors.honeyBrown + "AA", gridWidth = 1, showTooltip, className, ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [showGrid, setShowGrid] = useState(true);
@@ -405,7 +433,7 @@ export const CellCanvas = observer(({ cellSelection, cellColor = mutedColors.hon
   }, [cellSelection, cellColor, gridWidth]);
 
   return (
-    <>
+    <div className={cn("relative", className)} {...props}>
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
@@ -416,6 +444,6 @@ export const CellCanvas = observer(({ cellSelection, cellColor = mutedColors.hon
         onPointerLeave={e => setShowGrid(false)}
         className={`absolute inset-0 w-full h-full ${showGrid ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
       />
-    </>
+    </div>
   );
 });
