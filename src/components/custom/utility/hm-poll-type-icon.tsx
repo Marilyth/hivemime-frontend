@@ -1,7 +1,7 @@
 "use client";
 
 import { PollType } from "@/lib/Api";
-import { ArrowDownWideNarrow, BadgeQuestionMark, CopyCheck, Tag, SlidersHorizontal, MapPinned, Gauge, SquareDashedMousePointer } from "lucide-react";
+import { ArrowDownWideNarrow, BadgeQuestionMark, CopyCheck, Tag, SlidersHorizontal, MapPinned, Gauge, SquareDashedMousePointer, Brush } from "lucide-react";
 import { FaRankingStar } from "react-icons/fa6";
 import { observer } from "mobx-react-lite";
 
@@ -19,8 +19,8 @@ export const HiveMimePollTypeIcon = observer(({ answerType, ...props }: HiveMime
         return <FaRankingStar {...props} className={props.className} />;
       case PollType.Category:
         return <Tag {...props} className={props.className} />;
-      case PollType.Locate:
-        return <SquareDashedMousePointer {...props} className={props.className} />;
+      case PollType.Draw:
+        return <Brush {...props} className={props.className} />;
       default:
         return <BadgeQuestionMark {...props} className={props.className} />;
     }

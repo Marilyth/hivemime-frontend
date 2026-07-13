@@ -31,7 +31,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
       candidates: (poll.candidates || []).map(candidate => ({
         id: candidate.id!,
         name: candidate.name,
-        rectangles: new CellSelection(poll.maxVotesPerCandidate)
+        cellSelection: new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!)
       })),
     })),
   })));

@@ -19,7 +19,7 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
-    "locateInstruction": "Please select a candidate to pick between {{minLocations}} and {{maxLocations}} locations for.",
+    "drawInstruction": "Please draw between {{minCells}} and {{maxCells}} cells on the image.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
@@ -54,7 +54,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the user to assign the candidates to.",
-    "createLocateCandidates": "Select the image for the user to pick locations in.",
+    "createDrawCandidates": "Select the image for the user to draw on.",
     "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
@@ -81,8 +81,10 @@
       "shuffle": "The candidates <select/> shuffled for the user.",
       "minScore": "The minimum score is <select/>.",
       "maxScore": "The maximum score is <select/>.",
-      "minLocations": "The user has to pick at least <select/> locations.",
-      "maxLocations": "The user can pick up to <select/> locations."
+      "rowCount": "The image has <select/> rows.",
+      "columnCount": "The image has <select/> columns.",
+      "minCells": "The user has to draw at least <select/> cells.",
+      "maxCells": "The user can draw up to <select/> cells."
     },
     "scoring": {
       "minScore": "The minimum score is",

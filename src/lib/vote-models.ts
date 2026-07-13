@@ -6,7 +6,7 @@ export type UiCandidateVote = CandidateVoteDto & {
   score?: number;
   rank?: number;
   categoryId?: string;
-  rectangles?: CellSelection;
+  cellSelection?: CellSelection;
 };
 
 export interface UiPollVoteDto {

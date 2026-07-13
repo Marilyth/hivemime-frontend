@@ -16,8 +16,8 @@ import { Label } from "@radix-ui/react-label";
 import { HiveMimeCreateCategories } from "./hm-create-category";
 import { useTranslation } from "react-i18next";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
-import { HiveMimeCreateLocateRules } from "./hm-create-locate-poll";
-import { HiveMimeCreateLocateCandidates } from "./hm-create-locate-candidate";
+import { HiveMimeCreateDrawRules } from "./hm-create-draw-poll";
+import { HiveMimeCreateDrawCandidates } from "./hm-create-draw-candidate";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -33,7 +33,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
     [PollType.Score]: <HiveMimeCreateScoringRules poll={props.poll} />,
     [PollType.Rank]: <HiveMimeCreateRankingRules poll={props.poll} />,
     [PollType.Category]: <HiveMimeCreateCategorizationRules poll={props.poll} />,
-    [PollType.Locate]: <HiveMimeCreateLocateRules poll={props.poll} />,
+    [PollType.Draw]: <HiveMimeCreateDrawRules poll={props.poll} />,
   };
 
   const errors = validateCreatePoll(props.poll);
@@ -69,19 +69,19 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
-        {props.poll.pollType === PollType.Locate &&
+        {props.poll.pollType === PollType.Draw &&
           <HiveMimeStep canContinue={props.poll.candidates!.length > 0 && props.poll.candidates![0].media?.contentLength !== undefined}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">
-                <Label className="text-sm text-muted-foreground">{t("posts:create.createLocateCandidates")}</Label>
+                <Label className="text-sm text-muted-foreground">{t("posts:create.createDrawCandidates")}</Label>
               </div>
-              <HiveMimeCreateLocateCandidates poll={props.poll} />
+              <HiveMimeCreateDrawCandidates poll={props.poll} />
             </div>
           </HiveMimeStep>
         }
 
         
-        {props.poll.pollType !== PollType.Locate &&
+        {props.poll.pollType !== PollType.Draw &&
           <HiveMimeStep canContinue={props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">

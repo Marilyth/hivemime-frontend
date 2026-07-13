@@ -32,8 +32,8 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
         case PollType.Category:
             errors.push(...validateCategorizationPoll(poll));
             break;
-        case PollType.Locate:
-            errors.push(...validateLocatePoll(poll));
+        case PollType.Draw:
+            errors.push(...validateDrawPoll(poll));
             break;
         default:
             errors.push(i18n.t("validation:poll.noType"));
@@ -83,11 +83,11 @@ function validateCategorizationPoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-function validateLocatePoll(poll: CreatePollDto): string[] {
+function validateDrawPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (poll.candidates?.find(c => (c.media?.contentLength ?? 0) <= 0)) {
-       errors.push(i18n.t("validation:poll.locateMedia"));
+       errors.push(i18n.t("validation:poll.drawMedia"));
     }
 
     return errors;

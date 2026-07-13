@@ -62,14 +62,14 @@
     "score": "Score",
     "rank": "Rank",
     "category": "Category",
-    "locate": "Locate"
+    "draw": "Draw"
   },
   "pollTypeDescription": {
     "choice": "The user has to pick candidates.",
     "score": "The user has to assign numerical values to candidates.",
     "rank": "The user has to rank the candidates in order of preference. (E.g. top 10 lists)",
     "category": "The user has to assign categories to candidates. (E.g. tier lists)",
-    "locate": "The user has to select points or areas in an image."
+    "draw": "The user has to draw on an image."
   },
   "rankFilter": {
     "nothing": "Nothing"

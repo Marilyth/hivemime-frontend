@@ -55,13 +55,17 @@ enum ActionMode {
 export type DrawPickerProps = {
   cellSelection: CellSelection;
   src: string;
-} & React.HTMLAttributes<HTMLDivElement>;
+  showActionBar?: boolean;
+  imageClassName?: string;
+  canvasProps?: CellCanvasStyleProps;
+} & React.HTMLAttributes<HTMLDivElement> & CellCanvasStyleProps;
 
 export const DrawPicker = observer(({ cellSelection, src, className, ...props }: DrawPickerProps) => {
+  props.showActionBar = props.showActionBar ?? true;
+
   const { t } = useTranslation();
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const outerImageContainerRef = useRef<HTMLDivElement>(null);
-  const innerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
@@ -74,7 +78,6 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
   const wheelStep = 0.5;
   const isEditingRef = useRef(false);
   const undoStack = useRef<{ value: number }[][]>([]);
-
   const canTurnOnCells = cellSelection.onCellsCount < cellSelection.maxOnCells;
 
   function undo() {
@@ -247,118 +250,155 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
 
   return (
     <TransformWrapper
-      smooth={false}
-      panning={{ disabled: isEditing }}
-      wheel={{ step: wheelStep }}
-      onPinchStop={z => setZoomScale(z.state.scale)}
-      onZoomStop={z => setZoomScale(z.state.scale)}>
-      {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-        <div ref={cardContainerRef} className="w-full h-full flex flex-col gap-2">
-          <div className="flex w-full flex-wrap items-center justify-end gap-2 rounded-md border bg-card p-2">
-            {/* Zoom */}
-            <Button size="icon" variant="outline" onClick={() => zoomIn()}>
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button size="icon" variant="outline" onClick={() => zoomOut()}>
-              <ZoomOut className="h-4 w-4" />
-            </Button>
+  smooth={false}
+  panning={{ disabled: isEditing }}
+  wheel={{ step: wheelStep }}
+  onPinchStop={z => setZoomScale(z.state.scale)}
+  onZoomStop={z => setZoomScale(z.state.scale)}
+>
+  {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+    <div
+      ref={cardContainerRef}
+      className="w-full min-h-0 flex flex-col gap-2 border bg-muted p-1 rounded-md"
+    >
+      {props.showActionBar && (
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 p-2 border-b">
+          {/* Zoom */}
+          <Button size="icon" variant="outline" onClick={() => zoomIn()}>
+            <ZoomIn className="h-4 w-4" />
+          </Button>
 
-            <Separator orientation="vertical" className="h-4!" />
+          <Button size="icon" variant="outline" onClick={() => zoomOut()}>
+            <ZoomOut className="h-4 w-4" />
+          </Button>
 
-            {/* Mode */}
-            <ToggleGroup
-              type="single"
-              value={actionMode}
-              className="border"
-              onValueChange={(value) => {
-                if (value) updateActionMode(value as ActionMode);
-              }}
-            >
-              <ToggleGroupItem value={ActionMode.View}>
-                <Move className="h-4 w-4" />
-              </ToggleGroupItem>
+          <Separator orientation="vertical" className="h-4!" />
 
-              <ToggleGroupItem value={ActionMode.Draw}>
-                <PencilLine className="h-4 w-4" />
-              </ToggleGroupItem>
+          {/* Mode */}
+          <ToggleGroup
+            type="single"
+            value={actionMode}
+            className="border"
+            onValueChange={(value) => {
+              if (value) updateActionMode(value as ActionMode);
+            }}
+          >
+            <ToggleGroupItem value={ActionMode.View}>
+              <Move className="h-4 w-4" />
+            </ToggleGroupItem>
 
-              <ToggleGroupItem value={ActionMode.Erase}>
-                <Eraser className="h-4 w-4" />
-              </ToggleGroupItem>
-            </ToggleGroup>
+            <ToggleGroupItem value={ActionMode.Draw}>
+              <PencilLine className="h-4 w-4" />
+            </ToggleGroupItem>
 
-            {/** CursorSize */}
-            <Select onValueChange={(v) => setCursorSize(Number(v))} defaultValue={cursorSize.toString()}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">
-                  <div className="w-1 h-1 rounded-full bg-foreground" />1x1
-                </SelectItem>
-                <SelectItem value="3">
-                  <div className="w-2 h-2 rounded-full bg-foreground" />3x3
-                </SelectItem>
-                <SelectItem value="5">
-                  <div className="w-3 h-3 rounded-full bg-foreground" />5x5
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <ToggleGroupItem value={ActionMode.Erase}>
+              <Eraser className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
 
-            <Separator orientation="vertical" className="h-4!" />
+          <Select
+            onValueChange={(v) => setCursorSize(Number(v))}
+            defaultValue={cursorSize.toString()}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">
+                <div className="w-1 h-1 rounded-full bg-foreground" />1x1
+              </SelectItem>
+              <SelectItem value="3">
+                <div className="w-2 h-2 rounded-full bg-foreground" />3x3
+              </SelectItem>
+              <SelectItem value="5">
+                <div className="w-3 h-3 rounded-full bg-foreground" />5x5
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
-            {/* History */}
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={undo}
-              disabled={undoStack.current.length === 0}
-            >
-              <Undo2 className="h-4 w-4" />
-            </Button>
+          <Separator orientation="vertical" className="h-4!" />
 
-          </div>
-          <TransformComponent wrapperClass="w-full! h-full! rounded-md" contentClass="relative w-full! h-full! select-none">
-            <div
-              className="relative w-full h-full overflow-hidden select-none"
-              ref={outerImageContainerRef}
-              {...props}
-            >
-              <img ref={imgRef} src={src} alt="Draw Picker"
-                className="h-full w-full object-contain object-top"
-                onLoad={() => setImageSize({ width: imgRef.current!.naturalWidth, height: imgRef.current!.naturalHeight })}
-              />
-              <div className="absolute inset-0 flex justify-center">
-                <CellCanvas cellSelection={cellSelection} style={{ height: renderedSize.height, width: renderedSize.width }}
-                  scale={zoomScale}
-                  onPointerDown={pointerDown}
-                  onPointerMove={pointerMove}
-                  onPointerUp={pointerUp}
-                  onPointerCancel={pointerUp} />
-              </div>
-            </div>
-          </TransformComponent>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={undo}
+            disabled={undoStack.current.length === 0}
+          >
+            <Undo2 className="h-4 w-4" />
+          </Button>
         </div>
       )}
-    </TransformWrapper>
+
+      <TransformComponent
+        wrapperClass="w-full! flex-1! min-h-0!"
+        contentClass="relative w-full! h-full!"
+      >
+        <div
+          className="relative w-full h-full overflow-hidden select-none"
+          ref={outerImageContainerRef}
+          {...props}
+        >
+          <img
+            ref={imgRef}
+            src={src}
+            alt="Draw Picker"
+            className={cn("w-full h-full max-h-128 object-contain object-top", props.imageClassName)}
+            onLoad={() =>
+              setImageSize({
+                width: imgRef.current!.naturalWidth,
+                height: imgRef.current!.naturalHeight,
+              })
+            }
+          />
+
+          <div className="absolute inset-0 flex justify-center">
+            <CellCanvas
+              cellSelection={cellSelection}
+              style={{
+                height: renderedSize.height,
+                width: renderedSize.width,
+              }}
+              scale={zoomScale}
+              onPointerDown={pointerDown}
+              onPointerMove={pointerMove}
+              onPointerUp={pointerUp}
+              onPointerCancel={pointerUp}
+              {...props.canvasProps}
+            />
+          </div>
+        </div>
+      </TransformComponent>
+    </div>
+  )}
+</TransformWrapper>
   );
 });
 
+type CellCanvasStyleProps = {
+  gridColor?: string;
+  cellColor?: string;
+  alwaysShowGrid?: boolean;
+}
 
-export type CellCanvasProps = {
+type CellCanvasProps = {
   cellSelection: CellSelection;
   scale: number;
-} & React.HTMLAttributes<HTMLDivElement>;
+} & React.HTMLAttributes<HTMLDivElement> & CellCanvasStyleProps;
 
-export const CellCanvas = observer(({ cellSelection, scale, className, ...props }: CellCanvasProps) => {
+const CellCanvas = observer(({ cellSelection, scale, className,
+  alwaysShowGrid = false,
+  gridColor = mutedColors.gray + "AA",
+  cellColor = mutedColors.honeyBrown + "AA",
+  ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(alwaysShowGrid);
 
   function redrawCanvas() {
     if (!canvasRef.current || !gridCanvasRef.current)
       return;
 
+    console.log("Redrawing canvas");
     canvasRef.current.width = canvasRef.current.clientWidth * scale;
     canvasRef.current.height = canvasRef.current.clientHeight * scale;
 
@@ -381,7 +421,7 @@ export const CellCanvas = observer(({ cellSelection, scale, className, ...props 
     const cellWidth = canvas.width / cellSelection.cols;
     const cellHeight = canvas.height / cellSelection.rows;
 
-    ctx.strokeStyle = mutedColors.gray + "AA";
+    ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
 
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
@@ -439,12 +479,26 @@ export const CellCanvas = observer(({ cellSelection, scale, className, ...props 
 
     // Fill active cells.
     if (cellSelection.cells[cellIndex].value > 0) {
-      ctx.fillStyle = mutedColors.honeyBrown + "AA";
+      ctx.fillStyle = cellColor;
       ctx.fillRect(x, y, Math.ceil(cellWidth), Math.ceil(cellHeight));
     }
   }
 
+  function toggleGrid() {
+    if (alwaysShowGrid)
+      return;
+
+    setShowGrid(!showGrid);
+  }
+
   useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      redrawCanvas();
+    });
+
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current);
+    }
     redrawCanvas();
 
     const dispose = reaction(() => cellSelection.cells.map(cell => cell.value), (current, previous) => {
@@ -457,6 +511,7 @@ export const CellCanvas = observer(({ cellSelection, scale, className, ...props 
 
     return () => {
       dispose();
+      resizeObserver.disconnect();
     };
   }, [cellSelection, scale]);
 
@@ -468,8 +523,8 @@ export const CellCanvas = observer(({ cellSelection, scale, className, ...props 
       />
       <canvas
         ref={gridCanvasRef}
-        onPointerEnter={e => setShowGrid(true)}
-        onPointerLeave={e => setShowGrid(false)}
+        onPointerEnter={e => toggleGrid()}
+        onPointerLeave={e => toggleGrid()}
         className={`absolute inset-0 w-full h-full ${showGrid ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
       />
     </div>

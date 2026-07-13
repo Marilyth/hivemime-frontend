@@ -81,35 +81,7 @@ export type CandidateCategoryResultDto = CandidateResultDto & {
 };
 
 export interface CandidateCategoryResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  /** @format int32 */
-  minVotesPerCandidate?: number;
-  /** @format int32 */
-  maxVotesPerCandidate?: number;
-  /** @format int32 */
-  rows?: number | null;
-  /** @format int32 */
-  columns?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
   candidates?: CandidateCategoryResultDto[] | null;
-  categories?: CategoryDto[] | null;
 }
 
 export type CandidateCategoryVoteDto = CandidateVoteDto & {
@@ -120,35 +92,7 @@ export type CandidateCategoryVoteDto = CandidateVoteDto & {
 export type CandidateChoiceResultDto = CandidateResultDto & object;
 
 export interface CandidateChoiceResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  /** @format int32 */
-  minVotesPerCandidate?: number;
-  /** @format int32 */
-  maxVotesPerCandidate?: number;
-  /** @format int32 */
-  rows?: number | null;
-  /** @format int32 */
-  columns?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
   candidates?: CandidateChoiceResultDto[] | null;
-  categories?: CategoryDto[] | null;
 }
 
 export type CandidateChoiceVoteDto = CandidateVoteDto & object;
@@ -167,35 +111,7 @@ export type CandidateDrawResultDto = CandidateResultDto & {
 };
 
 export interface CandidateDrawResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  /** @format int32 */
-  minVotesPerCandidate?: number;
-  /** @format int32 */
-  maxVotesPerCandidate?: number;
-  /** @format int32 */
-  rows?: number | null;
-  /** @format int32 */
-  columns?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
   candidates?: CandidateDrawResultDto[] | null;
-  categories?: CategoryDto[] | null;
 }
 
 export type CandidateDrawVoteDto = CandidateVoteDto & {
@@ -224,35 +140,7 @@ export type CandidateRankResultDto = CandidateResultDto & {
 };
 
 export interface CandidateRankResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  /** @format int32 */
-  minVotesPerCandidate?: number;
-  /** @format int32 */
-  maxVotesPerCandidate?: number;
-  /** @format int32 */
-  rows?: number | null;
-  /** @format int32 */
-  columns?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
   candidates?: CandidateRankResultDto[] | null;
-  categories?: CategoryDto[] | null;
 }
 
 export type CandidateRankVoteDto = CandidateVoteDto & {
@@ -285,35 +173,7 @@ export type CandidateScoreResultDto = CandidateResultDto & {
 };
 
 export interface CandidateScoreResultDtoPollResultDto {
-  /** @format uuid */
-  id?: string;
-  title?: string | null;
-  mediaKeys?: string[] | null;
-  description?: string | null;
-  /** @format int32 */
-  allowedCustomCandidateCount?: number;
-  isShuffled?: boolean;
-  /** @format int32 */
-  minValue?: number;
-  /** @format int32 */
-  maxValue?: number;
-  /** @format int32 */
-  minVotes?: number;
-  /** @format int32 */
-  maxVotes?: number;
-  /** @format int32 */
-  minVotesPerCandidate?: number;
-  /** @format int32 */
-  maxVotesPerCandidate?: number;
-  /** @format int32 */
-  rows?: number | null;
-  /** @format int32 */
-  columns?: number | null;
-  /** @format double */
-  stepValue?: number | null;
-  pollType?: PollType;
   candidates?: CandidateScoreResultDto[] | null;
-  categories?: CategoryDto[] | null;
 }
 
 export type CandidateScoreVoteDto = CandidateVoteDto & {
@@ -546,10 +406,6 @@ export interface PollDto {
   categories?: CategoryDto[] | null;
 }
 
-export type PollResultDto1 = PollDto & {
-  candidates?: T[] | null;
-};
-
 export interface PollVoteDto {
   /** @format uuid */
   id?: string;
@@ -570,7 +426,7 @@ export interface PostDto {
   role?: MemberRole;
   /** @format uuid */
   id?: string;
-  polls?: (PollDto | PollResultDto1)[] | null;
+  polls?: PollDto[] | null;
   /** @format int32 */
   commentCount?: number;
   /** @format int32 */
@@ -603,15 +459,6 @@ export interface PostVoteDto {
   /** @format uuid */
   id?: string;
   polls?: PollVoteDto[] | null;
-}
-
-export interface T {
-  /** @format uuid */
-  id?: string;
-  name?: string | null;
-  isCustom?: boolean;
-  /** @format int32 */
-  voteCount?: number;
 }
 
 export interface UploadCandidateDto {

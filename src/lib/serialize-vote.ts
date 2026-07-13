@@ -1,7 +1,7 @@
 import {
   CandidateCategoryVoteDto,
   CandidateChoiceVoteDto,
-  CandidateLocateVoteDto,
+  CandidateDrawVoteDto,
   CandidateRankVoteDto,
   CandidateScoreVoteDto,
   PollDto,
@@ -15,7 +15,7 @@ import { UiCandidateVote, UiPostVoteDto } from "./vote-models";
 function serializeCandidateVote(
   poll: PollDto,
   candidate: UiCandidateVote,
-): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateLocateVoteDto[] | null {
+): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateDrawVoteDto[] | null {
   const base = { id: candidate.id, name: candidate.name };
 
   switch (poll.pollType) {
@@ -35,15 +35,12 @@ function serializeCandidateVote(
       if (!candidate.categoryId) return null;
       return { ...base, categoryId: candidate.categoryId };
 
-    case PollType.Locate:
-      if (!candidate.rectangles || candidate.rectangles.rectangles.length === 0) return null;
-      return candidate.rectangles.rectangles.map((rect) => ({
-        ...base,
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
-      }));
+    case PollType.Draw:
+      if (!candidate.cellSelection || candidate.cellSelection.cells.length === 0) return null;
+      return candidate.cellSelection.cells
+        .map((value, index) => ({ value: value, index }))
+        .filter(c => c.value.value > 0)
+        .map(c => ({ ...base, cellIndex: c.index }));
 
     default:
       return null;

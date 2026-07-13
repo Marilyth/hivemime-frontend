@@ -109,3 +109,21 @@ export function normalize(s: string, allowWhitespace: boolean): string {
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
+export function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = () => {
+      resolve({
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      });
+      URL.revokeObjectURL(url);
+    };
+
+    img.onerror = reject;
+    img.src = url;
+  });
+}

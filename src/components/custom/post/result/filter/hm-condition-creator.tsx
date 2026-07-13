@@ -28,6 +28,7 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
         [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} />,
         [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} />,
+        [PollType.Draw]: <div>ToDo</div>
     };
 
     return (
