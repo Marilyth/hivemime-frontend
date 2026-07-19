@@ -14,6 +14,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export class CellSelection {
   cells: { value: number }[] = [];
+  modifiedCells: Set<number> = new Set();
+  selectedCell: number | null = null;
   rows: number;
   cols: number;
   onCellsCount = 0;
@@ -31,10 +33,15 @@ export class CellSelection {
     makeAutoObservable(this);
   }
 
+  select(cellIndex: number) {
+    this.selectedCell = cellIndex;
+  }
+
   activate(cellIndex: number) {
     if (this.cells[cellIndex].value === 0 && this.onCellsCount < this.maxOnCells) {
       this.cells[cellIndex].value = 1;
       this.onCellsCount++;
+      this.modifiedCells.add(cellIndex);
     }
   }
 
@@ -42,8 +49,15 @@ export class CellSelection {
     if (this.cells[cellIndex].value > 0) {
       this.cells[cellIndex].value = 0;
       this.onCellsCount--;
+      this.modifiedCells.add(cellIndex);
     }
   }
+}
+
+export enum Variant {
+  View = "view",
+  Draw = "draw",
+  Result = "result"
 }
 
 enum ActionMode {
@@ -55,13 +69,13 @@ enum ActionMode {
 export type DrawPickerProps = {
   cellSelection: CellSelection;
   src: string;
-  showActionBar?: boolean;
+  variant?: Variant;
   imageClassName?: string;
   canvasProps?: CellCanvasStyleProps;
 } & React.HTMLAttributes<HTMLDivElement> & CellCanvasStyleProps;
 
-export const DrawPicker = observer(({ cellSelection, src, className, ...props }: DrawPickerProps) => {
-  props.showActionBar = props.showActionBar ?? true;
+export const DrawPicker = observer(({ cellSelection, src, variant, className, ...props }: DrawPickerProps) => {
+  variant = variant ?? Variant.View;
 
   const { t } = useTranslation();
   const cardContainerRef = useRef<HTMLDivElement>(null);
@@ -126,6 +140,8 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
           cellSelection.activate(cellIndex);
         } else if (actionMode === ActionMode.Erase) {
           cellSelection.deactivate(cellIndex);
+        } else if (variant === Variant.Result) {
+          cellSelection.select(cellIndex);
         }
       }
   }
@@ -166,13 +182,18 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
 
     const isPressing = (e.buttons & 1) === 1;
 
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cell = getCell(e.clientX, e.clientY, rect);
+
+    if (variant === Variant.Result) {
+      triggerCell(cell.row, cell.col);
+      return;
+    }
+
     if (!isPressing || !isEditingRef.current) {
       updateIsEditing(false);
       return;
     }
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cell = getCell(e.clientX, e.clientY, rect);
 
     // Also interpolate between the last position and the current position to trigger all cells in between.
     if (previousPosition) {
@@ -261,7 +282,7 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
       ref={cardContainerRef}
       className="w-full min-h-0 flex flex-col gap-2 border bg-muted p-1 rounded-md"
     >
-      {props.showActionBar && (
+      {variant != Variant.View && (
         <div className="flex w-full flex-wrap items-center justify-end gap-2 p-2 border-b">
           {/* Zoom */}
           <Button size="icon" variant="outline" onClick={() => zoomIn()}>
@@ -287,13 +308,17 @@ export const DrawPicker = observer(({ cellSelection, src, className, ...props }:
               <Move className="h-4 w-4" />
             </ToggleGroupItem>
 
-            <ToggleGroupItem value={ActionMode.Draw}>
-              <PencilLine className="h-4 w-4" />
-            </ToggleGroupItem>
+            {variant === Variant.Draw && (
+              <>
+                <ToggleGroupItem value={ActionMode.Draw}>
+                  <PencilLine className="h-4 w-4" />
+                </ToggleGroupItem>
 
-            <ToggleGroupItem value={ActionMode.Erase}>
-              <Eraser className="h-4 w-4" />
-            </ToggleGroupItem>
+                <ToggleGroupItem value={ActionMode.Erase}>
+                  <Eraser className="h-4 w-4" />
+                </ToggleGroupItem>
+              </>
+            )}
           </ToggleGroup>
 
           <Select
@@ -392,13 +417,14 @@ const CellCanvas = observer(({ cellSelection, scale, className,
   ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [tooltipContent, setTooltipContent] = useState({ x: 0, y: 0, totalScore: 0, totalVotes: 0 });
   const [showGrid, setShowGrid] = useState(alwaysShowGrid);
 
   function redrawCanvas() {
     if (!canvasRef.current || !gridCanvasRef.current)
       return;
 
-    console.log("Redrawing canvas");
     canvasRef.current.width = canvasRef.current.clientWidth * scale;
     canvasRef.current.height = canvasRef.current.clientHeight * scale;
 
@@ -482,6 +508,15 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       ctx.fillStyle = cellColor;
       ctx.fillRect(x, y, Math.ceil(cellWidth), Math.ceil(cellHeight));
     }
+
+    if (cellSelection.selectedCell === cellIndex) {
+      const lineWidth = 2;
+      const inset = lineWidth / 2;
+
+      ctx.strokeStyle = mutedColors.gold;
+      ctx.lineWidth = lineWidth;
+      ctx.strokeRect(x + inset, y + inset, Math.ceil(cellWidth) - lineWidth, Math.ceil(cellHeight) - lineWidth);
+    }
   }
 
   function toggleGrid() {
@@ -489,6 +524,37 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       return;
 
     setShowGrid(!showGrid);
+  }
+
+  function updateTooltip() {
+    if (!canvasRef.current || !tooltipRef.current)
+      return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d")!;
+
+    const cellWidth = canvas.width / scale / cellSelection.cols;
+    const cellHeight = canvas.height / scale / cellSelection.rows;
+
+    let totalScore = 0;
+    let totalVotes = 0;
+    let x = 0;
+    let y = 0;
+
+    if (cellSelection.selectedCell === null) {
+      setTooltipContent({ x, y, totalScore, totalVotes });
+      return;
+    }
+
+    totalScore += cellSelection.cells[cellSelection.selectedCell!].value;
+
+    const row = Math.floor(cellSelection.selectedCell! / cellSelection.cols) + 1;
+    const col = cellSelection.selectedCell! % cellSelection.cols + 1;
+
+    x = Math.floor(col * cellWidth);
+    y = Math.floor(row * cellHeight);
+
+    setTooltipContent({ x, y, totalScore, totalVotes });
   }
 
   useEffect(() => {
@@ -501,16 +567,28 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     }
     redrawCanvas();
 
-    const dispose = reaction(() => cellSelection.cells.map(cell => cell.value), (current, previous) => {
-      for (let i = 0; i < current.length; i++) {
-        if (current[i] !== previous[i]) {
-          drawCell(i);
-        }
+    const dispose = reaction(() => [...cellSelection.modifiedCells], (current, previous) => {
+      for (const i of current) {
+        drawCell(i);
       }
+
+      cellSelection.modifiedCells.clear();
+    });
+
+    const disposeSelection = reaction(() => cellSelection.selectedCell, (current, previous) => {
+      updateTooltip();
+
+      if (current)
+        drawCell(current);
+      if (previous)
+        drawCell(previous);
+
+      cellSelection.modifiedCells.clear();
     });
 
     return () => {
       dispose();
+      disposeSelection();
       resizeObserver.disconnect();
     };
   }, [cellSelection, scale]);
@@ -527,6 +605,12 @@ const CellCanvas = observer(({ cellSelection, scale, className,
         onPointerLeave={e => toggleGrid()}
         className={`absolute inset-0 w-full h-full ${showGrid ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
       />
+
+      {cellSelection.selectedCell && <div className="absolute bg-card p-2 rounded-md border" ref={tooltipRef} style={{ left: tooltipContent.x, top: tooltipContent.y, transform: `scale(${1/scale})`, transformOrigin: "top left" }}>
+        Score: {tooltipContent.totalScore.toFixed(4)}
+        <br />
+        Votes: {tooltipContent.totalVotes}
+      </div>}
     </div>
   );
 });

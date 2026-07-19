@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { mediaFiles } from "./hm-create-post";
 import { getImageDimensions, getReferenceId } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { CellSelection, DrawPicker } from "../../utility/draw-picker";
+import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
 import { mutedColors } from "@/lib/colors";
 
 
@@ -117,7 +117,7 @@ export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps)
         <DrawPicker
           src={candidateObjectUrl}
           cellSelection={new CellSelection(props.poll.rows!, props.poll.columns!, 1)}
-          showActionBar={false}
+          variant={Variant.View} 
           className="mt-2"
           canvasProps={{
             alwaysShowGrid: true,

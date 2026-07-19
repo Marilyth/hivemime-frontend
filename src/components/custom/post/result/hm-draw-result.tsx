@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { HiveMimePollResultProps as HiveMimePollCandidateResultProps } from "./hm-poll-result";
 import { api } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
-import { CellSelection, DrawPicker } from "../../utility/draw-picker";
+import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
 
 
 export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
@@ -39,6 +39,7 @@ export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
           <DrawPicker
             key={i}
             cellSelection={cellSelection}
+            variant={Variant.Result} 
             src={candidate.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"))!}
           />
         );
