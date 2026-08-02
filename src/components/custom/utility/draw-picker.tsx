@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mutedColors } from "@/lib/colors";
+import { mixColors, mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 import { Eraser, Move, PencilLine, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import { makeAutoObservable, reaction } from "mobx";
@@ -8,9 +8,12 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+
+const DEFAULT_START_COLOR = mutedColors.gray + "BB";
+const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
 
 export class CellSelection {
@@ -53,6 +56,20 @@ export class CellSelection {
       this.modifiedCells.add(cellIndex);
     }
   }
+
+  public get bounds() {
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (const cell of this.cells) {
+      if (cell.value < min && cell.value > 0)
+        min = cell.value;
+      if (cell.value > max)
+        max = cell.value;
+    }
+
+    return { min, max };
+  }
 }
 
 export enum Variant {
@@ -83,6 +100,16 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   const outerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [tooltip, setTooltip] = useState<{ cellIndex: number, x: number, y: number, value: number } | null>(null);
+
+  const canvasStyle = props.canvasProps ?? {};
+  const startColor = canvasStyle.startColor ?? DEFAULT_START_COLOR;
+  const endColor = canvasStyle.endColor ?? DEFAULT_END_COLOR;
+
+  const { min, max } = cellSelection.bounds;
+  const gradientSpan = max - min;
+  const tooltipRatio = tooltip && gradientSpan > 0
+    ? Math.max(0, Math.min(1, (tooltip.value - min) / gradientSpan))
+    : null;
 
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -222,7 +249,11 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   }
 
   function showTooltip(cellIndex: number | null, clientX?: number, clientY?: number) {
-    if (cellIndex == null || clientX == undefined || clientY == undefined || variant !== Variant.Result) {
+    if (cellIndex == null
+      || clientX == undefined
+      || clientY == undefined
+      || variant !== Variant.Result
+      || cellSelection.cells[cellIndex].value <= 0) {
       setTooltip(null);
       return;
     }
@@ -404,11 +435,25 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
               onPointerMove={pointerMove}
               onPointerUp={pointerUp}
               onPointerCancel={pointerUp}
+              startColor={startColor}
+              endColor={endColor}
               {...props.canvasProps}
             />
           </div>
         </div>
       </TransformComponent>
+
+      {variant === Variant.Result && <div
+        className="relative h-3 w-full shrink-0 rounded-sm"
+        style={{ background: `linear-gradient(to right, ${startColor}, ${endColor})` }}
+      >
+        {tooltipRatio != null && (
+          <div
+            className="absolute top-0 h-full w-0.5 -translate-x-1/2 bg-foreground"
+            style={{ left: `${tooltipRatio * 100}%` }}
+          />
+        )}
+      </div>}
 
       {tooltip && createPortal(
         <div
@@ -427,8 +472,9 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
 
 type CellCanvasStyleProps = {
   gridColor?: string;
-  cellColor?: string;
   alwaysShowGrid?: boolean;
+  startColor?: string;
+  endColor?: string;
 }
 
 type CellCanvasProps = {
@@ -441,7 +487,8 @@ type CellCanvasProps = {
 const CellCanvas = observer(({ cellSelection, scale, className,
   alwaysShowGrid = false,
   gridColor = mutedColors.gray + "AA",
-  cellColor = mutedColors.honeyBrown + "AA",
+  startColor = DEFAULT_START_COLOR,
+  endColor = DEFAULT_END_COLOR,
   onHover,
   ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -532,7 +579,11 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     // Fill active cells.
     if (cellSelection.cells[cellIndex].value > 0) {
-      ctx.fillStyle = cellColor;
+      const { min, max } = cellSelection.bounds;
+      const ratio = min == max ? 1 : (cellSelection.cells[cellIndex].value - min) / (max - min);
+      const mixedColor = mixColors(startColor, endColor, ratio);
+
+      ctx.fillStyle = mixedColor;
       ctx.fillRect(x, y, Math.ceil(cellWidth), Math.ceil(cellHeight));
     }
 

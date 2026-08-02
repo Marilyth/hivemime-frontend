@@ -48,3 +48,37 @@ export function numberToColorHex(num: number) {
 export function colorHexToNumber(hex: string) {
   return parseInt(hex.replace("#", ""), 16);
 }
+
+// Parses a hex color into its 0-255 channels. Handles both 6-digit (#RRGGBB)
+// and 8-digit (#RRGGBBAA) colors, returning alpha = 255 when not provided.
+function parseHexColor(hex: string) {
+  const num = colorHexToNumber(hex);
+  const hasAlpha = (hex.replace("#", "").length >= 8);
+
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+    a: hasAlpha ? (num >> 24) & 255 : 255,
+  };
+}
+
+export function mixColors(a: string, b: string, t: number): string {
+  const ac = parseHexColor(a);
+  const bc = parseHexColor(b);
+
+  const r = Math.round(ac.r + (bc.r - ac.r) * t);
+  const g = Math.round(ac.g + (bc.g - ac.g) * t);
+  const blu = Math.round(ac.b + (bc.b - ac.b) * t);
+  const alpha = Math.round(ac.a + (bc.a - ac.a) * t);
+
+  const rgb = (r << 16) | (g << 8) | blu;
+
+  // Include the alpha channel only when either input carries transparency.
+  if (ac.a < 255 || bc.a < 255) {
+    const toHexByte = (n: number) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0');
+    return `#${toHexByte(alpha)}${toHexByte(r)}${toHexByte(g)}${toHexByte(blu)}`;
+  }
+
+  return numberToColorHex(rgb);
+}
