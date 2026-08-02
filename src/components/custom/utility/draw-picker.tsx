@@ -6,6 +6,7 @@ import { Eraser, Move, PencilLine, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import { makeAutoObservable, reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { TransformComponent, TransformWrapper, useControls } from "react-zoom-pan-pinch";
 import { Separator } from "@/components/ui/separator";
@@ -81,6 +82,7 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const outerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const [tooltip, setTooltip] = useState<{ cellIndex: number, x: number, y: number, value: number } | null>(null);
 
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -219,6 +221,20 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
     updateIsEditing(false);
   }
 
+  function showTooltip(cellIndex: number | null, clientX?: number, clientY?: number) {
+    if (cellIndex == null || clientX == undefined || clientY == undefined || variant !== Variant.Result) {
+      setTooltip(null);
+      return;
+    }
+
+    setTooltip({
+      cellIndex,
+      x: clientX,
+      y: clientY,
+      value: cellSelection.cells[cellIndex].value
+    });
+  }
+
   function resize() {
     // We have to calculate the image's size to best fit the container ourselves.
     // object-contain does not tell us the rendered image dimensions.
@@ -241,8 +257,7 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   useEffect(() => {
     const el = cardContainerRef.current!;
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isEditingRef.current) {
+    const handleTouchMove = (e: TouchEvent) => {      if (isEditingRef.current) {
         e.preventDefault();
       }
     };
@@ -280,7 +295,7 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
     <div
       ref={cardContainerRef}
-      className="w-full min-h-0 flex flex-col gap-2 border bg-muted p-1 rounded-md"
+      className="relative w-full min-h-0 flex flex-col gap-2 border bg-muted p-1 rounded-md"
     >
       {variant != Variant.View && (
         <div className="flex w-full flex-wrap items-center justify-end gap-2 p-2 border-b">
@@ -384,6 +399,7 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
                 width: renderedSize.width,
               }}
               scale={zoomScale}
+              onHover={showTooltip}
               onPointerDown={pointerDown}
               onPointerMove={pointerMove}
               onPointerUp={pointerUp}
@@ -393,6 +409,16 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
           </div>
         </div>
       </TransformComponent>
+
+      {tooltip && createPortal(
+        <div
+          className="fixed bg-card p-2 rounded-md border z-50 pointer-events-none whitespace-nowrap"
+          style={{ left: tooltip.x, top: tooltip.y, transform: "translate(0.5rem, 0.5rem)" }}
+        >
+          Score: {tooltip.value.toFixed(4)}
+        </div>,
+        document.body
+      )}
     </div>
   )}
 </TransformWrapper>
@@ -408,17 +434,18 @@ type CellCanvasStyleProps = {
 type CellCanvasProps = {
   cellSelection: CellSelection;
   scale: number;
+  onHover?: (cellIndex: number | null, clientX?: number, clientY?: number) => void;
+  onHoverEnd?: () => void;
 } & React.HTMLAttributes<HTMLDivElement> & CellCanvasStyleProps;
 
 const CellCanvas = observer(({ cellSelection, scale, className,
   alwaysShowGrid = false,
   gridColor = mutedColors.gray + "AA",
   cellColor = mutedColors.honeyBrown + "AA",
+  onHover,
   ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const gridCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const [tooltipContent, setTooltipContent] = useState({ x: 0, y: 0, totalScore: 0, totalVotes: 0 });
   const [showGrid, setShowGrid] = useState(alwaysShowGrid);
 
   function redrawCanvas() {
@@ -526,35 +553,27 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     setShowGrid(!showGrid);
   }
 
-  function updateTooltip() {
-    if (!canvasRef.current || !tooltipRef.current)
+  function cellFromEvent(e: { clientX: number, clientY: number }) {
+    if (!canvasRef.current)
+      return null;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width;
+    const relY = (e.clientY - rect.top) / rect.height;
+
+    const col = Math.max(0, Math.min(cellSelection.cols - 1, Math.floor(relX * cellSelection.cols)));
+    const row = Math.max(0, Math.min(cellSelection.rows - 1, Math.floor(relY * cellSelection.rows)));
+
+    return { index: row * cellSelection.cols + col, clientX: e.clientX, clientY: e.clientY };
+  }
+
+  function handleHover(e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) {
+    if (!onHover)
       return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d")!;
-
-    const cellWidth = canvas.width / scale / cellSelection.cols;
-    const cellHeight = canvas.height / scale / cellSelection.rows;
-
-    let totalScore = 0;
-    let totalVotes = 0;
-    let x = 0;
-    let y = 0;
-
-    if (cellSelection.selectedCell === null) {
-      setTooltipContent({ x, y, totalScore, totalVotes });
-      return;
-    }
-
-    totalScore += cellSelection.cells[cellSelection.selectedCell!].value;
-
-    const row = Math.floor(cellSelection.selectedCell! / cellSelection.cols) + 1;
-    const col = cellSelection.selectedCell! % cellSelection.cols + 1;
-
-    x = Math.floor(col * cellWidth);
-    y = Math.floor(row * cellHeight);
-
-    setTooltipContent({ x, y, totalScore, totalVotes });
+    const cell = cellFromEvent(e);
+    if (cell)
+      onHover(cell.index, cell.clientX, cell.clientY);
   }
 
   useEffect(() => {
@@ -576,8 +595,6 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     });
 
     const disposeSelection = reaction(() => cellSelection.selectedCell, (current, previous) => {
-      updateTooltip();
-
       if (current)
         drawCell(current);
       if (previous)
@@ -602,15 +619,11 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       <canvas
         ref={gridCanvasRef}
         onPointerEnter={e => toggleGrid()}
-        onPointerLeave={e => toggleGrid()}
+        onPointerLeave={e => { toggleGrid(); onHover?.(null); }}
+        onPointerMove={handleHover}
+        onClick={handleHover}
         className={`absolute inset-0 w-full h-full ${showGrid ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
       />
-
-      {cellSelection.selectedCell && <div className="absolute bg-card p-2 rounded-md border" ref={tooltipRef} style={{ left: tooltipContent.x, top: tooltipContent.y, transform: `scale(${1/scale})`, transformOrigin: "top left" }}>
-        Score: {tooltipContent.totalScore.toFixed(4)}
-        <br />
-        Votes: {tooltipContent.totalVotes}
-      </div>}
     </div>
   );
 });
