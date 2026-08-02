@@ -9,6 +9,7 @@ import { HiveMimeFilterConditionCandidatePicker } from "./hm-candidate-picker";
 import { HiveMimeFilterConditionScoreValuePicker } from "./score/hm-score-value-picker";
 import { HiveMimeFilterConditionRankValuePicker } from "./rank/hm-rank-value-picker";
 import { HiveMimeFilterConditionCategoryValuePicker } from "./category/hm-category-value-picker";
+import { HiveMimeFilterConditionDrawValuePicker } from "./draw/hm-draw-value-picker";
 
 
 interface HiveMimeVoteQueryDialogProps {
@@ -28,7 +29,7 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
         [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} />,
         [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} />,
-        [PollType.Draw]: <div>ToDo</div>
+        [PollType.Draw]: <HiveMimeFilterConditionDrawValuePicker currentItem={item} />
     };
 
     return (

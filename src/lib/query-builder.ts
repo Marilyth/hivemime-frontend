@@ -9,6 +9,13 @@ export enum ValueOperator {
   LessEquals = "<=",
 }
 
+export enum DrawValueOperator {
+  Inside = "in",
+  Outside = "out",
+  ExclusiveInside = "xin",
+  ExclusiveOutside = "xout",
+}
+
 export enum BooleanOperator {
   And = "AND",
   Or = "OR",
@@ -61,7 +68,7 @@ export class VoteQueryGroup extends VoteQueryBase {
 export class VoteQuery extends VoteQueryBase {
   poll: PollDto | null = null;
   candidate: CandidateDto | null = null;
-  valueOperator: ValueOperator | null = null;
+  valueOperator: ValueOperator | DrawValueOperator | null = null;
   value: string | null = null;
 
   constructor() {

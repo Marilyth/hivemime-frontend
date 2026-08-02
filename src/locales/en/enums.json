@@ -74,6 +74,12 @@
   "rankFilter": {
     "nothing": "Nothing"
   },
+  "drawValueOperator": {
+    "inside": "inside the marked area",
+    "outside": "outside the marked area",
+    "exclusiveInside": "exclusively inside the marked area",
+    "exclusiveOutside": "exclusively outside the marked area"
+  },
   "chartType": {
     "bar": "Bar",
     "column": "Column",

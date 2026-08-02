@@ -113,6 +113,8 @@
     "uncategorized": "uncategorized",
     "categorizedAsViewer": "{{name}} is",
     "scoreViewer": "{{name}} score{{negation}} {{operator}} {{value}}",
-    "rankViewer": "{{name}} rank{{negation}} {{operator}}"
+    "rankViewer": "{{name}} rank{{negation}} {{operator}}",
+    "drawCellsWere": "Candidate's drawn cells were <select/>",
+    "drawViewer": "{{name}} drew {{count}} cells {{operator}}"
   }
 }
