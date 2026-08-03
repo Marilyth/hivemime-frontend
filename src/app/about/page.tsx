@@ -8,9 +8,7 @@ export default function Page() {
 
   return (
     <div className="w-128 h-256 overflow-hidden flex">
-      <DrawPicker cellSelection={new CellSelection(4, 4, 1000)}>
-        <img src="http://localhost:3000/HiveMimeIcon.png" className="block max-w-full max-h-full object-contain"></img>
-      </DrawPicker>
+      <DrawPicker cellSelection={new CellSelection(4, 4, 1000)} src="http://localhost:3000/HiveMimeIcon.png" imageClassName="block max-w-full max-h-full object-contain"></DrawPicker>
     </div>
   );
 }

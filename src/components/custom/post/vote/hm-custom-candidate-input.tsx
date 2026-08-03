@@ -42,7 +42,7 @@ export const CustomCandidateInput = ({ poll, pollVote }: CustomCandidateInputPro
       return;
     }
 
-    let voteCandidate: UiCandidateVote = { name: value, id: null };
+    const voteCandidate: UiCandidateVote = { name: value, id: null };
     let insertIndex = poll.candidates!.length;
 
     if (poll.pollType === PollType.Choice)

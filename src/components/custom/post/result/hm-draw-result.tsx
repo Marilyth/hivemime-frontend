@@ -40,7 +40,7 @@ export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
             key={i}
             cellSelection={cellSelection}
             variant={Variant.Result} 
-            src={candidate.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"))!}
+            src={candidate.mediaKeys?.find(key => !key.endsWith("thumbnail.webp")) ?? ""}
           />
         );
       })}
