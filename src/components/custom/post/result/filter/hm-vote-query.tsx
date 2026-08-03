@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { BooleanOperator, VoteQuery, VoteQueryBase, VoteQueryGroup } from "@/lib/query-builder";
-import { PollType } from "@/lib/Api";
+import { BooleanOperator, PollType, PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
+import { createVoteQueryGroup, isVoteQuery, isVoteQueryGroup, resolveCandidate } from "@/lib/vote-query";
 import { HiveMimeFilterConditionChoiceValueViewer } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-picker";
 import { HiveMimeFilterConditionRankValueViewer } from "./rank/hm-rank-value-picker";
@@ -22,22 +22,24 @@ type HiveMimeVoteQueryProps = {
     isFirstItem: boolean;
     onEdit?: () => void;
     onMoved?: () => void;
+    post: PostDto;
 };
 
-export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved }: HiveMimeVoteQueryProps) => {
+export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved, post }: HiveMimeVoteQueryProps) => {
     const { t } = useTranslation();
+    const { poll, candidate } = resolveCandidate(post, currentItem.candidateId);
     const pollMapping: {
         [key in PollType]: React.ReactElement;
     } = {
-        [PollType.Choice]: <HiveMimeFilterConditionChoiceValueViewer currentItem={currentItem} />,
-        [PollType.Score]: <HiveMimeFilterConditionScoreValueViewer currentItem={currentItem} />,
-        [PollType.Rank]: <HiveMimeFilterConditionRankValueViewer currentItem={currentItem} />,
-        [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} />,
-        [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} />
+        [PollType.Choice]: <HiveMimeFilterConditionChoiceValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Score]: <HiveMimeFilterConditionScoreValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Rank]: <HiveMimeFilterConditionRankValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />
     };
 
     function isNotAncestor(draggable: unknown): boolean {
-        return !(draggable instanceof VoteQueryGroup &&
+        return !(isVoteQueryGroup(draggable) &&
                  ancestors.includes(draggable as VoteQueryGroup));
     }
     
@@ -47,7 +49,7 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
 
     function removeItem(item: VoteQuery) {
         const parent = getParent();
-        parent.children = parent.children.filter(i => i !== item);
+        parent.children = parent.children!.filter(i => i !== item);
 
         onMoved?.();
     }
@@ -55,22 +57,22 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
     function onDropped(args: OnDroppedArgs) {
         const { draggableData, dropAreaData, zone } = args;
 
-        if (zone === "center" && draggableData instanceof VoteQueryBase) {
+        if (zone === "center" && (isVoteQuery(draggableData) || isVoteQueryGroup(draggableData))) {
             // We are the only children of the group no need for another.
-            if (getParent().children.length == 2)
+            if (getParent().children!.length == 2)
                 return;
 
-            const draggableItem = draggableData as VoteQueryBase;
+            const draggableItem = draggableData as VoteQuery | VoteQueryGroup;
 
             // Create a new group with the dragged item and the target item.
-            const newGroup = new VoteQueryGroup();
-            newGroup.children.push(currentItem);
-            newGroup.children.push(draggableItem);
+            const newGroup = createVoteQueryGroup();
+            newGroup.children!.push(currentItem);
+            newGroup.children!.push(draggableItem);
 
             // Replace the items in the current group with the new group.
-            const currentIndex = getParent().children.findIndex(i => i === currentItem);
-            getParent().children[currentIndex] = newGroup;
-            getParent().children = getParent().children.filter(i => i !== draggableItem && i !== currentItem);
+            const currentIndex = getParent().children!.findIndex(i => i === currentItem);
+            getParent().children![currentIndex] = newGroup;
+            getParent().children = getParent().children!.filter(i => i !== draggableItem && i !== currentItem);
         }
 
         onMoved?.();
@@ -87,7 +89,7 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
               key={getReferenceId(currentItem)}
               transition={{ duration: 0.2 }}>
             <HiveMimeDraggable className="flex flex-row gap-2 border-b hover:bg-honey-yellow/10" isDraggable isDropArea allowedZones={["top", "bottom", "center"]}
-                data={currentItem} dataList={getParent().children} onDropped={onDropped} canDrop={isNotAncestor}>
+                data={currentItem} dataList={getParent().children!} onDropped={onDropped} canDrop={isNotAncestor}>
                 <div className="flex flex-row items-center gap-2 flex-1 min-w-0 my-3 pl-2">
                     {!isFirstItem && (
                         <Select
@@ -103,7 +105,7 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
                             </SelectContent>
                         </Select>
                     )}
-                    {currentItem.poll?.pollType && pollMapping[currentItem.poll.pollType]}
+                    {poll?.pollType && pollMapping[poll.pollType]}
                 </div>
                 <Button variant="ghost" className="p-0 h-auto" onClick={() => removeItem(currentItem)}>
                     <Trash />

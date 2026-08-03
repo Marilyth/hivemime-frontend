@@ -1,6 +1,6 @@
 "use client";
 
-import { PollDto, PollType } from "@/lib/Api";
+import { PollDto, PollType, VoteQueryGroup } from "@/lib/Api";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
 import { ReactNode } from "react";
@@ -14,7 +14,7 @@ import { HiveMimeDrawResult } from "./hm-draw-result";
 
 export interface HiveMimePollResultProps {
   poll: PollDto;
-  filter?: string;
+  filter?: VoteQueryGroup;
 }
 
 export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResultProps) => {

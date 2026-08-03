@@ -14,9 +14,9 @@ import { AnimatePresence, motion } from "framer-motion";
 
 export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) {
   const data = useQuery({
-    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postCategoryResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postCategoryResultCreate(props.filter!, { pollId: props.poll.id! });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {

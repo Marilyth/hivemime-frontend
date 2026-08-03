@@ -597,11 +597,11 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     }
   }
 
-  function toggleGrid() {
+  function setGridVisible(visible: boolean) {
     if (alwaysShowGrid)
       return;
 
-    setShowGrid(!showGrid);
+    setShowGrid(visible);
   }
 
   function cellFromEvent(e: { clientX: number, clientY: number }) {
@@ -669,8 +669,8 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       />
       <canvas
         ref={gridCanvasRef}
-        onPointerEnter={e => toggleGrid()}
-        onPointerLeave={e => { toggleGrid(); onHover?.(null); }}
+        onPointerEnter={e => setGridVisible(true)}
+        onPointerLeave={e => { setGridVisible(false); onHover?.(null); }}
         onPointerMove={handleHover}
         onClick={handleHover}
         className={`absolute inset-0 w-full h-full ${showGrid ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}

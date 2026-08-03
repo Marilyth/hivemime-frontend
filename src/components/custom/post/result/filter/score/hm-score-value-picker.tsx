@@ -3,7 +3,7 @@ import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inli
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ValueOperator, VoteQuery } from "@/lib/query-builder";
+import { CandidateDto, PollDto, ValueOperator, VoteQuery } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
@@ -11,9 +11,11 @@ import { useTranslation } from "react-i18next";
 
 interface HiveMimeFilterConditionScoreValuePickerProps {
     currentItem: VoteQuery;
+    candidate: CandidateDto;
+    poll: PollDto;
 }
 
-export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
+export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionScoreValuePickerProps) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -21,7 +23,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
             return;
         
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = String(currentItem.poll!.minValue!);
+        currentItem.value = String(poll.minValue!);
     }, [currentItem]);
 
     function setNegation(value: boolean) {
@@ -69,7 +71,7 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
                                 {currentItem.valueOperator!}
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
-                                {Object.values(ValueOperator).map((operator) => (
+                                {[ValueOperator.Equals, ValueOperator.Greater, ValueOperator.Less, ValueOperator.GreaterEquals, ValueOperator.LessEquals].map((operator) => (
                                     <SelectItem key={operator} value={operator}>
                                         {valueOperatorToInlineString(operator)}
                                     </SelectItem>
@@ -81,11 +83,11 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
                     </div>
 
                     <Slider
-                        value={[Number(currentItem.value ?? currentItem.poll!.minValue!)]}
+                        value={[Number(currentItem.value ?? poll.minValue!)]}
                         onValueChange={(value) => setValue(value[0])}
-                        min={currentItem.poll!.minValue!}
-                        max={currentItem.poll!.maxValue!}
-                        step={currentItem.poll!.stepValue!}
+                        min={poll.minValue!}
+                        max={poll.maxValue!}
+                        step={poll.stepValue!}
                     />
                 </div>
             </HiveMimeBulletItem>
@@ -93,13 +95,13 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem }
     );
 });
 
-export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem }: HiveMimeFilterConditionScoreValuePickerProps) => {
+export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionScoreValuePickerProps) => {
     const { t } = useTranslation();
 
     return (
         <Label>
             {t("posts:filter.scoreViewer", {
-                name: currentItem.candidate?.name,
+                name: candidate.name,
                 negation: currentItem.isNegated ? " not" : "",
                 operator: currentItem.valueOperator!,
                 value: currentItem.value,

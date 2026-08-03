@@ -1,4 +1,5 @@
-import { VoteQueryGroup, VoteQuery, BooleanOperator, VoteQueryBase } from "@/lib/query-builder";
+import { BooleanOperator, PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
+import { isVoteQueryGroup } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
 import { HiveMimeVoteQuery } from "./hm-vote-query";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -15,9 +16,10 @@ type HiveMimeVoteQueryGroupProps = {
     group: VoteQueryGroup;
     isFirstItem: boolean;
     onMoved?: () => void;
+    post: PostDto;
 };
 
-export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem, onMoved }: HiveMimeVoteQueryGroupProps) => {
+export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem, onMoved, post }: HiveMimeVoteQueryGroupProps) => {
     const { t } = useTranslation();
     const newAncestors: VoteQueryGroup[] = useMemo(() => [...ancestors, group], [ancestors, group]);
 
@@ -35,19 +37,19 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
             return;
         }
 
-        for (let i = group.children.length - 1; i >= 0; i--) {
-            const child = group.children[i];
+        for (let i = group.children!.length - 1; i >= 0; i--) {
+            const child = group.children![i];
             
-            if (child instanceof VoteQueryGroup) {
+            if (isVoteQueryGroup(child)) {
                 cleanUpGroup(child);
 
                 // Adopt the child if there is only 1 left or it is my only child.
-                if (child.children.length == 1 || group.children.length == 1)
-                    group.children.splice(i, 1, ...child.children);
+                if (child.children!.length == 1 || group.children!.length == 1)
+                    group.children!.splice(i, 1, ...child.children!);
 
                 // Remove the group if it is empty.
-                else if (child.children.length == 0)
-                    group.children.splice(i, 1);
+                else if (child.children!.length == 0)
+                    group.children!.splice(i, 1);
             }
         }
     }
@@ -57,7 +59,7 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
     }
 
     function isNotAncestor(draggable: unknown): boolean {
-        return !(draggable instanceof VoteQueryGroup &&
+        return !(isVoteQueryGroup(draggable) &&
                  ancestors.includes(draggable as VoteQueryGroup));
     }
     
@@ -71,7 +73,7 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
                       key={getReferenceId(group)}
                       transition={{ duration: 0.2 }}>
             <HiveMimeDraggable className={`flex flex-col gap-2 ${!isRoot() ? "my-2" : ""}`} canDrop={isNotAncestor} isDraggable={!isRoot()}
-                isDropArea={!isRoot()} allowedZones={["top", "bottom"]} dataList={getParent()?.children} data={group} onDropped={onMoved}>
+                isDropArea={!isRoot()} allowedZones={["top", "bottom"]} dataList={getParent()?.children ?? []} data={group} onDropped={onMoved}>
                 {!isFirstItem && (
                     <Select
                         value={group.leftOperator}
@@ -88,10 +90,14 @@ export const HiveMimeVoteQueryGroup = observer(({ ancestors, group, isFirstItem,
                 )}
 
                 <div className={`${!isRoot() ? "mx-2 border border-l-3 border-b-3 rounded bg-muted/30" : ""}`}>
-                    {group.children.map((item, index) => item instanceof VoteQueryGroup ?
-                        <HiveMimeVoteQueryGroup key={index} group={item as VoteQueryGroup} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors} /> :
-                        <HiveMimeVoteQuery key={index} currentItem={item as VoteQuery} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors}  />
-                    )}
+                    {group.children!.map((item, index) => {
+                        if (isVoteQueryGroup(item)) {
+                            return <HiveMimeVoteQueryGroup key={index} group={item} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors} post={post} />;
+                        }
+
+                        const query = item as VoteQuery;
+                        return <HiveMimeVoteQuery key={index} currentItem={query} isFirstItem={index == 0} onMoved={() => cleanUpGroup(group)} ancestors={newAncestors} post={post} />;
+                    })}
                 </div>
             </HiveMimeDraggable>
         </motion.div>

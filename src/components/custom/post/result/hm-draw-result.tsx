@@ -8,9 +8,9 @@ import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
 export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
   const { t } = useTranslation();
   const data = useQuery({
-    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postDrawResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postDrawResultCreate(props.filter!, { pollId: props.poll.id! });
       return r.data;
     },
     staleTime: 0

@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { ValueOperator } from "./query-builder";
-import { ApprovalStatus, MemberRole } from "./Api";
+import { ApprovalStatus, MemberRole, ValueOperator } from "./Api";
 import i18n from "./i18n";
 
 const ids = new WeakMap();
@@ -33,6 +32,14 @@ export function valueOperatorToInlineString(operator: ValueOperator) {
       return i18n.t("enums:valueOperator.less");
     case ValueOperator.LessEquals:
       return i18n.t("enums:valueOperator.lessEquals");
+    case ValueOperator.Inside:
+      return i18n.t("enums:valueOperator.inside");
+    case ValueOperator.Outside:
+      return i18n.t("enums:valueOperator.outside");
+    case ValueOperator.ExclusiveInside:
+      return i18n.t("enums:valueOperator.exclusiveInside");
+    case ValueOperator.ExclusiveOutside:
+      return i18n.t("enums:valueOperator.exclusiveOutside");
     default:
       return operator;
   }

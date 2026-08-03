@@ -10,6 +10,18 @@
  * ---------------------------------------------------------------
  */
 
+export enum ValueOperator {
+  Equals = "Equals",
+  Greater = "Greater",
+  GreaterEquals = "GreaterEquals",
+  Less = "Less",
+  LessEquals = "LessEquals",
+  Inside = "Inside",
+  Outside = "Outside",
+  ExclusiveInside = "ExclusiveInside",
+  ExclusiveOutside = "ExclusiveOutside",
+}
+
 export enum UserOrderBy {
   New = "New",
   Old = "Old",
@@ -54,6 +66,11 @@ export enum CommentOrderBy {
   New = "New",
   Old = "Old",
   Best = "Best",
+}
+
+export enum BooleanOperator {
+  And = "And",
+  Or = "Or",
 }
 
 export enum ApprovalStatus {
@@ -548,6 +565,21 @@ export interface UserSettingsDto {
   shareAgeOnVote?: boolean;
   protectVoteOnFilter?: boolean;
 }
+
+export type VoteQuery = VoteQueryBase & {
+  candidateId?: string | null;
+  valueOperator?: ValueOperator;
+  value?: string | null;
+};
+
+export interface VoteQueryBase {
+  isNegated?: boolean;
+  leftOperator?: BooleanOperator;
+}
+
+export type VoteQueryGroup = VoteQueryBase & {
+  children?: (VoteQuery | VoteQueryGroup)[] | null;
+};
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -1310,23 +1342,25 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostChoiceResultList
-     * @request GET:/api/Post/choiceResult
+     * @name PostChoiceResultCreate
+     * @request POST:/api/Post/choiceResult
      * @secure
      */
-    postChoiceResultList: (
+    postChoiceResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CandidateChoiceResultDtoPollResultDto, any>({
         path: `/api/Post/choiceResult`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1335,23 +1369,25 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostScoreResultList
-     * @request GET:/api/Post/scoreResult
+     * @name PostScoreResultCreate
+     * @request POST:/api/Post/scoreResult
      * @secure
      */
-    postScoreResultList: (
+    postScoreResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CandidateScoreResultDtoPollResultDto, any>({
         path: `/api/Post/scoreResult`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1360,23 +1396,25 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostRankResultList
-     * @request GET:/api/Post/rankResult
+     * @name PostRankResultCreate
+     * @request POST:/api/Post/rankResult
      * @secure
      */
-    postRankResultList: (
+    postRankResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CandidateRankResultDtoPollResultDto, any>({
         path: `/api/Post/rankResult`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1385,23 +1423,25 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostCategoryResultList
-     * @request GET:/api/Post/categoryResult
+     * @name PostCategoryResultCreate
+     * @request POST:/api/Post/categoryResult
      * @secure
      */
-    postCategoryResultList: (
+    postCategoryResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CandidateCategoryResultDtoPollResultDto, any>({
         path: `/api/Post/categoryResult`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -1410,23 +1450,25 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostDrawResultList
-     * @request GET:/api/Post/drawResult
+     * @name PostDrawResultCreate
+     * @request POST:/api/Post/drawResult
      * @secure
      */
-    postDrawResultList: (
+    postDrawResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
-        filter?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<CandidateDrawResultDtoPollResultDto, any>({
         path: `/api/Post/drawResult`,
-        method: "GET",
+        method: "POST",
         query: query,
+        body: data,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

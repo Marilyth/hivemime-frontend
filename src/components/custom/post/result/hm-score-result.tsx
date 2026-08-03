@@ -11,9 +11,9 @@ import { CandidateDto } from "@/lib/Api";
 export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
   const { t } = useTranslation();
   const data = useQuery({
-    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postScoreResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postScoreResultCreate(props.filter!, { pollId: props.poll.id! });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {

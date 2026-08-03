@@ -3,40 +3,28 @@ import { CellSelection, DrawPicker, Variant } from "@/components/custom/utility/
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { DrawValueOperator, VoteQuery } from "@/lib/query-builder";
+import { VoteQuery, ValueOperator, CandidateDto, PollDto } from "@/lib/Api";
 import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { valueOperatorToInlineString } from "@/lib/utils";
 
 interface HiveMimeFilterConditionDrawValuePickerProps {
     currentItem: VoteQuery;
+    candidate: CandidateDto;
+    poll: PollDto;
 }
 
-function drawValueOperatorToInlineString(operator: DrawValueOperator, t: (key: string) => string) {
-    switch (operator) {
-        case DrawValueOperator.Inside:
-            return t("enums:drawValueOperator.inside");
-        case DrawValueOperator.Outside:
-            return t("enums:drawValueOperator.outside");
-        case DrawValueOperator.ExclusiveInside:
-            return t("enums:drawValueOperator.exclusiveInside");
-        case DrawValueOperator.ExclusiveOutside:
-            return t("enums:drawValueOperator.exclusiveOutside");
-    }
-}
-
-export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem }: HiveMimeFilterConditionDrawValuePickerProps) => {
-    const { t } = useTranslation();
-    const poll = currentItem.poll!;
-    const src = currentItem.candidate?.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"));
+export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDrawValuePickerProps) => {
+    const src = candidate?.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"));
     const [cellSelection] = useState(() => new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!));
 
     useEffect(() => {
         if (currentItem.valueOperator != null)
             return;
 
-        currentItem.valueOperator = DrawValueOperator.Inside;
+        currentItem.valueOperator = ValueOperator.Inside;
     }, [currentItem]);
 
     useEffect(() => {
@@ -78,7 +66,7 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem }:
         return dispose;
     }, [cellSelection, currentItem]);
 
-    function setOperator(operator: DrawValueOperator) {
+    function setOperator(operator: ValueOperator) {
         currentItem.valueOperator = operator;
     }
 
@@ -91,16 +79,16 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem }:
                         components={{
                             select: (
                                 <Select
-                                    value={currentItem.valueOperator?.toString() ?? DrawValueOperator.Inside}
-                                    onValueChange={(value) => setOperator(value as DrawValueOperator)}
+                                    value={currentItem.valueOperator?.toString() ?? ValueOperator.Inside}
+                                    onValueChange={(value) => setOperator(value as ValueOperator)}
                                 >
                                     <HiveMimeInlineSelectTrigger>
                                         <SelectValue />
                                     </HiveMimeInlineSelectTrigger>
                                     <SelectContent>
-                                        {Object.values(DrawValueOperator).map((operator) => (
+                                        {[ValueOperator.Inside, ValueOperator.Outside, ValueOperator.ExclusiveInside, ValueOperator.ExclusiveOutside].map((operator) => (
                                             <SelectItem key={operator} value={operator}>
-                                                {drawValueOperatorToInlineString(operator, t)}
+                                                {valueOperatorToInlineString(operator)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -116,9 +104,10 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem }:
     );
 });
 
-export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem }: HiveMimeFilterConditionDrawValuePickerProps) => {
+export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionDrawValuePickerProps) => {
     const { t } = useTranslation();
-    const operator = (currentItem.valueOperator ?? DrawValueOperator.Inside) as DrawValueOperator;
+    
+    const operator = (currentItem.valueOperator ?? ValueOperator.Inside) as ValueOperator;
     const cellCount = (currentItem.value ?? "")
         .split(",")
         .filter(index => index.trim().length > 0)
@@ -127,8 +116,8 @@ export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem }:
     return (
         <Label>
             {t("posts:filter.drawViewer", {
-                name: currentItem.candidate?.name,
-                operator: drawValueOperatorToInlineString(operator, t),
+                name: candidate.name,
+                operator: valueOperatorToInlineString(operator),
                 count: cellCount,
             })}
         </Label>

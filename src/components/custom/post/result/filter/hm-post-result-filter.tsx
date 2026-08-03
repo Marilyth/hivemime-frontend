@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { PostDto } from "@/lib/Api";
-import { VoteQuery, VoteQueryGroup } from "@/lib/query-builder";
+import { PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -25,7 +24,7 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
 
     function handleFinished(newQuery: VoteQuery | null) {
         if (newQuery) {
-            builder.children.push(newQuery);
+            builder.children!.push(newQuery);
         }
 
         setShowCreator(false);
@@ -52,14 +51,14 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
                         </span>
 
                         <LayoutGroup>
-                            {builder.children.length > 0 &&
+                            {builder.children!.length > 0 &&
                                 <div className="border rounded mb-2 text-sm text-muted-foreground ">
-                                    <HiveMimeVoteQueryGroup group={builder} isFirstItem={true} ancestors={[]} />
+                                    <HiveMimeVoteQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
                                 </div>
                             }
                         </LayoutGroup>
 
-                        {builder.children.length > 1 &&
+                        {builder.children!.length > 1 &&
                             <HiveMimeBulletItem className="mb-2">
                                 <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
                             </HiveMimeBulletItem>
