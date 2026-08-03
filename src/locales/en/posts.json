@@ -19,10 +19,17 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
+    "drawInstruction": "Please draw between {{minCells}} and {{maxCells}} cells on the image.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
-    "pickCandidatesDescription": "Please pick candidates to assign the category to."
+    "pickCandidatesDescription": "Please pick candidates to assign the category to.",
+    "draw": {
+      "draw": "Draw",
+      "erase": "Erase",
+      "undo": "Undo",
+      "cursorSize": "Cursor size"
+    }
   },
   "result": {
     "results": "Results",
@@ -46,8 +53,9 @@
     "pollTitlePlaceholder": "Give your poll a title.",
     "description": "Description",
     "descriptionPlaceholder": "Optionally, add a description.",
-    "createCategories": "Create categories for the users to assign the candidates to.",
-    "createCandidates": "Create candidates for the users to vote for.",
+    "createCategories": "Create categories for the user to assign the candidates to.",
+    "createDrawCandidates": "Select the image for the user to draw on.",
+    "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
     "candidateNamePlaceholder": "Candidate name...",
@@ -72,7 +80,11 @@
       "maxVotes": "The user can vote for up to <select/> candidates.",
       "shuffle": "The candidates <select/> shuffled for the user.",
       "minScore": "The minimum score is <select/>.",
-      "maxScore": "The maximum score is <select/>."
+      "maxScore": "The maximum score is <select/>.",
+      "rowCount": "The image has <select/> rows.",
+      "columnCount": "The image has <select/> columns.",
+      "minCells": "The user has to draw at least <select/> cells.",
+      "maxCells": "The user can draw up to <select/> cells."
     },
     "scoring": {
       "minScore": "The minimum score is",
@@ -101,6 +113,8 @@
     "uncategorized": "uncategorized",
     "categorizedAsViewer": "{{name}} is",
     "scoreViewer": "{{name}} score{{negation}} {{operator}} {{value}}",
-    "rankViewer": "{{name}} rank{{negation}} {{operator}}"
+    "rankViewer": "{{name}} rank{{negation}} {{operator}}",
+    "drawCellsWere": "Candidate's drawn cells were <select/>",
+    "drawViewer": "{{name}} drew {{count}} cells {{operator}}"
   }
 }

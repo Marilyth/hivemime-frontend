@@ -13,7 +13,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { toast } from "sonner";
 import { FieldSeparator } from "@/components/ui/field";
 
-
 export interface ImageViewerProps {
   thumb?: string;
   src?: string;
@@ -43,10 +42,16 @@ export function ImageViewer(props: ImageViewerProps) {
           <DialogHeader>
             <DialogTitle>{props.alt}</DialogTitle>
           </DialogHeader>
-          {props.src && <img src={props.src} alt={props.alt} className="w-fit h-fit rounded-md border" />}
+          <ImageViewerContent src={props.src} alt={props.alt} />
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export function ImageViewerContent(props: ImageViewerProps) {
+  return (
+    props.src && <img src={props.src} alt={props.alt} style={{ pointerEvents: "none" }} className="w-fit h-fit rounded-md" />
   );
 }
 
@@ -56,12 +61,69 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   const [fullResFile, setFullResFile] = useState<File | null>(src ?? null);
 
   const originalThumbUrl = thumb ? URL.createObjectURL(thumb) : null;
-  const previewUrl = thumbFile ? URL.createObjectURL(thumbFile) : null;
-  const fullResUrl = fullResFile ? URL.createObjectURL(fullResFile) : null;
   const [isOpen, setIsOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  function saveChanges() {
+    onChange(fullResFile, thumbFile);
+    setIsOpen(false);
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger>
+        {originalThumbUrl &&
+          <div className="group relative cursor-pointer overflow-hidden rounded-md">
+            <img src={originalThumbUrl} className="h-auto w-full object-cover" />
+
+            <div className="absolute inset-0 hidden items-center justify-center bg-black/40 group-hover:flex">
+              <Edit className="h-5 w-5 text-white" />
+            </div>
+          </div> ||
+          <Tooltip>
+            <TooltipTrigger
+              onClick={() => fileInputRef.current?.click()}
+              className="border-dashed border-1 border-informational cursor-pointer rounded-md p-1 bg-informational/15">
+              <Image className="text-informational" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t("settings:image.addImage")}</p>
+            </TooltipContent>
+          </Tooltip>
+        }
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("settings:image.editImage")}</DialogTitle>
+        </DialogHeader>
+
+        <ImageEditorContent thumb={thumbFile ?? undefined} src={fullResFile ?? undefined} onChange={(file, thumb) => {
+          setFullResFile(file);
+          setThumbFile(thumb);
+        }} />
+
+        <DialogFooter>
+          <div className="flex flex-row items-end gap-2">
+            <Button variant="outline" onClick={() => setIsOpen(false)}>{t("common:cancel")}</Button>
+            <Button onClick={saveChanges} disabled={src == fullResFile}><Save /> {t("common:save")}</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export function ImageEditorContent({ thumb, src, onChange }: ImageEditorProps) {
+  const { t } = useTranslation();
+  const [thumbFile, setThumbFile] = useState<File | null>(thumb ?? null);
+  const [fullResFile, setFullResFile] = useState<File | null>(src ?? null);
+
+  const previewUrl = thumbFile ? URL.createObjectURL(thumbFile) : null;
+  const fullResUrl = fullResFile ? URL.createObjectURL(fullResFile) : null;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   async function handleFile(file: File | null) {
     if (!file)
       return;
@@ -94,6 +156,7 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
 
       setFullResFile(compressedFullResFile);
       setThumbFile(compressedThumbFile);
+      onChange(compressedFullResFile, compressedThumbFile);
     }
 
     toast.promise(compressor(), {
@@ -105,11 +168,8 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   function handleRemove() {
     setFullResFile(null);
     setThumbFile(null);
-  }
 
-  function saveChanges() {
-    onChange(fullResFile, thumbFile);
-    setIsOpen(false);
+    onChange(null, null);
   }
 
   async function handleUrl(url: string) {
@@ -201,13 +261,6 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   }
 
   useEffect(() => {
-    if (!isOpen) {
-      setFullResFile(src ?? null);
-      setThumbFile(thumb ?? null);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     window.addEventListener("paste", handlePaste);
 
     return () => {
@@ -216,88 +269,52 @@ export function ImageEditor({ thumb, src, onChange }: ImageEditorProps) {
   }, []);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>
-        {originalThumbUrl &&
-          <div className="group relative cursor-pointer overflow-hidden rounded-md">
-            <img src={originalThumbUrl} className="h-auto w-full object-cover" />
+    <div className="flex flex-col gap-2">
+      {!previewUrl && (
+        <div className="flex flex-col gap-2 border-dashed border-1 rounded-md p-4" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+          <Image className="w-16 h-16 text-border mx-auto" />
+          <span className="mx-auto text-muted-foreground">{t("settings:image.dragImageHere")}</span>
 
-            <div className="absolute inset-0 hidden items-center justify-center bg-black/40 group-hover:flex">
-              <Edit className="h-5 w-5 text-white" />
-            </div>
-          </div> ||
-          <Tooltip>
-            <TooltipTrigger
-              onClick={() => fileInputRef.current?.click()}
-              className="border-dashed border-1 border-informational cursor-pointer rounded-md p-1 bg-informational/15">
-              <Image className="text-informational" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{t("settings:image.addImage")}</p>
-            </TooltipContent>
-          </Tooltip>
-        }
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("settings:image.editImage")}</DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-2">
-          {!previewUrl && (
-            <div className="flex flex-col gap-2 border-dashed border-1 rounded-md p-4" onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-              <Image className="w-16 h-16 text-border mx-auto" />
-              <span className="mx-auto text-muted-foreground">{t("settings:image.dragImageHere")}</span>
-
-              <div className="flex items-center gap-4 text-muted-foreground">
-                <FieldSeparator className="flex-1" />
-                <span className="text-sm text-muted-foreground">{t("common:or")}</span>
-                <FieldSeparator className="flex-1" />
-              </div>
-              
-              <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-                <FolderOpen className="text-honey-brown" />{t("settings:image.pickFile")}
-              </Button>
-              <Button variant="outline" onClick={handleClipboard}>
-                <Clipboard className="text-honey-brown" />{t("settings:image.pasteFromClipboard")}
-              </Button>
-              <Input type="file" accept="image/*" ref={fileInputRef} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} className="hidden" />
-            </div>) ||
-            (
-              <InputGroup>
-                <InputGroupInput value={fullResFile?.name ?? ""} readOnly />
-                <InputGroupAddon align="inline-end">
-                  <Button variant="ghost" onClick={handleRemove}>
-                    <Trash2 />
-                  </Button>
-                </InputGroupAddon>
-              </InputGroup>
-            )
-          }
-
-          {fullResUrl && (
-            <>
-              <div className="flex flex-row items-center gap-1 flex-wrap">
-                <Badge variant="outline">
-                  {fullResFile ? (fullResFile.size / 1024).toFixed(2) + " KB" : t("common:notAvailable")}
-                </Badge>
-                <Badge variant="outline">
-                  {fullResFile ? new Date(fullResFile.lastModified).toLocaleDateString() : t("common:notAvailable")}
-                </Badge>
-              </div>
-
-              {fullResUrl && <img src={fullResUrl} alt={t("a11y:fullResolutionPreview")} className="w-fit h-fit rounded-md border" />}
-            </>
-          )}
-        </div>
-
-        <DialogFooter>
-          <div className="flex flex-row items-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>{t("common:cancel")}</Button>
-            <Button onClick={saveChanges} disabled={src == fullResFile}><Save /> {t("common:save")}</Button>
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <FieldSeparator className="flex-1" />
+            <span className="text-sm text-muted-foreground">{t("common:or")}</span>
+            <FieldSeparator className="flex-1" />
           </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
+          
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+            <FolderOpen className="text-honey-brown" />{t("settings:image.pickFile")}
+          </Button>
+          <Button variant="outline" onClick={handleClipboard}>
+            <Clipboard className="text-honey-brown" />{t("settings:image.pasteFromClipboard")}
+          </Button>
+          <Input type="file" accept="image/*" ref={fileInputRef} onChange={(e) => handleFile(e.target.files?.[0] ?? null)} className="hidden" />
+        </div>) ||
+        (
+          <InputGroup>
+            <InputGroupInput value={fullResFile?.name ?? ""} readOnly />
+            <InputGroupAddon align="inline-end">
+              <Button variant="ghost" onClick={handleRemove}>
+                <Trash2 />
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
+        )
+      }
+
+      {fullResUrl && (
+        <>
+          <div className="flex flex-row items-center gap-1 flex-wrap">
+            <Badge variant="outline">
+              {fullResFile ? (fullResFile.size / 1024).toFixed(2) + " KB" : t("common:notAvailable")}
+            </Badge>
+            <Badge variant="outline">
+              {fullResFile ? new Date(fullResFile.lastModified).toLocaleDateString() : t("common:notAvailable")}
+            </Badge>
+          </div>
+
+          {fullResUrl && <img src={fullResUrl} alt={t("a11y:fullResolutionPreview")} className="w-fit h-fit rounded-md border" />}
+        </>
+      )}
+    </div>
+  );
 }

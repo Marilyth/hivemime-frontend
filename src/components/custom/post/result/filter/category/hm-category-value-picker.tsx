@@ -1,18 +1,20 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { ValueOperator, VoteQuery } from "@/lib/query-builder";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vote-category";
 import { Label } from "@/components/ui/label";
+import { CandidateDto, PollDto, ValueOperator, VoteQuery } from "@/lib/Api";
 
 interface HiveMimeFilterConditionCategoryValuePickerProps {
     currentItem: VoteQuery;
+    candidate: CandidateDto;
+    poll: PollDto;
 }
 
-export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionCategoryValuePickerProps) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -20,14 +22,14 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
             return;
 
         currentItem.valueOperator = ValueOperator.Equals;
-        currentItem.value = currentItem.poll!.minValue!;
+        currentItem.value = poll.categories![0].id!;
     }, [currentItem]);
 
     function setNegation(value: boolean) {
         currentItem.isNegated = value;
     }
 
-    function setValue(value: number | null) {
+    function setValue(value: string | null) {
         currentItem.value = value;
     }
 
@@ -59,14 +61,14 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
                         
                         <Select
                             value={currentItem.value?.toString() ?? "none"}
-                            onValueChange={(value) => setValue(value === "none" ? null : Number(value))}
+                            onValueChange={(value) => setValue(value === "none" ? null : value)}
                         >
                             <HiveMimeInlineSelectTrigger>
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
                             <SelectContent>
-                                {currentItem.poll!.categories!.map((category) => (
-                                    <SelectItem key={category.id} value={category.value!.toString()}>
+                                {poll.categories!.map((category) => (
+                                    <SelectItem key={category.id} value={category.id!}>
                                         <HiveMimeCategoryTag category={category} />
                                     </SelectItem>
                                 ))}
@@ -80,17 +82,17 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
     );
 });
 
-export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem }: HiveMimeFilterConditionCategoryValuePickerProps) => {
+export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionCategoryValuePickerProps) => {
     const { t } = useTranslation();
 
     return (
         <Label>
-            {t(currentItem.isNegated ? "posts:filter.notCategorized" : "posts:filter.categorizedAsViewer", { name: currentItem.candidate?.name })}{" "}
+            {t(currentItem.isNegated ? "posts:filter.notCategorized" : "posts:filter.categorizedAsViewer", { name: candidate.name })}{" "}
             {currentItem.value == null
                 ? t("posts:filter.uncategorized")
                 : (
                 <span className="inline-block align-middle">
-                    <HiveMimeCategoryTag category={currentItem.poll!.categories!.find(c => c.value === currentItem.value)!} />
+                    <HiveMimeCategoryTag category={poll.categories!.find(c => c.id === currentItem.value)!} />
                 </span>
             )}
         </Label>

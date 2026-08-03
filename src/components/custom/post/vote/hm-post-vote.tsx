@@ -1,5 +1,7 @@
-import { PostVoteDto, PostDto } from "@/lib/Api";
+import { PostDto } from "@/lib/Api";
 import { validatePickPoll } from "@/lib/validate-vote";
+import { serializePostVote } from "@/lib/serialize-vote";
+import { UiPostVoteDto } from "@/lib/vote-models";
 import { ChartBar, Vote } from "lucide-react";
 import { observable, reaction, toJS } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -11,6 +13,7 @@ import { HiveMimeListPoll } from "./hm-poll-vote";
 import { Accordion } from "@/components/ui/accordion";
 import { AsyncButton } from "../../utility/async-button";
 import { api } from "@/lib/contexts";
+import { CellSelection } from "../../utility/draw-picker";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -21,14 +24,14 @@ interface HiveMimePostVoteProps {
 export const HiveMimePostVote = observer(({ post, requestResults, footer }: HiveMimePostVoteProps) => {
   const { t } = useTranslation();
   const [isValid, setIsValid] = useState(false);
-  const [postVote, setPostVote] = useState<PostVoteDto>(() => (observable({
+  const [postVote, setPostVote] = useState<UiPostVoteDto>(() => (observable({
     id: post.id!,
     polls: (post.polls || []).map(poll => ({
       id: poll.id!,
       candidates: (poll.candidates || []).map(candidate => ({
         id: candidate.id!,
         name: candidate.name,
-        value: null,
+        cellSelection: new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!)
       })),
     })),
   })));
@@ -51,7 +54,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
 
   async function submitVote()
   {
-    const task = api.api.postVoteCreate(postVote);
+    const task = api.api.postVoteCreate(serializePostVote(post, postVote));
     toast.promise(task, {
       loading: t("toasts:vote.submitting")
     });

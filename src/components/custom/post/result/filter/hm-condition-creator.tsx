@@ -1,6 +1,6 @@
 import { HiveMimeMultiStep, HiveMimeStep } from "@/components/custom/utility/hm-multistep-ui";
-import { PollType, PostDto } from "@/lib/Api";
-import { VoteQuery } from "@/lib/query-builder";
+import { PollType, PostDto, VoteQuery } from "@/lib/Api";
+import { createVoteQuery, resolveCandidate } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ import { HiveMimeFilterConditionCandidatePicker } from "./hm-candidate-picker";
 import { HiveMimeFilterConditionScoreValuePicker } from "./score/hm-score-value-picker";
 import { HiveMimeFilterConditionRankValuePicker } from "./rank/hm-rank-value-picker";
 import { HiveMimeFilterConditionCategoryValuePicker } from "./category/hm-category-value-picker";
+import { HiveMimeFilterConditionDrawValuePicker } from "./draw/hm-draw-value-picker";
 
 
 interface HiveMimeVoteQueryDialogProps {
@@ -19,29 +20,31 @@ interface HiveMimeVoteQueryDialogProps {
 
 export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, onFinished }: HiveMimeVoteQueryDialogProps) => {
     const { t } = useTranslation();
-    const item = useMemo(() => currentItem ?? new VoteQuery(), [currentItem]);
+    const item = useMemo(() => currentItem ?? createVoteQuery(), [currentItem]);
+    const { poll, candidate } = resolveCandidate(post, item.candidateId);
 
     const pollMapping: {
         [key in PollType]: React.ReactElement;
     } = {
-        [PollType.Choice]: <HiveMimeFilterConditionChoiceValuePicker currentItem={item} />,
-        [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} />,
-        [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} />,
-        [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} />,
+        [PollType.Choice]: <HiveMimeFilterConditionChoiceValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
+        [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
+        [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
+        [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
+        [PollType.Draw]: <HiveMimeFilterConditionDrawValuePicker currentItem={item} candidate={candidate!} poll={poll!} />
     };
 
     return (
         <div>
             <HiveMimeMultiStep canCancel onCancelled={() => onFinished(null)} onFinished={() => onFinished(item)} showProgress={true}>
-                <HiveMimeStep canContinue={item.candidate != null}>
+                <HiveMimeStep canContinue={candidate != null}>
                     <HiveMimeFilterConditionCandidatePicker currentItem={item} post={post} />
                 </HiveMimeStep>
                 <HiveMimeStep canContinue={true}>
                     <div>
                         <div className="text-sm text-muted-foreground mb-4">
-                            {t("posts:filter.adjustCondition", { pollTitle: item?.poll?.title, candidateName: item?.candidate?.name })}
+                            {t("posts:filter.adjustCondition", { pollTitle: poll?.title, candidateName: candidate?.name })}
                         </div>
-                        {item.poll?.pollType && pollMapping[item.poll.pollType]}
+                        {poll?.pollType && pollMapping[poll.pollType]}
                     </div>
                 </HiveMimeStep>
             </HiveMimeMultiStep>

@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { CategoryDto, PollDto, PollVoteDto } from "@/lib/Api";
+import { CategoryDto, PollDto } from "@/lib/Api";
 import { CombinedPollCandidate } from "@/lib/view-models";
 import { LayoutGroup, motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
@@ -12,10 +12,11 @@ import { HiveMimeCategoryPollVoteCandidateDialog, HiveMimeCategoryPollVoteCatego
 import { HiveMimeCategoryTagBox, HiveMimePickCandidate } from "./hm-category-poll-vote-category";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { UiPollVoteDto } from "@/lib/vote-models";
 
 export interface HiveMimeCategoryPollVoteProps {
   poll: PollDto;
-  pollVotes: PollVoteDto;
+  pollVotes: UiPollVoteDto;
 }
 
 export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeCategoryPollVoteProps) => {
@@ -29,11 +30,11 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
   }));
 
   function assignCandidateToCategory(candidate: CombinedPollCandidate, category: CategoryDto) {
-    candidate.vote.value = category.value;
+    candidate.vote.categoryId = category.id;
   }
 
   function getCandidatesCategory(candidate: CombinedPollCandidate) {
-    const category = poll.categories!.find(category => category.value === candidate.vote.value);
+    const category = poll.categories!.find(category => category.id === candidate.vote.categoryId);
     return category ?? null;
   }
 
@@ -67,7 +68,7 @@ export const HiveMimeCategoryPollVote = observer(({ poll, pollVotes }: HiveMimeC
             isDraggable
             onClick={() => setOpenedCategory(category)}
             onDropped={data => assignCandidateToCategory(data.draggableData as CombinedPollCandidate, category)}
-            canDrop={data => (data as CombinedPollCandidate).vote.value != category.value}>
+            canDrop={data => (data as CombinedPollCandidate).vote.categoryId != category.id}>
             <HiveMimeCategoryTagBox category={category} />
           </HiveMimeDraggable>
         ))}

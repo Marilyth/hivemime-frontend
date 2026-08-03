@@ -12,9 +12,9 @@ import { CandidateDto } from "@/lib/Api";
 export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
   const { t } = useTranslation();
   const data = useQuery({
-    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postSumResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postChoiceResultCreate(props.filter!, { pollId: props.poll.id! });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {
@@ -38,8 +38,9 @@ export function HiveMimeChoiceResult(props: HiveMimePollCandidateResultProps) {
   return (
     <div className="flex flex-col gap-2">
       {props.poll.candidates!.map((candidate, i) => {
+        const totalVotes = data.data!.candidates!.reduce((sum, c) => sum + (c.voteCount ?? 0), 0);
         const resultCandidate = data.data!.candidates!.find(rc => rc.id === candidate.id);
-        const ratio = resultCandidate ? (resultCandidate.sum! / resultCandidate.voteCount!) : 0;
+        const ratio = resultCandidate ? (resultCandidate.voteCount! / totalVotes) : 0;
 
         return (
           <HiveMimeHoverCard key={i}

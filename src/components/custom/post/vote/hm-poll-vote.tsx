@@ -1,6 +1,6 @@
 "use client";
 
-import { PollDto, PollType, PollVoteDto } from "@/lib/Api";
+import { PollDto, PollType } from "@/lib/Api";
 import { ReactNode, useEffect, useState } from "react";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
@@ -14,10 +14,12 @@ import { validatePickPoll } from "@/lib/validate-vote";
 import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CustomCandidateInput } from "./hm-custom-candidate-input";
+import { UiPollVoteDto } from "@/lib/vote-models";
+import { HiveMimeDrawPollVote } from "./draw/hm-draw-poll-vote";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
-  pollVote: PollVoteDto;
+  pollVote: UiPollVoteDto;
 }
 
 export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollProps) => {
@@ -30,6 +32,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Score]: <HiveMimeScorePollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Rank]: <HiveMimeRankPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
+    [PollType.Draw]: <HiveMimeDrawPollVote poll={poll} pollVotes={pollVote} />,
   };
 
   function getStateColour(){

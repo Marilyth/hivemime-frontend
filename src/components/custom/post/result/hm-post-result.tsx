@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react-lite";
-import { PostDto } from "@/lib/Api";
+import { PostDto, VoteQueryGroup } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
 import { Vote, Filter } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
 import { HiveMimePostResultFilter } from "./filter/hm-post-result-filter";
-import { VoteQueryGroup } from "@/lib/query-builder";
+import { createVoteQueryGroup } from "@/lib/vote-query";
 
 interface HiveMimePostResultProps {
   post: PostDto;
@@ -19,7 +19,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
   const { t } = useTranslation();
   const [filterOpen, setFilterOpen] = useState(false);
   const queryBuilder: VoteQueryGroup = useMemo(() => 
-    new VoteQueryGroup(),
+    createVoteQueryGroup(),
     []
   );
 
@@ -46,7 +46,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
         
         <Accordion type="single" collapsible className="border rounded-md overflow-hidden">
           {post.polls!.map((poll, index) => (
-            <HiveMimePollResult key={index} poll={poll} filter={queryBuilder.toString()} />
+            <HiveMimePollResult key={index} poll={poll} filter={queryBuilder} />
           ))}
         </Accordion>
 

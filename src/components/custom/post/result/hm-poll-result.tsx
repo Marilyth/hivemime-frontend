@@ -1,6 +1,6 @@
 "use client";
 
-import { PollDto, PollType } from "@/lib/Api";
+import { PollDto, PollType, VoteQueryGroup } from "@/lib/Api";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { observer } from "mobx-react-lite";
 import { ReactNode } from "react";
@@ -10,10 +10,11 @@ import { HiveMimeChoiceResult } from "./hm-choice-result";
 import { HiveMimeScoreResult } from "./hm-score-result";
 import { HiveMimeCategoryResult } from "./hm-category-result";
 import { HiveMimeRankResult } from "./hm-rank-result";
+import { HiveMimeDrawResult } from "./hm-draw-result";
 
 export interface HiveMimePollResultProps {
   poll: PollDto;
-  filter?: string;
+  filter?: VoteQueryGroup;
 }
 
 export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResultProps) => {
@@ -23,6 +24,7 @@ export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResult
     [PollType.Score]: <HiveMimeScoreResult poll={poll} filter={filter} />,
     [PollType.Rank]: <HiveMimeRankResult poll={poll} filter={filter} />,
     [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
+    [PollType.Draw]: <HiveMimeDrawResult poll={poll} filter={filter} />,
   };
 
   return (

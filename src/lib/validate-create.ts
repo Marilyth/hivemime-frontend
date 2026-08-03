@@ -32,6 +32,9 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
         case PollType.Category:
             errors.push(...validateCategorizationPoll(poll));
             break;
+        case PollType.Draw:
+            errors.push(...validateDrawPoll(poll));
+            break;
         default:
             errors.push(i18n.t("validation:poll.noType"));
     }
@@ -75,6 +78,16 @@ function validateCategorizationPoll(poll: CreatePollDto): string[] {
 
     if (!poll.categories || poll.categories.length < 2) {
        errors.push(i18n.t("validation:poll.categoryMinCategories"));
+    }
+
+    return errors;
+}
+
+function validateDrawPoll(poll: CreatePollDto): string[] {
+    const errors: string[] = [];
+
+    if (poll.candidates?.find(c => (c.media?.contentLength ?? 0) <= 0)) {
+       errors.push(i18n.t("validation:poll.drawMedia"));
     }
 
     return errors;

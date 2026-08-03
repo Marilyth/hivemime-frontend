@@ -7,16 +7,16 @@ import { AnimatedBackground } from "../../utility/hm-animated-background";
 import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryTag } from "../vote/category/hm-category-poll-vote-category";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CandidateDistributionResultDto, CandidateDto, CandidationDistributionResultValueDto, CategoryDto, PollDto } from "@/lib/Api";
+import { CandidateDto, PollDto, CandidateCategoryDistributionResultDto, CandidateCategoryResultDto } from "@/lib/Api";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 
 export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) {
   const data = useQuery({
-    queryKey: ["poll-result", props.poll.id, props.filter],
+    queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postDistributionResultList({ pollId: props.poll.id!, filter: props.filter });
+      const r = await api.api.postCategoryResultCreate(props.filter!, { pollId: props.poll.id! });
       const existingCandidateIds = new Set(props.poll.candidates!.map(c => c.id));
 
       for (const candidateResult of r.data.candidates!) {
@@ -47,7 +47,7 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
       candidateResult: candidateResult!,
       winningDistribution: winningDistribution
     };
-  }).sort((a, b) => (a.winningDistribution?.value ?? 9999) - (b.winningDistribution?.value ?? 9999) ||
+  }).sort((a, b) => (props.poll.categories?.findIndex(cat => cat.id === a.winningDistribution?.categoryId) ?? 9999) - (props.poll.categories?.findIndex(cat => cat.id === b.winningDistribution?.categoryId) ?? 9999) ||
                     (b.winningDistribution?.voteCount ?? 0) - (a.winningDistribution?.voteCount ?? 0));
 
   return (
@@ -61,14 +61,14 @@ export function HiveMimeCategoryResult(props: HiveMimePollCandidateResultProps) 
 
 interface HiveMimeCategoryCandidateResultProps {
   candidate: CandidateDto;
-  candidateResult: CandidateDistributionResultDto;
-  winningDistribution: CandidationDistributionResultValueDto | undefined;
+  candidateResult: CandidateCategoryResultDto;
+  winningDistribution: CandidateCategoryDistributionResultDto | undefined;
   poll: PollDto;
 }
 
 function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultProps) {
   const { t } = useTranslation();
-  const category = props.winningDistribution ? props.poll.categories!.find(cat => cat.value === props.winningDistribution?.value) : null;
+  const category = props.winningDistribution ? props.poll.categories!.find(cat => cat.id === props.winningDistribution?.categoryId) : null;
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
   return (
@@ -109,11 +109,11 @@ function HiveMimeCategoryCandidateResult(props: HiveMimeCategoryCandidateResultP
         </AccordionTrigger>
         <AccordionContent className="border-t-1 flex flex-col gap-1 py-2">
           {props.poll.categories!.map(cat => {
-            const distribution = props.candidateResult?.distribution?.find(d => d.value === cat.value);
+            const distribution = props.candidateResult?.distribution?.find(d => d.categoryId === cat.id);
             const ratio = distribution ? (distribution.voteCount! / props.candidateResult!.voteCount!) : 0;
 
             return (
-              <div key={cat.value} className="relative flex flex-row gap-2 items-center overflow-hidden px-2">
+              <div key={cat.id} className="relative flex flex-row gap-2 items-center overflow-hidden px-2">
                 <AnimatedBackground colorSegments={[
                   {
                     color: numberToColorHex(cat.color!) + "77",
