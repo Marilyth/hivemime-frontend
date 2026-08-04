@@ -2,13 +2,13 @@ import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { CandidateDto, PollDto, ValueOperator, VoteQuery } from "@/lib/Api";
+import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface HiveMimeFilterConditionChoiceValuePickerProps {
-    currentItem: VoteQuery;
+    currentItem: FilterQuery;
     candidate: CandidateDto;
     poll: PollDto;
 }

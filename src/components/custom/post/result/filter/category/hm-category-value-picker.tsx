@@ -6,10 +6,10 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vote-category";
 import { Label } from "@/components/ui/label";
-import { CandidateDto, PollDto, ValueOperator, VoteQuery } from "@/lib/Api";
+import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
 
 interface HiveMimeFilterConditionCategoryValuePickerProps {
-    currentItem: VoteQuery;
+    currentItem: FilterQuery;
     candidate: CandidateDto;
     poll: PollDto;
 }

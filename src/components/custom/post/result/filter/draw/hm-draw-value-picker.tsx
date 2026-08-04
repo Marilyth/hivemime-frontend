@@ -3,7 +3,7 @@ import { CellSelection, DrawPicker, Variant } from "@/components/custom/utility/
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { VoteQuery, ValueOperator, CandidateDto, PollDto } from "@/lib/Api";
+import { FilterQuery, ValueOperator, CandidateDto, PollDto } from "@/lib/Api";
 import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { valueOperatorToInlineString } from "@/lib/utils";
 
 interface HiveMimeFilterConditionDrawValuePickerProps {
-    currentItem: VoteQuery;
+    currentItem: FilterQuery;
     candidate: CandidateDto;
     poll: PollDto;
 }

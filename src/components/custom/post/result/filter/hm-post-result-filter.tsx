@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
-import { PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
+import { PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
-import { HiveMimeVoteQueryGroup } from "./hm-vote-query-group";
+import { HiveMimeFilterQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { LayoutGroup } from "framer-motion";
@@ -13,7 +13,7 @@ import { LayoutGroup } from "framer-motion";
 
 interface HiveMimePostResultFilterProps {
     post: PostDto;
-    builder: VoteQueryGroup;
+    builder: FilterQueryGroup;
     isOpen: boolean;
     onFinished: () => void;
 }
@@ -22,7 +22,7 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
     const { t } = useTranslation();
     const [showCreator, setShowCreator] = useState(false);
 
-    function handleFinished(newQuery: VoteQuery | null) {
+    function handleFinished(newQuery: FilterQuery | null) {
         if (newQuery) {
             builder.children!.push(newQuery);
         }
@@ -53,7 +53,7 @@ export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFin
                         <LayoutGroup>
                             {builder.children!.length > 0 &&
                                 <div className="border rounded mb-2 text-sm text-muted-foreground ">
-                                    <HiveMimeVoteQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
+                                    <HiveMimeFilterQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
                                 </div>
                             }
                         </LayoutGroup>

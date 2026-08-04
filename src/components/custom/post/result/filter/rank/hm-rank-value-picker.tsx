@@ -3,14 +3,14 @@ import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inli
 import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { CandidateDto, PollDto, ValueOperator, VoteQuery } from "@/lib/Api";
+import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface HiveMimeFilterConditionRankValuePickerProps {
-    currentItem: VoteQuery;
+    currentItem: FilterQuery;
     candidate: CandidateDto;
     poll: PollDto;
 }

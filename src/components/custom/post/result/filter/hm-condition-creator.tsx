@@ -1,6 +1,6 @@
 import { HiveMimeMultiStep, HiveMimeStep } from "@/components/custom/utility/hm-multistep-ui";
-import { PollType, PostDto, VoteQuery } from "@/lib/Api";
-import { createVoteQuery, resolveCandidate } from "@/lib/vote-query";
+import { PollType, PostDto, FilterQuery } from "@/lib/Api";
+import { createFilterQuery, resolveCandidate } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,16 +12,16 @@ import { HiveMimeFilterConditionCategoryValuePicker } from "./category/hm-catego
 import { HiveMimeFilterConditionDrawValuePicker } from "./draw/hm-draw-value-picker";
 
 
-interface HiveMimeVoteQueryDialogProps {
+interface HiveMimeFilterQueryDialogProps {
     post: PostDto;
-    currentItem?: VoteQuery | null;
-    onFinished: (result: VoteQuery | null) => void;
+    currentItem?: FilterQuery | null;
+    onFinished: (result: FilterQuery | null) => void;
 }
 
-export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, onFinished }: HiveMimeVoteQueryDialogProps) => {
+export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, onFinished }: HiveMimeFilterQueryDialogProps) => {
     const { t } = useTranslation();
-    const item = useMemo(() => currentItem ?? createVoteQuery(), [currentItem]);
-    const { poll, candidate } = resolveCandidate(post, item.candidateId);
+    const item = useMemo(() => currentItem ?? createFilterQuery(), [currentItem]);
+    const { poll, candidate } = resolveCandidate(post, item.property);
 
     const pollMapping: {
         [key in PollType]: React.ReactElement;

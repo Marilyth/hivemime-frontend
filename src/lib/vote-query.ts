@@ -1,19 +1,19 @@
 import { observable } from "mobx";
-import { BooleanOperator, CandidateDto, PollDto, PostDto, VoteQuery, VoteQueryGroup } from "./Api";
+import { BooleanOperator, CandidateDto, PollDto, PostDto, FilterQuery, FilterQueryGroup } from "./Api";
 
-export function createVoteQuery(): VoteQuery {
-  return observable<VoteQuery>({ isNegated: false, leftOperator: BooleanOperator.And });
+export function createFilterQuery(): FilterQuery {
+  return observable<FilterQuery>({ isNegated: false, leftOperator: BooleanOperator.And });
 }
 
-export function createVoteQueryGroup(): VoteQueryGroup {
-  return observable<VoteQueryGroup>({ isNegated: false, leftOperator: BooleanOperator.And, children: [] });
+export function createFilterQueryGroup(): FilterQueryGroup {
+  return observable<FilterQueryGroup>({ isNegated: false, leftOperator: BooleanOperator.And, children: [] });
 }
 
-export function isVoteQuery(x: unknown): x is VoteQuery {
+export function isFilterQuery(x: unknown): x is FilterQuery {
   return !!x && typeof x === "object" && !Array.isArray((x as { children?: unknown }).children);
 }
 
-export function isVoteQueryGroup(x: unknown): x is VoteQueryGroup {
+export function isFilterQueryGroup(x: unknown): x is FilterQueryGroup {
   return !!x && typeof x === "object" && Array.isArray((x as { children?: unknown }).children);
 }
 

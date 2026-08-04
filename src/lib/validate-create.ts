@@ -1,4 +1,4 @@
-import { CreatePollDto, CreatePostDto, PollType, DatePollMode } from "./Api";
+import { CreatePollDto, CreatePostDto, PollType } from "./Api";
 import i18n from "./i18n";
 
 export function validatePostTitle(post: CreatePostDto): string[] {
@@ -99,13 +99,8 @@ function validateDrawPoll(poll: CreatePollDto): string[] {
 function validateDatePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
-    if (poll.dateMode === DatePollMode.Specific) {
-        if (!poll.candidates || poll.candidates.length < 1) {
-            errors.push(i18n.t("validation:poll.noCandidates"));
-        }
-
-        return errors;
-    }
+    if (!poll.candidates || poll.candidates.length < 1)
+        errors.push(i18n.t("validation:poll.noCandidates"));
 
     if (poll.minValue == undefined || poll.maxValue == undefined || poll.minValue >= poll.maxValue) {
         errors.push(i18n.t("validation:poll.dateRange"));

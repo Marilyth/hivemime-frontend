@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-import { BooleanOperator, PollType, PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
-import { createVoteQueryGroup, isVoteQuery, isVoteQueryGroup, resolveCandidate } from "@/lib/vote-query";
+import { BooleanOperator, PollType, PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
+import { createFilterQueryGroup, isFilterQuery, isFilterQueryGroup, resolveCandidate } from "@/lib/vote-query";
 import { HiveMimeFilterConditionChoiceValueViewer } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-picker";
 import { HiveMimeFilterConditionRankValueViewer } from "./rank/hm-rank-value-picker";
@@ -16,18 +16,18 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 
-type HiveMimeVoteQueryProps = {
-    ancestors: VoteQueryGroup[];
-    currentItem: VoteQuery;
+type HiveMimeFilterQueryProps = {
+    ancestors: FilterQueryGroup[];
+    currentItem: FilterQuery;
     isFirstItem: boolean;
     onEdit?: () => void;
     onMoved?: () => void;
     post: PostDto;
 };
 
-export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved, post }: HiveMimeVoteQueryProps) => {
+export const HiveMimeFilterQuery = observer(({ currentItem, ancestors, isFirstItem, onEdit, onMoved, post }: HiveMimeFilterQueryProps) => {
     const { t } = useTranslation();
-    const { poll, candidate } = resolveCandidate(post, currentItem.candidateId);
+    const { poll, candidate } = resolveCandidate(post, currentItem.property);
     const pollMapping: {
         [key in PollType]: React.ReactElement;
     } = {
@@ -40,15 +40,15 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
     };
 
     function isNotAncestor(draggable: unknown): boolean {
-        return !(isVoteQueryGroup(draggable) &&
-                 ancestors.includes(draggable as VoteQueryGroup));
+        return !(isFilterQueryGroup(draggable) &&
+                 ancestors.includes(draggable as FilterQueryGroup));
     }
     
     function getParent() {
         return ancestors[ancestors.length - 1];
     }
 
-    function removeItem(item: VoteQuery) {
+    function removeItem(item: FilterQuery) {
         const parent = getParent();
         parent.children = parent.children!.filter(i => i !== item);
 
@@ -58,15 +58,15 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
     function onDropped(args: OnDroppedArgs) {
         const { draggableData, dropAreaData, zone } = args;
 
-        if (zone === "center" && (isVoteQuery(draggableData) || isVoteQueryGroup(draggableData))) {
+        if (zone === "center" && (isFilterQuery(draggableData) || isFilterQueryGroup(draggableData))) {
             // We are the only children of the group no need for another.
             if (getParent().children!.length == 2)
                 return;
 
-            const draggableItem = draggableData as VoteQuery | VoteQueryGroup;
+            const draggableItem = draggableData as FilterQuery | FilterQueryGroup;
 
             // Create a new group with the dragged item and the target item.
-            const newGroup = createVoteQueryGroup();
+            const newGroup = createFilterQueryGroup();
             newGroup.children!.push(currentItem);
             newGroup.children!.push(draggableItem);
 

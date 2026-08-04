@@ -2,7 +2,7 @@ import { HiveMimeHoverCard } from "@/components/custom/utility/hm-hover-card";
 import { useHiveMimeStep } from "@/components/custom/utility/hm-multistep-ui";
 import { HiveMimePollTypeIcon } from "@/components/custom/utility/hm-poll-type-icon";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CandidateDto, PollDto, PostDto, VoteQuery } from "@/lib/Api";
+import { CandidateDto, PollDto, PostDto, FilterQuery } from "@/lib/Api";
 import { getReferenceId } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ import { HiveMimeViewCandidate } from "../../hm-candidate";
 
 interface HiveMimeFilterConditionCandidatePickerProps {
     post: PostDto;
-    currentItem: VoteQuery;
+    currentItem: FilterQuery;
 }
 
 export const HiveMimeFilterConditionCandidatePicker = observer(({ post, currentItem }: HiveMimeFilterConditionCandidatePickerProps) => {
@@ -20,8 +20,8 @@ export const HiveMimeFilterConditionCandidatePicker = observer(({ post, currentI
 
     function onCandidatePicked(poll: PollDto, candidate: CandidateDto) {
         // If a new candidate was picked, reset the value.
-        if (currentItem.candidateId != candidate.id){
-            currentItem.candidateId = candidate.id;
+        if (currentItem.property != candidate.id){
+            currentItem.property = candidate.id;
             currentItem.value = null;
             currentItem.valueOperator = undefined;
             currentItem.isNegated = false;

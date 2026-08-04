@@ -44,11 +44,6 @@ export enum PollType {
   Date = "Date",
 }
 
-export enum DatePollMode {
-  Range = "Range",
-  Specific = "Specific",
-}
-
 export enum MemberRole {
   Guest = "Guest",
   Follower = "Follower",
@@ -329,8 +324,9 @@ export interface CreatePollDto {
   columns?: number | null;
   /** @format double */
   stepValue?: number | null;
+  dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
-  dateMode?: DatePollMode | null;
   candidates?: CreateCandidateDto[] | null;
   categories?: CreateCategoryDto[] | null;
 }
@@ -346,6 +342,21 @@ export interface EditCommentDto {
   commentId?: string;
   newContent?: string | null;
 }
+
+export type FilterQuery = FilterQueryBase & {
+  property?: string | null;
+  valueOperator?: ValueOperator;
+  value?: string | null;
+};
+
+export interface FilterQueryBase {
+  isNegated?: boolean;
+  leftOperator?: BooleanOperator;
+}
+
+export type FilterQueryGroup = FilterQueryBase & {
+  children?: (FilterQuery | FilterQueryGroup)[] | null;
+};
 
 export interface HiveDto {
   /** @format uuid */
@@ -445,8 +456,9 @@ export interface PollDto {
   columns?: number | null;
   /** @format double */
   stepValue?: number | null;
+  dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
-  dateMode?: DatePollMode | null;
   candidates?: CandidateDto[] | null;
   categories?: CategoryDto[] | null;
 }
@@ -594,21 +606,6 @@ export interface UserSettingsDto {
   shareAgeOnVote?: boolean;
   protectVoteOnFilter?: boolean;
 }
-
-export type VoteQuery = VoteQueryBase & {
-  candidateId?: string | null;
-  valueOperator?: ValueOperator;
-  value?: string | null;
-};
-
-export interface VoteQueryBase {
-  isNegated?: boolean;
-  leftOperator?: BooleanOperator;
-}
-
-export type VoteQueryGroup = VoteQueryBase & {
-  children?: (VoteQuery | VoteQueryGroup)[] | null;
-};
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -1376,7 +1373,7 @@ export class Api<
      * @secure
      */
     postChoiceResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1403,7 +1400,7 @@ export class Api<
      * @secure
      */
     postScoreResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1430,7 +1427,7 @@ export class Api<
      * @secure
      */
     postRankResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1457,7 +1454,7 @@ export class Api<
      * @secure
      */
     postCategoryResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1484,7 +1481,7 @@ export class Api<
      * @secure
      */
     postDrawResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1511,7 +1508,7 @@ export class Api<
      * @secure
      */
     postDateResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
