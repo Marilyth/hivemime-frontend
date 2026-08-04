@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { HiveMimeCreateDrawRules } from "./hm-create-draw-poll";
 import { HiveMimeCreateDrawCandidates } from "./hm-create-draw-candidate";
+import { HiveMimeCreateDateCandidates } from "./hm-create-date-candidate";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -34,6 +35,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
     [PollType.Rank]: <HiveMimeCreateRankingRules poll={props.poll} />,
     [PollType.Category]: <HiveMimeCreateCategorizationRules poll={props.poll} />,
     [PollType.Draw]: <HiveMimeCreateDrawRules poll={props.poll} />,
+    [PollType.Date]: <div>ToDo</div>,
   };
 
   const errors = validateCreatePoll(props.poll);
@@ -80,8 +82,18 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
+        {props.poll.pollType === PollType.Date &&
+          <HiveMimeStep canContinue={props.poll.candidates!.length > 0 && props.poll.maxValue !== undefined && props.poll.maxValue > 0 && props.poll.minValue !== undefined && props.poll.minValue > 0}>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <Label className="text-sm text-muted-foreground">{t("posts:create.createDateCandidates")}</Label>
+              </div>
+              <HiveMimeCreateDateCandidates poll={props.poll} />
+            </div>
+          </HiveMimeStep>
+        }
         
-        {props.poll.pollType !== PollType.Draw &&
+        {(props.poll.pollType !== PollType.Draw && props.poll.pollType !== PollType.Date) &&
           <HiveMimeStep canContinue={props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">

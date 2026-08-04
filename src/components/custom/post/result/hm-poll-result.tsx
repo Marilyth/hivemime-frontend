@@ -25,6 +25,7 @@ export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResult
     [PollType.Rank]: <HiveMimeRankResult poll={poll} filter={filter} />,
     [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
     [PollType.Draw]: <HiveMimeDrawResult poll={poll} filter={filter} />,
+    [PollType.Date]: <div>ToDo</div>,
   };
 
   return (

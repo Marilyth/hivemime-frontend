@@ -1,6 +1,7 @@
 import {
   CandidateCategoryVoteDto,
   CandidateChoiceVoteDto,
+  CandidateDateVoteDto,
   CandidateDrawVoteDto,
   CandidateRankVoteDto,
   CandidateScoreVoteDto,
@@ -15,7 +16,7 @@ import { UiCandidateVote, UiPostVoteDto } from "./vote-models";
 function serializeCandidateVote(
   poll: PollDto,
   candidate: UiCandidateVote,
-): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateDrawVoteDto[] | null {
+): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateDrawVoteDto[] | CandidateDateVoteDto[] | null {
   const base = { id: candidate.id, name: candidate.name };
 
   switch (poll.pollType) {
@@ -41,6 +42,11 @@ function serializeCandidateVote(
         .map((value, index) => ({ value: value, index }))
         .filter(c => c.value.value > 0)
         .map(c => ({ ...base, cellIndex: c.index }));
+
+    case PollType.Date:
+      if (!candidate.timestamps || candidate.timestamps.length === 0) return null;
+      return candidate.timestamps
+        .map(t => ({ ...base, timestamp: t }));
 
     default:
       return null;

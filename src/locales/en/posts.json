@@ -55,6 +55,7 @@
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the user to assign the candidates to.",
     "createDrawCandidates": "Select the image for the user to draw on.",
+    "createDateCandidates": "Adjust the date selection properties.",
     "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
@@ -64,6 +65,9 @@
     "pickColorFor": "Pick a color for {{name}}",
     "defaultCandidateName": "Candidate {{index}}",
     "defaultCategoryName": "Category {{index}}",
+    "endDate": "End date",
+    "startDate": "Start date",
+    "precision": "Precision",
     "hiveSelection": {
       "thisIsA": "This is a <select/> post.",
       "postedInto": "It will be posted into",

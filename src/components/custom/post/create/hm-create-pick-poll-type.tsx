@@ -21,6 +21,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
   const options: HiveMimeCreatePollTypePickerOption[] = [
     { value: PollType.Choice },
     { value: PollType.Score },
+    { value: PollType.Date },
     { value: PollType.Rank },
     { value: PollType.Category },
     { value: PollType.Draw },

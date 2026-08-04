@@ -35,7 +35,8 @@ export const HiveMimeVoteQuery = observer(({ currentItem, ancestors, isFirstItem
         [PollType.Score]: <HiveMimeFilterConditionScoreValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Rank]: <HiveMimeFilterConditionRankValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
-        [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />
+        [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Date]: <div>ToDo</div>,
     };
 
     function isNotAncestor(draggable: unknown): boolean {

@@ -35,6 +35,8 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
         case PollType.Draw:
             errors.push(...validateDrawPoll(poll));
             break;
+        case PollType.Date:
+            break;
         default:
             errors.push(i18n.t("validation:poll.noType"));
     }

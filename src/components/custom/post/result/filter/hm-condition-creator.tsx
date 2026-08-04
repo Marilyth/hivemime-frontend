@@ -30,7 +30,8 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
         [PollType.Score]: <HiveMimeFilterConditionScoreValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
         [PollType.Rank]: <HiveMimeFilterConditionRankValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
-        [PollType.Draw]: <HiveMimeFilterConditionDrawValuePicker currentItem={item} candidate={candidate!} poll={poll!} />
+        [PollType.Draw]: <HiveMimeFilterConditionDrawValuePicker currentItem={item} candidate={candidate!} poll={poll!} />,
+        [PollType.Date]: <div>ToDo</div>,
     };
 
     return (

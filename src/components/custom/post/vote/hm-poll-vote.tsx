@@ -33,6 +33,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Rank]: <HiveMimeRankPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Draw]: <HiveMimeDrawPollVote poll={poll} pollVotes={pollVote} />,
+    [PollType.Date]: <div>ToDo</div>,
   };
 
   function getStateColour(){

@@ -66,14 +66,16 @@
     "score": "Score",
     "rank": "Rank",
     "category": "Category",
-    "draw": "Draw"
+    "draw": "Draw",
+    "date": "Date"
   },
   "pollTypeDescription": {
     "choice": "The user has to pick candidates.",
     "score": "The user has to assign numerical values to candidates.",
-    "rank": "The user has to rank the candidates in order of preference. (E.g. top 10 lists)",
+    "rank": "The user has to rank candidates in order of preference. (E.g. top 10 lists)",
     "category": "The user has to assign categories to candidates. (E.g. tier lists)",
-    "draw": "The user has to draw on an image."
+    "draw": "The user has to draw on an image.",
+    "date": "The user has to select dates."
   },
   "rankFilter": {
     "nothing": "Nothing"
