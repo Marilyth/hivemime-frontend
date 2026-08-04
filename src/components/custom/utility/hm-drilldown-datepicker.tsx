@@ -4,20 +4,26 @@ import * as React from "react";
 import {
   addDays,
   addHours,
+  addMinutes,
   addMonths,
   addYears,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
-  isSameDay,
+  endOfYear,
   isToday,
   startOfMonth,
   startOfWeek,
+  startOfYear,
 } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { makeAutoObservable, observable } from "mobx";
+import { observer } from "mobx-react-lite";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
+import { mixColors, mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -39,20 +45,108 @@ export enum DrilldownScope {
   Minute,
 }
 
+export enum Variant {
+  Edit = "edit",
+  Result = "result",
+}
+
+const DEFAULT_START_COLOR = mutedColors.gray + "BB";
+const DEFAULT_END_COLOR = mutedColors.red + "BB";
+
+interface DateValue {
+  date: Date;
+  value: number;
+}
+
+export class DateSelection {
+  dates = observable.map<number, DateValue>();
+  onDatesCount = 0;
+  maxOnDates: number;
+
+  constructor(maxOnDates: number) {
+    this.maxOnDates = maxOnDates;
+    makeAutoObservable(this);
+  }
+
+  setValue(date: Date, value: number) {
+    const key = date.getTime();
+    const existing = this.dates.get(key)?.value ?? 0;
+
+    if (existing > 0 && value === 0)
+      this.onDatesCount--;
+    else if (existing === 0 && value > 0)
+      this.onDatesCount++;
+
+    this.dates.set(key, { date: new Date(key), value });
+  }
+
+  getValue(date: Date): number {
+    return this.dates.get(date.getTime())?.value ?? 0;
+  }
+
+  sumInRange(start: Date, end: Date): number {
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+    let sum = 0;
+
+    for (const { date, value } of this.dates.values()) {
+      const time = date.getTime();
+      if (time >= startTime && time <= endTime)
+        sum += value;
+    }
+
+    return sum;
+  }
+
+  hasSelectionInRange(start: Date, end: Date): boolean {
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+
+    for (const { date, value } of this.dates.values()) {
+      const time = date.getTime();
+      if (value === 1 && time >= startTime && time <= endTime)
+        return true;
+    }
+
+    return false;
+  }
+
+  public get bounds() {
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (const { value } of this.dates.values()) {
+      if (value < min && value > 0)
+        min = value;
+      if (value > max)
+        max = value;
+    }
+
+    if (min === Infinity)
+      return { min: 0, max: 0 };
+
+    return { min, max };
+  }
+}
+
 interface GridItem {
   key: string | number;
   label: string;
-  isSelected: boolean;
   onSelect: () => void;
   className?: string;
+  style?: React.CSSProperties;
+  onHover?: (e: React.MouseEvent) => void;
+  onHoverEnd?: () => void;
 }
 
 export interface HiveMimeDrilldownDatePickerProps {
-  value?: Date | null;
   initialDate?: Date;
-  onChange?: (date: Date) => void;
   step?: DrilldownStep;
   initialScope?: DrilldownScope;
+  variant?: Variant;
+  dateSelection: DateSelection;
+  startColor?: string;
+  endColor?: string;
   className?: string;
   classNames?: {
     header?: string;
@@ -91,12 +185,14 @@ const monthLabels = () =>
     new Date(2000, i, 1).toLocaleString("default", { month: "short" })
   );
 
-export function HiveMimeDrilldownDatePicker({
-  value,
+export const HiveMimeDrilldownDatePicker = observer(function HiveMimeDrilldownDatePicker({
   initialDate,
-  onChange,
   step = DrilldownStep.Day,
   initialScope = DrilldownScope.Day,
+  variant = Variant.Edit,
+  dateSelection,
+  startColor = DEFAULT_START_COLOR,
+  endColor = DEFAULT_END_COLOR,
   className,
   classNames,
 }: HiveMimeDrilldownDatePickerProps) {
@@ -104,10 +200,10 @@ export function HiveMimeDrilldownDatePicker({
 
   const reachableScopes = scopesForStep(step);
   const finestScope = reachableScopes[reachableScopes.length - 1];
-  const seed = value ?? initialDate ?? new Date();
+  const seed = initialDate ?? new Date();
 
-  const [internalValue, setInternalValue] = React.useState<Date>(seed);
   const [scope, setScope] = React.useState<DrilldownScope>(Math.min(initialScope, finestScope));
+  const [tooltip, setTooltip] = React.useState<{ title: string; value: number; x: number; y: number } | null>(null);
 
   const [focus, setFocus] = React.useState(() => ({
     year: seed.getFullYear(),
@@ -134,27 +230,6 @@ export function HiveMimeDrilldownDatePicker({
     action();
   }, [animation]);
 
-  const selected = value ?? internalValue;
-
-  React.useEffect(() => {
-    if (value) {
-      setFocus({
-        year: value.getFullYear(),
-        month: value.getMonth(),
-        day: value.getDate(),
-        hour: value.getHours(),
-        minute: value.getMinutes(),
-      });
-    }
-  }, [value]);
-
-  const isSelectedPart = (hour?: number, minute?: number) =>
-    focus.year === selected.getFullYear() &&
-    focus.month === selected.getMonth() &&
-    focus.day === selected.getDate() &&
-    (hour === undefined || hour === selected.getHours()) &&
-    (minute === undefined || minute === selected.getMinutes());
-
   const viewKey = () => {
     if (scope === DrilldownScope.Year)
       return `year-${yearPageStart}`;
@@ -169,34 +244,41 @@ export function HiveMimeDrilldownDatePicker({
 
   const isFinest = (scopeValue: DrilldownScope) => scopeValue === finestScope;
 
+  function toggleDate(date: Date) {
+    if (variant !== Variant.Edit)
+      return;
+    const current = dateSelection.getValue(date);
+    dateSelection.setValue(date, current === 1 ? 0 : 1);
+  }
+
   function handleSelect(scopeValue: DrilldownScope, index: number) {
     if (scopeValue === DrilldownScope.Year) {
       setFocus((f) => ({ ...f, year: index }));
       if (isFinest(DrilldownScope.Year))
-        commit({ year: index, month: 0, day: 1, hour: 0, minute: 0 });
+        toggleDate(new Date(index, 0, 1));
       else
         drillInto(DrilldownScope.Month);
     } else if (scopeValue === DrilldownScope.Month) {
       setFocus((f) => ({ ...f, month: index }));
       if (isFinest(DrilldownScope.Month))
-        commit({ year: focus.year, month: index, day: 1, hour: 0, minute: 0 });
+        toggleDate(new Date(focus.year, index, 1));
       else
         drillInto(DrilldownScope.Day);
     } else if (scopeValue === DrilldownScope.Day) {
       setFocus((f) => ({ ...f, day: index }));
       if (isFinest(DrilldownScope.Day))
-        commit({ ...focus, day: index, hour: 0, minute: 0 });
+        toggleDate(new Date(focus.year, focus.month, index));
       else
         drillInto(DrilldownScope.Hour);
     } else if (scopeValue === DrilldownScope.Hour) {
       setFocus((f) => ({ ...f, hour: index }));
       if (isFinest(DrilldownScope.Hour))
-        commit({ ...focus, hour: index, minute: 0 });
+        toggleDate(new Date(focus.year, focus.month, focus.day, index));
       else
         drillInto(DrilldownScope.Minute);
     } else if (scopeValue === DrilldownScope.Minute) {
       setFocus((f) => ({ ...f, minute: index }));
-      commit({ ...focus, minute: index });
+      toggleDate(new Date(focus.year, focus.month, focus.day, focus.hour, index));
     }
   }
 
@@ -212,12 +294,6 @@ export function HiveMimeDrilldownDatePicker({
 
     setAnimation({ type: "zoom", direction: -1 });
     pendingNav.current = () => setScope(currentIndex - 1);
-  }
-
-  function commit(dateParts: { year: number; month: number; day: number; hour: number; minute?: number }) {
-    const date = new Date(dateParts.year, dateParts.month, dateParts.day, dateParts.hour, dateParts.minute ?? 0, 0, 0);
-    setInternalValue(date);
-    onChange?.(date);
   }
 
   function navigateParent(delta: 1 | -1) {
@@ -271,6 +347,78 @@ export function HiveMimeDrilldownDatePicker({
     return dayString;
   }
 
+  function scopeHover(start: Date, end: Date, title: string) {
+    if (!dateSelection || variant !== Variant.Result)
+      return { onHover: undefined, onHoverEnd: undefined };
+
+    return {
+      onHover: (e: React.MouseEvent) => {
+        const value = dateSelection.sumInRange(start, end);
+        if (value <= 0) {
+          setTooltip(null);
+          return;
+        }
+        setTooltip({ title, value, x: e.clientX, y: e.clientY });
+      },
+      onHoverEnd: () => setTooltip(null),
+    };
+  }
+
+  function bucketKey(scopeValue: DrilldownScope, date: Date): number {
+    if (scopeValue === DrilldownScope.Year)
+      return new Date(date.getFullYear(), 0, 1).getTime();
+    if (scopeValue === DrilldownScope.Month)
+      return new Date(date.getFullYear(), date.getMonth(), 1).getTime();
+    if (scopeValue === DrilldownScope.Day)
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    if (scopeValue === DrilldownScope.Hour)
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()).getTime();
+  }
+
+  function scopeScale(scopeValue: DrilldownScope): { min: number; max: number } {
+    if (!dateSelection)
+      return { min: 0, max: 0 };
+
+    const groups = new Map<number, number>();
+    for (const { date, value } of dateSelection.dates.values()) {
+      if (value <= 0)
+        continue;
+      const key = bucketKey(scopeValue, date);
+      groups.set(key, (groups.get(key) ?? 0) + value);
+    }
+
+    let min = Infinity;
+    let max = -Infinity;
+    for (const v of groups.values()) {
+      if (v < min)
+        min = v;
+      if (v > max)
+        max = v;
+    }
+
+    if (min === Infinity)
+      return { min: 0, max: 0 };
+
+    return { min, max };
+  }
+
+  function gradientStyle(value: number, min: number, max: number): React.CSSProperties | undefined {
+    if (value <= 0)
+      return undefined;
+
+    const span = max - min;
+    const ratio = span <= 0
+      ? 1
+      : Math.max(0, Math.min(1, (value - min) / span));
+
+    return { background: mixColors(startColor, endColor, ratio) };
+  }
+
+  function rangeValue(start: Date, end: Date): number {
+    return dateSelection ? dateSelection.sumInRange(start, end) : 0;
+  }
+
   function renderHeader(value: string, onClickUp?: () => void) {
     return (
       <>
@@ -315,19 +463,21 @@ export function HiveMimeDrilldownDatePicker({
     );
   }
 
-  function renderCell(label: string, isSelected: boolean, onClick: () => void, extraClass?: string) {
+  function renderCell(item: GridItem) {
     return (
       <Button
         variant="ghost"
         className={cn(
           "h-9 flex-1 min-w-0 p-0 text-sm font-normal select-none",
-          isSelected && cn("bg-primary text-primary-foreground", classNames?.cellSelected),
-          extraClass,
+          item.className,
           classNames?.cell
         )}
-        onClick={onClick}
+        style={item.style}
+        onClick={item.onSelect}
+        onMouseEnter={item.onHover}
+        onMouseLeave={item.onHoverEnd}
       >
-        {label}
+        {item.label}
       </Button>
     );
   }
@@ -337,65 +487,122 @@ export function HiveMimeDrilldownDatePicker({
       <>
         {items.map((item) => (
           <div key={item.key} className="flex">
-            {renderCell(item.label, item.isSelected, item.onSelect, item.className)}
+            {renderCell(item)}
           </div>
         ))}
       </>
     );
   }
 
-  function renderSimpleScope(items: GridItem[], gridClassName: string) {
+  function renderGradientLegend(min: number, max: number) {
+    const span = max - min;
+    if (span <= 0)
+      return null;
+
+    return (
+      <div
+        className="relative mt-3 h-3 w-full rounded-sm"
+        style={{ background: `linear-gradient(to right, ${startColor}, ${endColor})` }}
+      >
+        {tooltip && (
+          <div
+            className="absolute top-0 h-full w-0.5 -translate-x-1/2 bg-foreground"
+            style={{ left: `${(Math.max(0, Math.min(1, (tooltip.value - min) / span))) * 100}%` }}
+          />
+        )}
+      </div>
+    );
+  }
+
+  function renderSimpleScope(items: GridItem[], gridClassName: string, min: number, max: number) {
     return (
       <div>
         {renderHeader(formatScopeValue(), scope === DrilldownScope.Year ? undefined : goUp)}
         <div className={cn(gridClassName, classNames?.grid)}>{renderGrid(items)}</div>
+        {renderGradientLegend(min, max)}
       </div>
     );
   }
 
   function renderYearView() {
+    const { min, max } = scopeScale(DrilldownScope.Year);
+
     const items: GridItem[] = [...Array(YEAR_PAGE_SIZE).keys()].map((i) => {
       const year = yearPageStart + i;
-      return { key: year, label: year.toString(), isSelected: year === selected.getFullYear(), onSelect: () => handleSelect(DrilldownScope.Year, year) };
+      const start = startOfYear(new Date(year, 0, 1));
+      const end = endOfYear(new Date(year, 0, 1));
+      return {
+        key: year,
+        label: year.toString(),
+        onSelect: () => handleSelect(DrilldownScope.Year, year),
+        style: gradientStyle(rangeValue(start, end), min, max),
+        ...scopeHover(start, end, year.toString()),
+      };
     });
 
-    return renderSimpleScope(items, "mt-3 grid grid-cols-5 gap-1");
+    return renderSimpleScope(items, "mt-3 grid grid-cols-5 gap-1", min, max);
   }
 
   function renderMonthView() {
-    const items: GridItem[] = monthLabels().map((label, month) => ({
-      key: month,
-      label,
-      isSelected: focus.year === selected.getFullYear() && month === selected.getMonth(),
-      onSelect: () => handleSelect(DrilldownScope.Month, month),
-    }));
+    const { min, max } = scopeScale(DrilldownScope.Month);
 
-    return renderSimpleScope(items, "mt-3 grid grid-cols-3 gap-1");
+    const items: GridItem[] = monthLabels().map((label, month) => {
+      const start = new Date(focus.year, month, 1);
+      const end = endOfMonth(start);
+      const title = start.toLocaleString("default", { month: "long", year: "numeric" });
+      return {
+        key: month,
+        label,
+        onSelect: () => handleSelect(DrilldownScope.Month, month),
+        style: gradientStyle(rangeValue(start, end), min, max),
+        ...scopeHover(start, end, title),
+      };
+    });
+
+    return renderSimpleScope(items, "mt-3 grid grid-cols-3 gap-1", min, max);
   }
 
   function renderHourView() {
-    const items: GridItem[] = [...Array(24).keys()].map((hour) => ({
-      key: hour,
-      label: hour.toString().padStart(2, "0"),
-      isSelected: isSelectedPart(hour),
-      onSelect: () => handleSelect(DrilldownScope.Hour, hour),
-    }));
+    const { min, max } = scopeScale(DrilldownScope.Hour);
 
-    return renderSimpleScope(items, "mt-3 grid grid-cols-6 gap-1");
+    const items: GridItem[] = [...Array(24).keys()].map((hour) => {
+      const start = new Date(focus.year, focus.month, focus.day, hour);
+      const end = addHours(start, 1);
+      const title = `${formatScopeValue()}, ${hour.toString().padStart(2, "0")}:00`;
+      return {
+        key: hour,
+        label: hour.toString().padStart(2, "0"),
+        onSelect: () => handleSelect(DrilldownScope.Hour, hour),
+        style: gradientStyle(rangeValue(start, end), min, max),
+        ...scopeHover(start, end, title),
+      };
+    });
+
+    return renderSimpleScope(items, "mt-3 grid grid-cols-6 gap-1", min, max);
   }
 
   function renderMinuteView() {
     const minutes = [...Array(60).keys()].filter((m) => m % 15 === 0 || (m % 5 === 0 && step === 1) || step === 0);
-    const items: GridItem[] = minutes.map((minute) => ({
-      key: minute,
-      label: minute.toString().padStart(2, "0"),
-      isSelected: isSelectedPart(focus.hour, minute),
-      onSelect: () => handleSelect(DrilldownScope.Minute, minute),
-    }));
+    const { min, max } = scopeScale(DrilldownScope.Minute);
+
+    const items: GridItem[] = minutes.map((minute) => {
+      const start = new Date(focus.year, focus.month, focus.day, focus.hour, minute);
+      const end = addMinutes(start, 1);
+      const title = `${formatScopeValue()}, ${focus.hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+      return {
+        key: minute,
+        label: minute.toString().padStart(2, "0"),
+        onSelect: () => handleSelect(DrilldownScope.Minute, minute),
+        style: gradientStyle(rangeValue(start, end), min, max),
+        ...scopeHover(start, end, title),
+      };
+    });
 
     return renderSimpleScope(
       items,
-      cn("mt-3 grid gap-1", step === 2 ? "grid-cols-4" : step === 1 ? "grid-cols-6" : "grid-cols-10")
+      cn("mt-3 grid gap-1", step === 2 ? "grid-cols-4" : step === 1 ? "grid-cols-6" : "grid-cols-10"),
+      min,
+      max
     );
   }
 
@@ -405,20 +612,23 @@ export function HiveMimeDrilldownDatePicker({
     const gridEnd = endOfWeek(endOfMonth(monthStart), { weekStartsOn: 1 });
     const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
 
+    const { min, max } = scopeScale(DrilldownScope.Day);
+
     const items: GridItem[] = days.map((day) => {
       const outside = day.getMonth() !== focus.month;
-      const isSelectedDay = isSameDay(day, selected);
+      const dayValue = dateSelection.getValue(day);
+      const title = day.toLocaleString("default", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
       return {
         key: day.getTime(),
         label: day.getDate().toString(),
-        isSelected: isSelectedDay,
         onSelect: () => outside ? undefined : handleSelect(DrilldownScope.Day, day.getDate()),
         className: cn(
           outside && "text-muted-foreground opacity-0",
-          !outside && isToday(day) && "bg-accent",
-          isSelectedDay && "bg-primary text-primary-foreground"
+          !outside && isToday(day) && "bg-accent"
         ),
+        style: !outside ? gradientStyle(dayValue, min, max) : undefined,
+        ...scopeHover(day, day, title),
       };
     });
 
@@ -435,6 +645,8 @@ export function HiveMimeDrilldownDatePicker({
           </div>
           <div className={cn("mt-2 grid grid-cols-7 gap-1", classNames?.grid)}>{renderGrid(items)}</div>
         </div>
+
+        {renderGradientLegend(min, max)}
       </div>
     );
   }
@@ -472,6 +684,19 @@ export function HiveMimeDrilldownDatePicker({
           {renderCurrentScope()}
         </motion.div>
       </AnimatePresence>
+
+      {variant === Variant.Result && tooltip && createPortal(
+        <div
+          className="fixed z-50 whitespace-nowrap rounded-md border bg-card p-2 pointer-events-none"
+          style={{ left: tooltip.x, top: tooltip.y, transform: "translate(0.5rem, 0.5rem)" }}
+        >
+          <div className="text-xs text-muted-foreground">
+            {tooltip.title}
+          </div>
+          <div>Value: {tooltip.value.toFixed(4)}</div>
+        </div>,
+        document.body
+      )}
     </div>
   );
-}
+});
