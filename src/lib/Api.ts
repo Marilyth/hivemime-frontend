@@ -41,6 +41,7 @@ export enum PollType {
   Rank = "Rank",
   Category = "Category",
   Draw = "Draw",
+  Date = "Date",
 }
 
 export enum MemberRole {
@@ -113,6 +114,26 @@ export interface CandidateChoiceResultDtoPollResultDto {
 }
 
 export type CandidateChoiceVoteDto = CandidateVoteDto & object;
+
+export interface CandidateDateDistributionResultDto {
+  /** @format int64 */
+  timestamp?: number;
+  /** @format int32 */
+  voteCount?: number;
+}
+
+export type CandidateDateResultDto = CandidateResultDto & {
+  distribution?: CandidateDateDistributionResultDto[] | null;
+};
+
+export interface CandidateDateResultDtoPollResultDto {
+  candidates?: CandidateDateResultDto[] | null;
+}
+
+export type CandidateDateVoteDto = CandidateVoteDto & {
+  /** @format int64 */
+  timestamp?: number;
+};
 
 export interface CandidateDrawDistributionResultDto {
   /** @format int32 */
@@ -433,6 +454,7 @@ export interface PollVoteDto {
         | CandidateRankVoteDto
         | CandidateCategoryVoteDto
         | CandidateDrawVoteDto
+        | CandidateDateVoteDto
       )[]
     | null;
 }
@@ -1464,6 +1486,33 @@ export class Api<
     ) =>
       this.request<CandidateDrawResultDtoPollResultDto, any>({
         path: `/api/Post/drawResult`,
+        method: "POST",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostDateResultCreate
+     * @request POST:/api/Post/dateResult
+     * @secure
+     */
+    postDateResultCreate: (
+      data: VoteQuery | VoteQueryGroup,
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateDateResultDtoPollResultDto, any>({
+        path: `/api/Post/dateResult`,
         method: "POST",
         query: query,
         body: data,
