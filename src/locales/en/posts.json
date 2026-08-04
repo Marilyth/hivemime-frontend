@@ -55,7 +55,6 @@
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the user to assign the candidates to.",
     "createDrawCandidates": "Select the image for the user to draw on.",
-    "createDateCandidates": "Adjust the date selection properties.",
     "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
@@ -65,9 +64,9 @@
     "pickColorFor": "Pick a color for {{name}}",
     "defaultCandidateName": "Candidate {{index}}",
     "defaultCategoryName": "Category {{index}}",
-    "endDate": "End date",
-    "startDate": "Start date",
-    "precision": "Precision",
+    "pickDate": "Pick a date",
+    "chooseDateMode": "Choose how the dates should be presented.",
+    "addDate": "Add date",
     "hiveSelection": {
       "thisIsA": "This is a <select/> post.",
       "postedInto": "It will be posted into",
@@ -88,7 +87,12 @@
       "rowCount": "The image has <select/> rows.",
       "columnCount": "The image has <select/> columns.",
       "minCells": "The user has to draw at least <select/> cells.",
-      "maxCells": "The user can draw up to <select/> cells."
+      "maxCells": "The user can draw up to <select/> cells.",
+      "startDate": "The user can pick a date starting from <select/>.",
+      "endDate": "The user can pick a date up to <select/>.",
+      "precision": "The date precision is <select/>.",
+      "minDates": "The user has to select at least <select/> dates.",
+      "maxDates": "The user can select up to <select/> dates."
     },
     "scoring": {
       "minScore": "The minimum score is",

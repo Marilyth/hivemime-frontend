@@ -9,7 +9,9 @@
     "choiceMinCandidates": "A choice poll must have at least two candidates.",
     "scoreStepValue": "A scoring poll must have a step value higher than 0.",
     "categoryMinCategories": "A categorization poll must have at least two categories.",
-    "drawMedia": "A draw poll must have an image for each candidate."
+    "drawMedia": "A draw poll must have an image for each candidate.",
+    "dateRange": "A date poll must have a valid date range.",
+    "datePrecision": "A date poll must have a precision higher than 0."
   },
   "vote": {
     "required": "You must vote for this poll.",

@@ -44,6 +44,11 @@ export enum PollType {
   Date = "Date",
 }
 
+export enum DatePollMode {
+  Range = "Range",
+  Specific = "Specific",
+}
+
 export enum MemberRole {
   Guest = "Guest",
   Follower = "Follower",
@@ -325,6 +330,7 @@ export interface CreatePollDto {
   /** @format double */
   stepValue?: number | null;
   pollType?: PollType;
+  dateMode?: DatePollMode | null;
   candidates?: CreateCandidateDto[] | null;
   categories?: CreateCategoryDto[] | null;
 }
@@ -440,6 +446,7 @@ export interface PollDto {
   /** @format double */
   stepValue?: number | null;
   pollType?: PollType;
+  dateMode?: DatePollMode | null;
   candidates?: CandidateDto[] | null;
   categories?: CategoryDto[] | null;
 }

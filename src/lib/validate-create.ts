@@ -1,4 +1,4 @@
-import { CreatePollDto, CreatePostDto, PollType } from "./Api";
+import { CreatePollDto, CreatePostDto, PollType, DatePollMode } from "./Api";
 import i18n from "./i18n";
 
 export function validatePostTitle(post: CreatePostDto): string[] {
@@ -36,6 +36,7 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
             errors.push(...validateDrawPoll(poll));
             break;
         case PollType.Date:
+            errors.push(...validateDatePoll(poll));
             break;
         default:
             errors.push(i18n.t("validation:poll.noType"));
@@ -90,6 +91,28 @@ function validateDrawPoll(poll: CreatePollDto): string[] {
 
     if (poll.candidates?.find(c => (c.media?.contentLength ?? 0) <= 0)) {
        errors.push(i18n.t("validation:poll.drawMedia"));
+    }
+
+    return errors;
+}
+
+function validateDatePoll(poll: CreatePollDto): string[] {
+    const errors: string[] = [];
+
+    if (poll.dateMode === DatePollMode.Specific) {
+        if (!poll.candidates || poll.candidates.length < 1) {
+            errors.push(i18n.t("validation:poll.noCandidates"));
+        }
+
+        return errors;
+    }
+
+    if (poll.minValue == undefined || poll.maxValue == undefined || poll.minValue >= poll.maxValue) {
+        errors.push(i18n.t("validation:poll.dateRange"));
+    }
+
+    if (poll.stepValue == undefined || poll.stepValue <= 0) {
+        errors.push(i18n.t("validation:poll.datePrecision"));
     }
 
     return errors;

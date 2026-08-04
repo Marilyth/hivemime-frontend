@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollType } from "@/lib/Api";
+import { CreatePollDto, PollType, DatePollMode } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../../utility/labelled-input";
 import { observer } from "mobx-react-lite";
 import { HiveMimeCreatePollTypePicker } from "./hm-create-pick-poll-type";
@@ -19,6 +19,11 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { HiveMimeCreateDrawRules } from "./hm-create-draw-poll";
 import { HiveMimeCreateDrawCandidates } from "./hm-create-draw-candidate";
 import { HiveMimeCreateDateCandidates } from "./hm-create-date-candidate";
+import {
+  HiveMimeCreateDateModePicker,
+  HiveMimeCreateDateRangeRules,
+  HiveMimeCreateDateSpecificRules,
+} from "./hm-create-date-poll";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -35,10 +40,17 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
     [PollType.Rank]: <HiveMimeCreateRankingRules poll={props.poll} />,
     [PollType.Category]: <HiveMimeCreateCategorizationRules poll={props.poll} />,
     [PollType.Draw]: <HiveMimeCreateDrawRules poll={props.poll} />,
-    [PollType.Date]: <div>ToDo</div>,
+    [PollType.Date]: <></>,
   };
 
   const errors = validateCreatePoll(props.poll);
+
+  function renderDateRules() {
+    if (props.poll.dateMode === DatePollMode.Specific)
+      return <HiveMimeCreateDateSpecificRules poll={props.poll} />;
+
+    return <HiveMimeCreateDateRangeRules poll={props.poll} />;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -49,6 +61,17 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
             <HiveMimeCreatePollTypePicker poll={props.poll} />
           </div>
         </HiveMimeStep>
+
+        {props.poll.pollType === PollType.Date &&
+          <HiveMimeStep canContinue={props.poll.dateMode !== undefined}>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <Label className="text-sm text-muted-foreground">{t("posts:create.chooseDateMode")}</Label>
+              </div>
+              <HiveMimeCreateDateModePicker poll={props.poll} />
+            </div>
+          </HiveMimeStep>
+        }
 
         <HiveMimeStep canContinue={props.poll.title !== undefined && props.poll.title!.trim().length >= 3}>
           <div className="flex flex-col gap-4">
@@ -82,24 +105,18 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
-        {props.poll.pollType === PollType.Date &&
-          <HiveMimeStep canContinue={props.poll.candidates!.length > 0 && props.poll.maxValue !== undefined && props.poll.maxValue > 0 && props.poll.minValue !== undefined && props.poll.minValue > 0}>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col">
-                <Label className="text-sm text-muted-foreground">{t("posts:create.createDateCandidates")}</Label>
-              </div>
-              <HiveMimeCreateDateCandidates poll={props.poll} />
-            </div>
-          </HiveMimeStep>
-        }
-        
-        {(props.poll.pollType !== PollType.Draw && props.poll.pollType !== PollType.Date) &&
-          <HiveMimeStep canContinue={props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
+        {props.poll.pollType !== PollType.Draw &&
+          (props.poll.pollType !== PollType.Date || props.poll.dateMode === DatePollMode.Specific) &&
+          <HiveMimeStep canContinue={props.poll.pollType === PollType.Date
+              ? props.poll.candidates!.length > 0
+              : props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">
                 <Label className="text-sm text-muted-foreground">{t("posts:create.createCandidates")}</Label>
               </div>
-              <HiveMimeCreateCandidates poll={props.poll} />
+              {props.poll.pollType === PollType.Date
+                ? <HiveMimeCreateDateCandidates poll={props.poll} />
+                : <HiveMimeCreateCandidates poll={props.poll} />}
             </div>
           </HiveMimeStep>
         }
@@ -107,7 +124,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
         <HiveMimeStep canContinue={errors.length === 0}>
           <div className="flex flex-col gap-4">
             <Label className="text-sm text-muted-foreground mb-2">{t("posts:create.configureRules")}</Label>
-            {pollMapping[props.poll.pollType!]}
+            {props.poll.pollType === PollType.Date ? renderDateRules() : pollMapping[props.poll.pollType!]}
 
             {errors.length > 0 && <div className="flex flex-col">
               {errors.map((error, index) => (

@@ -69,7 +69,7 @@ export const HiveMimeCreatePost = observer(() => {
                        minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
                        minVotesPerCandidate: 1, maxVotesPerCandidate: 1,
                        allowedCustomCandidateCount: 0, shuffleCandidates: false,
-                       pollType: undefined }));
+                       pollType: undefined, dateMode: undefined }));
   }
 
   function cancelPoll() {

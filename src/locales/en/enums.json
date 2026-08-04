@@ -50,6 +50,17 @@
     "are": "are",
     "areNot": "are not"
   },
+  "datePrecision": {
+    "day": "day",
+    "hour": "hour",
+    "minute": "minute"
+  },
+  "datePollMode": {
+    "range": "Date range",
+    "rangeDescription": "The user picks dates from a continuous range.",
+    "specific": "Specific dates",
+    "specificDescription": "The user votes for a set of specific dates."
+  },
   "memberRole": {
     "anyone": "Anyone",
     "followers": "Followers",
