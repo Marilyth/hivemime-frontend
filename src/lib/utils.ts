@@ -134,3 +134,20 @@ export function getImageDimensions(file: File): Promise<{ width: number; height:
     img.src = url;
   });
 }
+
+export function lowerBound<T>(arr: T[], target: T, compare: (a: T, b: T) => number) {
+  let lo = 0;
+  let hi = arr.length;
+
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+
+    if (compare(arr[mid], target) < 0) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+
+  return lo;
+}

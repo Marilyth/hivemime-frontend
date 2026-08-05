@@ -1,3 +1,4 @@
+import { lowerBound } from "@/lib/utils";
 import { makeAutoObservable } from "mobx";
 
 export enum CalendarScope {
@@ -18,33 +19,48 @@ export enum Animation {
 }
 
 export class DateSelection {
-  dates: { date: Date, value: number }[] = [];
+  // Note that this must be ordered at all times.
+  private dates: { date: Date, value: number }[] = [];
+
   currentDate: Date = new Date();
   maxDates: number;
   currentScope: CalendarScope = CalendarScope.Day;
   maxScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
 
-  constructor(maxScope: CalendarScope, maxDates: number) {
+  constructor(maxScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = []) {
     this.maxDates = maxDates;
     this.maxScope = maxScope;
+    this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
     makeAutoObservable(this);
   }
 
-  public get bounds() {
-    const dates = Object.groupBy(this.dates, d => this.getIdentifier(d.date));
+  public get yearBounds() {
+    return this.getBoundsForScope(CalendarScope.Year);
+  }
 
-    let min = Infinity;
-    let max = -Infinity;
+  public get monthBounds() {
+    return this.getBoundsForScope(CalendarScope.Month);
+  }
 
-    for (const yearDates of Object.values(dates)) {
-      const value = yearDates!.reduce((sum, d) => sum + d.value, 0);
+  public get dayBounds() {
+    return this.getBoundsForScope(CalendarScope.Day);
+  }
 
-      min = Math.min(min, value);
-      max = Math.max(max, value);
-    }
+  public get hourBounds() {
+    return this.getBoundsForScope(CalendarScope.Hour);
+  }
 
-    return { min, max };
+  public get fifteenMinuteBounds() {
+    return this.getBoundsForScope(CalendarScope.FifteenMinutes);
+  }
+
+  public get fiveMinuteBounds() {
+    return this.getBoundsForScope(CalendarScope.FiveMinutes);
+  }
+
+  public get minuteBounds() {
+    return this.getBoundsForScope(CalendarScope.Minute);
   }
 
   public get headerText() {
@@ -53,15 +69,15 @@ export class DateSelection {
         const startYear = this.currentDate.getFullYear() - (this.currentDate.getFullYear() % 25);
         return `${startYear} - ${startYear + 24}`;
       case CalendarScope.Month:
-        return this.currentDate.toLocaleString("default", { year: "numeric" });
+        return this.getScopedDateLocale(this.currentDate, CalendarScope.Year);
       case CalendarScope.Day:
-        return this.currentDate.toLocaleString("default", { month: "long", year: "numeric" });
+        return this.getScopedDateLocale(this.currentDate, CalendarScope.Month);
       case CalendarScope.Hour:
-        return this.currentDate.toLocaleString("default", { month: "short", day: "numeric", year: "numeric" });
+        return this.getScopedDateLocale(this.currentDate, CalendarScope.Day);
       case CalendarScope.FifteenMinutes:
       case CalendarScope.FiveMinutes:
       case CalendarScope.Minute:
-        return this.currentDate.toLocaleString("default", { month: "short", day: "numeric", year: "numeric", hour: "numeric" });
+        return this.getScopedDateLocale(this.currentDate, CalendarScope.Hour);
     }
   }
 
@@ -72,11 +88,12 @@ export class DateSelection {
     }
 
     // Select the date if we are at the max scope.
-    const scopedDate = this.getScopedDate(this.currentDate);
+    const scopedDate = this.getScopedDate(this.currentDate, this.currentScope);
     const index = this.dates.findIndex(d => d.date.getTime() === scopedDate.getTime());
 
     if (index === -1) {
-      this.dates.push({ date: scopedDate, value: 1 });
+      const insertIndex = lowerBound(this.dates, { date: scopedDate, value: 0 }, (a, b) => a.date.getTime() - b.date.getTime());
+      this.dates.splice(insertIndex, 0, { date: scopedDate, value: 1 });
     } else {
       this.dates.splice(index, 1);
     }
@@ -110,7 +127,7 @@ export class DateSelection {
     let newScope = Math.min(Math.max(this.currentScope + delta, this.maxScope), CalendarScope.Year);
 
     if (newScope <= CalendarScope.FifteenMinutes)
-      newScope = this.maxScope;
+      newScope = delta > 0 ? CalendarScope.Hour : this.maxScope;
 
     if (newScope !== this.currentScope) {
       this.animation = delta > 0 ? Animation.ZoomOut : Animation.ZoomIn;
@@ -118,21 +135,72 @@ export class DateSelection {
     }
   }
 
-  sumRange(start: Date, end: Date): number {
-    return this.dates
-      .filter(d => d.date >= start && d.date <= end)
-      .reduce((sum, d) => sum + d.value, 0);
+  sumScopedRange(date: Date, scope: CalendarScope): number {
+    const { start, end } = this.getScopedDateRange(date, scope);
+    
+    let startIndex = lowerBound(this.dates, { date: start, value: 0 }, (a, b) => a.date.getTime() - b.date.getTime());
+    let sum = 0;
+
+    for (let i = startIndex; i < this.dates.length && this.dates[i].date <= end; i++)
+      sum += this.dates[i].value;
+
+    return sum;
   }
 
-  getIdentifier(date: Date): string {
-    const keyParts = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()];
-    keyParts.splice(keyParts.length - (Math.max(0, this.currentScope - 2)));
+  private getScopedDateRange(date: Date, scope: CalendarScope): { start: Date, end: Date } {
+    const start = this.getScopedDate(date, scope);
+    const end = this.getScopedDate(date, scope);
 
-    return keyParts.join("-");
+    switch (scope) {
+      case CalendarScope.Year:
+        end.setFullYear(end.getFullYear() + 1);
+        break;
+      case CalendarScope.Month:
+        end.setMonth(end.getMonth() + 1);
+        break;
+      case CalendarScope.Day:
+        end.setDate(end.getDate() + 1);
+        break;
+      case CalendarScope.Hour:
+        end.setHours(end.getHours() + 1);
+        break;
+      case CalendarScope.FifteenMinutes:
+        end.setMinutes(end.getMinutes() + 15);
+        break;
+      case CalendarScope.FiveMinutes:
+        end.setMinutes(end.getMinutes() + 5);
+        break;
+      case CalendarScope.Minute:
+        end.setMinutes(end.getMinutes() + 1);
+        break;
+    }
+
+    end.setMilliseconds(end.getMilliseconds() - 1);
+
+    return { start: start, end: end };
   }
 
-  private getScopedDate(date: Date): Date {
-    switch (this.currentScope) {
+  getScopedDateLocale(date: Date, scope: CalendarScope): string {
+    date = this.getScopedDate(date, scope);
+
+    switch (scope) {
+      case CalendarScope.Year:
+        return date.toLocaleString("default", { year: "numeric" });
+      case CalendarScope.Month:
+        return date.toLocaleString("default", { month: "long", year: "numeric" });
+      case CalendarScope.Day:
+        return date.toLocaleString("default", { month: "short", day: "numeric", year: "numeric" });
+      case CalendarScope.Hour:
+        return date.toLocaleString("default", { month: "short", day: "numeric", year: "numeric", hour: "numeric" });
+      case CalendarScope.FifteenMinutes:
+      case CalendarScope.FiveMinutes:
+      case CalendarScope.Minute:
+        return date.toLocaleString("default", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "numeric" });
+    }
+  }
+
+  getScopedDate(date: Date, scope: CalendarScope): Date {
+    switch (scope) {
       case CalendarScope.Year:
         return new Date(date.getFullYear(), 0, 1);
       case CalendarScope.Month:
@@ -150,5 +218,21 @@ export class DateSelection {
       case CalendarScope.Minute:
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes());
     }
+  }
+
+  private getBoundsForScope(scope: CalendarScope): { min: number, max: number } {
+    const dates = Object.groupBy(this.dates, d => this.getScopedDateLocale(d.date, scope));
+
+    let min = Infinity;
+    let max = -Infinity;
+
+    for (const yearDates of Object.values(dates)) {
+      const value = yearDates!.reduce((sum, d) => sum + d.value, 0);
+
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+
+    return { min, max };
   }
 }

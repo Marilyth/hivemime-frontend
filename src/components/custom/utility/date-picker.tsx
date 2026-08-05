@@ -65,8 +65,8 @@ const CalendarMotion = observer(({ dateSelection, variant, startColor, endColor 
     [CalendarScope.Day]: <DayPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
     [CalendarScope.Hour]: <HourPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
     [CalendarScope.Minute]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.FiveMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.FifteenMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.FiveMinutes]: <FiveMinutesPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.FifteenMinutes]: <FifteenMinutesPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
   };
 
   function getInitialAnimation() {
@@ -118,9 +118,12 @@ const YearPicker = observer(({ dateSelection, variant, startColor, endColor, dat
   return (
     <div className="mt-3 grid grid-cols-5 gap-1">
       {Array.from({ length: yearsPerPage }, (_, i) => {
+        const mapDate = new Date(startYear + i, 0, 1);
+
         const year = startYear + i;
-        const value = dateSelection.sumRange(new Date(year, 0, 1), new Date(year, 11, 31, 23, 59, 59));
-        const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Year);
+        const bounds = dateSelection.yearBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
@@ -146,8 +149,11 @@ const MonthPicker = observer(({ dateSelection, variant, startColor, endColor, da
   return (
     <div className="mt-3 grid grid-cols-3 gap-1">
       {monthLabels().map((month, index) => {
-        const value = dateSelection.sumRange(new Date(date.getFullYear(), index, 1), new Date(date.getFullYear(), index, 31, 23, 59, 59));
-        const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
+        const mapDate = new Date(date.getFullYear(), index, 1);
+
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Month);
+        const bounds = dateSelection.monthBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
@@ -184,8 +190,10 @@ const DayPicker = observer(({ dateSelection, variant, startColor, endColor, date
       ))}
       {days.map((day) => {
         const isOutside = day.getMonth() !== date.getMonth();
-        const value = dateSelection.sumRange(new Date(day.getFullYear(), day.getMonth(), day.getDate()), new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59));
-        const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
+
+        const value = dateSelection.sumScopedRange(day, CalendarScope.Day);
+        const bounds = dateSelection.dayBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
@@ -211,8 +219,11 @@ const HourPicker = observer(({ dateSelection, variant, startColor, endColor, dat
   return (
     <div className="mt-3 grid grid-flow-col grid-rows-12 gap-1">
       {hourLabels().map((hour, i) => {
-        const value = dateSelection.sumRange(new Date(date.getFullYear(), date.getMonth(), date.getDate(), i), new Date(date.getFullYear(), date.getMonth(), date.getDate(), i, 59, 59));
-        const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
+        const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), i);
+
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Hour);
+        const bounds = dateSelection.hourBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
@@ -225,21 +236,73 @@ const HourPicker = observer(({ dateSelection, variant, startColor, endColor, dat
   );
 });
 
-const MinutePicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
-  const cols = dateSelection.maxScope === CalendarScope.Minute ? "grid-cols-10" : dateSelection.maxScope === CalendarScope.FifteenMinutes ? "grid-cols-4" : "grid-cols-6";
-  const minutes = Array.from({ length: 60 / (dateSelection.maxScope === CalendarScope.Minute ? 1 : dateSelection.maxScope === CalendarScope.FiveMinutes ? 5 : 15) },
-    (_, i) => i * (dateSelection.maxScope === CalendarScope.Minute ? 1 : dateSelection.maxScope === CalendarScope.FiveMinutes ? 5 : 15));
-
+const FifteenMinutesPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
   }
 
   return (
-    <div className={`mt-3 grid ${cols} gap-1`}>
-      {minutes.map((minute) => {
-        const value = dateSelection.sumRange(new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute), new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute, 59));
-        const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
+    <div className={`mt-3 grid grid-cols-4 gap-1`}>
+      {Array.from({ length: 60 / 15 }, (_, i) => i * 15).map((minute) => {
+        const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
+
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.FifteenMinutes);
+        const bounds = dateSelection.fifteenMinuteBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
+        const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+
+        return (
+          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} style={{ backgroundColor: mixedColor }}>
+            {minute.toString().padStart(2, "0")}
+          </Button>
+        );
+      })}
+    </div>
+  );
+});
+
+
+const FiveMinutesPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+  function onClick(value: number) {
+    dateSelection.currentDate.setMinutes(value);
+    dateSelection.confirm();
+  }
+
+  return (
+    <div className={`mt-3 grid grid-cols-6 gap-1`}>
+      {Array.from({ length: 60 / 5 }, (_, i) => i * 5).map((minute) => {
+        const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
+
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.FiveMinutes);
+        const bounds = dateSelection.fiveMinuteBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
+        const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+
+        return (
+          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} style={{ backgroundColor: mixedColor }}>
+            {minute.toString().padStart(2, "0")}
+          </Button>
+        );
+      })}
+    </div>
+  );
+});
+
+const MinutePicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+  function onClick(value: number) {
+    dateSelection.currentDate.setMinutes(value);
+    dateSelection.confirm();
+  }
+
+  return (
+    <div className={`mt-3 grid grid-cols-10 gap-1`}>
+      {Array.from({ length: 60 }, (_, i) => i).map((minute) => {
+        const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
+
+        const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Minute);
+        const bounds = dateSelection.minuteBounds;
+        const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
