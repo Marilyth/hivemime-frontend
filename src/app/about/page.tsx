@@ -24,7 +24,7 @@ export default function Page() {
       dates.push({ date, value: Math.floor(Math.random() * 100) });
     }
 
-    const selection = new DateSelection(CalendarScope.Month, 30, dates);
+    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, dates);
     selection.currentScope = CalendarScope.Year;
     return selection;
   }, []);

@@ -7,7 +7,7 @@ import { eachDayOfInterval, endOfMonth, endOfWeek, startOfMonth, startOfWeek } f
 import { CalendarScope, DateSelection, Animation } from "./date-selection";
 import { useTranslation } from "react-i18next";
 
-const DEFAULT_START_COLOR = mutedColors.gray + "BB";
+const DEFAULT_START_COLOR = mutedColors.gray + "22";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
 
