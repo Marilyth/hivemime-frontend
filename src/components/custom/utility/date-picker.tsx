@@ -1,76 +1,13 @@
 import { observer } from "mobx-react-lite";
-import { makeAutoObservable, reaction } from "mobx";
 import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
 import { eachDayOfInterval, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+import { CalendarScope, DateSelection, Animation } from "./date-selection";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
-export enum CalendarScope {
-  Minute,
-  FiveMinutes,
-  FifteenMinutes,
-  Hour,
-  Day,
-  Month,
-  Year
-}
-
-export class DateSelection {
-  dates: { date: Date, value: number }[] = [];
-  currentDate: Date = new Date();
-  maxDates: number;
-  currentScope: CalendarScope = CalendarScope.Day;
-  maxScope: CalendarScope;
-
-  constructor(maxScope: CalendarScope, maxDates: number) {
-    this.maxDates = maxDates;
-    this.maxScope = maxScope;
-    makeAutoObservable(this);
-  }
-
-  toggle(date: Date) {
-    const index = this.dates.findIndex(d => d.date.getTime() === date.getTime());
-
-    if (index === -1) {
-      this.dates.push({ date, value: 1 });
-    } else {
-      this.dates.splice(index, 1);
-    }
-  }
-
-  sumRange(start: Date, end: Date): number {
-    return this.dates
-      .filter(d => d.date >= start && d.date <= end)
-      .reduce((sum, d) => sum + d.value, 0);
-  }
-
-  getIdentifier(date: Date): string {
-    const keyParts = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()];
-    keyParts.splice(keyParts.length - this.currentScope);
-
-    return keyParts.join("-");
-  }
-
-  public get bounds() {
-    const dates = Object.groupBy(this.dates, d => this.getIdentifier(d.date));
-
-    let min = Infinity;
-    let max = -Infinity;
-
-    for (const yearDates of Object.values(dates)) {
-      const value = yearDates!.reduce((sum, d) => sum + d.value, 0);
-
-      min = Math.min(min, value);
-      max = Math.max(max, value);
-    }
-
-    return { min, max };
-  }
-}
 
 export enum Variant {
   View = "view",
@@ -85,19 +22,7 @@ export interface DatePickerProps {
   endColor?: string;
 }
 
-enum Animation {
-  SlideLeft,
-  SlideRight,
-  ZoomIn,
-  ZoomOut
-}
-
 export const DatePicker = observer(({ dateSelection, variant, startColor, endColor, ...props }: DatePickerProps) => {
-  const animation = useRef(Animation.ZoomIn);
-  const setAnimation = (newAnimation: Animation) => {
-    animation.current = newAnimation;
-  };
-
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
 
@@ -111,32 +36,41 @@ export const DatePicker = observer(({ dateSelection, variant, startColor, endCol
     [CalendarScope.FifteenMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
   };
 
+  return (
+    <div className="bg-card border rounded-md flex flex-col p-2 w-80">
+      <div className="flex justify-between items-center p-2 border-b">
+        <Button variant="ghost" onClick={() => dateSelection.slide(-1)}>&lt;</Button>
+        <Button variant="ghost" onClick={() => dateSelection.drill(1)}>{dateSelection.headerText}</Button>
+        <Button variant="ghost" onClick={() => dateSelection.slide(1)}>&gt;</Button>
+      </div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        <CalendarMotion
+          key={`${dateSelection.currentDate.getTime()}-${dateSelection.currentScope}`}
+          dateSelection={dateSelection}>
+          {scopeMapping[dateSelection.currentScope]}
+        </CalendarMotion>
+      </AnimatePresence>
+    </div>
+  );
+});
+
+const CalendarMotion = observer(({ dateSelection, children }: { dateSelection: DateSelection; children: React.ReactNode }) => {
   function getInitialAnimation() {
-    switch (animation.current) {
+    switch (dateSelection.animation) {
       case Animation.SlideLeft:
         return { opacity: 0, x: 20 };
       case Animation.SlideRight:
         return { opacity: 0, x: -20 };
       case Animation.ZoomIn:
-        return { opacity: 0, scale: 0.8 };
+        return { opacity: 0, scale: 0.9 };
       case Animation.ZoomOut:
-        return { opacity: 0, scale: 1.2 };
-    }
-  }
-
-  function getAnimateAnimation() {
-    switch (animation.current) {
-      case Animation.SlideLeft:
-      case Animation.SlideRight:
-        return { opacity: 1, x: 0 };
-      case Animation.ZoomIn:
-      case Animation.ZoomOut:
-        return { opacity: 1, scale: 1 };
+        return { opacity: 0, scale: 1.1 };
     }
   }
 
   function getExitAnimation() {
-    switch (animation.current) {
+    switch (dateSelection.animation) {
       case Animation.SlideLeft:
         return { opacity: 0, x: -20 };
       case Animation.SlideRight:
@@ -148,94 +82,24 @@ export const DatePicker = observer(({ dateSelection, variant, startColor, endCol
     }
   }
 
-  useEffect(() => {
-    const dispose = reaction(
-      () => ({
-        scope: dateSelection.currentScope,
-        date: dateSelection.currentDate.getTime(),
-      }),
-      (newSelection, oldSelection) => {
-        console.log("Date selection changed:", newSelection, oldSelection);
-        if (newSelection.scope > oldSelection.scope) {
-          setAnimation(Animation.ZoomIn);
-        } else if (newSelection.scope < oldSelection.scope) {
-          setAnimation(Animation.ZoomOut);
-        } else if (newSelection.date > oldSelection.date) {
-          setAnimation(Animation.SlideLeft);
-        } else if (newSelection.date < oldSelection.date) {
-          setAnimation(Animation.SlideRight);
-        }
-      }
-    );
-
-    return dispose;
-  }, [dateSelection]);
-
   return (
-    <div className="bg-card border rounded-md flex flex-col p-2 w-80">
-      <CalendarHeader dateSelection={dateSelection} variant={variant} />
-
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div 
-          key={`$${dateSelection.currentDate.getTime()}-${dateSelection.currentScope}`}
-          initial={getInitialAnimation()}
-          animate={getAnimateAnimation()}
-          exit={getExitAnimation()}
-          transition={{ duration: 0.2 }}>
-          {scopeMapping[dateSelection.currentScope]}
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-});
-
-const CalendarHeader = observer(({ dateSelection, variant }: DatePickerProps) => {
-  const currentDate = dateSelection.currentDate;
-
-  function onNext(delta: number) {
-    switch (dateSelection.currentScope) {
-      case CalendarScope.Year:
-        dateSelection.currentDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 25 * delta));
-        break;
-      case CalendarScope.Month:
-        dateSelection.currentDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + delta));
-        break;
-      case CalendarScope.Day:
-        dateSelection.currentDate = new Date(currentDate.setMonth(currentDate.getMonth() + delta));
-        break;
-      case CalendarScope.Hour:
-        dateSelection.currentDate = new Date(currentDate.setDate(currentDate.getDate() + delta));
-        break;
-      case CalendarScope.Minute || CalendarScope.FiveMinutes || CalendarScope.FifteenMinutes:
-        dateSelection.currentDate = new Date(currentDate.setHours(currentDate.getHours() + delta));
-        break;
-    }
-  }
-
-  function goUpScope() {
-    dateSelection.currentScope = Math.min(dateSelection.currentScope + 1, CalendarScope.Year);
-  }
-
-  return (
-    <div className="flex justify-between items-center p-2 border-b">
-      <Button variant="ghost" onClick={() => onNext(-1)}>&lt;</Button>
-      <Button variant="ghost" onClick={() => goUpScope()}>{dateSelection.currentDate.toDateString()}</Button>
-      <Button variant="ghost" onClick={() => onNext(1)}>&gt;</Button>
-    </div>
+    <motion.div
+      initial={getInitialAnimation()}
+      animate={{ opacity: 1, scale: 1, x: 0 }}
+      exit={getExitAnimation()}
+      transition={{ duration: 0.2 }}>
+      {children}
+    </motion.div>
   );
 });
 
 const YearPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
-  const startYear = dateSelection.currentDate.getFullYear();
+  const startYear = dateSelection.currentDate.getFullYear() - (dateSelection.currentDate.getFullYear() % 25);
   const yearsPerPage = 25;
 
   function onClick(value: number) {
     dateSelection.currentDate.setFullYear(value);
-    if (dateSelection.maxScope < CalendarScope.Year) {
-      dateSelection.currentScope = CalendarScope.Month;
-    } else {
-      dateSelection.toggle(new Date(value, 0, 1));
-    }
+    dateSelection.confirm();
   }
 
   return (
@@ -263,12 +127,7 @@ const MonthPicker = ({ dateSelection, variant, startColor, endColor }: DatePicke
 
   function onClick(value: number) {
     dateSelection.currentDate.setMonth(value);
-
-    if (dateSelection.maxScope < CalendarScope.Month) {
-      dateSelection.currentScope = CalendarScope.Day;
-    } else {
-      dateSelection.toggle(new Date(dateSelection.currentDate.getFullYear(), value, 1));
-    }
+    dateSelection.confirm();
   }
 
   return (
@@ -302,12 +161,7 @@ const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerP
     dateSelection.currentDate.setFullYear(day.getFullYear());
     dateSelection.currentDate.setMonth(day.getMonth());
     dateSelection.currentDate.setDate(day.getDate());
-
-    if (dateSelection.maxScope < CalendarScope.Day) {
-      dateSelection.currentScope = CalendarScope.Hour;
-    } else {
-      dateSelection.toggle(new Date(day.getFullYear(), day.getMonth(), day.getDate()));
-    }
+    dateSelection.confirm();
   }
 
   return (
@@ -334,12 +188,7 @@ const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerP
 const HourPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
   function onClick(value: number) {
     dateSelection.currentDate.setHours(value);
-
-    if (dateSelection.maxScope < CalendarScope.Hour) {
-      dateSelection.currentScope = dateSelection.maxScope;
-    } else {
-      dateSelection.toggle(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), value));
-    }
+    dateSelection.confirm();
   }
 
   return (
@@ -366,7 +215,7 @@ const MinutePicker = ({ dateSelection, variant, startColor, endColor }: DatePick
 
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
-    dateSelection.toggle(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), dateSelection.currentDate.getHours(), value));
+    dateSelection.confirm();
   }
 
   return (
