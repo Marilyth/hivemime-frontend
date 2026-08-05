@@ -99,15 +99,8 @@ function validateDrawPoll(poll: CreatePollDto): string[] {
 function validateDatePoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
-    if (!poll.candidates || poll.candidates.length < 1)
-        errors.push(i18n.t("validation:poll.noCandidates"));
-
-    if (poll.minValue == undefined || poll.maxValue == undefined || poll.minValue >= poll.maxValue) {
-        errors.push(i18n.t("validation:poll.dateRange"));
-    }
-
-    if (poll.stepValue == undefined || poll.stepValue <= 0) {
-        errors.push(i18n.t("validation:poll.datePrecision"));
+    if (poll.maxVotesPerCandidate == null || poll.maxVotesPerCandidate < 1) {
+        errors.push(i18n.t("validation:poll.dateMaxDates"));
     }
 
     return errors;

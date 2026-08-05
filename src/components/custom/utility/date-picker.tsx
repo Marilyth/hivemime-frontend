@@ -8,6 +8,7 @@ import { CalendarScope, DateSelection, Animation, Variant } from "./date-selecti
 import { GradientBar } from "./gradient-bar";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "22";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -17,13 +18,14 @@ export interface DatePickerProps {
   startColor?: string;
   endColor?: string;
   onHoverValue?: (value: number | null, date?: Date, x?: number, y?: number) => void;
+  className?: string;
 }
 
 interface PickerProps extends DatePickerProps {
   date: Date;
 }
 
-export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, ...props }: DatePickerProps) => {
+export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, className, ...props }: DatePickerProps) => {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState<{ value: number, date: Date, x: number, y: number } | null>(null);
   startColor ??= DEFAULT_START_COLOR;
@@ -35,7 +37,7 @@ export const DatePicker = observer(({ dateSelection, startColor, endColor, onHov
   };
 
   return (
-    <div className="bg-card border rounded-md flex flex-col p-2 w-80">
+    <div className={cn("bg-muted border rounded-md flex flex-col p-2 w-80", className)}>
       <div className="flex justify-between items-center p-2 border-b mb-4">
         <Button variant="ghost" onClick={() => dateSelection.slide(-1)}>&lt;</Button>
         <Button variant="ghost" onClick={() => dateSelection.drill(1)}>{dateSelection.headerText}</Button>

@@ -39,6 +39,8 @@ export class DateSelection {
     this.maxScope = maxScope;
     this.variant = variant;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
+    this.currentScope = Math.max(this.maxScope, CalendarScope.Day);
+    
     makeAutoObservable(this);
   }
 
@@ -74,6 +76,14 @@ export class DateSelection {
     return this.getBoundsForScope(this.currentScope);
   }
 
+  public get activeCount() {
+    return this.dates.filter(d => d.value > 0).length;
+  }
+
+  public get selectedTimestamps() {
+    return this.dates.filter(d => d.value > 0).map(d => d.date.getTime()).sort((a, b) => a - b);
+  }
+
   public get headerText() {
     switch (this.currentScope) {
       case CalendarScope.Year:
@@ -107,6 +117,9 @@ export class DateSelection {
     const index = this.dates.findIndex(d => d.date.getTime() === scopedDate.getTime());
 
     if (index === -1) {
+      if (this.activeCount >= this.maxDates)
+        return;
+
       const insertIndex = lowerBound(this.dates, { date: scopedDate, value: 0 }, (a, b) => a.date.getTime() - b.date.getTime());
       this.dates.splice(insertIndex, 0, { date: scopedDate, value: 1 });
     } else {

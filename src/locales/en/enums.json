@@ -60,6 +60,15 @@
     "Month": "Select month",
     "Year": "Select year"
   },
+  "datePrecision": {
+    "Year": "year",
+    "Month": "month",
+    "Minute": "minute",
+    "FiveMinutes": "5 minutes",
+    "FifteenMinutes": "15 minutes",
+    "Hour": "hour",
+    "Day": "day"
+  },
   "memberRole": {
     "anyone": "Anyone",
     "followers": "Followers",

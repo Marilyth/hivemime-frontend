@@ -20,6 +20,7 @@
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
     "drawInstruction": "Please draw between {{minCells}} and {{maxCells}} cells on the image.",
+    "dateInstruction": "Please select between {{minDates}} and {{maxDates}} dates.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",

@@ -11,7 +11,8 @@
     "categoryMinCategories": "A categorization poll must have at least two categories.",
     "drawMedia": "A draw poll must have an image for each candidate.",
     "dateRange": "A date poll must have a valid date range.",
-    "datePrecision": "A date poll must have a precision higher than 0."
+    "datePrecision": "A date poll must have a precision higher than 0.",
+    "dateMaxDates": "A date poll must allow selecting up to a maximum number of dates."
   },
   "vote": {
     "required": "You must vote for this poll.",

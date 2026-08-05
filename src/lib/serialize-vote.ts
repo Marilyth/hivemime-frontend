@@ -44,8 +44,8 @@ function serializeCandidateVote(
         .map(c => ({ ...base, cellIndex: c.index }));
 
     case PollType.Date:
-      if (!candidate.timestamps || candidate.timestamps.length === 0) return null;
-      return candidate.timestamps
+      if (!candidate.dateSelection || candidate.dateSelection.activeCount === 0) return null;
+      return candidate.dateSelection.selectedTimestamps
         .map(t => ({ ...base, timestamp: t }));
 
     default:
