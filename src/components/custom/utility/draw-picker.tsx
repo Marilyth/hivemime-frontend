@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { GradientBar } from "./gradient-bar";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -106,10 +107,6 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
   const endColor = canvasStyle.endColor ?? DEFAULT_END_COLOR;
 
   const { min, max } = cellSelection.bounds;
-  const gradientSpan = max - min;
-  const tooltipRatio = tooltip && gradientSpan > 0
-    ? Math.max(0, Math.min(1, (tooltip.value - min) / gradientSpan))
-    : null;
 
   const lastPosition = useRef({ x: 0, y: 0 } as { x: number, y: number } | null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -443,17 +440,13 @@ export const DrawPicker = observer(({ cellSelection, src, variant, className, ..
         </div>
       </TransformComponent>
 
-      {variant === Variant.Result && <div
-        className="relative h-3 w-full shrink-0 rounded-sm"
-        style={{ background: `linear-gradient(to right, ${startColor}, ${endColor})` }}
-      >
-        {tooltipRatio != null && (
-          <div
-            className="absolute top-0 h-full w-0.5 -translate-x-1/2 bg-foreground"
-            style={{ left: `${tooltipRatio * 100}%` }}
-          />
-        )}
-      </div>}
+      {variant === Variant.Result && <GradientBar
+        min={min}
+        max={max}
+        current={tooltip?.value ?? null}
+        startColor={startColor}
+        endColor={endColor}
+      />}
 
       {tooltip && createPortal(
         <div

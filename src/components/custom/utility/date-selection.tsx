@@ -18,6 +18,11 @@ export enum Animation {
   ZoomOut
 }
 
+export enum Variant {
+  Edit = "edit",
+  Result = "result"
+}
+
 export class DateSelection {
   // Note that this must be ordered at all times.
   private dates: { date: Date, value: number }[] = [];
@@ -27,10 +32,12 @@ export class DateSelection {
   currentScope: CalendarScope = CalendarScope.Day;
   maxScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
+  variant: Variant;
 
-  constructor(maxScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = []) {
+  constructor(maxScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
     this.maxDates = maxDates;
     this.maxScope = maxScope;
+    this.variant = variant;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
     makeAutoObservable(this);
   }
@@ -63,6 +70,10 @@ export class DateSelection {
     return this.getBoundsForScope(CalendarScope.Minute);
   }
 
+  public get currentScopeBounds() {
+    return this.getBoundsForScope(this.currentScope);
+  }
+
   public get headerText() {
     switch (this.currentScope) {
       case CalendarScope.Year:
@@ -86,6 +97,10 @@ export class DateSelection {
       this.drill(-1);
       return;
     }
+
+    // In result view, values cannot be added to the dates.
+    if (this.variant === Variant.Result)
+      return;
 
     // Select the date if we are at the max scope.
     const scopedDate = this.getScopedDate(this.currentDate, this.currentScope);
@@ -147,39 +162,6 @@ export class DateSelection {
     return sum;
   }
 
-  private getScopedDateRange(date: Date, scope: CalendarScope): { start: Date, end: Date } {
-    const start = this.getScopedDate(date, scope);
-    const end = this.getScopedDate(date, scope);
-
-    switch (scope) {
-      case CalendarScope.Year:
-        end.setFullYear(end.getFullYear() + 1);
-        break;
-      case CalendarScope.Month:
-        end.setMonth(end.getMonth() + 1);
-        break;
-      case CalendarScope.Day:
-        end.setDate(end.getDate() + 1);
-        break;
-      case CalendarScope.Hour:
-        end.setHours(end.getHours() + 1);
-        break;
-      case CalendarScope.FifteenMinutes:
-        end.setMinutes(end.getMinutes() + 15);
-        break;
-      case CalendarScope.FiveMinutes:
-        end.setMinutes(end.getMinutes() + 5);
-        break;
-      case CalendarScope.Minute:
-        end.setMinutes(end.getMinutes() + 1);
-        break;
-    }
-
-    end.setMilliseconds(end.getMilliseconds() - 1);
-
-    return { start: start, end: end };
-  }
-
   getScopedDateLocale(date: Date, scope: CalendarScope): string {
     date = this.getScopedDate(date, scope);
 
@@ -218,6 +200,39 @@ export class DateSelection {
       case CalendarScope.Minute:
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes());
     }
+  }
+
+  private getScopedDateRange(date: Date, scope: CalendarScope): { start: Date, end: Date } {
+    const start = this.getScopedDate(date, scope);
+    const end = this.getScopedDate(date, scope);
+
+    switch (scope) {
+      case CalendarScope.Year:
+        end.setFullYear(end.getFullYear() + 1);
+        break;
+      case CalendarScope.Month:
+        end.setMonth(end.getMonth() + 1);
+        break;
+      case CalendarScope.Day:
+        end.setDate(end.getDate() + 1);
+        break;
+      case CalendarScope.Hour:
+        end.setHours(end.getHours() + 1);
+        break;
+      case CalendarScope.FifteenMinutes:
+        end.setMinutes(end.getMinutes() + 15);
+        break;
+      case CalendarScope.FiveMinutes:
+        end.setMinutes(end.getMinutes() + 5);
+        break;
+      case CalendarScope.Minute:
+        end.setMinutes(end.getMinutes() + 1);
+        break;
+    }
+
+    end.setMilliseconds(end.getMilliseconds() - 1);
+
+    return { start: start, end: end };
   }
 
   private getBoundsForScope(scope: CalendarScope): { min: number, max: number } {

@@ -4,34 +4,35 @@ import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
 import { eachDayOfInterval, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
-import { CalendarScope, DateSelection, Animation } from "./date-selection";
+import { CalendarScope, DateSelection, Animation, Variant } from "./date-selection";
+import { GradientBar } from "./gradient-bar";
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "22";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
-
-export enum Variant {
-  View = "view",
-  Edit = "edit",
-  Result = "result"
-}
-
 export interface DatePickerProps {
   dateSelection: DateSelection;
-  variant: Variant;
   startColor?: string;
   endColor?: string;
+  onHoverValue?: (value: number | null, date?: Date, x?: number, y?: number) => void;
 }
 
 interface PickerProps extends DatePickerProps {
   date: Date;
 }
 
-export const DatePicker = observer(({ dateSelection, variant, startColor, endColor, ...props }: DatePickerProps) => {
+export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, ...props }: DatePickerProps) => {
   const { t } = useTranslation();
+  const [hovered, setHovered] = useState<{ value: number, date: Date, x: number, y: number } | null>(null);
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
+
+  const handleHover = (value: number | null, date?: Date, x?: number, y?: number) => {
+    setHovered(value != null && date && x != null && y != null ? { value, date, x, y } : null);
+    onHoverValue?.(value, date, x, y);
+  };
 
   return (
     <div className="bg-card border rounded-md flex flex-col p-2 w-80">
@@ -45,28 +46,50 @@ export const DatePicker = observer(({ dateSelection, variant, startColor, endCol
 
       <AnimatePresence mode="wait" initial={false}>
         <CalendarMotion
-          key={`${dateSelection.currentDate.getTime()}-${dateSelection.currentScope}`}
+          key={`${dateSelection.headerText}`}
           dateSelection={dateSelection}
-          variant={variant}
+          startColor={startColor}
+          endColor={endColor}
+          onHoverValue={handleHover}
+        />
+      </AnimatePresence>
+
+      {dateSelection.variant === Variant.Result && (
+        <GradientBar
+          className="mt-3"
+          min={dateSelection.currentScopeBounds.min}
+          max={dateSelection.currentScopeBounds.max}
+          current={hovered && hovered.value > 0 ? hovered.value : null}
           startColor={startColor}
           endColor={endColor}
         />
-      </AnimatePresence>
+      )}
+
+      {dateSelection.variant === Variant.Result && hovered && hovered.value > 0 && createPortal(
+        <div
+          className="fixed bg-card p-2 rounded-md border z-50 pointer-events-none whitespace-nowrap"
+          style={{ left: hovered.x, top: hovered.y, transform: "translate(0.5rem, 0.5rem)" }}
+        >
+          <div className="text-informational">{dateSelection.getScopedDateLocale(hovered.date, dateSelection.currentScope)}</div>
+          <div>{hovered.value.toFixed(0)}</div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 });
 
-const CalendarMotion = observer(({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+const CalendarMotion = observer(({ dateSelection, startColor, endColor, onHoverValue }: DatePickerProps) => {
   const [snapshot] = useState(() => ({ date: dateSelection.currentDate, scope: dateSelection.currentScope }));
 
   const scopeMapping: { [key in CalendarScope]: React.ReactElement } = {
-    [CalendarScope.Year]: <YearPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.Month]: <MonthPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.Day]: <DayPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.Hour]: <HourPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.Minute]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.FiveMinutes]: <FiveMinutesPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
-    [CalendarScope.FifteenMinutes]: <FifteenMinutesPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.Year]: <YearPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.Month]: <MonthPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.Day]: <DayPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.Hour]: <HourPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.Minute]: <MinutePicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.FiveMinutes]: <FiveMinutesPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
+    [CalendarScope.FifteenMinutes]: <FifteenMinutesPicker dateSelection={dateSelection} startColor={startColor} endColor={endColor} onHoverValue={onHoverValue} date={snapshot.date} />,
   };
 
   function getInitialAnimation() {
@@ -106,7 +129,7 @@ const CalendarMotion = observer(({ dateSelection, variant, startColor, endColor 
   );
 });
 
-const YearPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const YearPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   const startYear = date.getFullYear() - (date.getFullYear() % 25);
   const yearsPerPage = 25;
 
@@ -127,7 +150,7 @@ const YearPicker = observer(({ dateSelection, variant, startColor, endColor, dat
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button variant="ghost" key={year} onClick={() => onClick(year)} style={{ backgroundColor: mixedColor }}>
+          <Button variant="ghost" key={year} onClick={() => onClick(year)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {year}
           </Button>
         );
@@ -136,7 +159,7 @@ const YearPicker = observer(({ dateSelection, variant, startColor, endColor, dat
   );
 });
 
-const MonthPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const MonthPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   const monthLabels = () => [...Array(12).keys()].map((i) =>
     new Date(2000, i, 1).toLocaleString("default", { month: "short" })
   );
@@ -157,7 +180,7 @@ const MonthPicker = observer(({ dateSelection, variant, startColor, endColor, da
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button variant="ghost" key={month} onClick={() => onClick(index)} style={{ backgroundColor: mixedColor }}>
+          <Button variant="ghost" key={month} onClick={() => onClick(index)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {month}
           </Button>
         );
@@ -166,7 +189,7 @@ const MonthPicker = observer(({ dateSelection, variant, startColor, endColor, da
   );
 });
 
-const DayPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const DayPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   const monthStart = startOfMonth(new Date(date.getFullYear(), date.getMonth(), 1));
   const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const gridEnd = endOfWeek(endOfMonth(monthStart), { weekStartsOn: 1 });
@@ -197,7 +220,7 @@ const DayPicker = observer(({ dateSelection, variant, startColor, endColor, date
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button variant="ghost" key={day.toISOString()} className={`${isOutside ? "opacity-20" : ""}`} onClick={() => onClick(day)} style={{ backgroundColor: mixedColor }}>
+          <Button variant="ghost" key={day.toISOString()} className={`${isOutside ? "opacity-20" : ""}`} onClick={() => onClick(day)} onPointerEnter={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {day.getDate()}
           </Button>
         )
@@ -206,7 +229,7 @@ const DayPicker = observer(({ dateSelection, variant, startColor, endColor, date
   );
 });
 
-const HourPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const HourPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   const hourLabels = () => [...Array(24).keys()].map((i) =>
     new Date(2000, 0, 0, i).toLocaleString("default", { hour: "numeric" })
   );
@@ -227,7 +250,7 @@ const HourPicker = observer(({ dateSelection, variant, startColor, endColor, dat
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button key={i} variant="ghost" onClick={() => onClick(i)} style={{ backgroundColor: mixedColor }}>
+          <Button key={i} variant="ghost" onClick={() => onClick(i)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {hour}
           </Button>
         );
@@ -236,7 +259,7 @@ const HourPicker = observer(({ dateSelection, variant, startColor, endColor, dat
   );
 });
 
-const FifteenMinutesPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -253,7 +276,7 @@ const FifteenMinutesPicker = observer(({ dateSelection, variant, startColor, end
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {minute.toString().padStart(2, "0")}
           </Button>
         );
@@ -263,7 +286,7 @@ const FifteenMinutesPicker = observer(({ dateSelection, variant, startColor, end
 });
 
 
-const FiveMinutesPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const FiveMinutesPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -280,7 +303,7 @@ const FiveMinutesPicker = observer(({ dateSelection, variant, startColor, endCol
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {minute.toString().padStart(2, "0")}
           </Button>
         );
@@ -289,7 +312,7 @@ const FiveMinutesPicker = observer(({ dateSelection, variant, startColor, endCol
   );
 });
 
-const MinutePicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+const MinutePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -306,7 +329,7 @@ const MinutePicker = observer(({ dateSelection, variant, startColor, endColor, d
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {minute.toString().padStart(2, "0")}
           </Button>
         );

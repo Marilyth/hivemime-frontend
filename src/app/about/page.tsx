@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { DatePicker, Variant } from "@/components/custom/utility/date-picker";
-import { CalendarScope, DateSelection } from "@/components/custom/utility/date-selection";
+import { DatePicker } from "@/components/custom/utility/date-picker";
+import { CalendarScope, DateSelection, Variant } from "@/components/custom/utility/date-selection";
 
 export default function Page() {
   const dateSelection = useMemo(() => {
@@ -24,14 +24,14 @@ export default function Page() {
       dates.push({ date, value: Math.floor(Math.random() * 100) });
     }
 
-    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, dates);
+    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, dates, Variant.Result);
     selection.currentScope = CalendarScope.Year;
     return selection;
   }, []);
 
   return (
     <div>
-      <DatePicker dateSelection={dateSelection} variant={Variant.View} />
+      <DatePicker dateSelection={dateSelection} />
     </div>
   );
 }
