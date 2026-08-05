@@ -1,4 +1,5 @@
 import { observer } from "mobx-react-lite";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
@@ -23,20 +24,14 @@ export interface DatePickerProps {
   endColor?: string;
 }
 
+interface PickerProps extends DatePickerProps {
+  date: Date;
+}
+
 export const DatePicker = observer(({ dateSelection, variant, startColor, endColor, ...props }: DatePickerProps) => {
   const { t } = useTranslation();
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
-
-  const scopeMapping: { [key in CalendarScope]: React.ReactElement } = {
-    [CalendarScope.Year]: <YearPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.Month]: <MonthPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.Day]: <DayPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.Hour]: <HourPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.Minute]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.FiveMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-    [CalendarScope.FifteenMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} />,
-  };
 
   return (
     <div className="bg-card border rounded-md flex flex-col p-2 w-80">
@@ -51,15 +46,29 @@ export const DatePicker = observer(({ dateSelection, variant, startColor, endCol
       <AnimatePresence mode="wait" initial={false}>
         <CalendarMotion
           key={`${dateSelection.currentDate.getTime()}-${dateSelection.currentScope}`}
-          dateSelection={dateSelection}>
-          {scopeMapping[dateSelection.currentScope]}
-        </CalendarMotion>
+          dateSelection={dateSelection}
+          variant={variant}
+          startColor={startColor}
+          endColor={endColor}
+        />
       </AnimatePresence>
     </div>
   );
 });
 
-const CalendarMotion = observer(({ dateSelection, children }: { dateSelection: DateSelection; children: React.ReactNode }) => {
+const CalendarMotion = observer(({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+  const [snapshot] = useState(() => ({ date: dateSelection.currentDate, scope: dateSelection.currentScope }));
+
+  const scopeMapping: { [key in CalendarScope]: React.ReactElement } = {
+    [CalendarScope.Year]: <YearPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.Month]: <MonthPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.Day]: <DayPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.Hour]: <HourPicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.Minute]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.FiveMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+    [CalendarScope.FifteenMinutes]: <MinutePicker dateSelection={dateSelection} variant={variant} startColor={startColor} endColor={endColor} date={snapshot.date} />,
+  };
+
   function getInitialAnimation() {
     switch (dateSelection.animation) {
       case Animation.SlideLeft:
@@ -92,13 +101,13 @@ const CalendarMotion = observer(({ dateSelection, children }: { dateSelection: D
       animate={{ opacity: 1, scale: 1, x: 0 }}
       exit={getExitAnimation()}
       transition={{ duration: 0.2 }}>
-      {children}
+      {scopeMapping[snapshot.scope]}
     </motion.div>
   );
 });
 
-const YearPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
-  const startYear = dateSelection.currentDate.getFullYear() - (dateSelection.currentDate.getFullYear() % 25);
+const YearPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+  const startYear = date.getFullYear() - (date.getFullYear() % 25);
   const yearsPerPage = 25;
 
   function onClick(value: number) {
@@ -122,9 +131,9 @@ const YearPicker = ({ dateSelection, variant, startColor, endColor }: DatePicker
       })}
     </div>
   );
-};
+});
 
-const MonthPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+const MonthPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
   const monthLabels = () => [...Array(12).keys()].map((i) =>
     new Date(2000, i, 1).toLocaleString("default", { month: "short" })
   );
@@ -137,7 +146,7 @@ const MonthPicker = ({ dateSelection, variant, startColor, endColor }: DatePicke
   return (
     <div className="mt-3 grid grid-cols-3 gap-1">
       {monthLabels().map((month, index) => {
-        const value = dateSelection.sumRange(new Date(dateSelection.currentDate.getFullYear(), index, 1), new Date(dateSelection.currentDate.getFullYear(), index, 31, 23, 59, 59));
+        const value = dateSelection.sumRange(new Date(date.getFullYear(), index, 1), new Date(date.getFullYear(), index, 31, 23, 59, 59));
         const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
@@ -149,10 +158,10 @@ const MonthPicker = ({ dateSelection, variant, startColor, endColor }: DatePicke
       })}
     </div>
   );
-};
+});
 
-const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
-  const monthStart = startOfMonth(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), 1));
+const DayPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
+  const monthStart = startOfMonth(new Date(date.getFullYear(), date.getMonth(), 1));
   const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const gridEnd = endOfWeek(endOfMonth(monthStart), { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
@@ -174,7 +183,7 @@ const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerP
         <div key={day} className="text-center text-informational text-sm">{day}</div>
       ))}
       {days.map((day) => {
-        const isOutside = day.getMonth() !== dateSelection.currentDate.getMonth();
+        const isOutside = day.getMonth() !== date.getMonth();
         const value = dateSelection.sumRange(new Date(day.getFullYear(), day.getMonth(), day.getDate()), new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59));
         const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
@@ -187,9 +196,9 @@ const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerP
       })}
     </div>
   );
-};
+});
 
-const HourPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+const HourPicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
   const hourLabels = () => [...Array(24).keys()].map((i) =>
     new Date(2000, 0, 0, i).toLocaleString("default", { hour: "numeric" })
   );
@@ -202,7 +211,7 @@ const HourPicker = ({ dateSelection, variant, startColor, endColor }: DatePicker
   return (
     <div className="mt-3 grid grid-flow-col grid-rows-12 gap-1">
       {hourLabels().map((hour, i) => {
-        const value = dateSelection.sumRange(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), i), new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), i, 59, 59));
+        const value = dateSelection.sumRange(new Date(date.getFullYear(), date.getMonth(), date.getDate(), i), new Date(date.getFullYear(), date.getMonth(), date.getDate(), i, 59, 59));
         const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
@@ -214,9 +223,9 @@ const HourPicker = ({ dateSelection, variant, startColor, endColor }: DatePicker
       })}
     </div>
   );
-};
+});
 
-const MinutePicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+const MinutePicker = observer(({ dateSelection, variant, startColor, endColor, date }: PickerProps) => {
   const cols = dateSelection.maxScope === CalendarScope.Minute ? "grid-cols-10" : dateSelection.maxScope === CalendarScope.FifteenMinutes ? "grid-cols-4" : "grid-cols-6";
   const minutes = Array.from({ length: 60 / (dateSelection.maxScope === CalendarScope.Minute ? 1 : dateSelection.maxScope === CalendarScope.FiveMinutes ? 5 : 15) },
     (_, i) => i * (dateSelection.maxScope === CalendarScope.Minute ? 1 : dateSelection.maxScope === CalendarScope.FiveMinutes ? 5 : 15));
@@ -229,7 +238,7 @@ const MinutePicker = ({ dateSelection, variant, startColor, endColor }: DatePick
   return (
     <div className={`mt-3 grid ${cols} gap-1`}>
       {minutes.map((minute) => {
-        const value = dateSelection.sumRange(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), dateSelection.currentDate.getHours(), minute), new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), dateSelection.currentDate.getHours(), minute, 59));
+        const value = dateSelection.sumRange(new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute), new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute, 59));
         const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
@@ -241,4 +250,4 @@ const MinutePicker = ({ dateSelection, variant, startColor, endColor }: DatePick
       })}
     </div>
   );
-};
+});
