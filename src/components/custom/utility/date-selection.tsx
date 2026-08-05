@@ -166,7 +166,7 @@ export class DateSelection {
   sumScopedRange(date: Date, scope: CalendarScope): number {
     const { start, end } = this.getScopedDateRange(date, scope);
     
-    let startIndex = lowerBound(this.dates, { date: start, value: 0 }, (a, b) => a.date.getTime() - b.date.getTime());
+    const startIndex = lowerBound(this.dates, { date: start, value: 0 }, (a, b) => a.date.getTime() - b.date.getTime());
     let sum = 0;
 
     for (let i = startIndex; i < this.dates.length && this.dates[i].date <= end; i++)
