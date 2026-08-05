@@ -50,16 +50,15 @@
     "are": "are",
     "areNot": "are not"
   },
-  "datePrecision": {
-    "day": "day",
-    "hour": "hour",
-    "minute": "minute"
-  },
-  "datePollMode": {
-    "range": "Date range",
-    "rangeDescription": "The user picks dates from a continuous range.",
-    "specific": "Specific dates",
-    "specificDescription": "The user votes for a set of specific dates."
+  "calendarScopeSelection": {
+    "FiveMinutes": "Select minute",
+    "FifteenMinutes": "Select minute",
+    "Minute": "Select minute",
+    "Hour": "Select hour",
+    "Day": "Select day",
+    "Week": "Select week",
+    "Month": "Select month",
+    "Year": "Select year"
   },
   "memberRole": {
     "anyone": "Anyone",

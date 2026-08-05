@@ -4,6 +4,7 @@ import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
 import { eachDayOfInterval, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
 import { CalendarScope, DateSelection, Animation } from "./date-selection";
+import { useTranslation } from "react-i18next";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -23,6 +24,7 @@ export interface DatePickerProps {
 }
 
 export const DatePicker = observer(({ dateSelection, variant, startColor, endColor, ...props }: DatePickerProps) => {
+  const { t } = useTranslation();
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
 
@@ -38,11 +40,13 @@ export const DatePicker = observer(({ dateSelection, variant, startColor, endCol
 
   return (
     <div className="bg-card border rounded-md flex flex-col p-2 w-80">
-      <div className="flex justify-between items-center p-2 border-b">
+      <div className="flex justify-between items-center p-2 border-b mb-4">
         <Button variant="ghost" onClick={() => dateSelection.slide(-1)}>&lt;</Button>
         <Button variant="ghost" onClick={() => dateSelection.drill(1)}>{dateSelection.headerText}</Button>
         <Button variant="ghost" onClick={() => dateSelection.slide(1)}>&gt;</Button>
       </div>
+
+      <span className="text-center text-sm text-muted-foreground">{t(`enums:calendarScopeSelection.${CalendarScope[dateSelection.currentScope]}`)}</span>
 
       <AnimatePresence mode="wait" initial={false}>
         <CalendarMotion
@@ -186,20 +190,24 @@ const DayPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerP
 };
 
 const HourPicker = ({ dateSelection, variant, startColor, endColor }: DatePickerProps) => {
+  const hourLabels = () => [...Array(24).keys()].map((i) =>
+    new Date(2000, 0, 0, i).toLocaleString("default", { hour: "numeric" })
+  );
+
   function onClick(value: number) {
     dateSelection.currentDate.setHours(value);
     dateSelection.confirm();
   }
 
   return (
-    <div className="mt-3 grid grid-cols-6 gap-1">
-      {[...Array(24).keys()].map((hour) => {
-        const value = dateSelection.sumRange(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), hour), new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), hour, 59, 59));
+    <div className="mt-3 grid grid-flow-col grid-rows-12 gap-1">
+      {hourLabels().map((hour, i) => {
+        const value = dateSelection.sumRange(new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), i), new Date(dateSelection.currentDate.getFullYear(), dateSelection.currentDate.getMonth(), dateSelection.currentDate.getDate(), i, 59, 59));
         const ratio = dateSelection.bounds.min == dateSelection.bounds.max ? 1 : (value - dateSelection.bounds.min) / (dateSelection.bounds.max - dateSelection.bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
 
         return (
-          <Button key={hour} variant="ghost" onClick={() => onClick(hour)} style={{ backgroundColor: mixedColor }}>
+          <Button key={i} variant="ghost" onClick={() => onClick(i)} style={{ backgroundColor: mixedColor }}>
             {hour}
           </Button>
         );

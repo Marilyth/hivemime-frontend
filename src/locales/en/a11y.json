@@ -12,21 +12,5 @@
   "fullResolutionPreview": "Full resolution preview",
   "carousel": "carousel",
   "slide": "slide",
-  "back": "Back",
-  "previousMonth": "Previous month",
-  "nextMonth": "Next month",
-  "previousYear": "Previous year",
-  "nextYear": "Next year",
-  "previousPage": "Previous page",
-  "nextPage": "Next page",
-  "selectYear": "Select year",
-  "selectMonth": "Select month",
-  "selectDay": "Select day",
-  "selectHour": "Select hour",
-  "selectMinute": "Select minute",
-  "previousDay": "Previous day",
-  "nextDay": "Next day",
-  "previousHour": "Previous hour",
-  "nextHour": "Next hour",
-  "goUp": "Go to parent"
+  "back": "Back"
 }

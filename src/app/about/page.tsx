@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { CalendarScope, DatePicker, DateSelection, Variant } from "@/components/custom/utility/date-picker";
+import { DatePicker, Variant } from "@/components/custom/utility/date-picker";
+import { CalendarScope, DateSelection } from "@/components/custom/utility/date-selection";
 
 export default function Page() {
   const dateSelection = useMemo(() => {
