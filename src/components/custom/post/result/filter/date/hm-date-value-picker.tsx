@@ -1,6 +1,5 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { CalendarScope, DateSelection, Variant } from "@/components/custom/utility/date-selection";
 import { DatePicker } from "@/components/custom/utility/date-picker";
@@ -10,6 +9,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { reaction } from "mobx";
+import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
 enum DateSubValue {
     Date = "Date",
@@ -57,11 +57,15 @@ function formatValue(subValue: DateSubValue, value?: string | null): string {
 
     switch (subValue) {
         case DateSubValue.Date:
-            return value.split(",").map(v => new Date(Number(v)).toLocaleString()).join(", ");
+            return new Date(Number(value)).toLocaleString();
         case DateSubValue.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
         case DateSubValue.DayOfWeek:
             return new Date(2024, 0, Number(value)).toLocaleString("default", { weekday: "long" });
+        case DateSubValue.Hour:
+            return new Date(2000, 0, 1, Number(value)).toLocaleString("default", { hour: "numeric" });
+        case DateSubValue.Minute:
+            return new Date(2000, 0, 1, 0, Number(value)).toLocaleString("default", { minute: "numeric" });
         default:
             return value;
     }
@@ -225,16 +229,15 @@ export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, c
 
     const subValue = getSubValue(currentItem.property);
     const operator = currentItem.valueOperator ?? ValueOperator.Equals;
+    const values = splitValues(currentItem.value).map(value => formatValue(subValue, value));
 
     return (
-        <Label>
-            {t("posts:filter.dateViewer", {
-                name: candidate.name,
-                subValue: t(`posts:filter.dateSub${subValue}`),
-                negation: currentItem.isNegated ? " not" : "",
-                operator: valueOperatorToInlineString(operator),
-                value: formatValue(subValue, currentItem.value),
-            })}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            subValue={t(`posts:filter.dateSub${subValue}`)}
+            operator={valueOperatorToInlineString(operator)}
+            negated={currentItem.isNegated}
+            values={values}
+        />
     );
 });

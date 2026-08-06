@@ -1,13 +1,13 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
 import { hiveMimeRankIcon } from "@/components/custom/utility/hm-rank-icon";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { HiveMimeConditionViewer } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionRankValuePickerProps {
     currentItem: FilterQuery;
@@ -108,16 +108,16 @@ export const HiveMimeFilterConditionRankValuePicker = observer(({ currentItem, c
 export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem, poll, candidate }: HiveMimeFilterConditionRankValuePickerProps) => {
     const { t } = useTranslation();
 
+    const values = currentItem.value == null
+        ? [t("posts:filter.unranked")]
+        : [hiveMimeRankIcon(Number(poll.maxValue! - Number(currentItem.value)) + 1)];
+
     return (
-        <Label>
-            {t("posts:filter.rankViewer", {
-                name: candidate.name,
-                negation: currentItem.isNegated ? " not" : "",
-                operator: currentItem.valueOperator!,
-            })}{" "}
-            {currentItem.value == null
-                ? t("posts:filter.unranked")
-                : hiveMimeRankIcon(Number(poll.maxValue! - Number(currentItem.value)) + 1)}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            operator={valueOperatorToInlineString(currentItem.valueOperator!)}
+            negated={currentItem.isNegated}
+            values={values}
+        />
     );
 });

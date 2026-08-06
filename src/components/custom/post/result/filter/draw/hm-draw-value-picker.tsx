@@ -1,14 +1,14 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { CellSelection, DrawPicker, Variant } from "@/components/custom/utility/draw-picker";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { FilterQuery, ValueOperator, CandidateDto, PollDto } from "@/lib/Api";
 import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 import { valueOperatorToInlineString } from "@/lib/utils";
+import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionDrawValuePickerProps {
     currentItem: FilterQuery;
@@ -105,21 +105,13 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem, c
 });
 
 export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionDrawValuePickerProps) => {
-    const { t } = useTranslation();
-    
     const operator = (currentItem.valueOperator ?? ValueOperator.Inside) as ValueOperator;
-    const cellCount = (currentItem.value ?? "")
-        .split(",")
-        .filter(index => index.trim().length > 0)
-        .length;
 
     return (
-        <Label>
-            {t("posts:filter.drawViewer", {
-                name: candidate.name,
-                operator: valueOperatorToInlineString(operator),
-                count: cellCount,
-            })}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            operator={valueOperatorToInlineString(operator)}
+            values={splitValues(currentItem.value)}
+        />
     );
 });

@@ -23,15 +23,15 @@ export function deepCopy<T>(obj: T): T {
 export function valueOperatorToInlineString(operator: ValueOperator) {
   switch (operator) {
     case ValueOperator.Equals:
-      return i18n.t("enums:valueOperator.equals");
+      return "=";
     case ValueOperator.Greater:
-      return i18n.t("enums:valueOperator.greater");
+      return ">";
     case ValueOperator.GreaterEquals:
-      return i18n.t("enums:valueOperator.greaterEquals");
+      return ">=";
     case ValueOperator.Less:
-      return i18n.t("enums:valueOperator.less");
+      return "<";
     case ValueOperator.LessEquals:
-      return i18n.t("enums:valueOperator.lessEquals");
+      return "<=";
     case ValueOperator.Inside:
       return i18n.t("enums:valueOperator.inside");
     case ValueOperator.Outside:

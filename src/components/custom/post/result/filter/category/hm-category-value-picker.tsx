@@ -5,8 +5,9 @@ import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { HiveMimeCategoryTag } from "../../../vote/category/hm-category-poll-vote-category";
-import { Label } from "@/components/ui/label";
 import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
+import { valueOperatorToInlineString } from "@/lib/utils";
+import { HiveMimeConditionViewer } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionCategoryValuePickerProps {
     currentItem: FilterQuery;
@@ -85,16 +86,16 @@ export const HiveMimeFilterConditionCategoryValuePicker = observer(({ currentIte
 export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionCategoryValuePickerProps) => {
     const { t } = useTranslation();
 
+    const values = currentItem.value == null
+        ? [t("posts:filter.uncategorized")]
+        : [<HiveMimeCategoryTag key="category" category={poll.categories!.find(c => c.id === currentItem.value)!} />];
+
     return (
-        <Label>
-            {t(currentItem.isNegated ? "posts:filter.notCategorized" : "posts:filter.categorizedAsViewer", { name: candidate.name })}{" "}
-            {currentItem.value == null
-                ? t("posts:filter.uncategorized")
-                : (
-                <span className="inline-block align-middle">
-                    <HiveMimeCategoryTag category={poll.categories!.find(c => c.id === currentItem.value)!} />
-                </span>
-            )}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            operator={valueOperatorToInlineString(ValueOperator.Equals)}
+            negated={currentItem.isNegated}
+            values={values}
+        />
     );
 });

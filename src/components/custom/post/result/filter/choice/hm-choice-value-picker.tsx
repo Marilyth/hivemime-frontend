@@ -1,11 +1,12 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
+import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { HiveMimeConditionViewer } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionChoiceValuePickerProps {
     currentItem: FilterQuery;
@@ -55,10 +56,12 @@ export const HiveMimeFilterConditionChoiceValueViewer = observer(({ currentItem,
     const { t } = useTranslation();
 
     return (
-        <Label>
-            {currentItem.value === "1"
-                ? t("posts:filter.candidateSelected", { name: candidate.name })
-                : t("posts:filter.candidateNotSelected", { name: candidate.name })}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            operator={valueOperatorToInlineString(ValueOperator.Equals)}
+            values={[currentItem.value === "1"
+                ? t("enums:selection.selected")
+                : t("enums:selection.notSelected")]}
+        />
     );
 });

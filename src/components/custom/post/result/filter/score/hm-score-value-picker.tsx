@@ -1,6 +1,5 @@
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { HiveMimeInlineSelectTrigger } from "@/components/custom/utility/hm-inline-select";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
@@ -8,6 +7,7 @@ import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionScoreValuePickerProps {
     currentItem: FilterQuery;
@@ -96,16 +96,12 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem, 
 });
 
 export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionScoreValuePickerProps) => {
-    const { t } = useTranslation();
-
     return (
-        <Label>
-            {t("posts:filter.scoreViewer", {
-                name: candidate.name,
-                negation: currentItem.isNegated ? " not" : "",
-                operator: currentItem.valueOperator!,
-                value: currentItem.value,
-            })}
-        </Label>
+        <HiveMimeConditionViewer
+            name={candidate.name}
+            operator={valueOperatorToInlineString(currentItem.valueOperator!)}
+            negated={currentItem.isNegated}
+            values={splitValues(currentItem.value)}
+        />
     );
 });
