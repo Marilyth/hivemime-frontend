@@ -28,7 +28,7 @@ export const HiveMimePostResultFilter = observer(({ post, builder, onAddConditio
                 }
             </LayoutGroup>
 
-            {builder.children!.length > 1 &&
+            {builder.children!.length > 2 &&
                 <HiveMimeBulletItem>
                     <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
                 </HiveMimeBulletItem>

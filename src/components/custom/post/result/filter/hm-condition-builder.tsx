@@ -30,13 +30,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
     const hideCandidate = lockedCandidate != null || (selectedPoll != null && (selectedPoll.candidates?.length ?? 0) === 1);
 
     useEffect(() => {
-        if (lockedPoll && lockedCandidate) {
-            const pollOrder = post.polls!.indexOf(lockedPoll);
-            const candidateOrder = lockedPoll.candidates!.indexOf(lockedCandidate);
-            draft.property = lockedCandidate.id ?? `${pollOrder}:${candidateOrder}`;
-        } else if (!lockedPoll && availablePolls.length === 1) {
-            handlePollPicked(availablePolls[0]);
-        }
+        resetBuilder();
     }, []);
 
     function clearDraftFields() {
@@ -44,6 +38,23 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
         draft.value = null;
         draft.valueOperator = undefined;
         setValid(false);
+    }
+
+    function resetBuilder() {
+        if (lockedPoll == null)
+            setSelectedPoll(null);
+        if (lockedCandidate == null)
+            setSelectedCandidate(null);
+
+        clearDraftFields();
+
+        if (lockedPoll && lockedCandidate) {
+            const pollOrder = post.polls!.indexOf(lockedPoll);
+            const candidateOrder = lockedPoll.candidates!.indexOf(lockedCandidate);
+            draft.property = lockedCandidate.id ?? `${pollOrder}:${candidateOrder}`;
+        } else if (!lockedPoll && availablePolls.length === 1) {
+            handlePollPicked(availablePolls[0]);
+        }
     }
 
     function handlePollPicked(poll: PollDto) {
@@ -72,17 +83,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
 
         onAddCondition({ ...draft, leftOperator: BooleanOperator.And });
 
-        if (lockedPoll == null)
-            setSelectedPoll(null);
-        if (lockedCandidate == null)
-            setSelectedCandidate(null);
-
-        draft.value = null;
-        draft.valueOperator = undefined;
-        if (lockedCandidate == null)
-            draft.property = null;
-
-        setValid(false);
+        resetBuilder();
         setResetKey(key => key + 1);
     }
 
