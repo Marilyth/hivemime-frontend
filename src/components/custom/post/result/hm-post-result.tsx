@@ -8,8 +8,7 @@ import { Vote, Filter } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
 import { HiveMimePostResultFilter } from "./filter/hm-post-result-filter";
-import { HiveMimeFilterConditionCreator } from "./filter/hm-condition-creator";
-import { createFilterQuery, createFilterQueryGroup } from "@/lib/vote-query";
+import { createFilterQueryGroup } from "@/lib/vote-query";
 
 interface HiveMimePostResultProps {
   post: PostDto;
@@ -20,25 +19,13 @@ interface HiveMimePostResultProps {
 export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveMimePostResultProps) => {
   const { t } = useTranslation();
   const [filterOpen, setFilterOpen] = useState(false);
-  const [creatorOpen, setCreatorOpen] = useState(false);
-  const [draftQuery, setDraftQuery] = useState<FilterQuery | null>(null);
   const queryBuilder: FilterQueryGroup = useMemo(() =>
     createFilterQueryGroup(),
     []
   );
 
-  function addCondition() {
-    setDraftQuery(createFilterQuery());
-    setCreatorOpen(true);
-  }
-
-  function creatorFinished(result: FilterQuery | null) {
-    setCreatorOpen(false);
-
-    if (result && draftQuery)
-      queryBuilder.children!.push(result);
-
-    setDraftQuery(null);
+  function addCondition(result: FilterQuery) {
+    queryBuilder.children!.push(result);
   }
 
   return (
@@ -56,16 +43,6 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
 
             <HiveMimePostResultFilter post={post} builder={queryBuilder} onAddCondition={addCondition} />
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={creatorOpen} onOpenChange={(open) => !open && setCreatorOpen(false)}>
-        <DialogContent onClick={(e) => e.stopPropagation()}>
-          <span className="text-lg font-semibold">
-            {t("posts:filter.createCondition")}
-          </span>
-
-          <HiveMimeFilterConditionCreator post={post} currentItem={draftQuery} onFinished={creatorFinished} />
         </DialogContent>
       </Dialog>
 

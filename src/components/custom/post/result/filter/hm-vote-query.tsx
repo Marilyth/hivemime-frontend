@@ -1,12 +1,12 @@
 import { observer } from "mobx-react-lite";
 import { BooleanOperator, PollType, PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
 import { createFilterQueryGroup, isFilterQuery, isFilterQueryGroup, resolveCandidate } from "@/lib/vote-query";
-import { HiveMimeFilterConditionChoiceValueViewer } from "./choice/hm-choice-value-picker";
-import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-picker";
-import { HiveMimeFilterConditionRankValueViewer } from "./rank/hm-rank-value-picker";
-import { HiveMimeFilterConditionCategoryValueViewer } from "./category/hm-category-value-picker";
-import { HiveMimeFilterConditionDrawValueViewer } from "./draw/hm-draw-value-picker";
-import { HiveMimeFilterConditionDateValueViewer } from "./date/hm-date-value-picker";
+import { HiveMimeFilterConditionChoiceValueViewer } from "./viewer/hm-choice-viewer";
+import { HiveMimeFilterConditionScoreValueViewer } from "./viewer/hm-score-viewer";
+import { HiveMimeFilterConditionRankValueViewer } from "./viewer/hm-rank-viewer";
+import { HiveMimeFilterConditionCategoryValueViewer } from "./viewer/hm-category-viewer";
+import { HiveMimeFilterConditionDrawValueViewer } from "./viewer/hm-draw-viewer";
+import { HiveMimeFilterConditionDateValueViewer } from "./viewer/hm-date-viewer";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";

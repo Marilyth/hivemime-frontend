@@ -17,10 +17,10 @@ export const HiveMimeConditionViewer = ({ pollName, name, operator, values = [],
 
     return (
         <div className="flex flex-wrap items-center gap-1 overflow-x-auto">
+            {negated && <span className={`${box} text-failure`}>{t("common:not")}</span>}
             {pollName != null && <span className={`${box} text-muted-purple`}>{pollName}</span>}
             <span className={`${box} text-honey-brown`}>{name}</span>
             {subValue != null && <span className={`${box} text-muted-green`}>{subValue}</span>}
-            {negated && <span className={`${box} text-failure`}>{t("common:not")}</span>}
             {operator != null && <span className={`${box} text-foreground`}>{operator}</span>}
             {values.map((value, index) => (
                 <span key={index} className={`${box} text-muted-blue`}>{value}</span>
