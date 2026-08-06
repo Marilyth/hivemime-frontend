@@ -107,6 +107,9 @@
     "addCondition": "Add condition",
     "createCondition": "Create condition",
     "pickCandidate": "Pick a candidate to create a condition for.",
+    "pickPoll": "Pick a poll to create a condition for.",
+    "dateFilterTitle": "Date conditions",
+    "dateFilterDescription": "Add conditions to refine which dates are available for voting.",
     "adjustCondition": "Adjust the condition for {{pollTitle}}: {{candidateName}}.",
     "candidateWas": "Candidate was",
     "candidateSelected": "{{name}} selected",
@@ -123,6 +126,13 @@
     "categorizedAsViewer": "{{name}} is",
     "scoreViewer": "{{name}} score{{negation}} {{operator}} {{value}}",
     "rankViewer": "{{name}} rank{{negation}} {{operator}}",
+    "dateSubDate": "date",
+    "dateSubMonth": "month",
+    "dateSubDayOfMonth": "day of month",
+    "dateSubDayOfWeek": "day of week",
+    "dateSubHour": "hour",
+    "dateSubMinute": "minute",
+    "dateViewer": "{{name}} {{subValue}}{{negation}} {{operator}} {{value}}",
     "drawCellsWere": "Candidate's drawn cells were <select/>",
     "drawViewer": "{{name}} drew {{count}} cells {{operator}}"
   }

@@ -19,6 +19,7 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { HiveMimeCreateDrawRules } from "./hm-create-draw-poll";
 import { HiveMimeCreateDrawCandidates } from "./hm-create-draw-candidate";
 import { HiveMimeCreateDateRules } from "./hm-create-date-poll";
+import { HiveMimeCreateDateCondition } from "./hm-create-date-condition";
 
 export interface HiveMimeCreatePollProps {
   poll: CreatePollDto;
@@ -90,6 +91,18 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
                 <Label className="text-sm text-muted-foreground">{t("posts:create.createCandidates")}</Label>
               </div>
               <HiveMimeCreateCandidates poll={props.poll} />
+            </div>
+          </HiveMimeStep>
+        }
+
+        {props.poll.pollType === PollType.Date &&
+          <HiveMimeStep canContinue={true}>
+            <div className="flex flex-col gap-4">
+              <span className="text-sm text-muted-foreground">
+                {t("posts:filter.dateFilterDescription")}
+              </span>
+
+              <HiveMimeCreateDateCondition poll={props.poll} />
             </div>
           </HiveMimeStep>
         }

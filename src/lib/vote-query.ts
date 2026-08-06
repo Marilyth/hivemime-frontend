@@ -23,8 +23,18 @@ export function resolveCandidate(
 ): { poll?: PollDto; candidate?: CandidateDto } {
   if (!candidateId) return {};
 
+  // Strip a sub-value suffix ("pollOrder:candidateOrder.SubValue") before resolving.
+  const base = candidateId.split(".")[0];
+
+  // Order-based fallback ("pollOrder:candidateOrder"), used when the candidate has no id yet.
+  if (base.includes(":")) {
+    const [pollIndex, candidateIndex] = base.split(":").map(Number);
+    const poll = post.polls?.[pollIndex];
+    return { poll, candidate: poll?.candidates?.[candidateIndex] };
+  }
+
   for (const poll of post.polls ?? []) {
-    const candidate = (poll.candidates ?? []).find((c) => c.id === candidateId);
+    const candidate = (poll.candidates ?? []).find((c) => c.id === base);
     if (candidate) return { poll, candidate };
   }
 

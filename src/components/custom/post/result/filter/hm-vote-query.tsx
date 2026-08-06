@@ -6,6 +6,7 @@ import { HiveMimeFilterConditionScoreValueViewer } from "./score/hm-score-value-
 import { HiveMimeFilterConditionRankValueViewer } from "./rank/hm-rank-value-picker";
 import { HiveMimeFilterConditionCategoryValueViewer } from "./category/hm-category-value-picker";
 import { HiveMimeFilterConditionDrawValueViewer } from "./draw/hm-draw-value-picker";
+import { HiveMimeFilterConditionDateValueViewer } from "./date/hm-date-value-picker";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -36,7 +37,7 @@ export const HiveMimeFilterQuery = observer(({ currentItem, ancestors, isFirstIt
         [PollType.Rank]: <HiveMimeFilterConditionRankValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
-        [PollType.Date]: <div>ToDo</div>,
+        [PollType.Date]: <HiveMimeFilterConditionDateValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
     };
 
     function isNotAncestor(draggable: unknown): boolean {

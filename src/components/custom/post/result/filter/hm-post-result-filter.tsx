@@ -1,12 +1,9 @@
 import { observer } from "mobx-react-lite";
-import { PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { PostDto, FilterQueryGroup } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { HiveMimeFilterQueryGroup } from "./hm-vote-query-group";
-import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { LayoutGroup } from "framer-motion";
 
@@ -14,63 +11,32 @@ import { LayoutGroup } from "framer-motion";
 interface HiveMimePostResultFilterProps {
     post: PostDto;
     builder: FilterQueryGroup;
-    isOpen: boolean;
-    onFinished: () => void;
+    onAddCondition: () => void;
 }
 
-export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFinished }: HiveMimePostResultFilterProps) => {
+export const HiveMimePostResultFilter = observer(({ post, builder, onAddCondition }: HiveMimePostResultFilterProps) => {
     const { t } = useTranslation();
-    const [showCreator, setShowCreator] = useState(false);
-
-    function handleFinished(newQuery: FilterQuery | null) {
-        if (newQuery) {
-            builder.children!.push(newQuery);
-        }
-
-        setShowCreator(false);
-    }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onFinished}>
-            <DialogContent onClick={(e) => e.stopPropagation()}>
-                {showCreator ?
-                    <div className="flex flex-col">
-                        <span className="text-lg font-semibold">
-                            {t("posts:filter.createCondition")}
-                        </span>
-
-                        <HiveMimeFilterConditionCreator post={post} onFinished={handleFinished} />
-                    </div> :
-                    <div className="flex flex-col">
-                        <span className="text-lg font-semibold">
-                            {t("posts:filter.title")}
-                        </span>
-
-                        <span className="text-sm text-muted-foreground mb-4">
-                            {t("posts:filter.description")}
-                        </span>
-
-                        <LayoutGroup>
-                            {builder.children!.length > 0 &&
-                                <div className="border rounded mb-2 text-sm text-muted-foreground ">
-                                    <HiveMimeFilterQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
-                                </div>
-                            }
-                        </LayoutGroup>
-
-                        {builder.children!.length > 1 &&
-                            <HiveMimeBulletItem className="mb-2">
-                                <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
-                            </HiveMimeBulletItem>
-                        }
-
-                        <Button variant="outline" onClick={() => setShowCreator(true)}>
-                            <Plus />
-                            {t("posts:filter.addCondition")}
-                        </Button>
+        <div className="flex flex-col">
+            <LayoutGroup>
+                {builder.children!.length > 0 &&
+                    <div className="border rounded mb-2 text-sm text-muted-foreground ">
+                        <HiveMimeFilterQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
                     </div>
                 }
-            </DialogContent>
-        </Dialog>
+            </LayoutGroup>
+
+            {builder.children!.length > 1 &&
+                <HiveMimeBulletItem className="mb-2">
+                    <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
+                </HiveMimeBulletItem>
+            }
+
+            <Button variant="outline" onClick={onAddCondition}>
+                <Plus />
+                {t("posts:filter.addCondition")}
+            </Button>
+        </div>
     );
 });
