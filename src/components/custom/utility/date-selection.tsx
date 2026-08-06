@@ -25,21 +25,21 @@ export enum Variant {
 
 export class DateSelection {
   // Note that this must be ordered at all times.
-  private dates: { date: Date, value: number }[] = [];
+  dates: { date: Date, value: number }[] = [];
 
   currentDate: Date = new Date();
   maxDates: number;
   currentScope: CalendarScope = CalendarScope.Day;
-  maxScope: CalendarScope;
+  minScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
   variant: Variant;
 
-  constructor(maxScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
+  constructor(minScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
     this.maxDates = maxDates;
-    this.maxScope = maxScope;
+    this.minScope = minScope;
     this.variant = variant;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
-    this.currentScope = Math.max(this.maxScope, CalendarScope.Day);
+    this.currentScope = Math.max(this.minScope, CalendarScope.Day);
     
     makeAutoObservable(this);
   }
@@ -80,10 +80,6 @@ export class DateSelection {
     return this.dates.filter(d => d.value > 0).length;
   }
 
-  public get selectedTimestamps() {
-    return this.dates.filter(d => d.value > 0).map(d => d.date.getTime()).sort((a, b) => a - b);
-  }
-
   public get headerText() {
     switch (this.currentScope) {
       case CalendarScope.Year:
@@ -103,7 +99,7 @@ export class DateSelection {
   }
 
   confirm() {
-    if (this.currentScope > this.maxScope) {
+    if (this.currentScope > this.minScope) {
       this.drill(-1);
       return;
     }
@@ -152,10 +148,10 @@ export class DateSelection {
   }
 
   drill(delta: number) {
-    let newScope = Math.min(Math.max(this.currentScope + delta, this.maxScope), CalendarScope.Year);
+    let newScope = Math.min(Math.max(this.currentScope + delta, this.minScope), CalendarScope.Year);
 
     if (newScope <= CalendarScope.FifteenMinutes)
-      newScope = delta > 0 ? CalendarScope.Hour : this.maxScope;
+      newScope = delta > 0 ? CalendarScope.Hour : this.minScope;
 
     if (newScope !== this.currentScope) {
       this.animation = delta > 0 ? Animation.ZoomOut : Animation.ZoomIn;

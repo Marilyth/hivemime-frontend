@@ -45,7 +45,7 @@ function serializeCandidateVote(
 
     case PollType.Date:
       if (!candidate.dateSelection || candidate.dateSelection.activeCount === 0) return null;
-      return candidate.dateSelection.selectedTimestamps
+      return candidate.dateSelection.dates
         .map(t => ({ ...base, timestamp: t }));
 
     default:

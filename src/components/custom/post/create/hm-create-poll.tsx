@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollType } from "@/lib/Api";
+import { CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../../utility/labelled-input";
 import { observer } from "mobx-react-lite";
 import { HiveMimeCreatePollTypePicker } from "./hm-create-pick-poll-type";
@@ -22,6 +22,7 @@ import { HiveMimeCreateDateRules } from "./hm-create-date-poll";
 import { HiveMimeCreateDateCondition } from "./hm-create-date-condition";
 
 export interface HiveMimeCreatePollProps {
+  post: CreatePostDto;
   poll: CreatePollDto;
   canCancel: boolean;
   onCancelled?: () => void;
@@ -102,7 +103,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
                 {t("posts:filter.dateFilterDescription")}
               </span>
 
-              <HiveMimeCreateDateCondition poll={props.poll} />
+              <HiveMimeCreateDateCondition poll={props.poll} post={props.post} />
             </div>
           </HiveMimeStep>
         }

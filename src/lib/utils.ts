@@ -36,10 +36,6 @@ export function valueOperatorToInlineString(operator: ValueOperator) {
       return i18n.t("enums:valueOperator.inside");
     case ValueOperator.Outside:
       return i18n.t("enums:valueOperator.outside");
-    case ValueOperator.ExclusiveInside:
-      return i18n.t("enums:valueOperator.exclusiveInside");
-    case ValueOperator.ExclusiveOutside:
-      return i18n.t("enums:valueOperator.exclusiveOutside");
     default:
       return operator;
   }

@@ -86,7 +86,7 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem, c
                                         <SelectValue />
                                     </HiveMimeInlineSelectTrigger>
                                     <SelectContent>
-                                        {[ValueOperator.Inside, ValueOperator.Outside, ValueOperator.ExclusiveInside, ValueOperator.ExclusiveOutside].map((operator) => (
+                                        {[ValueOperator.Inside, ValueOperator.Outside].map((operator) => (
                                             <SelectItem key={operator} value={operator}>
                                                 {valueOperatorToInlineString(operator)}
                                             </SelectItem>

@@ -6,14 +6,19 @@ import { CalendarScope, DateSelection, Variant } from "@/components/custom/utili
 import { DatePicker } from "@/components/custom/utility/date-picker";
 import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
-import { autorun } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { reaction } from "mobx";
 
-type DateSubValue = "Date" | "Month" | "DayOfMonth" | "DayOfWeek" | "Hour" | "Minute";
-
-const DATE_SUB_VALUES: DateSubValue[] = ["Date", "Month", "DayOfMonth", "DayOfWeek", "Hour", "Minute"];
+enum DateSubValue {
+    Date = "Date",
+    Month = "Month",
+    DayOfMonth = "DayOfMonth",
+    DayOfWeek = "DayOfWeek",
+    Hour = "Hour",
+    Minute = "Minute"
+}
 
 interface HiveMimeFilterConditionDateValuePickerProps {
     currentItem: FilterQuery;
@@ -26,29 +31,21 @@ interface HiveMimeFilterConditionDateValuePickerProps {
  */
 function getSubValue(property?: string | null): DateSubValue {
     const dot = (property ?? "").lastIndexOf(".");
-    return dot === -1 ? "Date" : (property!.substring(dot + 1) as DateSubValue);
-}
-
-/**
- * Strips the sub-value suffix, returning the "pollOrder:candidateOrder" (or candidate id) part.
- */
-function getBaseProperty(property?: string | null): string {
-    const dot = (property ?? "").lastIndexOf(".");
-    return dot === -1 ? (property ?? "") : property!.substring(0, dot);
+    return dot === -1 ? DateSubValue.Date : (property!.substring(dot + 1) as DateSubValue);
 }
 
 function getNumericOptions(subValue: DateSubValue): { value: string; label: string }[] {
     switch (subValue) {
-        case "Month":
+        case DateSubValue.Month:
             return [...Array(12).keys()].map(i => ({ value: String(i + 1), label: new Date(2000, i, 1).toLocaleString("default", { month: "long" }) }));
-        case "DayOfMonth":
+        case DateSubValue.DayOfMonth:
             return [...Array(31).keys()].map(i => ({ value: String(i + 1), label: String(i + 1) }));
-        case "DayOfWeek":
+        case DateSubValue.DayOfWeek:
             return [...Array(7).keys()].map(i => ({ value: String(i + 1), label: new Date(2024, 0, i + 1).toLocaleString("default", { weekday: "long" }) }));
-        case "Hour":
-            return [...Array(24).keys()].map(i => ({ value: String(i), label: String(i) }));
-        case "Minute":
-            return [...Array(60).keys()].map(i => ({ value: String(i), label: String(i) }));
+        case DateSubValue.Hour:
+            return [...Array(24).keys()].map(i => ({ value: String(i), label: new Date(2000, 0, 1, i).toLocaleString("default", { hour: "numeric" })}));
+        case DateSubValue.Minute:
+            return [...Array(60).keys()].map(i => ({ value: String(i), label: new Date(2000, 0, 1, 0, i).toLocaleString("default", { minute: "numeric" }) }));
         default:
             return [];
     }
@@ -59,11 +56,11 @@ function formatValue(subValue: DateSubValue, value?: string | null): string {
         return "";
 
     switch (subValue) {
-        case "Date":
-            return new Date(Number(value)).toLocaleString();
-        case "Month":
+        case DateSubValue.Date:
+            return value.split(",").map(v => new Date(Number(v)).toLocaleString()).join(", ");
+        case DateSubValue.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
-        case "DayOfWeek":
+        case DateSubValue.DayOfWeek:
             return new Date(2024, 0, Number(value)).toLocaleString("default", { weekday: "long" });
         default:
             return value;
@@ -73,55 +70,40 @@ function formatValue(subValue: DateSubValue, value?: string | null): string {
 export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, poll }: HiveMimeFilterConditionDateValuePickerProps) => {
     const { t } = useTranslation();
     const [subValue, setSubValue] = useState<DateSubValue>(() => getSubValue(currentItem.property));
-    const [dateSelection] = useState(() => new DateSelection(
-        (poll.stepValue as CalendarScope) ?? CalendarScope.Day,
-        1,
-        [],
-        Variant.Edit
-    ));
+    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, [], Variant.Edit));
 
     useEffect(() => {
-        if (currentItem.valueOperator != null)
-            return;
+        if (currentItem.value != null)
+        {
+            const dates = currentItem.value.split(",").map(v => ({ date: new Date(Number(v)), value: Number(v) }));
+            dateSelection.dates = dates;
+        }
+        else
+        {
+            setProperty(DateSubValue.Date);
+            setOperator(ValueOperator.Equals);
+        }
 
-        currentItem.valueOperator = ValueOperator.Equals;
+        const dispose = reaction(() => dateSelection.dates.map(d => d), (newDates, oldDates) => {
+            currentItem.value = newDates.map(d => d.date.getTime()).join(",");
+        })
+
+        return () => {
+            dispose();
+        }
     }, [currentItem]);
 
-    // Ensure the property carries the sub-value suffix.
-    useEffect(() => {
-        currentItem.property = `${getBaseProperty(currentItem.property)}.${subValue}`;
-    }, []);
+    function setProperty(subValue: DateSubValue) {
+        const dotIndex = currentItem.property!.lastIndexOf(".");
+        const propertyWithoutSubValue = dotIndex === -1 ? currentItem.property : currentItem.property!.substring(0, dotIndex);
+        currentItem.property = `${propertyWithoutSubValue}.${subValue}`;
+        setSubValue(subValue);
 
-    // (Re)initialize the date selection whenever the "Date" sub-value becomes active.
-    useEffect(() => {
-        if (subValue !== "Date")
-            return;
-
-        dateSelection.currentDate = currentItem.value != null
-            ? new Date(Number(currentItem.value))
-            : new Date();
-
-        if (dateSelection.activeCount === 0)
-            dateSelection.confirm();
-    }, [subValue]);
-
-    // Sync the selected date into the value.
-    useEffect(() => {
-        if (subValue !== "Date")
-            return;
-
-        const dispose = autorun(() => {
-            const timestamps = dateSelection.selectedTimestamps;
-            currentItem.value = timestamps.length > 0 ? String(timestamps[0]) : null;
-        });
-
-        return dispose;
-    }, [dateSelection, currentItem, subValue]);
-
-    function changeSubValue(next: DateSubValue) {
-        currentItem.property = `${getBaseProperty(currentItem.property)}.${next}`;
-        currentItem.value = next === "Date" ? null : getNumericOptions(next)[0].value;
-        setSubValue(next);
+        const options = getNumericOptions(subValue);
+        if (options.length > 0)
+            currentItem.value = options[0].value;
+        else
+            currentItem.value = null;
     }
 
     function setNegation(value: boolean) {
@@ -130,6 +112,39 @@ export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, p
 
     function setOperator(operator: ValueOperator) {
         currentItem.valueOperator = operator;
+
+        if (operator === ValueOperator.Inside || operator === ValueOperator.Outside)
+            dateSelection.maxDates = 20;
+        else
+        {
+            dateSelection.maxDates = 1;
+            dateSelection.dates = dateSelection.dates.slice(0, 1);
+        }
+    }
+
+    function getOperators() {
+        const operators: ValueOperator[] = [ValueOperator.Equals, ValueOperator.Greater, ValueOperator.GreaterEquals, ValueOperator.Less, ValueOperator.LessEquals];
+
+        if (subValue === DateSubValue.Date)
+            operators.push(ValueOperator.Inside, ValueOperator.Outside);
+
+        return operators;
+    }
+
+    function getSubValueOptions() {
+        console.log(poll.stepValue);
+        const options: DateSubValue[] = [DateSubValue.Date];
+
+        if (poll.stepValue! <= CalendarScope.Month)
+            options.push(DateSubValue.Month)
+        if (poll.stepValue! <= CalendarScope.Day)
+            options.push(DateSubValue.DayOfMonth, DateSubValue.DayOfWeek)
+        if (poll.stepValue! <= CalendarScope.Hour)
+            options.push(DateSubValue.Hour)
+        if (poll.stepValue! <= CalendarScope.FifteenMinutes)
+            options.push(DateSubValue.Minute)
+
+        return options;
     }
 
     const numericOptions = getNumericOptions(subValue);
@@ -157,28 +172,25 @@ export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, p
 
             <HiveMimeBulletItem className="gap-2">
                 <span className="text-sm text-muted-foreground">
-                    <Select value={subValue} onValueChange={(value) => changeSubValue(value as DateSubValue)}>
+                    <Select value={subValue.toString()} onValueChange={(value) => setProperty(value as DateSubValue)}>
                         <HiveMimeInlineSelectTrigger>
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            {DATE_SUB_VALUES.map(sv => (
-                                <SelectItem key={sv} value={sv}>
-                                    {t(`posts:filter.dateSub${sv}`)}
+                            {getSubValueOptions().map(sv => (
+                                <SelectItem key={sv} value={sv.toString()}>
+                                    {t(`posts:filter.dateSub${DateSubValue[sv].toString()}`)}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
 
-                    <Select
-                        value={currentItem.valueOperator!}
-                        onValueChange={(value) => setOperator(value as ValueOperator)}
-                    >
+                    <Select value={currentItem.valueOperator!} onValueChange={(value) => setOperator(value as ValueOperator)}>
                         <HiveMimeInlineSelectTrigger>
                             <SelectValue />
                         </HiveMimeInlineSelectTrigger>
                         <SelectContent>
-                            {[ValueOperator.Equals, ValueOperator.Greater, ValueOperator.Less, ValueOperator.GreaterEquals, ValueOperator.LessEquals].map((operator) => (
+                            {getOperators().map((operator) => (
                                 <SelectItem key={operator} value={operator}>
                                     {valueOperatorToInlineString(operator)}
                                 </SelectItem>
@@ -186,11 +198,8 @@ export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, p
                         </SelectContent>
                     </Select>
 
-                    {subValue !== "Date" && (
-                        <Select
-                            value={currentItem.value ?? numericOptions[0].value}
-                            onValueChange={(value) => currentItem.value = value}
-                        >
+                    {subValue !== DateSubValue.Date && (
+                        <Select value={currentItem.value ?? numericOptions[0].value} onValueChange={(value) => currentItem.value = value}>
                             <HiveMimeInlineSelectTrigger>
                                 <SelectValue />
                             </HiveMimeInlineSelectTrigger>
@@ -202,11 +211,11 @@ export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, p
                                 ))}
                             </SelectContent>
                         </Select>
-                    )}
+                   )}
                 </span>
             </HiveMimeBulletItem>
 
-            {subValue === "Date" && <DatePicker dateSelection={dateSelection} />}
+            {subValue === DateSubValue.Date && <DatePicker dateSelection={dateSelection} />}
         </div>
     );
 });

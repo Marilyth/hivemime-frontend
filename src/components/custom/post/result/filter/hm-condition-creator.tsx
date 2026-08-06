@@ -2,7 +2,7 @@ import { HiveMimeMultiStep, HiveMimeStep } from "@/components/custom/utility/hm-
 import { CandidateDto, PollDto, PollType, PostDto, FilterQuery } from "@/lib/Api";
 import { createFilterQuery } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { HiveMimeFilterConditionChoiceValuePicker } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionPollPicker } from "./hm-poll-picker";
@@ -24,7 +24,7 @@ interface HiveMimeFilterQueryDialogProps {
 
 export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, poll, candidate, onFinished }: HiveMimeFilterQueryDialogProps) => {
     const { t } = useTranslation();
-    const item = useMemo(() => currentItem ?? createFilterQuery(), [currentItem]);
+    const [item] = useState(() => currentItem ?? createFilterQuery());
     const [selectedPoll, setSelectedPoll] = useState<PollDto | null>(poll ?? null);
     const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(candidate ?? null);
 
@@ -33,6 +33,10 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
 
     const needsPoll = poll == null;
     const needsCandidate = candidate == null;
+
+    if (!needsCandidate && item.property == null){
+        handleCandidatePicked(candidate);
+    }
 
     function handlePollPicked(poll: PollDto) {
         setSelectedPoll(poll);
@@ -46,9 +50,10 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
 
     function handleCandidatePicked(candidate: CandidateDto, poll?: PollDto) {
         const targetPoll = poll ?? valuePoll;
-        const pollOrder = (post.polls ?? []).findIndex(p => p === targetPoll);
-        const candidateOrder = (targetPoll?.candidates ?? []).findIndex(c => c === candidate);
 
+        const pollOrder = (post.polls!).findIndex(p => p === targetPoll);
+        const candidateOrder = (targetPoll!.candidates!).findIndex(c => c === candidate);
+        
         item.property = candidate.id ?? `${pollOrder}:${candidateOrder}`;
         item.value = null;
         item.valueOperator = undefined;

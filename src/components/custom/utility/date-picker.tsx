@@ -262,6 +262,10 @@ const HourPicker = observer(({ dateSelection, startColor, endColor, onHoverValue
 });
 
 const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
+  const minuteLabels = () => Array.from({ length: 60 / 15 }, (_, i) => i * 15).map((i) =>
+    new Date(2000, 0, 0, 0, i).toLocaleString("default", { minute: "numeric" })
+  );
+
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -269,7 +273,8 @@ const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, on
 
   return (
     <div className={`mt-3 grid grid-cols-4 gap-1`}>
-      {Array.from({ length: 60 / 15 }, (_, i) => i * 15).map((minute) => {
+      {minuteLabels().map((label, i) => {
+        const minute = i * 15;
         const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
 
         const value = dateSelection.sumScopedRange(mapDate, CalendarScope.FifteenMinutes);
@@ -279,7 +284,7 @@ const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, on
 
         return (
           <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
-            {minute.toString().padStart(2, "0")}
+            {label}
           </Button>
         );
       })}
@@ -289,6 +294,10 @@ const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, on
 
 
 const FiveMinutesPicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
+  const minuteLabels = () => Array.from({ length: 60 / 5 }, (_, i) => i * 5).map((i) =>
+    new Date(2000, 0, 0, 0, i).toLocaleString("default", { minute: "numeric" })
+  );
+
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -296,7 +305,8 @@ const FiveMinutesPicker = observer(({ dateSelection, startColor, endColor, onHov
 
   return (
     <div className={`mt-3 grid grid-cols-6 gap-1`}>
-      {Array.from({ length: 60 / 5 }, (_, i) => i * 5).map((minute) => {
+      {minuteLabels().map((label, i) => {
+        const minute = i * 5;
         const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
 
         const value = dateSelection.sumScopedRange(mapDate, CalendarScope.FiveMinutes);
@@ -315,6 +325,10 @@ const FiveMinutesPicker = observer(({ dateSelection, startColor, endColor, onHov
 });
 
 const MinutePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, date }: PickerProps) => {
+  const minuteLabels = () => Array.from({ length: 60 }, (_, i) => i).map((i) =>
+    new Date(2000, 0, 0, 0, i).toLocaleString("default", { minute: "numeric" })
+  );
+
   function onClick(value: number) {
     dateSelection.currentDate.setMinutes(value);
     dateSelection.confirm();
@@ -322,7 +336,7 @@ const MinutePicker = observer(({ dateSelection, startColor, endColor, onHoverVal
 
   return (
     <div className={`mt-3 grid grid-cols-10 gap-1`}>
-      {Array.from({ length: 60 }, (_, i) => i).map((minute) => {
+      {minuteLabels().map((label, minute) => {
         const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), minute);
 
         const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Minute);

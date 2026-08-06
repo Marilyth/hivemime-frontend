@@ -2,14 +2,14 @@
 
 import { observer } from "mobx-react-lite";
 import { HiveMimeCreatePollProps } from "./hm-create-choice-poll";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CalendarScope, DateSelection, Variant } from "../../utility/date-selection";
 import { DatePicker } from "../../utility/date-picker";
-import { FilterQuery, FilterQueryGroup, PollDto, PostDto } from "@/lib/Api";
+import { CreatePostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
 import { createFilterQuery, createFilterQueryGroup } from "@/lib/vote-query";
 import { HiveMimePostResultFilter } from "../result/filter/hm-post-result-filter";
 import { HiveMimeFilterConditionCreator } from "../result/filter/hm-condition-creator";
@@ -17,7 +17,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const DATE_SCOPES = Array.from({ length: CalendarScope.Year + 1 }, (_, i) => i) as CalendarScope[];
 
-export const HiveMimeCreateDateCondition = observer((props: HiveMimeCreatePollProps) => {
+export type HiveMimeCreateDatePollProps = {
+  post: CreatePostDto;
+} & HiveMimeCreatePollProps;
+
+export const HiveMimeCreateDateCondition = observer((props: HiveMimeCreateDatePollProps) => {
   const { t } = useTranslation();
   const [creatorOpen, setCreatorOpen] = useState(false);
   const [draftQuery, setDraftQuery] = useState<FilterQuery | null>(null);
@@ -32,17 +36,13 @@ export const HiveMimeCreateDateCondition = observer((props: HiveMimeCreatePollPr
 
   const dateQuery = props.poll.dateFilterQuery as FilterQueryGroup;
 
-  const post: PostDto = useMemo(() => ({
-    polls: [{ ...props.poll, candidates: props.poll.candidates } as PollDto],
-  }), [props.poll]);
-
   function updateGranularity(value: string) {
     props.poll.stepValue = Number(value);
   }
 
   function addCondition() {
     const query = createFilterQuery();
-    query.property = "0:0";
+    query.property = `${props.post.polls!.indexOf(props.poll)}:0`;
     setDraftQuery(query);
     setCreatorOpen(true);
   }
@@ -83,7 +83,7 @@ export const HiveMimeCreateDateCondition = observer((props: HiveMimeCreatePollPr
         />
       </HiveMimeBulletItem>
 
-      <HiveMimePostResultFilter post={post} builder={dateQuery} onAddCondition={addCondition} />
+      <HiveMimePostResultFilter post={props.post} builder={dateQuery} onAddCondition={addCondition} />
 
       <Dialog open={creatorOpen} onOpenChange={(open) => !open && setCreatorOpen(false)}>
         <DialogContent onClick={(e) => e.stopPropagation()}>
@@ -91,7 +91,7 @@ export const HiveMimeCreateDateCondition = observer((props: HiveMimeCreatePollPr
             {t("posts:filter.createCondition")}
           </span>
 
-          <HiveMimeFilterConditionCreator post={post} currentItem={draftQuery} poll={post.polls![0]} candidate={post.polls![0].candidates![0]} onFinished={creatorFinished} />
+          <HiveMimeFilterConditionCreator post={props.post} currentItem={draftQuery} poll={props.poll} candidate={props.poll.candidates![0]} onFinished={creatorFinished} />
         </DialogContent>
       </Dialog>
 

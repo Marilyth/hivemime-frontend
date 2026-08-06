@@ -41,10 +41,8 @@
     "greaterEquals": "greater than or equal to",
     "less": "less than",
     "lessEquals": "less than or equal to",
-    "inside": "partly inside the marked area",
-    "outside": "partly outside the marked area",
-    "exclusiveInside": "exclusively inside the marked area",
-    "exclusiveOutside": "exclusively outside the marked area"
+    "inside": "contained within",
+    "outside": "not contained within"
   },
   "shuffle": {
     "are": "are",
