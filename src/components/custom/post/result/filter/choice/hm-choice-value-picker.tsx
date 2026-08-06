@@ -57,6 +57,7 @@ export const HiveMimeFilterConditionChoiceValueViewer = observer(({ currentItem,
 
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             operator={valueOperatorToInlineString(ValueOperator.Equals)}
             values={[currentItem.value === "1"

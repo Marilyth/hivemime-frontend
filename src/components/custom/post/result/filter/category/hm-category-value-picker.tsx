@@ -92,6 +92,7 @@ export const HiveMimeFilterConditionCategoryValueViewer = observer(({ currentIte
 
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             operator={valueOperatorToInlineString(ValueOperator.Equals)}
             negated={currentItem.isNegated}

@@ -114,6 +114,7 @@ export const HiveMimeFilterConditionRankValueViewer = observer(({ currentItem, p
 
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             operator={valueOperatorToInlineString(currentItem.valueOperator!)}
             negated={currentItem.isNegated}

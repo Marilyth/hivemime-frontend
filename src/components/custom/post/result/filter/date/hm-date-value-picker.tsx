@@ -224,7 +224,7 @@ export const HiveMimeFilterConditionDateValuePicker = observer(({ currentItem, p
     );
 });
 
-export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionDateValuePickerProps) => {
+export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDateValuePickerProps) => {
     const { t } = useTranslation();
 
     const subValue = getSubValue(currentItem.property);
@@ -233,6 +233,7 @@ export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, c
 
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             subValue={t(`posts:filter.dateSub${subValue}`)}
             operator={valueOperatorToInlineString(operator)}

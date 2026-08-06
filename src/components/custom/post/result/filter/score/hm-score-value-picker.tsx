@@ -95,9 +95,10 @@ export const HiveMimeFilterConditionScoreValuePicker = observer(({ currentItem, 
     );
 });
 
-export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionScoreValuePickerProps) => {
+export const HiveMimeFilterConditionScoreValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionScoreValuePickerProps) => {
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             operator={valueOperatorToInlineString(currentItem.valueOperator!)}
             negated={currentItem.isNegated}

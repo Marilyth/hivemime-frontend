@@ -104,11 +104,12 @@ export const HiveMimeFilterConditionDrawValuePicker = observer(({ currentItem, c
     );
 });
 
-export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate }: HiveMimeFilterConditionDrawValuePickerProps) => {
+export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDrawValuePickerProps) => {
     const operator = (currentItem.valueOperator ?? ValueOperator.Inside) as ValueOperator;
 
     return (
         <HiveMimeConditionViewer
+            pollName={poll.title}
             name={candidate.name}
             operator={valueOperatorToInlineString(operator)}
             values={splitValues(currentItem.value)}
