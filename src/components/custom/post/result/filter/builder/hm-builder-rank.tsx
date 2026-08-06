@@ -9,7 +9,7 @@ import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } 
 
 const OPERATORS = [ValueOperator.Equals, ValueOperator.Greater, ValueOperator.GreaterEquals, ValueOperator.Less, ValueOperator.LessEquals];
 
-export const RankEditor = observer(({ currentItem, poll, onValidChange }: HiveMimeFilterConditionEditorProps) => {
+export const RankEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
 
     const rankValues = [...Array(poll.candidates!.length).keys()].map(rank => (poll.maxValue! - rank).toString());
@@ -22,6 +22,7 @@ export const RankEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
     return (
         <>
             <SelectChip
+                autoOpen={isActive}
                 value={currentItem.valueOperator}
                 onValueChange={(value) => {
                     currentItem.valueOperator = value as ValueOperator;
@@ -34,6 +35,8 @@ export const RankEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
             </SelectChip>
             {showRest && !hideValue && (
                 <SelectChip
+                    autoOpen={isActive}
+                    hasValue={currentItem.value != null}
                     value={currentItem.value ?? "none"}
                     onValueChange={(value) => currentItem.value = value === "none" ? null : value}
                     lockedClassName="text-muted-blue"

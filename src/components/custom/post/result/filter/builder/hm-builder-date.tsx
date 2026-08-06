@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ValueOperator } from "@/lib/Api";
 import { SelectItem } from "@/components/ui/select";
 import { valueOperatorToInlineString } from "@/lib/utils";
-import { Chip, ValuePopover, SelectChip } from "./hm-builder-chip";
+import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } from "./hm-builder-editor";
 
 enum DateSubValue {
@@ -51,10 +51,14 @@ function formatValue(subValue: DateSubValue, value?: string | null): string {
     }
 }
 
-export const DateEditor = observer(({ currentItem, poll, onValidChange }: HiveMimeFilterConditionEditorProps) => {
+export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
     const [subValue, setSubValue] = useState<DateSubValue | null>(null);
     const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, [], Variant.Edit));
+
+    const subValueOptions = getSubValueOptions();
+    const hideSubValue = subValueOptions.length <= 1;
+    useAutoSingle((value) => setProperty(value as DateSubValue), subValueOptions);
 
     useEffect(() => {
         if (subValue === DateSubValue.Date && currentItem.value != null) {
@@ -123,8 +127,6 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
     }
 
     const numericOptions = getNumericOptions(subValue ?? DateSubValue.Date);
-    const subValueOptions = getSubValueOptions();
-    const hideSubValue = useAutoSingle((value) => setProperty(value as DateSubValue), subValueOptions);
 
     useReportValidity(currentItem, onValidChange);
 
@@ -135,6 +137,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
         <>
             {!hideSubValue && (
                 <SelectChip
+                    autoOpen={isActive}
                     value={subValue ?? ""}
                     onValueChange={(value) => setProperty(value as DateSubValue)}
                     lockedClassName="text-muted-green"
@@ -148,6 +151,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
             {subValue != null && (
                 <>
                     <SelectChip
+                        autoOpen={isActive}
                         value={currentItem.valueOperator}
                         onValueChange={(value) => setOperator(value as ValueOperator)}
                         lockedClassName="text-foreground"
@@ -156,15 +160,18 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange }: HiveMi
                         {getOperators().map(op => <SelectItem key={op} value={op}>{valueOperatorToInlineString(op)}</SelectItem>)}
                     </SelectChip>
                     {showRest && (subValue === DateSubValue.Date ? (
-                        <ValuePopover
+                        <DialogValueChip
+                            autoOpen={isActive}
+                            hasValue={currentItem.value != null && currentItem.value !== ""}
                             trigger={dateValues.length > 0
                                 ? dateValues.map(value => <Chip key={value} className="text-muted-blue">{value}</Chip>)
                                 : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
                         >
                             <DatePicker dateSelection={dateSelection} />
-                        </ValuePopover>
+                        </DialogValueChip>
                     ) : (
                         <SelectChip
+                            autoOpen={isActive}
                             value={currentItem.value ?? ""}
                             onValueChange={(value) => currentItem.value = value}
                             lockedClassName="text-muted-blue"

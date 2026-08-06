@@ -113,6 +113,7 @@
     "selectSubValue": "Select type...",
     "selectOperator": "Select operator…",
     "setValue": "Select value…",
+    "pickValuePrompt": "Please pick a value for your filter",
     "dateFilterTitle": "Date conditions",
     "dateFilterDescription": "Add conditions to refine which dates are available for voting.",
     "adjustCondition": "Adjust the condition for {{pollTitle}}: {{candidateName}}.",

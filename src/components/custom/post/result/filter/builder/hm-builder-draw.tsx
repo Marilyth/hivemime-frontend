@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next";
 import { ValueOperator } from "@/lib/Api";
 import { SelectItem } from "@/components/ui/select";
 import { valueOperatorToInlineString } from "@/lib/utils";
-import { Chip, ValuePopover, SelectChip } from "./hm-builder-chip";
+import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { splitValues } from "../hm-condition-viewer";
 import { HiveMimeFilterConditionEditorProps, useReportValidity } from "./hm-builder-editor";
 
-export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChange }: HiveMimeFilterConditionEditorProps) => {
+export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
     const src = candidate?.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"));
     const [cellSelection] = useState(() => new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!));
@@ -58,6 +58,7 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
     return (
         <>
             <SelectChip
+                autoOpen={isActive}
                 value={currentItem.valueOperator}
                 onValueChange={(value) => {
                     currentItem.valueOperator = value as ValueOperator;
@@ -71,13 +72,15 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
                 ))}
             </SelectChip>
             {showRest && (
-                <ValuePopover
+                <DialogValueChip
+                    autoOpen={isActive}
+                    hasValue={currentItem.value != null && currentItem.value !== ""}
                     trigger={values.length > 0
                         ? values.map(value => <Chip key={value} className="text-muted-blue">{value}</Chip>)
                         : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
                 >
                     <DrawPicker variant={Variant.Draw} cellSelection={cellSelection} src={src!} />
-                </ValuePopover>
+                </DialogValueChip>
             )}
         </>
     );

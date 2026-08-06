@@ -6,6 +6,7 @@ export interface HiveMimeFilterConditionEditorProps {
     poll: PollDto;
     candidate: CandidateDto;
     onValidChange?: (valid: boolean) => void;
+    isActive?: boolean;
 }
 
 export function useReportValidity(currentItem: FilterQuery, onValidChange?: (valid: boolean) => void, extra: () => boolean = () => true) {

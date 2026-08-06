@@ -1,8 +1,9 @@
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
-import { useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { FilterQuery } from "@/lib/Api";
 
@@ -25,17 +26,42 @@ interface SelectChipProps {
     className?: string;
     lockedClassName?: string;
     disabled?: boolean;
+    /** When true, auto-opens this dropdown on mount while it has no value (used while the builder is "active"). */
+    autoOpen?: boolean;
+    /** Overrides the value-based "has a value" check (e.g. when a sentinel like "none" is used). */
+    hasValue?: boolean;
     children: ReactNode;
 }
 
-export const SelectChip = ({ value, onValueChange, placeholder, className, lockedClassName, disabled, children }: SelectChipProps) => (
-    <Select value={value ?? ""} onValueChange={onValueChange} disabled={disabled}>
-        <SelectTrigger className={cn(chipBase, "gap-1", value ? lockedClassName : "border-dashed text-muted-foreground", disabled && "opacity-60", className)}>
-            <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>{children}</SelectContent>
-    </Select>
-);
+export const SelectChip = ({ value, onValueChange, placeholder, className, lockedClassName, disabled, autoOpen, hasValue, children }: SelectChipProps) => {
+    const [open, setOpen] = useState(false);
+    const dismissedRef = useRef(false);
+    const effectiveHasValue = hasValue ?? (value != null && value !== "");
+
+    useEffect(() => {
+        if (!effectiveHasValue)
+            dismissedRef.current = false;
+    }, [effectiveHasValue]);
+
+    useEffect(() => {
+        if (autoOpen && !effectiveHasValue && !dismissedRef.current)
+            setOpen(true);
+    }, [autoOpen, effectiveHasValue]);
+
+    function handleOpenChange(next: boolean) {
+        dismissedRef.current = !next;
+        setOpen(next);
+    }
+
+    return (
+        <Select value={value ?? ""} onValueChange={onValueChange} disabled={disabled} open={open} onOpenChange={handleOpenChange}>
+            <SelectTrigger className={cn(chipBase, "gap-1", value ? lockedClassName : "border-dashed text-muted-foreground", disabled && "opacity-60", className)}>
+                <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>{children}</SelectContent>
+        </Select>
+    );
+};
 
 interface ToggleChipProps {
     active: boolean;
@@ -71,61 +97,36 @@ export const NegationChip = observer(({ currentItem }: { currentItem: FilterQuer
     );
 });
 
-interface PopoverChipProps {
-    value?: ReactNode;
-    placeholder?: string;
-    className?: string;
-    lockedClassName?: string;
-    children: ReactNode;
-}
-
-export const PopoverChip = ({ value, placeholder, className, lockedClassName, children }: PopoverChipProps) => (
-    <Popover>
-        <PopoverTrigger asChild>
-            <button
-                type="button"
-                className={cn(chipBase, "cursor-pointer", value ? lockedClassName : "border-dashed text-muted-foreground", className)}
-            >
-                {value ?? placeholder}
-            </button>
-        </PopoverTrigger>
-        <PopoverContent align="start" className="w-auto">{children}</PopoverContent>
-    </Popover>
-);
-
-interface ValuePopoverProps {
+interface DialogValueChipProps {
     trigger: ReactNode;
+    autoOpen?: boolean;
+    hasValue?: boolean;
     children: ReactNode;
 }
 
-type VirtualRect = { left: number; top: number; right: number; bottom: number; width: number; height: number };
-
-/**
- * A dialog-safe Radix Popover anchored to a virtual element whose rect is captured once when the
- * popover opens and frozen. Radix re-reads that rect on every update, so the popup never moves —
- * even though the value-chip trigger wraps and grows. The trigger remains the clickable element.
- */
-export const ValuePopover = ({ trigger, children }: ValuePopoverProps) => {
+export const DialogValueChip = ({ trigger, autoOpen, hasValue, children }: DialogValueChipProps) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
-    const triggerRef = useRef<HTMLSpanElement>(null);
-    const rectRef = useRef<VirtualRect>({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 });
-    const virtualRef = useRef({ getBoundingClientRect: () => rectRef.current });
 
-    function handleOpenChange(next: boolean) {
-        if (next && triggerRef.current) {
-            const r = triggerRef.current.getBoundingClientRect();
-            rectRef.current = { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
-        }
-        setOpen(next);
-    }
+    useEffect(() => {
+        if (autoOpen && !hasValue)
+            setOpen(true);
+    }, [autoOpen, hasValue]);
 
     return (
-        <Popover open={open} onOpenChange={handleOpenChange}>
-            <PopoverAnchor virtualRef={virtualRef as unknown as RefObject<{ getBoundingClientRect(): DOMRect }>} />
-            <PopoverTrigger asChild>
-                <span ref={triggerRef} className="inline-flex flex-wrap items-center gap-1 cursor-pointer">{trigger}</span>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto">{children}</PopoverContent>
-        </Popover>
+        <>
+            <button type="button" onClick={() => setOpen(true)} className="inline-flex flex-wrap items-center gap-1 cursor-pointer">
+                {trigger}
+            </button>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="w-auto">
+                    <span className="text-sm text-muted-foreground">{t("posts:filter.pickValuePrompt")}</span>
+                    <div className="mt-1">{children}</div>
+                    <div className="mt-3 flex justify-end">
+                        <Button type="button" size="sm" onClick={() => setOpen(false)}>{t("common:submit")}</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };

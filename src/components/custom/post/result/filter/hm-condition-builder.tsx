@@ -24,6 +24,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
     const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(lockedCandidate ?? null);
     const [valid, setValid] = useState(false);
     const [resetKey, setResetKey] = useState(0);
+    const [isActive, setIsActive] = useState(false);
 
     const availablePolls = post.polls ?? [];
     const hidePoll = lockedPoll != null || availablePolls.length === 1;
@@ -47,6 +48,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
             setSelectedCandidate(null);
 
         clearDraftFields();
+        setIsActive(false);
 
         if (lockedPoll && lockedCandidate) {
             const pollOrder = post.polls!.indexOf(lockedPoll);
@@ -90,10 +92,14 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
     const Editor = selectedPoll ? editorMapping[selectedPoll.pollType!] : null;
 
     return (
-        <div className="flex flex-wrap items-center gap-1 overflow-x-auto border rounded-md p-2">
+        <div
+            className="flex flex-wrap items-center gap-1 overflow-x-auto border rounded-md p-2"
+            onClick={() => setIsActive(true)}
+        >
             <NegationChip currentItem={draft} />
             {!hidePoll && (
                 <SelectChip
+                    autoOpen={isActive}
                     value={selectedPoll?.title ?? undefined}
                     onValueChange={(value) => {
                         const poll = availablePolls.find(p => p.title === value);
@@ -112,6 +118,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
 
             {selectedPoll && !hideCandidate && (
                 <SelectChip
+                    autoOpen={isActive}
                     value={selectedCandidate?.name ?? undefined}
                     onValueChange={(value) => {
                         const candidate = selectedPoll.candidates!.find(c => c.name === value);
@@ -135,6 +142,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
                     poll={selectedPoll}
                     candidate={selectedCandidate}
                     onValidChange={setValid}
+                    isActive={isActive}
                 />
             )}
 

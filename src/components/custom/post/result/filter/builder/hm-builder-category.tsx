@@ -8,7 +8,7 @@ import { valueOperatorToInlineString } from "@/lib/utils";
 import { Chip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } from "./hm-builder-editor";
 
-export const CategoryEditor = observer(({ currentItem, poll, onValidChange }: HiveMimeFilterConditionEditorProps) => {
+export const CategoryEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -26,6 +26,8 @@ export const CategoryEditor = observer(({ currentItem, poll, onValidChange }: Hi
             <Chip className="text-foreground">{valueOperatorToInlineString(ValueOperator.Equals)}</Chip>
             {!hideValue && (
                 <SelectChip
+                    autoOpen={isActive}
+                    hasValue={currentItem.value != null}
                     value={currentItem.value ?? "none"}
                     onValueChange={(value) => currentItem.value = value === "none" ? null : value}
                     lockedClassName="text-muted-blue"

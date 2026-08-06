@@ -4,12 +4,12 @@ import { ValueOperator } from "@/lib/Api";
 import { SelectItem } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { valueOperatorToInlineString } from "@/lib/utils";
-import { PopoverChip, SelectChip } from "./hm-builder-chip";
+import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity } from "./hm-builder-editor";
 
 const OPERATORS = [ValueOperator.Equals, ValueOperator.Greater, ValueOperator.Less, ValueOperator.GreaterEquals, ValueOperator.LessEquals];
 
-export const ScoreEditor = observer(({ currentItem, poll, onValidChange }: HiveMimeFilterConditionEditorProps) => {
+export const ScoreEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
 
     useReportValidity(currentItem, onValidChange);
@@ -19,6 +19,7 @@ export const ScoreEditor = observer(({ currentItem, poll, onValidChange }: HiveM
     return (
         <>
             <SelectChip
+                autoOpen={isActive}
                 value={currentItem.valueOperator}
                 onValueChange={(value) => {
                     currentItem.valueOperator = value as ValueOperator;
@@ -30,20 +31,26 @@ export const ScoreEditor = observer(({ currentItem, poll, onValidChange }: HiveM
                 {OPERATORS.map(op => <SelectItem key={op} value={op}>{valueOperatorToInlineString(op)}</SelectItem>)}
             </SelectChip>
             {showRest && (
-                <PopoverChip
-                    value={currentItem.value}
-                    placeholder={t("posts:filter.setValue")}
-                    lockedClassName="text-muted-blue"
+                <DialogValueChip
+                    autoOpen={isActive}
+                    hasValue={currentItem.value != null && currentItem.value !== ""}
+                    trigger={currentItem.value
+                        ? <Chip className="text-muted-blue">{currentItem.value}</Chip>
+                        : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
                 >
-                    <Slider
-                        value={[Number(currentItem.value ?? poll.minValue!)]}
-                        onValueChange={(value) => currentItem.value = String(value[0])}
-                        min={poll.minValue!}
-                        max={poll.maxValue!}
-                        step={poll.stepValue!}
-                        className="w-40"
-                    />
-                </PopoverChip>
+                    <div className="flex flex-col items-center gap-4 p-2">
+                        <span className="text-2xl font-semibold tabular-nums text-foreground">
+                            {currentItem.value ?? poll.minValue!}
+                        </span>
+                        <Slider
+                            value={[Number(currentItem.value ?? poll.minValue!)]}
+                            onValueChange={(value) => currentItem.value = String(value[0])}
+                            min={poll.minValue!}
+                            max={poll.maxValue!}
+                            step={poll.stepValue!}
+                        />
+                    </div>
+                </DialogValueChip>
             )}
         </>
     );
