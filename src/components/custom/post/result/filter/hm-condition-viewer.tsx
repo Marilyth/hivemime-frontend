@@ -4,15 +4,15 @@ import { useTranslation } from "react-i18next";
 interface HiveMimeConditionViewerProps {
     pollName?: ReactNode;
     name: ReactNode;
-    operator: ReactNode;
-    values: ReactNode[];
+    operator?: ReactNode;
+    values?: ReactNode[];
     negated?: boolean;
     subValue?: ReactNode;
 }
 
 const box = "rounded-md border px-2 py-0.5 text-sm whitespace-nowrap";
 
-export const HiveMimeConditionViewer = ({ pollName, name, operator, values, negated, subValue }: HiveMimeConditionViewerProps) => {
+export const HiveMimeConditionViewer = ({ pollName, name, operator, values = [], negated, subValue }: HiveMimeConditionViewerProps) => {
     const { t } = useTranslation();
 
     return (
@@ -21,7 +21,7 @@ export const HiveMimeConditionViewer = ({ pollName, name, operator, values, nega
             <span className={`${box} text-honey-brown`}>{name}</span>
             {subValue != null && <span className={`${box} text-muted-green`}>{subValue}</span>}
             {negated && <span className={`${box} text-failure`}>{t("common:not")}</span>}
-            <span className={`${box} text-foreground`}>{operator}</span>
+            {operator != null && <span className={`${box} text-foreground`}>{operator}</span>}
             {values.map((value, index) => (
                 <span key={index} className={`${box} text-muted-blue`}>{value}</span>
             ))}

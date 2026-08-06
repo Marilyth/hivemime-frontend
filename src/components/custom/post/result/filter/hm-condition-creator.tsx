@@ -2,8 +2,7 @@ import { HiveMimeMultiStep, HiveMimeStep } from "@/components/custom/utility/hm-
 import { CandidateDto, PollDto, PollType, PostDto, FilterQuery } from "@/lib/Api";
 import { createFilterQuery } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { HiveMimeFilterConditionChoiceValuePicker } from "./choice/hm-choice-value-picker";
 import { HiveMimeFilterConditionPollPicker } from "./hm-poll-picker";
 import { HiveMimeFilterConditionCandidatePicker } from "./hm-candidate-picker";
@@ -12,6 +11,7 @@ import { HiveMimeFilterConditionRankValuePicker } from "./rank/hm-rank-value-pic
 import { HiveMimeFilterConditionCategoryValuePicker } from "./category/hm-category-value-picker";
 import { HiveMimeFilterConditionDrawValuePicker } from "./draw/hm-draw-value-picker";
 import { HiveMimeFilterConditionDateValuePicker } from "./date/hm-date-value-picker";
+import { HiveMimeConditionViewer } from "./hm-condition-viewer";
 
 
 interface HiveMimeFilterQueryDialogProps {
@@ -23,7 +23,6 @@ interface HiveMimeFilterQueryDialogProps {
 }
 
 export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = null, poll, candidate, onFinished }: HiveMimeFilterQueryDialogProps) => {
-    const { t } = useTranslation();
     const [item] = useState(() => currentItem ?? createFilterQuery());
     const [selectedPoll, setSelectedPoll] = useState<PollDto | null>(poll ?? null);
     const [selectedCandidate, setSelectedCandidate] = useState<CandidateDto | null>(candidate ?? null);
@@ -89,8 +88,8 @@ export const HiveMimeFilterConditionCreator = observer(({ post, currentItem = nu
                 }
                 <HiveMimeStep canContinue={valueCandidate != null}>
                     <div>
-                        <div className="text-sm text-muted-foreground mb-4">
-                            {t("posts:filter.adjustCondition", { pollTitle: valuePoll?.title, candidateName: valueCandidate?.name })}
+                        <div className="mb-4">
+                            <HiveMimeConditionViewer pollName={valuePoll?.title} name={valueCandidate?.name} />
                         </div>
                         {valuePoll?.pollType && pollMapping[valuePoll.pollType]}
                     </div>
