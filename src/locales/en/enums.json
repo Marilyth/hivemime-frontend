@@ -41,8 +41,7 @@
     "greaterEquals": "greater than or equal to",
     "less": "less than",
     "lessEquals": "less than or equal to",
-    "inside": "contained within",
-    "outside": "not contained within"
+    "inside": "contained within"
   },
   "shuffle": {
     "are": "are",

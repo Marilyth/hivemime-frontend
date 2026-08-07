@@ -42,7 +42,7 @@ export const HiveMimeFilterQuery = observer(({ currentItem, ancestors, isFirstIt
 
     function isNotAncestor(draggable: unknown): boolean {
         return !(isFilterQueryGroup(draggable) &&
-                 ancestors.includes(draggable as FilterQueryGroup));
+            ancestors.includes(draggable as FilterQueryGroup));
     }
     
     function getParent() {

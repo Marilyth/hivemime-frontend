@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { getReferenceId } from "@/lib/utils";
+import { NegationChip } from "./builder/hm-builder-chip";
 
 
 type HiveMimeFilterQueryGroupProps = {
@@ -74,21 +75,25 @@ export const HiveMimeFilterQueryGroup = observer(({ ancestors, group, isFirstIte
                       transition={{ duration: 0.2 }}>
             <HiveMimeDraggable className={`flex flex-col gap-2 ${!isRoot() ? "my-2" : ""}`} canDrop={isNotAncestor} isDraggable={!isRoot()}
                 isDropArea={!isRoot()} allowedZones={["top", "bottom"]} dataList={getParent()?.children ?? []} data={group} onDropped={onMoved}>
-                {!isFirstItem && (
-                    <Select
-                        value={group.leftOperator}
-                        onValueChange={(value) => setLeftOperator(value as BooleanOperator)}
-                    >
-                        <HiveMimeInlineSelectTrigger className="p-0">
-                            <SelectValue />
-                        </HiveMimeInlineSelectTrigger>
-                        <SelectContent>
-                            <SelectItem value={BooleanOperator.And}>{t("enums:queryOperator.and")}</SelectItem>
-                            <SelectItem value={BooleanOperator.Or}>{t("enums:queryOperator.or")}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                )}
+                {!isRoot() && (<div className="flex flex-row gap-2 ml-2">
+                    {!isFirstItem && (
+                        <Select
+                            value={group.leftOperator}
+                            onValueChange={(value) => setLeftOperator(value as BooleanOperator)}
+                        >
+                            <HiveMimeInlineSelectTrigger className="p-0">
+                                <SelectValue />
+                            </HiveMimeInlineSelectTrigger>
+                            <SelectContent>
+                                <SelectItem value={BooleanOperator.And}>{t("enums:queryOperator.and")}</SelectItem>
+                                <SelectItem value={BooleanOperator.Or}>{t("enums:queryOperator.or")}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
 
+                    <NegationChip currentItem={group} />
+                </div>)}
+                
                 <div className={`${!isRoot() ? "mx-2 border border-l-3 border-b-3 rounded bg-muted/30" : ""}`}>
                     {group.children!.map((item, index) => {
                         if (isFilterQueryGroup(item)) {

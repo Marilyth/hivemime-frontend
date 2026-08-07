@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { FilterQuery } from "@/lib/Api";
+import type { FilterQueryBase } from "@/lib/Api";
 
 export const chipBase = "rounded-md border px-2 py-1 text-sm whitespace-nowrap inline-flex items-center justify-center h-9";
 
@@ -82,7 +82,7 @@ export const ToggleChip = ({ active, onActive, activeClassName, inactiveClassNam
     </button>
 );
 
-export const NegationChip = observer(({ currentItem }: { currentItem: FilterQuery }) => {
+export const NegationChip = observer(({ currentItem }: { currentItem: FilterQueryBase }) => {
     const { t } = useTranslation();
     const negated = currentItem.isNegated === true;
     return (

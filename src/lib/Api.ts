@@ -16,8 +16,7 @@ export enum ValueOperator {
   GreaterEquals = "GreaterEquals",
   Less = "Less",
   LessEquals = "LessEquals",
-  Inside = "Inside",
-  Outside = "Outside"
+  Inside = "Inside"
 }
 
 export enum UserOrderBy {

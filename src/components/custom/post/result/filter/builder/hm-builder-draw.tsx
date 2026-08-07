@@ -16,6 +16,8 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
     const [cellSelection] = useState(() => new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!));
 
     useEffect(() => {
+        currentItem.valueOperator = ValueOperator.Inside;
+
         if (currentItem.value == null)
             return;
 
@@ -51,37 +53,19 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
     }, [cellSelection, currentItem]);
 
     useReportValidity(currentItem, onValidChange);
-
-    const showRest = currentItem.valueOperator != null;
     const values = splitValues(currentItem.value);
 
     return (
         <>
-            <SelectChip
-                autoOpen={isActive}
-                value={currentItem.valueOperator}
-                onValueChange={(value) => {
-                    currentItem.valueOperator = value as ValueOperator;
-                    currentItem.value = null;
-                }}
-                lockedClassName="text-foreground"
-                placeholder={t("posts:filter.selectOperator")}
+            <Chip className="text-foreground">{valueOperatorToInlineString(ValueOperator.Inside)}</Chip>
+            <DialogValueChip
+                hasValue={currentItem.value != null && currentItem.value !== ""}
+                trigger={values.length > 0
+                    ? values.map(value => <Chip key={value} className="text-muted-blue">{value}</Chip>)
+                    : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
             >
-                {[ValueOperator.Inside, ValueOperator.Outside].map(op => (
-                    <SelectItem key={op} value={op}>{valueOperatorToInlineString(op)}</SelectItem>
-                ))}
-            </SelectChip>
-            {showRest && (
-                <DialogValueChip
-                    autoOpen={isActive}
-                    hasValue={currentItem.value != null && currentItem.value !== ""}
-                    trigger={values.length > 0
-                        ? values.map(value => <Chip key={value} className="text-muted-blue">{value}</Chip>)
-                        : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
-                >
-                    <DrawPicker variant={Variant.Draw} cellSelection={cellSelection} src={src!} />
-                </DialogValueChip>
-            )}
+                <DrawPicker variant={Variant.Draw} cellSelection={cellSelection} src={src!} />
+            </DialogValueChip>
         </>
     );
 });

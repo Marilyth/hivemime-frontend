@@ -98,7 +98,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
         currentItem.valueOperator = operator;
         currentItem.value = null;
 
-        if (operator === ValueOperator.Inside || operator === ValueOperator.Outside)
+        if (operator === ValueOperator.Inside)
             dateSelection.maxDates = 20;
         else {
             dateSelection.maxDates = 1;
@@ -109,7 +109,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
     function getOperators() {
         const operators: ValueOperator[] = [ValueOperator.Equals, ValueOperator.Greater, ValueOperator.GreaterEquals, ValueOperator.Less, ValueOperator.LessEquals];
         if (subValue === DateSubValue.Date)
-            operators.push(ValueOperator.Inside, ValueOperator.Outside);
+            operators.push(ValueOperator.Inside);
         return operators;
     }
 
