@@ -39,6 +39,10 @@ export class DateSelection {
   variant: Variant;
   filter?: FilterQueryBase;
 
+  private validityCache: Map<string, boolean> = new Map();
+  private cachedFilterSignature: string | null = null;
+  private evaluationTree: QueryEvaluation | undefined;
+
   constructor(minScope: CalendarScope, maxDates: number, filter?: FilterQueryBase, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
     this.maxDates = maxDates;
     this.minScope = minScope;
@@ -165,15 +169,38 @@ export class DateSelection {
     }
   }
 
+  private get filterSignature(): string {
+    return this.filter ? JSON.stringify(this.filter) : "";
+  }
+
+  private ensureFilterCache(): void {
+    const signature = this.filterSignature;
+
+    if (signature === this.cachedFilterSignature)
+      return;
+
+    const copiedAST = queryToBalancedAST(JSON.parse(JSON.stringify(this.filter!)));
+    this.evaluationTree = new QueryEvaluation(copiedAST);
+    this.validityCache.clear();
+    this.cachedFilterSignature = signature;
+  }
+
   isRangeValid(date: Date, scope: CalendarScope): boolean {
     if (!this.filter)
       return true;
 
-    const {start, end} = this.getScopedDateRange(date, scope);
-    const copiedASTFilter = queryToBalancedAST(JSON.parse(JSON.stringify(this.filter)));
+    this.ensureFilterCache();
 
-    const evaluation = new QueryEvaluation(copiedASTFilter, (property, operator, value) => {
-      console.log("Hit");
+    const key = `${date.getTime()}:${scope}`;
+    const cached = this.validityCache.get(key);
+
+    if (cached !== undefined)
+      return cached;
+
+    const {start, end} = this.getScopedDateRange(date, scope);
+
+    const state = this.evaluationTree!.getDeepEvaluationState((property, operator, value) => {
+      console.log("Miss");
       const numValue: number = Number(value);
       const subvalue: DateSubValue = property.split(".").pop() as DateSubValue;
       let currentValue: number = 0;
@@ -242,19 +269,23 @@ export class DateSelection {
       return QuadBoolean.Maybe;
     });
 
-    const state = evaluation.getDeepEvaluationState();
-
-    if (state !== QuadBoolean.Maybe || scope === CalendarScope.Minute)
-      return state === QuadBoolean.Yes || state === QuadBoolean.Partially;
+    if (state !== QuadBoolean.Maybe || scope === CalendarScope.Minute) {
+      const result = state === QuadBoolean.Yes || state === QuadBoolean.Partially;
+      this.validityCache.set(key, result);
+      return result;
+    }
 
     let runningDate = start;
     while (runningDate <= end) {
       runningDate = this.incrementDate(runningDate, scope - 1, 1);
 
-      if (this.isRangeValid(runningDate, scope - 1))
+      if (this.isRangeValid(runningDate, scope - 1)) {
+        this.validityCache.set(key, true);
         return true;
+      }
     }
 
+    this.validityCache.set(key, false);
     return false;
   }
 
