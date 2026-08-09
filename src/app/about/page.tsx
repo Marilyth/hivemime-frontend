@@ -3,6 +3,9 @@
 import { useMemo } from "react";
 import { DatePicker } from "@/components/custom/utility/date-picker";
 import { CalendarScope, DateSelection, Variant } from "@/components/custom/utility/date-selection";
+import { createFilterQuery, createFilterQueryGroup } from "@/lib/vote-query";
+import { BooleanOperator, ValueOperator } from "@/lib/Api";
+import { DateSubValue } from "@/components/custom/post/result/filter/builder/hm-builder-date";
 
 export default function Page() {
   const dateSelection = useMemo(() => {
@@ -24,7 +27,21 @@ export default function Page() {
       dates.push({ date, value: Math.floor(Math.random() * 100) });
     }
 
-    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, dates, Variant.Result);
+    const group = createFilterQueryGroup();
+    const filterA = createFilterQuery();
+    const filterB = createFilterQuery();
+    group.children!.push(filterA, filterB);
+
+    filterA.property = DateSubValue.DayOfWeek;
+    filterA.valueOperator = ValueOperator.Equals;
+    filterA.value = "0";
+
+    filterB.property = DateSubValue.DayOfWeek;
+    filterB.valueOperator = ValueOperator.Equals;
+    filterB.leftOperator = BooleanOperator.Or;
+    filterB.value = "3";
+
+    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, group, dates, Variant.Result);
     selection.currentScope = CalendarScope.Year;
     return selection;
   }, []);

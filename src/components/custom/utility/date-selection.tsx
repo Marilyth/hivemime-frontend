@@ -1,5 +1,9 @@
+import { FilterQueryBase, ValueOperator } from "@/lib/Api";
+import { QuadBoolean } from "@/lib/quad-bool";
 import { lowerBound } from "@/lib/utils";
+import { QueryEvaluation, queryToBalancedAST } from "@/lib/vote-query";
 import { makeAutoObservable } from "mobx";
+import { DateSubValue } from "../post/result/filter/builder/hm-builder-date";
 
 export enum CalendarScope {
   Minute,
@@ -33,11 +37,13 @@ export class DateSelection {
   minScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
   variant: Variant;
+  filter?: FilterQueryBase;
 
-  constructor(minScope: CalendarScope, maxDates: number, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
+  constructor(minScope: CalendarScope, maxDates: number, filter?: FilterQueryBase, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
     this.maxDates = maxDates;
     this.minScope = minScope;
     this.variant = variant;
+    this.filter = filter;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
     this.currentScope = Math.max(this.minScope, CalendarScope.Day);
     
@@ -159,6 +165,99 @@ export class DateSelection {
     }
   }
 
+  isRangeValid(date: Date, scope: CalendarScope): boolean {
+    if (!this.filter)
+      return true;
+
+    const {start, end} = this.getScopedDateRange(date, scope);
+    const copiedASTFilter = queryToBalancedAST(JSON.parse(JSON.stringify(this.filter)));
+
+    const evaluation = new QueryEvaluation(copiedASTFilter, (property, operator, value) => {
+      console.log("Hit");
+      const numValue: number = Number(value);
+      const subvalue: DateSubValue = property.split(".").pop() as DateSubValue;
+      let currentValue: number = 0;
+
+      switch(subvalue) {
+        case DateSubValue.Date:
+          const dateValue = new Date(numValue);
+
+          switch(operator){
+            case ValueOperator.Equals:
+              return dateValue >= start && start <= end ? QuadBoolean.Partially : QuadBoolean.No;
+            case ValueOperator.GreaterEquals:
+              return start >= dateValue ? QuadBoolean.Yes : end >= dateValue ? QuadBoolean.Partially : QuadBoolean.No;
+            case ValueOperator.Greater:
+              return start > dateValue ? QuadBoolean.Yes : end > dateValue ? QuadBoolean.Partially : QuadBoolean.No;
+            case ValueOperator.LessEquals:
+              return end <= dateValue ? QuadBoolean.Yes : start <= dateValue ? QuadBoolean.Partially : QuadBoolean.No;
+            case ValueOperator.Less:
+              return end < dateValue ? QuadBoolean.Yes : start < dateValue ? QuadBoolean.Partially : QuadBoolean.No;
+          }
+        case DateSubValue.Month:
+          if (scope > CalendarScope.Month)
+            return QuadBoolean.Maybe;
+
+          currentValue = date.getMonth();
+          break;
+        case DateSubValue.DayOfMonth:
+          if (scope > CalendarScope.Day)
+            return QuadBoolean.Maybe;
+          
+          currentValue = date.getDate();
+          break;
+        case DateSubValue.DayOfWeek:
+          if (scope > CalendarScope.Day)
+            return QuadBoolean.Maybe;
+          
+          currentValue = date.getDay();
+          break;
+        case DateSubValue.Hour:
+          if (scope > CalendarScope.Hour)
+            return QuadBoolean.Maybe;
+          
+          currentValue = date.getHours();
+          break;
+        case DateSubValue.Minute:
+          if (scope > CalendarScope.FifteenMinutes)
+            return QuadBoolean.Maybe;
+          
+          currentValue = date.getMinutes();
+          break;
+      }
+
+      switch(operator){
+        case ValueOperator.Equals:
+          return currentValue === numValue ? QuadBoolean.Yes : QuadBoolean.No;
+        case ValueOperator.GreaterEquals:
+          return currentValue >= numValue ? QuadBoolean.Yes : QuadBoolean.No;
+        case ValueOperator.Greater:
+          return currentValue > numValue ? QuadBoolean.Yes : QuadBoolean.No;
+        case ValueOperator.LessEquals:
+          return currentValue <= numValue ? QuadBoolean.Yes : QuadBoolean.No;
+        case ValueOperator.Less:
+          return currentValue < numValue ? QuadBoolean.Yes : QuadBoolean.No;
+      }
+
+      return QuadBoolean.Maybe;
+    });
+
+    const state = evaluation.getDeepEvaluationState();
+
+    if (state !== QuadBoolean.Maybe || scope === CalendarScope.Minute)
+      return state === QuadBoolean.Yes || state === QuadBoolean.Partially;
+
+    let runningDate = start;
+    while (runningDate <= end) {
+      runningDate = this.incrementDate(runningDate, scope - 1, 1);
+
+      if (this.isRangeValid(runningDate, scope - 1))
+        return true;
+    }
+
+    return false;
+  }
+
   sumScopedRange(date: Date, scope: CalendarScope): number {
     const { start, end } = this.getScopedDateRange(date, scope);
     
@@ -258,5 +357,35 @@ export class DateSelection {
     }
 
     return { min, max };
+  }
+
+  private incrementDate(date: Date, scope: CalendarScope, delta: number) {
+    const newDate = new Date(date.getTime());
+
+    switch (scope) {
+      case CalendarScope.Year:
+        newDate.setFullYear(date.getFullYear() + delta);
+        break;
+      case CalendarScope.Month:
+        newDate.setMonth(date.getMonth() + delta);
+        break;
+      case CalendarScope.Day:
+        newDate.setDate(date.getDate() + delta);
+        break;
+      case CalendarScope.Hour:
+        newDate.setHours(date.getHours() + delta);
+        break;
+      case CalendarScope.FifteenMinutes:
+        newDate.setMinutes(date.getMinutes() + 15 * delta);
+        break;
+      case CalendarScope.FiveMinutes:
+        newDate.setMinutes(date.getMinutes() + 5 * delta);
+        break;
+      case CalendarScope.Minute:
+        newDate.setMinutes(date.getMinutes() + delta);
+        break;
+    }
+
+    return newDate;
   }
 }

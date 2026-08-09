@@ -150,9 +150,20 @@ const YearPicker = observer(({ dateSelection, startColor, endColor, onHoverValue
         const bounds = dateSelection.yearBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Year);
 
         return (
-          <Button variant="ghost" key={year} onClick={() => onClick(year)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button variant="ghost"
+            key={year}
+            disabled={!isValid}
+            onClick={() => onClick(year)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)}
+            style={{ backgroundColor: mixedColor }}>
             {year}
           </Button>
         );
@@ -180,9 +191,20 @@ const MonthPicker = observer(({ dateSelection, startColor, endColor, onHoverValu
         const bounds = dateSelection.monthBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Month);
 
         return (
-          <Button variant="ghost" key={month} onClick={() => onClick(index)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button
+            variant="ghost"
+            key={month}
+            disabled={!isValid}
+            onClick={() => onClick(index)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {month}
           </Button>
         );
@@ -220,9 +242,21 @@ const DayPicker = observer(({ dateSelection, startColor, endColor, onHoverValue,
         const bounds = dateSelection.dayBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(day, CalendarScope.Day);
 
         return (
-          <Button variant="ghost" key={day.toISOString()} className={`${isOutside ? "opacity-20" : ""}`} onClick={() => onClick(day)} onPointerEnter={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button variant="ghost"
+            key={day.toISOString()}
+            className={`${isOutside ? "opacity-20" : ""}`}
+            disabled={!isValid}
+            onClick={() => onClick(day)}
+            onPointerEnter={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)}
+            style={{ backgroundColor: mixedColor }}>
             {day.getDate()}
           </Button>
         )
@@ -250,9 +284,20 @@ const HourPicker = observer(({ dateSelection, startColor, endColor, onHoverValue
         const bounds = dateSelection.hourBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Hour);
 
         return (
-          <Button key={i} variant="ghost" onClick={() => onClick(i)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button key={i}
+            variant="ghost"
+            disabled={!isValid}
+            onClick={() => onClick(i)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)}
+            style={{ backgroundColor: mixedColor }}>
             {hour}
           </Button>
         );
@@ -281,9 +326,20 @@ const FifteenMinutesPicker = observer(({ dateSelection, startColor, endColor, on
         const bounds = dateSelection.fifteenMinuteBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.FifteenMinutes);
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute}
+            variant="ghost"
+            disabled={!isValid}
+            onClick={() => onClick(minute)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)}
+            style={{ backgroundColor: mixedColor }}>
             {label}
           </Button>
         );
@@ -313,9 +369,18 @@ const FiveMinutesPicker = observer(({ dateSelection, startColor, endColor, onHov
         const bounds = dateSelection.fiveMinuteBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.FiveMinutes);
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute}
+            variant="ghost"
+            disabled={!isValid}
+            onClick={() => onClick(minute)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
             {minute.toString().padStart(2, "0")}
           </Button>
         );
@@ -343,9 +408,20 @@ const MinutePicker = observer(({ dateSelection, startColor, endColor, onHoverVal
         const bounds = dateSelection.minuteBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
+        const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Minute);
 
         return (
-          <Button key={minute} variant="ghost" onClick={() => onClick(minute)} onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)} onPointerUp={() => onHoverValue?.(null)} onPointerLeave={() => onHoverValue?.(null)} onPointerCancel={() => onHoverValue?.(null)} style={{ backgroundColor: mixedColor }}>
+          <Button key={minute}
+            variant="ghost"
+            disabled={!isValid}
+            onClick={() => onClick(minute)}
+            onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerDown={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerMove={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
+            onPointerUp={() => onHoverValue?.(null)}
+            onPointerLeave={() => onHoverValue?.(null)}
+            onPointerCancel={() => onHoverValue?.(null)}
+            style={{ backgroundColor: mixedColor }}>
             {minute.toString().padStart(2, "0")}
           </Button>
         );

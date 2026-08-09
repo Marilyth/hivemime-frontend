@@ -10,7 +10,7 @@ import { valueOperatorToInlineString } from "@/lib/utils";
 import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } from "./hm-builder-editor";
 
-enum DateSubValue {
+export enum DateSubValue {
     Date = "Date",
     Month = "Month",
     DayOfMonth = "DayOfMonth",
