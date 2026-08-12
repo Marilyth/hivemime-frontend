@@ -1,4 +1,5 @@
 import { CellSelection } from "@/components/custom/utility/draw-picker";
+import { DateSelection } from "@/components/custom/utility/date-selection";
 import { CandidateVoteDto } from "./Api";
 
 export type UiCandidateVote = CandidateVoteDto & {
@@ -7,6 +8,7 @@ export type UiCandidateVote = CandidateVoteDto & {
   rank?: number;
   categoryId?: string;
   cellSelection?: CellSelection;
+  dateSelection?: DateSelection;
 };
 
 export interface UiPollVoteDto {

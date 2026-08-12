@@ -1,76 +1,52 @@
 import { observer } from "mobx-react-lite";
-import { PostDto, VoteQuery, VoteQueryGroup } from "@/lib/Api";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { CandidateDto, FilterQueryBase, PollDto, PostDto, FilterQueryGroup } from "@/lib/Api";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
-import { HiveMimeVoteQueryGroup } from "./hm-vote-query-group";
-import { HiveMimeFilterConditionCreator } from "./hm-condition-creator";
+import { HiveMimeFilterQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
 import { LayoutGroup } from "framer-motion";
+import { HiveMimeFilterConditionOverflowBuilder } from "./hm-condition-builder";
+import { Button } from "@/components/ui/button";
+import { canConvertToAST, deepChildCount, queryToBalancedAST } from "@/lib/vote-query";
+import { Network } from "lucide-react";
 
 
 interface HiveMimePostResultFilterProps {
     post: PostDto;
-    builder: VoteQueryGroup;
-    isOpen: boolean;
-    onFinished: () => void;
+    builder: FilterQueryGroup;
+    onAddCondition: (result: FilterQueryBase) => void;
+    lockedPoll?: PollDto;
+    lockedCandidate?: CandidateDto;
 }
 
-export const HiveMimePostResultFilter = observer(({ post, builder, isOpen, onFinished }: HiveMimePostResultFilterProps) => {
+export const HiveMimePostResultFilter = observer(({ post, builder, onAddCondition, lockedPoll, lockedCandidate }: HiveMimePostResultFilterProps) => {
     const { t } = useTranslation();
-    const [showCreator, setShowCreator] = useState(false);
-
-    function handleFinished(newQuery: VoteQuery | null) {
-        if (newQuery) {
-            builder.children!.push(newQuery);
-        }
-
-        setShowCreator(false);
-    }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onFinished}>
-            <DialogContent onClick={(e) => e.stopPropagation()}>
-                {showCreator ?
-                    <div className="flex flex-col">
-                        <span className="text-lg font-semibold">
-                            {t("posts:filter.createCondition")}
-                        </span>
+        <div className="flex flex-col gap-2">
+            {canConvertToAST(builder) && 
+                <Button variant="link" size="sm" onClick={() => queryToBalancedAST(builder)} className="h-auto w-fit ml-auto"><Network/> Convert to AST</Button>
+            }
 
-                        <HiveMimeFilterConditionCreator post={post} onFinished={handleFinished} />
-                    </div> :
-                    <div className="flex flex-col">
-                        <span className="text-lg font-semibold">
-                            {t("posts:filter.title")}
-                        </span>
-
-                        <span className="text-sm text-muted-foreground mb-4">
-                            {t("posts:filter.description")}
-                        </span>
-
-                        <LayoutGroup>
-                            {builder.children!.length > 0 &&
-                                <div className="border rounded mb-2 text-sm text-muted-foreground ">
-                                    <HiveMimeVoteQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
-                                </div>
-                            }
-                        </LayoutGroup>
-
-                        {builder.children!.length > 1 &&
-                            <HiveMimeBulletItem className="mb-2">
-                                <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
-                            </HiveMimeBulletItem>
-                        }
-
-                        <Button variant="outline" onClick={() => setShowCreator(true)}>
-                            <Plus />
-                            {t("posts:filter.addCondition")}
-                        </Button>
+            <LayoutGroup>
+                {builder.children!.length > 0 &&
+                    <div className="border rounded text-sm text-muted-foreground ">
+                        <HiveMimeFilterQueryGroup post={post} group={builder} isFirstItem={true} ancestors={[]} />
                     </div>
                 }
-            </DialogContent>
-        </Dialog>
+            </LayoutGroup>
+
+            {deepChildCount(builder) > 2 &&
+                <HiveMimeBulletItem>
+                    <span className="text-muted-foreground text-sm">{t("posts:filter.reorderHint")}</span>
+                </HiveMimeBulletItem>
+            }
+
+            <HiveMimeFilterConditionOverflowBuilder
+                post={post}
+                onAddCondition={onAddCondition}
+                lockedPoll={lockedPoll}
+                lockedCandidate={lockedCandidate}
+            />
+        </div>
     );
 });

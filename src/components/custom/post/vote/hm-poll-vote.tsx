@@ -16,6 +16,7 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CustomCandidateInput } from "./hm-custom-candidate-input";
 import { UiPollVoteDto } from "@/lib/vote-models";
 import { HiveMimeDrawPollVote } from "./draw/hm-draw-poll-vote";
+import { HiveMimeDatePollVote } from "./date/hm-date-poll-vote";
 
 export type HiveMimeListPollProps =   {
   poll: PollDto;
@@ -33,6 +34,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Rank]: <HiveMimeRankPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Draw]: <HiveMimeDrawPollVote poll={poll} pollVotes={pollVote} />,
+    [PollType.Date]: <HiveMimeDatePollVote poll={poll} pollVotes={pollVote} />,
   };
 
   function getStateColour(){

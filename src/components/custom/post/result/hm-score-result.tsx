@@ -37,13 +37,14 @@ export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      {data.data.candidates!.map((d, i) => {
-        const candidate = props.poll.candidates!.find(c => c.id === d.id);
-        const minRatio = (d.min! - props.poll.minValue!) / range;
-        const q1Ratio = (d.q1! - props.poll.minValue!) / range;
-        const medianRatio = (d.median! - props.poll.minValue!) / range;
-        const q3Ratio = (d.q3! - props.poll.minValue!) / range;
-        const maxRatio = (d.max! - props.poll.minValue!) / range;
+      {props.poll.candidates!.map((d, i) => {
+        const result = data.data!.candidates!.find(c => c.id === d.id)
+          ?? {min: undefined, q1: undefined, median: undefined, q3: undefined, max: undefined}
+        const minRatio = (result.min! - props.poll.minValue!) / range;
+        const q1Ratio = (result.q1! - props.poll.minValue!) / range;
+        const medianRatio = (result.median! - props.poll.minValue!) / range;
+        const q3Ratio = (result.q3! - props.poll.minValue!) / range;
+        const maxRatio = (result.max! - props.poll.minValue!) / range;
 
         return (
           <HiveMimeHoverCard key={i}
@@ -60,10 +61,10 @@ export function HiveMimeScoreResult(props: HiveMimePollCandidateResultProps) {
             ]} />
             <div className="flex flex-col gap-0 relative">
               <div className="relative flex flex-row gap-2 items-center">
-                <HiveMimeViewCandidate candidate={candidate!} />
+                <HiveMimeViewCandidate candidate={d} />
 
                 <div className="flex flex-col items-end text-muted-foreground ml-auto">
-                  {d.median}
+                  {result?.median}
                 </div>
               </div>
             </div>

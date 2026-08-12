@@ -41,14 +41,30 @@
     "greaterEquals": "greater than or equal to",
     "less": "less than",
     "lessEquals": "less than or equal to",
-    "inside": "partly inside the marked area",
-    "outside": "partly outside the marked area",
-    "exclusiveInside": "exclusively inside the marked area",
-    "exclusiveOutside": "exclusively outside the marked area"
+    "inside": "contained within"
   },
   "shuffle": {
     "are": "are",
     "areNot": "are not"
+  },
+  "calendarScopeSelection": {
+    "FiveMinutes": "Select minute",
+    "FifteenMinutes": "Select minute",
+    "Minute": "Select minute",
+    "Hour": "Select hour",
+    "Day": "Select day",
+    "Week": "Select week",
+    "Month": "Select month",
+    "Year": "Select year"
+  },
+  "datePrecision": {
+    "Year": "year",
+    "Month": "month",
+    "Minute": "minute",
+    "FiveMinutes": "5 minutes",
+    "FifteenMinutes": "15 minutes",
+    "Hour": "hour",
+    "Day": "day"
   },
   "memberRole": {
     "anyone": "Anyone",
@@ -66,14 +82,16 @@
     "score": "Score",
     "rank": "Rank",
     "category": "Category",
-    "draw": "Draw"
+    "draw": "Draw",
+    "date": "Date"
   },
   "pollTypeDescription": {
     "choice": "The user has to pick candidates.",
     "score": "The user has to assign numerical values to candidates.",
-    "rank": "The user has to rank the candidates in order of preference. (E.g. top 10 lists)",
+    "rank": "The user has to rank candidates in order of preference. (E.g. top 10 lists)",
     "category": "The user has to assign categories to candidates. (E.g. tier lists)",
-    "draw": "The user has to draw on an image."
+    "draw": "The user has to draw on an image.",
+    "date": "The user has to select dates."
   },
   "rankFilter": {
     "nothing": "Nothing"

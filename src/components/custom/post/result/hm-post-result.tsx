@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react-lite";
-import { PostDto, VoteQueryGroup } from "@/lib/Api";
+import { PostDto, FilterQueryBase, FilterQueryGroup } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Vote, Filter } from "lucide-react";
 import { Accordion } from "@/components/ui/accordion";
 import { HiveMimePollResult } from "./hm-poll-result";
 import { HiveMimePostResultFilter } from "./filter/hm-post-result-filter";
-import { createVoteQueryGroup } from "@/lib/vote-query";
+import { createFilterQueryGroup } from "@/lib/vote-query";
 
 interface HiveMimePostResultProps {
   post: PostDto;
@@ -18,18 +19,33 @@ interface HiveMimePostResultProps {
 export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveMimePostResultProps) => {
   const { t } = useTranslation();
   const [filterOpen, setFilterOpen] = useState(false);
-  const queryBuilder: VoteQueryGroup = useMemo(() => 
-    createVoteQueryGroup(),
+  const queryBuilder: FilterQueryGroup = useMemo(() =>
+    createFilterQueryGroup(),
     []
   );
 
-  function filterFinished() {
-    setFilterOpen(false);
+  function addCondition(result: FilterQueryBase) {
+    queryBuilder.children!.push(result);
   }
 
   return (
     <div>
-      <HiveMimePostResultFilter post={post} builder={queryBuilder} isOpen={filterOpen} onFinished={filterFinished} />
+      <Dialog open={filterOpen} onOpenChange={(open) => !open && setFilterOpen(false)}>
+        <DialogContent onClick={(e) => e.stopPropagation()}>
+          <div className="flex flex-col">
+            <span className="text-lg font-semibold">
+              {t("posts:filter.title")}
+            </span>
+
+            <span className="text-sm text-muted-foreground mb-4">
+              {t("posts:filter.description")}
+            </span>
+
+            <HiveMimePostResultFilter post={post} builder={queryBuilder} onAddCondition={addCondition} />
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center px-2 rounded-md">
           <span className="font-semibold">

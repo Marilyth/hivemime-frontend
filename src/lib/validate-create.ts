@@ -35,6 +35,9 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
         case PollType.Draw:
             errors.push(...validateDrawPoll(poll));
             break;
+        case PollType.Date:
+            errors.push(...validateDatePoll(poll));
+            break;
         default:
             errors.push(i18n.t("validation:poll.noType"));
     }
@@ -88,6 +91,16 @@ function validateDrawPoll(poll: CreatePollDto): string[] {
 
     if (poll.candidates?.find(c => (c.media?.contentLength ?? 0) <= 0)) {
        errors.push(i18n.t("validation:poll.drawMedia"));
+    }
+
+    return errors;
+}
+
+function validateDatePoll(poll: CreatePollDto): string[] {
+    const errors: string[] = [];
+
+    if (poll.maxVotesPerCandidate == null || poll.maxVotesPerCandidate < 1) {
+        errors.push(i18n.t("validation:poll.dateMaxDates"));
     }
 
     return errors;

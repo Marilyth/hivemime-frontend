@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatePollDto, PollType } from "@/lib/Api";
+import { CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
 import { InputWithLabel, TextAreaWithLabel } from "../../utility/labelled-input";
 import { observer } from "mobx-react-lite";
 import { HiveMimeCreatePollTypePicker } from "./hm-create-pick-poll-type";
@@ -18,8 +18,10 @@ import { useTranslation } from "react-i18next";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { HiveMimeCreateDrawRules } from "./hm-create-draw-poll";
 import { HiveMimeCreateDrawCandidates } from "./hm-create-draw-candidate";
+import { HiveMimeCreateDateRules } from "./hm-create-date-poll";
 
 export interface HiveMimeCreatePollProps {
+  post: CreatePostDto;
   poll: CreatePollDto;
   canCancel: boolean;
   onCancelled?: () => void;
@@ -34,6 +36,7 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
     [PollType.Rank]: <HiveMimeCreateRankingRules poll={props.poll} />,
     [PollType.Category]: <HiveMimeCreateCategorizationRules poll={props.poll} />,
     [PollType.Draw]: <HiveMimeCreateDrawRules poll={props.poll} />,
+    [PollType.Date]: <HiveMimeCreateDateRules poll={props.poll} post={props.post} />,
   };
 
   const errors = validateCreatePoll(props.poll);
@@ -80,8 +83,8 @@ export const HiveMimeCreatePoll = observer((props: HiveMimeCreatePollProps) => {
           </HiveMimeStep>
         }
 
-        
         {props.poll.pollType !== PollType.Draw &&
+          (props.poll.pollType !== PollType.Date) &&
           <HiveMimeStep canContinue={props.poll.candidates!.length == 0 || props.poll.candidates!.every(c => c.name!.trim().length > 0)}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col">

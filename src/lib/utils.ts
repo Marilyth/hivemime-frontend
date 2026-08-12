@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { ApprovalStatus, MemberRole, ValueOperator } from "./Api";
+import { ApprovalStatus, FilterQueryBase, MemberRole, ValueOperator } from "./Api";
 import i18n from "./i18n";
 
 const ids = new WeakMap();
@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getReferenceId(obj: WeakKey) {
   if (!ids.has(obj))
-    ids.set(obj, crypto.randomUUID());
+    ids.set(obj, Math.random());
 
   return ids.get(obj);
 }
@@ -20,26 +20,20 @@ export function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function valueOperatorToInlineString(operator: ValueOperator) {
+export function valueOperatorToInlineString(operator: ValueOperator | string) {
   switch (operator) {
     case ValueOperator.Equals:
-      return i18n.t("enums:valueOperator.equals");
+      return "=";
     case ValueOperator.Greater:
-      return i18n.t("enums:valueOperator.greater");
+      return ">";
     case ValueOperator.GreaterEquals:
-      return i18n.t("enums:valueOperator.greaterEquals");
+      return ">=";
     case ValueOperator.Less:
-      return i18n.t("enums:valueOperator.less");
+      return "<";
     case ValueOperator.LessEquals:
-      return i18n.t("enums:valueOperator.lessEquals");
-    case ValueOperator.Inside:
+      return "<=";
+    case "Inside":
       return i18n.t("enums:valueOperator.inside");
-    case ValueOperator.Outside:
-      return i18n.t("enums:valueOperator.outside");
-    case ValueOperator.ExclusiveInside:
-      return i18n.t("enums:valueOperator.exclusiveInside");
-    case ValueOperator.ExclusiveOutside:
-      return i18n.t("enums:valueOperator.exclusiveOutside");
     default:
       return operator;
   }
@@ -133,4 +127,21 @@ export function getImageDimensions(file: File): Promise<{ width: number; height:
     img.onerror = reject;
     img.src = url;
   });
+}
+
+export function lowerBound<T>(arr: T[], target: T, compare: (a: T, b: T) => number) {
+  let lo = 0;
+  let hi = arr.length;
+
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+
+    if (compare(arr[mid], target) < 0) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+
+  return lo;
 }

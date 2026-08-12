@@ -1,4 +1,4 @@
-import { PostDto } from "@/lib/Api";
+import { PollDto, PollType, PostDto } from "@/lib/Api";
 import { validatePickPoll } from "@/lib/validate-vote";
 import { serializePostVote } from "@/lib/serialize-vote";
 import { UiPostVoteDto } from "@/lib/vote-models";
@@ -14,6 +14,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { AsyncButton } from "../../utility/async-button";
 import { api } from "@/lib/contexts";
 import { CellSelection } from "../../utility/draw-picker";
+import { CalendarScope, DateSelection } from "../../utility/date-selection";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -28,11 +29,18 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
     id: post.id!,
     polls: (post.polls || []).map(poll => ({
       id: poll.id!,
-      candidates: (poll.candidates || []).map(candidate => ({
-        id: candidate.id!,
-        name: candidate.name,
-        cellSelection: new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!)
-      })),
+      candidates: (poll.candidates || []).map(candidate => {
+        if (poll.pollType === PollType.Date) {
+          const dateSelection = new DateSelection(poll.stepValue as CalendarScope, poll.maxVotesPerCandidate!, poll.dateFilterQuery);
+          return { id: candidate.id!, name: candidate.name, dateSelection };
+        }
+
+        return {
+          id: candidate.id!,
+          name: candidate.name,
+          cellSelection: new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!),
+        };
+      }),
     })),
   })));
 

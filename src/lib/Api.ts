@@ -16,10 +16,6 @@ export enum ValueOperator {
   GreaterEquals = "GreaterEquals",
   Less = "Less",
   LessEquals = "LessEquals",
-  Inside = "Inside",
-  Outside = "Outside",
-  ExclusiveInside = "ExclusiveInside",
-  ExclusiveOutside = "ExclusiveOutside",
 }
 
 export enum UserOrderBy {
@@ -27,6 +23,15 @@ export enum UserOrderBy {
   Old = "Old",
   Honey = "Honey",
   Name = "Name",
+}
+
+export enum SubProperty {
+  Date = "Date",
+  Month = "Month",
+  DayOfMonth = "DayOfMonth",
+  DayOfWeek = "DayOfWeek",
+  Hour = "Hour",
+  Minute = "Minute",
 }
 
 export enum PostOrderBy {
@@ -41,6 +46,7 @@ export enum PollType {
   Rank = "Rank",
   Category = "Category",
   Draw = "Draw",
+  Date = "Date",
 }
 
 export enum MemberRole {
@@ -113,6 +119,26 @@ export interface CandidateChoiceResultDtoPollResultDto {
 }
 
 export type CandidateChoiceVoteDto = CandidateVoteDto & object;
+
+export interface CandidateDateDistributionResultDto {
+  /** @format int64 */
+  timestamp?: number;
+  /** @format int32 */
+  voteCount?: number;
+}
+
+export type CandidateDateResultDto = CandidateResultDto & {
+  distribution?: CandidateDateDistributionResultDto[] | null;
+};
+
+export interface CandidateDateResultDtoPollResultDto {
+  candidates?: CandidateDateResultDto[] | null;
+}
+
+export type CandidateDateVoteDto = CandidateVoteDto & {
+  /** @format int64 */
+  timestamp?: number;
+};
 
 export interface CandidateDrawDistributionResultDto {
   /** @format int32 */
@@ -303,6 +329,8 @@ export interface CreatePollDto {
   columns?: number | null;
   /** @format double */
   stepValue?: number | null;
+  dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
   candidates?: CreateCandidateDto[] | null;
   categories?: CreateCategoryDto[] | null;
@@ -319,6 +347,22 @@ export interface EditCommentDto {
   commentId?: string;
   newContent?: string | null;
 }
+
+export type FilterQuery = FilterQueryBase & {
+  property?: string | null;
+  subProperty?: SubProperty;
+  valueOperator?: ValueOperator;
+  value?: string | null;
+};
+
+export interface FilterQueryBase {
+  isNegated?: boolean;
+  leftOperator?: BooleanOperator;
+}
+
+export type FilterQueryGroup = FilterQueryBase & {
+  children?: (FilterQuery | FilterQueryGroup)[] | null;
+};
 
 export interface HiveDto {
   /** @format uuid */
@@ -418,6 +462,8 @@ export interface PollDto {
   columns?: number | null;
   /** @format double */
   stepValue?: number | null;
+  dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
   candidates?: CandidateDto[] | null;
   categories?: CategoryDto[] | null;
@@ -433,6 +479,7 @@ export interface PollVoteDto {
         | CandidateRankVoteDto
         | CandidateCategoryVoteDto
         | CandidateDrawVoteDto
+        | CandidateDateVoteDto
       )[]
     | null;
 }
@@ -565,21 +612,6 @@ export interface UserSettingsDto {
   shareAgeOnVote?: boolean;
   protectVoteOnFilter?: boolean;
 }
-
-export type VoteQuery = VoteQueryBase & {
-  candidateId?: string | null;
-  valueOperator?: ValueOperator;
-  value?: string | null;
-};
-
-export interface VoteQueryBase {
-  isNegated?: boolean;
-  leftOperator?: BooleanOperator;
-}
-
-export type VoteQueryGroup = VoteQueryBase & {
-  children?: (VoteQuery | VoteQueryGroup)[] | null;
-};
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -1347,7 +1379,7 @@ export class Api<
      * @secure
      */
     postChoiceResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1374,7 +1406,7 @@ export class Api<
      * @secure
      */
     postScoreResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1401,7 +1433,7 @@ export class Api<
      * @secure
      */
     postRankResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1428,7 +1460,7 @@ export class Api<
      * @secure
      */
     postCategoryResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1455,7 +1487,7 @@ export class Api<
      * @secure
      */
     postDrawResultCreate: (
-      data: VoteQuery | VoteQueryGroup,
+      data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
         pollId?: string;
@@ -1464,6 +1496,33 @@ export class Api<
     ) =>
       this.request<CandidateDrawResultDtoPollResultDto, any>({
         path: `/api/Post/drawResult`,
+        method: "POST",
+        query: query,
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Post
+     * @name PostDateResultCreate
+     * @request POST:/api/Post/dateResult
+     * @secure
+     */
+    postDateResultCreate: (
+      data: FilterQuery | FilterQueryGroup,
+      query?: {
+        /** @format uuid */
+        pollId?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CandidateDateResultDtoPollResultDto, any>({
+        path: `/api/Post/dateResult`,
         method: "POST",
         query: query,
         body: data,

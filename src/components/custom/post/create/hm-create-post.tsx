@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { HiveMimeCreatePoll } from "./hm-create-poll";
-import { CreateHiveDto, CreatePollDto, CreatePostDto, PollType } from "@/lib/Api";
+import { CreateHiveDto, CreatePostDto, PollType } from "@/lib/Api";
 import { Button } from "../../../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Label } from "@radix-ui/react-label";
@@ -30,14 +30,14 @@ export const HiveMimeCreatePost = observer(() => {
   const { t } = useTranslation();
   const router = useRouter();
   const [selectedPollIndex, setSelectedPollIndex] = useState<number>(0);
-  const [selectedPoll, setSelectedPoll] = useState<CreatePollDto | null>(null);
+  const [draftPost, setDraftPost] = useState<CreatePostDto | null>(null);
   const [hiveId, setHiveId] = useQueryParam("hiveId", undefined);
 
   const createHive = useRef<CreateHiveDto>(observable({ title: null, description: "" }));
   const postRef = useRef<CreatePostDto>(observable({ title: "", description: "", polls: [], hiveId: hiveId ?? undefined }));
   const post = postRef.current;
 
-  if (post.polls!.length === 0 && selectedPoll == null) {
+  if (post.polls!.length === 0 && draftPost == null) {
     addPoll();
   }
 
@@ -46,35 +46,40 @@ export const HiveMimeCreatePost = observer(() => {
   }, []);
 
   function editPoll(index: number) {
+    const draft = observable({ ...post, polls: [...post.polls!] }) as CreatePostDto;
+    draft.polls![index] = observable(deepCopy(post.polls![index]));
+    setDraftPost(draft);
     setSelectedPollIndex(index);
-    setSelectedPoll(observable(deepCopy(post.polls![index])));
   }
 
   function finishPoll() {
-    // Clean-up unused values depending on poll type.
-    if (selectedPoll!.pollType != PollType.Category)
-      selectedPoll!.categories = [];
+    const poll = draftPost!.polls![selectedPollIndex];
 
-    if (selectedPollIndex == -1)
-      post.polls!.push(selectedPoll!);
-    else
-      post.polls![selectedPollIndex] = selectedPoll!;
+    // Clean-up unused values depending on poll type.
+    if (poll.pollType != PollType.Category)
+      poll.categories = [];
+
+    // Commit the draft poll(s) back into the real post.
+    post.polls = draftPost!.polls;
 
     cancelPoll();
   }
 
   function addPoll() {
-    setSelectedPollIndex(-1);
-    setSelectedPoll(observable({ title: "", description: "", candidates: [], categories: [],
+    const draft = observable({ ...post, polls: [...post.polls!] }) as CreatePostDto;
+    draft.polls!.push(observable({ title: "", description: "", candidates: [], categories: [],
                        minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
                        minVotesPerCandidate: 1, maxVotesPerCandidate: 1,
                        allowedCustomCandidateCount: 0, shuffleCandidates: false,
-                       pollType: undefined }));
+                       pollType: undefined, dateMode: undefined }));
+
+    setDraftPost(draft);
+    setSelectedPollIndex(draft.polls!.length - 1);
   }
 
   function cancelPoll() {
+    setDraftPost(null);
     setSelectedPollIndex(-1);
-    setSelectedPoll(null);
   }
 
   async function removePoll(index: number) {
@@ -175,7 +180,7 @@ export const HiveMimeCreatePost = observer(() => {
         <CardContent className="flex flex-col gap-4">
           <HiveSelection post={post} newHive={createHive.current} />
           <FieldSeparator />
-          {selectedPoll == null ? (
+          {draftPost == null ? (
             <div className="flex flex-col gap-4">
               {/* Polls */}
               <div className="flex flex-col gap-2 border rounded-md p-4 bg-muted/40">
@@ -217,7 +222,8 @@ export const HiveMimeCreatePost = observer(() => {
             </div>
           ) : (
             <HiveMimeCreatePoll
-              poll={selectedPoll!}
+              poll={draftPost!.polls![selectedPollIndex]}
+              post={draftPost!}
               canCancel={post.polls!.length >= 1}
               onCancelled={() => cancelPoll()}
               onFinished={() => finishPoll()}

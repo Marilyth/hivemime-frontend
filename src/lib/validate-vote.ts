@@ -44,6 +44,10 @@ function countCandidateVotes(poll: PollDto, vote: UiPollVoteDto): { [key: string
                 if (candidate.cellSelection != null && candidate.cellSelection.cells.length > 0)
                     candidatesVoteCounts[candidateKey] += candidate.cellSelection.cells.filter(c => c.value > 0).length;
                 break;
+            case PollType.Date:
+                if (candidate.dateSelection != null && candidate.dateSelection.activeCount > 0)
+                    candidatesVoteCounts[candidateKey] += candidate.dateSelection.activeCount;
+                break;
         }
     }
 
@@ -64,6 +68,8 @@ function countVotes(poll: PollDto, vote: UiPollVoteDto): number {
             return candidates.filter(c => c.categoryId != null).length;
         case PollType.Draw:
             return candidates.filter(c => c.cellSelection != null && c.cellSelection.cells.length > 0).length;
+        case PollType.Date:
+            return candidates.filter(c => c.dateSelection != null && c.dateSelection.activeCount > 0).length;
         default:
             return 0;
     }
