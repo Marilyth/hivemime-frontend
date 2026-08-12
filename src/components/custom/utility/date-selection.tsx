@@ -215,7 +215,7 @@ export class DateSelection {
 
           switch(operator){
             case ValueOperator.Equals:
-              return dateValue >= start && start <= end ? QuadBoolean.Partially : QuadBoolean.No;
+              return dateValue >= start && dateValue <= end ? QuadBoolean.Partially : QuadBoolean.No;
             case ValueOperator.GreaterEquals:
               return start >= dateValue ? QuadBoolean.Yes : end >= dateValue ? QuadBoolean.Partially : QuadBoolean.No;
             case ValueOperator.Greater:
