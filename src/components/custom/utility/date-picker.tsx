@@ -37,7 +37,7 @@ export const DatePicker = observer(({ dateSelection, startColor, endColor, onHov
   };
 
   return (
-    <div className={cn("bg-muted border rounded-md flex flex-col p-2 w-80", className)}>
+    <div className={cn("bg-muted border rounded-md flex flex-col p-2 max-w-80", className)}>
       <div className="flex justify-between items-center p-2 border-b mb-4">
         <Button variant="ghost" onClick={() => dateSelection.slide(-1)}>&lt;</Button>
         <Button variant="ghost" onClick={() => dateSelection.drill(1)}>{dateSelection.headerText}</Button>

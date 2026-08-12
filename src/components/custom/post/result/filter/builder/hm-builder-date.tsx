@@ -47,7 +47,7 @@ function formatValue(subValue: SubProperty, value?: string | null): string {
 export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
     const [subValue, setSubValue] = useState<SubProperty | null>(currentItem.subProperty ?? null);
-    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, poll.dateFilterQuery, [], Variant.Edit));
+    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, poll.id ? poll.dateFilterQuery : null, [], Variant.Edit));
 
     const subValueOptions = getSubValueOptions();
     const hideSubValue = subValueOptions.length <= 1;

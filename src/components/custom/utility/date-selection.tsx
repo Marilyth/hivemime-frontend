@@ -229,7 +229,7 @@ export class DateSelection {
           if (scope > CalendarScope.Month)
             return QuadBoolean.Maybe;
 
-          currentValue = date.getMonth();
+          currentValue = date.getMonth() + 1;
           break;
         case SubProperty.DayOfMonth:
           if (scope > CalendarScope.Day)

@@ -31,7 +31,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
       id: poll.id!,
       candidates: (poll.candidates || []).map(candidate => {
         if (poll.pollType === PollType.Date) {
-          const dateSelection = new DateSelection(poll.stepValue as CalendarScope, poll.maxVotesPerCandidate!);
+          const dateSelection = new DateSelection(poll.stepValue as CalendarScope, poll.maxVotesPerCandidate!, poll.dateFilterQuery);
           return { id: candidate.id!, name: candidate.name, dateSelection };
         }
 
