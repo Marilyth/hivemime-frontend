@@ -4,47 +4,40 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { reaction } from "mobx";
 import { useTranslation } from "react-i18next";
-import { ValueOperator } from "@/lib/Api";
+import { SubProperty, ValueOperator } from "@/lib/Api";
+import { InsideOperator } from "@/lib/vote-query";
 import { SelectItem } from "@/components/ui/select";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } from "./hm-builder-editor";
 
-export enum DateSubValue {
-    Date = "Date",
-    Month = "Month",
-    DayOfMonth = "DayOfMonth",
-    DayOfWeek = "DayOfWeek",
-    Hour = "Hour",
-    Minute = "Minute"
-}
 
-function getNumericOptions(subValue: DateSubValue): { value: string; label: string }[] {
+function getNumericOptions(subValue: SubProperty): { value: string; label: string }[] {
     switch (subValue) {
-        case DateSubValue.Month:
+        case SubProperty.Month:
             return [...Array(12).keys()].map(i => ({ value: String(i + 1), label: new Date(2000, i, 1).toLocaleString("default", { month: "long" }) }));
-        case DateSubValue.DayOfMonth:
+        case SubProperty.DayOfMonth:
             return [...Array(31).keys()].map(i => ({ value: String(i + 1), label: String(i + 1) }));
-        case DateSubValue.DayOfWeek:
+        case SubProperty.DayOfWeek:
             return [...Array(7).keys()].map(i => ({ value: String(i + 1), label: new Date(2024, 0, i + 1).toLocaleString("default", { weekday: "long" }) }));
-        case DateSubValue.Hour:
+        case SubProperty.Hour:
             return [...Array(24).keys()].map(i => ({ value: String(i), label: String(i) }));
-        case DateSubValue.Minute:
+        case SubProperty.Minute:
             return [...Array(60).keys()].map(i => ({ value: String(i), label: String(i) }));
         default:
             return [];
     }
 }
 
-function formatValue(subValue: DateSubValue, value?: string | null): string {
+function formatValue(subValue: SubProperty, value?: string | null): string {
     if (value == null)
         return "";
     switch (subValue) {
-        case DateSubValue.Date:
+        case SubProperty.Date:
             return new Date(Number(value)).toLocaleString();
-        case DateSubValue.Month:
+        case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
-        case DateSubValue.DayOfWeek:
+        case SubProperty.DayOfWeek:
             return new Date(2024, 0, Number(value)).toLocaleString("default", { weekday: "long" });
         default:
             return value;
@@ -53,15 +46,15 @@ function formatValue(subValue: DateSubValue, value?: string | null): string {
 
 export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
-    const [subValue, setSubValue] = useState<DateSubValue | null>(null);
-    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, [], Variant.Edit));
+    const [subValue, setSubValue] = useState<SubProperty | null>(null);
+    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, poll.dateFilterQuery, [], Variant.Edit));
 
     const subValueOptions = getSubValueOptions();
     const hideSubValue = subValueOptions.length <= 1;
-    useAutoSingle((value) => setProperty(value as DateSubValue), subValueOptions);
+    useAutoSingle((value) => setProperty(value as SubProperty), subValueOptions);
 
     useEffect(() => {
-        if (subValue === DateSubValue.Date && currentItem.value != null) {
+        if (subValue === SubProperty.Date && currentItem.value != null) {
             const dates = currentItem.value.split(",").map(v => ({ date: new Date(Number(v)), value: Number(v) }));
             dateSelection.dates = dates;
         }
@@ -69,7 +62,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
         const dispose = reaction(
             () => dateSelection.dates.map(d => d),
             () => {
-                if (subValue !== DateSubValue.Date)
+                if (subValue !== SubProperty.Date)
                     return;
                 const times = dateSelection.dates.map(d => d.date.getTime());
                 currentItem.value = times.length > 0 ? times.join(",") : null;
@@ -84,7 +77,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
         dateSelection.dates = [];
     }, [poll.stepValue]);
 
-    function setProperty(nextSubValue: DateSubValue) {
+    function setProperty(nextSubValue: SubProperty) {
         const dotIndex = currentItem.property!.lastIndexOf(".");
         const propertyWithoutSubValue = dotIndex === -1 ? currentItem.property : currentItem.property!.substring(0, dotIndex);
         currentItem.property = `${propertyWithoutSubValue}.${nextSubValue}`;
@@ -98,7 +91,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
         currentItem.valueOperator = operator;
         currentItem.value = null;
 
-        if (operator === ValueOperator.Inside)
+        if (operator === InsideOperator)
             dateSelection.maxDates = 20;
         else {
             dateSelection.maxDates = 1;
@@ -108,30 +101,31 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
 
     function getOperators() {
         const operators: ValueOperator[] = [ValueOperator.Equals, ValueOperator.Greater, ValueOperator.GreaterEquals, ValueOperator.Less, ValueOperator.LessEquals];
-        if (subValue === DateSubValue.Date)
-            operators.push(ValueOperator.Inside);
+        if (subValue === SubProperty.Date)
+            operators.push(InsideOperator);
+        
         return operators;
     }
 
     function getSubValueOptions() {
-        const options: DateSubValue[] = [DateSubValue.Date];
+        const options: SubProperty[] = [SubProperty.Date];
         if (poll.stepValue! <= CalendarScope.Month)
-            options.push(DateSubValue.Month);
+            options.push(SubProperty.Month);
         if (poll.stepValue! <= CalendarScope.Day)
-            options.push(DateSubValue.DayOfMonth, DateSubValue.DayOfWeek);
+            options.push(SubProperty.DayOfMonth, SubProperty.DayOfWeek);
         if (poll.stepValue! <= CalendarScope.Hour)
-            options.push(DateSubValue.Hour);
+            options.push(SubProperty.Hour);
         if (poll.stepValue! <= CalendarScope.FifteenMinutes)
-            options.push(DateSubValue.Minute);
+            options.push(SubProperty.Minute);
         return options;
     }
 
-    const numericOptions = getNumericOptions(subValue ?? DateSubValue.Date);
+    const numericOptions = getNumericOptions(subValue ?? SubProperty.Date);
 
     useReportValidity(currentItem, onValidChange);
 
     const showRest = currentItem.valueOperator != null;
-    const dateValues = currentItem.value ? currentItem.value.split(",").map(v => formatValue(subValue ?? DateSubValue.Date, v)).filter(Boolean) : [];
+    const dateValues = currentItem.value ? currentItem.value.split(",").map(v => formatValue(subValue ?? SubProperty.Date, v)).filter(Boolean) : [];
 
     return (
         <>
@@ -139,7 +133,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
                 <SelectChip
                     autoOpen={isActive}
                     value={subValue ?? ""}
-                    onValueChange={(value) => setProperty(value as DateSubValue)}
+                    onValueChange={(value) => setProperty(value as SubProperty)}
                     lockedClassName="text-muted-green"
                     placeholder={t("posts:filter.selectSubValue")}
                 >
@@ -159,7 +153,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
                     >
                         {getOperators().map(op => <SelectItem key={op} value={op}>{valueOperatorToInlineString(op)}</SelectItem>)}
                     </SelectChip>
-                    {showRest && (subValue === DateSubValue.Date ? (
+                    {showRest && (subValue === SubProperty.Date ? (
                         <DialogValueChip
                             autoOpen={isActive}
                             hasValue={currentItem.value != null && currentItem.value !== ""}

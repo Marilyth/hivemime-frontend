@@ -16,7 +16,6 @@ export enum ValueOperator {
   GreaterEquals = "GreaterEquals",
   Less = "Less",
   LessEquals = "LessEquals",
-  Inside = "Inside"
 }
 
 export enum UserOrderBy {
@@ -24,6 +23,15 @@ export enum UserOrderBy {
   Old = "Old",
   Honey = "Honey",
   Name = "Name",
+}
+
+export enum SubProperty {
+  Date = "Date",
+  Month = "Month",
+  DayOfMonth = "DayOfMonth",
+  DayOfWeek = "DayOfWeek",
+  Hour = "Hour",
+  Minute = "Minute",
 }
 
 export enum PostOrderBy {
@@ -342,6 +350,7 @@ export interface EditCommentDto {
 
 export type FilterQuery = FilterQueryBase & {
   property?: string | null;
+  subProperty?: SubProperty;
   valueOperator?: ValueOperator;
   value?: string | null;
 };

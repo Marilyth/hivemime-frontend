@@ -1,17 +1,9 @@
-import { CandidateDto, PollDto, ValueOperator, FilterQuery } from "@/lib/Api";
+import { CandidateDto, PollDto, ValueOperator, FilterQuery, SubProperty } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
-enum DateSubValue {
-    Date = "Date",
-    Month = "Month",
-    DayOfMonth = "DayOfMonth",
-    DayOfWeek = "DayOfWeek",
-    Hour = "Hour",
-    Minute = "Minute"
-}
 
 interface HiveMimeFilterConditionDateValueViewerProps {
     currentItem: FilterQuery;
@@ -22,25 +14,25 @@ interface HiveMimeFilterConditionDateValueViewerProps {
 /**
  * Reads the sub-value suffix ("pollOrder:candidateOrder.SubValue") from a property, defaulting to "Date".
  */
-function getSubValue(property?: string | null): DateSubValue {
+function getSubValue(property?: string | null): SubProperty {
     const dot = (property ?? "").lastIndexOf(".");
-    return dot === -1 ? DateSubValue.Date : (property!.substring(dot + 1) as DateSubValue);
+    return dot === -1 ? SubProperty.Date : (property!.substring(dot + 1) as SubProperty);
 }
 
-function formatValue(subValue: DateSubValue, value?: string | null): string {
+function formatValue(subValue: SubProperty, value?: string | null): string {
     if (value == null)
         return "";
 
     switch (subValue) {
-        case DateSubValue.Date:
+        case SubProperty.Date:
             return new Date(Number(value)).toLocaleString();
-        case DateSubValue.Month:
+        case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
-        case DateSubValue.DayOfWeek:
+        case SubProperty.DayOfWeek:
             return new Date(2024, 0, Number(value)).toLocaleString("default", { weekday: "long" });
-        case DateSubValue.Hour:
+        case SubProperty.Hour:
             return new Date(2000, 0, 1, Number(value)).toLocaleString("default", { hour: "numeric" });
-        case DateSubValue.Minute:
+        case SubProperty.Minute:
             return new Date(2000, 0, 1, 0, Number(value)).toLocaleString("default", { minute: "numeric" });
         default:
             return value;

@@ -2,12 +2,41 @@ import { observable } from "mobx";
 import { BooleanOperator, CandidateDto, PollDto, PostDto, FilterQuery, FilterQueryGroup, FilterQueryBase, ValueOperator } from "./Api";
 import { QuadAnd, QuadBoolean, QuadNot, QuadOr } from "./quad-bool";
 
+
 export function createFilterQuery(): FilterQuery {
   return observable<FilterQuery>({ isNegated: false, leftOperator: BooleanOperator.And });
 }
 
 export function createFilterQueryGroup(): FilterQueryGroup {
   return observable<FilterQueryGroup>({ isNegated: false, leftOperator: BooleanOperator.And, children: [] });
+}
+
+// UI-only operator used by the query builder as a shortcut for multiple "Equals" conditions
+export const InsideOperator = "Inside" as ValueOperator;
+
+export function expandInsideOperators(query: FilterQueryBase): FilterQueryBase {
+  if (isFilterQuery(query)) {
+    if (query.valueOperator !== InsideOperator)
+      return query;
+
+    const values = (query.value ?? "").split(",").filter(value => value !== "");
+    const group = createFilterQueryGroup();
+    group.isNegated = query.isNegated;
+    group.leftOperator = query.leftOperator;
+    group.children = values.map((value, index) => ({
+      isNegated: false,
+      leftOperator: BooleanOperator.Or,
+      property: query.property,
+      subProperty: query.subProperty,
+      valueOperator: ValueOperator.Equals,
+      value,
+    }));
+    return group;
+  }
+
+  const group = query as FilterQueryGroup;
+  group.children = group.children?.map(expandInsideOperators);
+  return query;
 }
 
 export function isFilterQuery(x: unknown): x is FilterQuery {
@@ -114,19 +143,7 @@ export class QueryEvaluation {
     let deepEvaluationState: QuadBoolean = QuadBoolean.No;
 
     if (isFilterQuery(this.filter)){
-      // Handle inside as a list of equals for ease of use.
-      if (this.filter.valueOperator === ValueOperator.Inside) {
-        const values = this.filter.value!.split(',');
-        for (const value of values) {
-          deepEvaluationState = Math.max(evaluator(this.filter.property!, ValueOperator.Equals, value), deepEvaluationState)
-
-          if (deepEvaluationState === QuadBoolean.Yes)
-            break;
-        }
-      }
-      else {
-        deepEvaluationState = evaluator(this.filter.property!, this.filter.valueOperator!, this.filter.value!);
-      }
+      deepEvaluationState = evaluator(this.filter.property!, this.filter.valueOperator!, this.filter.value!);
     }
     else {
       const leftState = this.leftChild!.getDeepEvaluationState(evaluator);

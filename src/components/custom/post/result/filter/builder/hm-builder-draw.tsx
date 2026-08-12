@@ -3,10 +3,9 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { reaction } from "mobx";
 import { useTranslation } from "react-i18next";
-import { ValueOperator } from "@/lib/Api";
-import { SelectItem } from "@/components/ui/select";
 import { valueOperatorToInlineString } from "@/lib/utils";
-import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
+import { InsideOperator } from "@/lib/vote-query";
+import { Chip, DialogValueChip } from "./hm-builder-chip";
 import { splitValues } from "../hm-condition-viewer";
 import { HiveMimeFilterConditionEditorProps, useReportValidity } from "./hm-builder-editor";
 
@@ -16,7 +15,7 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
     const [cellSelection] = useState(() => new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!));
 
     useEffect(() => {
-        currentItem.valueOperator = ValueOperator.Inside;
+        currentItem.valueOperator = InsideOperator;
 
         if (currentItem.value == null)
             return;
@@ -57,7 +56,7 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
 
     return (
         <>
-            <Chip className="text-foreground">{valueOperatorToInlineString(ValueOperator.Inside)}</Chip>
+            <Chip className="text-foreground">{valueOperatorToInlineString(InsideOperator)}</Chip>
             <DialogValueChip
                 hasValue={currentItem.value != null && currentItem.value !== ""}
                 trigger={values.length > 0

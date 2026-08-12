@@ -1,9 +1,8 @@
-import { FilterQueryBase, ValueOperator } from "@/lib/Api";
+import { FilterQuery, FilterQueryGroup, SubProperty, ValueOperator } from "@/lib/Api";
 import { QuadBoolean } from "@/lib/quad-bool";
 import { lowerBound } from "@/lib/utils";
 import { QueryEvaluation, queryToBalancedAST } from "@/lib/vote-query";
 import { makeAutoObservable } from "mobx";
-import { DateSubValue } from "../post/result/filter/builder/hm-builder-date";
 
 export enum CalendarScope {
   Minute,
@@ -37,13 +36,17 @@ export class DateSelection {
   minScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
   variant: Variant;
-  filter?: FilterQueryBase;
+  filter?: FilterQueryGroup | FilterQuery | undefined | null;
 
   private validityCache: Map<string, boolean> = new Map();
   private cachedFilterSignature: string | null = null;
   private evaluationTree: QueryEvaluation | undefined;
 
-  constructor(minScope: CalendarScope, maxDates: number, filter?: FilterQueryBase, initialDates: { date: Date, value: number }[] = [], variant: Variant = Variant.Edit) {
+  constructor(minScope: CalendarScope,
+    maxDates: number,
+    filter?: FilterQueryGroup | FilterQuery | undefined | null,
+    initialDates: { date: Date, value: number }[] = [],
+    variant: Variant = Variant.Edit) {
     this.maxDates = maxDates;
     this.minScope = minScope;
     this.variant = variant;
@@ -202,11 +205,11 @@ export class DateSelection {
     const state = this.evaluationTree!.getDeepEvaluationState((property, operator, value) => {
       console.log("Miss");
       const numValue: number = Number(value);
-      const subvalue: DateSubValue = property.split(".").pop() as DateSubValue;
+      const subvalue: SubProperty = property.split(".").pop() as SubProperty;
       let currentValue: number = 0;
 
       switch(subvalue) {
-        case DateSubValue.Date:
+        case SubProperty.Date:
           const dateValue = new Date(numValue);
 
           switch(operator){
@@ -221,31 +224,31 @@ export class DateSelection {
             case ValueOperator.Less:
               return end < dateValue ? QuadBoolean.Yes : start < dateValue ? QuadBoolean.Partially : QuadBoolean.No;
           }
-        case DateSubValue.Month:
+        case SubProperty.Month:
           if (scope > CalendarScope.Month)
             return QuadBoolean.Maybe;
 
           currentValue = date.getMonth();
           break;
-        case DateSubValue.DayOfMonth:
+        case SubProperty.DayOfMonth:
           if (scope > CalendarScope.Day)
             return QuadBoolean.Maybe;
           
           currentValue = date.getDate();
           break;
-        case DateSubValue.DayOfWeek:
+        case SubProperty.DayOfWeek:
           if (scope > CalendarScope.Day)
             return QuadBoolean.Maybe;
           
           currentValue = date.getDay();
           break;
-        case DateSubValue.Hour:
+        case SubProperty.Hour:
           if (scope > CalendarScope.Hour)
             return QuadBoolean.Maybe;
           
           currentValue = date.getHours();
           break;
-        case DateSubValue.Minute:
+        case SubProperty.Minute:
           if (scope > CalendarScope.FifteenMinutes)
             return QuadBoolean.Maybe;
           

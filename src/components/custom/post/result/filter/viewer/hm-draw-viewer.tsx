@@ -1,6 +1,7 @@
-import { FilterQuery, ValueOperator, CandidateDto, PollDto } from "@/lib/Api";
+import { FilterQuery, CandidateDto, PollDto } from "@/lib/Api";
 import { observer } from "mobx-react-lite";
 import { valueOperatorToInlineString } from "@/lib/utils";
+import { InsideOperator } from "@/lib/vote-query";
 import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
 interface HiveMimeFilterConditionDrawValueViewerProps {
@@ -10,7 +11,7 @@ interface HiveMimeFilterConditionDrawValueViewerProps {
 }
 
 export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDrawValueViewerProps) => {
-    const operator = (currentItem.valueOperator ?? ValueOperator.Inside) as ValueOperator;
+    const operator = currentItem.valueOperator ?? InsideOperator;
 
     return (
         <HiveMimeConditionViewer

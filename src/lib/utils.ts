@@ -20,7 +20,7 @@ export function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function valueOperatorToInlineString(operator: ValueOperator) {
+export function valueOperatorToInlineString(operator: ValueOperator | string) {
   switch (operator) {
     case ValueOperator.Equals:
       return "=";
@@ -32,7 +32,7 @@ export function valueOperatorToInlineString(operator: ValueOperator) {
       return "<";
     case ValueOperator.LessEquals:
       return "<=";
-    case ValueOperator.Inside:
+    case "Inside":
       return i18n.t("enums:valueOperator.inside");
     default:
       return operator;

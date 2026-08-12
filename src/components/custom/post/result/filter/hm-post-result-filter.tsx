@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { CandidateDto, FilterQuery, PollDto, PostDto, FilterQueryGroup } from "@/lib/Api";
+import { CandidateDto, FilterQueryBase, PollDto, PostDto, FilterQueryGroup } from "@/lib/Api";
 import { useTranslation } from "react-i18next";
 import { HiveMimeFilterQueryGroup } from "./hm-vote-query-group";
 import { HiveMimeBulletItem } from "@/components/custom/utility/hm-bullet-item";
@@ -13,7 +13,7 @@ import { Network } from "lucide-react";
 interface HiveMimePostResultFilterProps {
     post: PostDto;
     builder: FilterQueryGroup;
-    onAddCondition: (result: FilterQuery) => void;
+    onAddCondition: (result: FilterQueryBase) => void;
     lockedPoll?: PollDto;
     lockedCandidate?: CandidateDto;
 }

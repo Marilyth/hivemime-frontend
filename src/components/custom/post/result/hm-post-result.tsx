@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react-lite";
-import { PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
+import { PostDto, FilterQueryBase, FilterQueryGroup } from "@/lib/Api";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Vote, Filter } from "lucide-react";
@@ -24,7 +24,7 @@ export const HiveMimePostResult = observer(({ post, requestVote, footer }: HiveM
     []
   );
 
-  function addCondition(result: FilterQuery) {
+  function addCondition(result: FilterQueryBase) {
     queryBuilder.children!.push(result);
   }
 
