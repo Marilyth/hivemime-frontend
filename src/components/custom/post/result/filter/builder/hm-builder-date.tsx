@@ -20,7 +20,7 @@ function getNumericOptions(subValue: SubProperty): { value: string; label: strin
         case SubProperty.DayOfMonth:
             return [...Array(31).keys()].map(i => ({ value: String(i + 1), label: String(i + 1) }));
         case SubProperty.DayOfWeek:
-            return [...Array(7).keys()].map(i => ({ value: String(i + 1), label: new Date(2024, 0, i + 1).toLocaleString("default", { weekday: "long" }) }));
+            return [...Array(7).keys()].map(i => ({ value: String(i), label: new Date(2023, 0, i + 1).toLocaleString("default", { weekday: "long" }) }));
         case SubProperty.Hour:
             return [...Array(24).keys()].map(i => ({ value: String(i), label: String(i) }));
         case SubProperty.Minute:
