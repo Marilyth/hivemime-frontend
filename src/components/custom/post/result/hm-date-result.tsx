@@ -29,6 +29,7 @@ export function HiveMimeDateResult(props: HiveMimePollResultProps) {
         const dateSelection = new DateSelection(
           props.poll.stepValue as CalendarScope,
           props.poll.maxVotesPerCandidate!,
+          props.poll.dateFilterQuery,
           resultCandidate?.distribution?.map(d => ({ date: new Date(d.timestamp!), value: d.voteCount! })) ?? [],
           Variant.Result
         );

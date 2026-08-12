@@ -202,10 +202,11 @@ export class DateSelection {
 
     const {start, end} = this.getScopedDateRange(date, scope);
 
-    const state = this.evaluationTree!.getDeepEvaluationState((property, operator, value) => {
+    const state = this.evaluationTree!.getDeepEvaluationState((filter) => {
       console.log("Miss");
-      const numValue: number = Number(value);
-      const subvalue: SubProperty = property.split(".").pop() as SubProperty;
+      const operator = filter.valueOperator!;
+      const numValue: number = Number(filter.value!);
+      const subvalue: SubProperty = filter.subProperty ?? SubProperty.Date;
       let currentValue: number = 0;
 
       switch(subvalue) {

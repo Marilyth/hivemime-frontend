@@ -31,11 +31,11 @@ export default function Page() {
     const filterB = createFilterQuery();
     group.children!.push(filterA, filterB);
 
-    filterA.property = SubProperty.DayOfMonth;
+    filterA.subProperty = SubProperty.DayOfMonth;
     filterA.valueOperator = ValueOperator.Equals;
     filterA.value = "29";
 
-    filterB.property = SubProperty.Month;
+    filterB.subProperty = SubProperty.Month;
     filterB.valueOperator = ValueOperator.Equals;
     filterB.leftOperator = BooleanOperator.And;
     filterB.value = "1";

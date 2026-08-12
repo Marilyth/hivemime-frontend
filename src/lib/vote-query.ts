@@ -64,18 +64,15 @@ export function resolveCandidate(
 ): { poll?: PollDto; candidate?: CandidateDto } {
   if (!candidateId) return {};
 
-  // Strip a sub-value suffix ("pollOrder:candidateOrder.SubValue") before resolving.
-  const base = candidateId.split(".")[0];
-
   // Order-based fallback ("pollOrder:candidateOrder"), used when the candidate has no id yet.
-  if (base.includes(":")) {
-    const [pollIndex, candidateIndex] = base.split(":").map(Number);
+  if (candidateId.includes(":")) {
+    const [pollIndex, candidateIndex] = candidateId.split(":").map(Number);
     const poll = post.polls?.[pollIndex];
     return { poll, candidate: poll?.candidates?.[candidateIndex] };
   }
 
   for (const poll of post.polls ?? []) {
-    const candidate = (poll.candidates ?? []).find((c) => c.id === base);
+    const candidate = (poll.candidates ?? []).find((c) => c.id === candidateId);
     if (candidate) return { poll, candidate };
   }
 
@@ -134,22 +131,31 @@ export class QueryEvaluation {
     this.filter = filter;
 
     if (isFilterQueryGroup(filter)) {
-      this.leftChild = new QueryEvaluation(filter.children![0]);
-      this.rightChild = new QueryEvaluation(filter.children![1]);
+      if (filter.children![0] != null)
+        this.leftChild = new QueryEvaluation(filter.children![0]);
+      if (filter.children![1] != null)
+        this.rightChild = new QueryEvaluation(filter.children![1]);
     }
   }
 
-  public getDeepEvaluationState(evaluator: (property: string, operator: ValueOperator, value: string) => QuadBoolean): QuadBoolean {
+  public getDeepEvaluationState(evaluator: (filter: FilterQuery) => QuadBoolean): QuadBoolean {
     let deepEvaluationState: QuadBoolean = QuadBoolean.No;
 
-    if (isFilterQuery(this.filter)){
-      deepEvaluationState = evaluator(this.filter.property!, this.filter.valueOperator!, this.filter.value!);
+    if (isFilterQuery(this.filter)) {
+      deepEvaluationState = evaluator(this.filter);
+    }
+    else if (this.leftChild == null && this.rightChild == null) {
+      // Empty group (e.g. a date poll with no conditions yet) imposes no restriction.
+      deepEvaluationState = QuadBoolean.Yes;
+    }
+    else if (this.leftChild == null || this.rightChild == null) {
+      deepEvaluationState = (this.leftChild ?? this.rightChild)!.getDeepEvaluationState(evaluator);
     }
     else {
-      const leftState = this.leftChild!.getDeepEvaluationState(evaluator);
-      const rightState = this.rightChild!.getDeepEvaluationState(evaluator);
+      const leftState = this.leftChild.getDeepEvaluationState(evaluator);
+      const rightState = this.rightChild.getDeepEvaluationState(evaluator);
 
-      if (this.rightChild?.filter.leftOperator == BooleanOperator.And)
+      if (this.rightChild.filter.leftOperator == BooleanOperator.And)
         deepEvaluationState = QuadAnd(leftState, rightState);
       else
         deepEvaluationState = QuadOr(leftState, rightState);

@@ -11,13 +11,6 @@ interface HiveMimeFilterConditionDateValueViewerProps {
     poll: PollDto;
 }
 
-/**
- * Reads the sub-value suffix ("pollOrder:candidateOrder.SubValue") from a property, defaulting to "Date".
- */
-function getSubValue(property?: string | null): SubProperty {
-    const dot = (property ?? "").lastIndexOf(".");
-    return dot === -1 ? SubProperty.Date : (property!.substring(dot + 1) as SubProperty);
-}
 
 function formatValue(subValue: SubProperty, value?: string | null): string {
     if (value == null)
@@ -42,7 +35,7 @@ function formatValue(subValue: SubProperty, value?: string | null): string {
 export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDateValueViewerProps) => {
     const { t } = useTranslation();
 
-    const subValue = getSubValue(currentItem.property);
+    const subValue = currentItem.subProperty ?? SubProperty.Date;
     const operator = currentItem.valueOperator ?? ValueOperator.Equals;
     const values = splitValues(currentItem.value).map(value => formatValue(subValue, value));
 
