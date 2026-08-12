@@ -227,17 +227,19 @@ export class DateSelection {
           }
         case SubProperty.Month:
           if (scope > CalendarScope.Month)
-            return QuadBoolean.Maybe;
+            return QuadBoolean.Partially;
 
           currentValue = date.getMonth() + 1;
           break;
         case SubProperty.DayOfMonth:
+          // Days over 28 need to drill down to be sure.
           if (scope > CalendarScope.Day)
-            return QuadBoolean.Maybe;
+            return numValue >= 28 ? QuadBoolean.Maybe : QuadBoolean.Partially;
           
           currentValue = date.getDate();
           break;
         case SubProperty.DayOfWeek:
+          // Day of week should always drill down since it highly depends on other conditions.
           if (scope > CalendarScope.Day)
             return QuadBoolean.Maybe;
           
@@ -245,13 +247,13 @@ export class DateSelection {
           break;
         case SubProperty.Hour:
           if (scope > CalendarScope.Hour)
-            return QuadBoolean.Maybe;
+            return QuadBoolean.Partially;
           
           currentValue = date.getHours();
           break;
         case SubProperty.Minute:
           if (scope > CalendarScope.FifteenMinutes)
-            return QuadBoolean.Maybe;
+            return QuadBoolean.Partially;
           
           currentValue = date.getMinutes();
           break;
@@ -269,8 +271,6 @@ export class DateSelection {
         case ValueOperator.Less:
           return currentValue < numValue ? QuadBoolean.Yes : QuadBoolean.No;
       }
-
-      return QuadBoolean.Maybe;
     });
 
     if (state !== QuadBoolean.Maybe || scope === CalendarScope.Minute) {

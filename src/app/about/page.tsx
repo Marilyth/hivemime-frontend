@@ -3,11 +3,12 @@
 import { useMemo } from "react";
 import { DatePicker } from "@/components/custom/utility/date-picker";
 import { CalendarScope, DateSelection, Variant } from "@/components/custom/utility/date-selection";
-import { createFilterQuery, createFilterQueryGroup } from "@/lib/vote-query";
-import { BooleanOperator, SubProperty, ValueOperator } from "@/lib/Api";
+import { HiveMimePostResultFilter } from "@/components/custom/post/result/filter/hm-post-result-filter";
+import { createFilterQueryGroup } from "@/lib/vote-query";
+import { FilterQueryBase, PollDto, PollType, PostDto } from "@/lib/Api";
 
 export default function Page() {
-  const dateSelection = useMemo(() => {
+  const { dateSelection, post, poll, onAddCondition } = useMemo(() => {
     const dates: { date: Date, value: number }[] = [];
     for (let i = 0; i < 3000; i++) {
       const date = new Date();
@@ -26,28 +27,38 @@ export default function Page() {
       dates.push({ date, value: Math.floor(Math.random() * 100) });
     }
 
-    const group = createFilterQueryGroup();
-    const filterA = createFilterQuery();
-    const filterB = createFilterQuery();
-    group.children!.push(filterA, filterB);
+    const dateQuery = createFilterQueryGroup();
+    const candidate = { name: "Date" };
+    const poll: PollDto = {
+      title: "Date",
+      pollType: PollType.Date,
+      stepValue: CalendarScope.FiveMinutes,
+      candidates: [candidate],
+      dateFilterQuery: dateQuery,
+    };
+    const post: PostDto = { polls: [poll] };
 
-    filterA.subProperty = SubProperty.DayOfMonth;
-    filterA.valueOperator = ValueOperator.Equals;
-    filterA.value = "29";
-
-    filterB.subProperty = SubProperty.Month;
-    filterB.valueOperator = ValueOperator.Equals;
-    filterB.leftOperator = BooleanOperator.And;
-    filterB.value = "1";
-
-    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, group, dates, Variant.Result);
+    const selection = new DateSelection(CalendarScope.FiveMinutes, 30, dateQuery, dates, Variant.Result);
     selection.currentScope = CalendarScope.Year;
-    return selection;
+
+    return {
+      dateSelection: selection,
+      post,
+      poll,
+      onAddCondition: (result: FilterQueryBase) => dateQuery.children!.push(result),
+    };
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <DatePicker dateSelection={dateSelection} />
+      <HiveMimePostResultFilter
+        post={post}
+        builder={poll.dateFilterQuery!}
+        onAddCondition={onAddCondition}
+        lockedPoll={poll}
+        lockedCandidate={poll.candidates![0]}
+      />
     </div>
   );
 }

@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getReferenceId(obj: WeakKey) {
   if (!ids.has(obj))
-    ids.set(obj, crypto.randomUUID());
+    ids.set(obj, Math.random());
 
   return ids.get(obj);
 }
