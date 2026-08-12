@@ -3,6 +3,7 @@ import { HiveMimePollResultProps } from "./hm-poll-result";
 import { api } from "@/lib/contexts";
 import { DatePicker } from "../../utility/date-picker";
 import { CalendarScope, DateSelection, Variant } from "../../utility/date-selection";
+import { fromGMT } from "@/lib/gmt";
 
 export function HiveMimeDateResult(props: HiveMimePollResultProps) {
   const data = useQuery({
@@ -30,7 +31,7 @@ export function HiveMimeDateResult(props: HiveMimePollResultProps) {
           props.poll.stepValue as CalendarScope,
           props.poll.maxVotesPerCandidate!,
           props.poll.dateFilterQuery,
-          resultCandidate?.distribution?.map(d => ({ date: new Date(d.timestamp!), value: d.voteCount! })) ?? [],
+          resultCandidate?.distribution?.map(d => ({ date: fromGMT(d.timestamp!), value: d.voteCount! })) ?? [],
           Variant.Result
         );
 

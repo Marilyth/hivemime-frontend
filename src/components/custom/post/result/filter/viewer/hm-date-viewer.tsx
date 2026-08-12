@@ -1,5 +1,6 @@
 import { CandidateDto, PollDto, ValueOperator, FilterQuery, SubProperty } from "@/lib/Api";
 import { valueOperatorToInlineString } from "@/lib/utils";
+import { fromGMT } from "@/lib/gmt";
 import { observer } from "mobx-react-lite";
 import { useTranslation } from "react-i18next";
 import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
@@ -18,7 +19,7 @@ function formatValue(subValue: SubProperty, value?: string | null): string {
 
     switch (subValue) {
         case SubProperty.Date:
-            return new Date(Number(value)).toLocaleString();
+            return fromGMT(Number(value)).toLocaleString();
         case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
         case SubProperty.DayOfWeek:

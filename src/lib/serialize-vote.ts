@@ -12,6 +12,7 @@ import {
   PostVoteDto,
 } from "./Api";
 import { UiCandidateVote, UiPostVoteDto } from "./vote-models";
+import { toGMT } from "./gmt";
 
 function serializeCandidateVote(
   poll: PollDto,
@@ -46,7 +47,7 @@ function serializeCandidateVote(
     case PollType.Date:
       if (!candidate.dateSelection || candidate.dateSelection.activeCount === 0) return null;
       return candidate.dateSelection.dates
-        .map(t => ({ ...base, timestamp: t.date.getTime() }));
+        .map(t => ({ ...base, timestamp: toGMT(t.date) }));
 
     default:
       return null;

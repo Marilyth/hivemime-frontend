@@ -8,6 +8,7 @@ import { SubProperty, ValueOperator } from "@/lib/Api";
 import { InsideOperator } from "@/lib/vote-query";
 import { SelectItem } from "@/components/ui/select";
 import { valueOperatorToInlineString } from "@/lib/utils";
+import { fromGMT, toGMT } from "@/lib/gmt";
 import { Chip, DialogValueChip, SelectChip } from "./hm-builder-chip";
 import { HiveMimeFilterConditionEditorProps, useReportValidity, useAutoSingle } from "./hm-builder-editor";
 
@@ -34,7 +35,7 @@ function formatValue(subValue: SubProperty, value?: string | null): string {
         return "";
     switch (subValue) {
         case SubProperty.Date:
-            return new Date(Number(value)).toLocaleString();
+            return fromGMT(Number(value)).toLocaleString();
         case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
         case SubProperty.DayOfWeek:
@@ -55,7 +56,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
 
     useEffect(() => {
         if (subValue === SubProperty.Date && currentItem.value != null) {
-            const dates = currentItem.value.split(",").map(v => ({ date: new Date(Number(v)), value: Number(v) }));
+            const dates = currentItem.value.split(",").map(v => ({ date: fromGMT(Number(v)), value: Number(v) }));
             dateSelection.dates = dates;
         }
 
@@ -64,7 +65,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
             () => {
                 if (subValue !== SubProperty.Date)
                     return;
-                const times = dateSelection.dates.map(d => d.date.getTime());
+                const times = dateSelection.dates.map(d => toGMT(d.date));
                 currentItem.value = times.length > 0 ? times.join(",") : null;
             }
         );

@@ -1,6 +1,7 @@
 import { FilterQuery, FilterQueryGroup, SubProperty, ValueOperator } from "@/lib/Api";
 import { QuadBoolean } from "@/lib/quad-bool";
 import { lowerBound } from "@/lib/utils";
+import { fromGMT } from "@/lib/gmt";
 import { QueryEvaluation, queryToBalancedAST } from "@/lib/vote-query";
 import { makeAutoObservable } from "mobx";
 
@@ -203,7 +204,6 @@ export class DateSelection {
     const {start, end} = this.getScopedDateRange(date, scope);
 
     const state = this.evaluationTree!.getDeepEvaluationState((filter) => {
-      console.log("Miss");
       const operator = filter.valueOperator!;
       const numValue: number = Number(filter.value!);
       const subvalue: SubProperty = filter.subProperty ?? SubProperty.Date;
@@ -211,7 +211,7 @@ export class DateSelection {
 
       switch(subvalue) {
         case SubProperty.Date:
-          const dateValue = new Date(numValue);
+          const dateValue = fromGMT(numValue);
 
           switch(operator){
             case ValueOperator.Equals:
