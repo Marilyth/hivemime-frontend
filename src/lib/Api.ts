@@ -309,9 +309,9 @@ export interface CreatePollDto {
   description?: string | null;
   media?: UploadMediaRequestDto;
   isShuffled?: boolean;
-  /** @format int32 */
+  /** @format double */
   minValue?: number;
-  /** @format int32 */
+  /** @format double */
   maxValue?: number;
   /** @format int32 */
   allowedCustomCandidateCount?: number;
@@ -330,6 +330,7 @@ export interface CreatePollDto {
   /** @format double */
   stepValue?: number | null;
   dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  ignoreTimeZone?: boolean | null;
   conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
   candidates?: CreateCandidateDto[] | null;
@@ -444,9 +445,9 @@ export interface PollDto {
   /** @format int32 */
   allowedCustomCandidateCount?: number;
   isShuffled?: boolean;
-  /** @format int32 */
+  /** @format double */
   minValue?: number;
-  /** @format int32 */
+  /** @format double */
   maxValue?: number;
   /** @format int32 */
   minVotes?: number;
@@ -463,6 +464,7 @@ export interface PollDto {
   /** @format double */
   stepValue?: number | null;
   dateFilterQuery?: FilterQuery | FilterQueryGroup | null;
+  ignoreTimeZone?: boolean | null;
   conditionQuery?: FilterQuery | FilterQueryGroup | null;
   pollType?: PollType;
   candidates?: CandidateDto[] | null;

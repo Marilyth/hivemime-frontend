@@ -66,6 +66,10 @@
     "Hour": "hour",
     "Day": "day"
   },
+  "dateTimeZone": {
+    "ignored": "ignores",
+    "respected": "considers"
+  },
   "memberRole": {
     "anyone": "Anyone",
     "followers": "Followers",

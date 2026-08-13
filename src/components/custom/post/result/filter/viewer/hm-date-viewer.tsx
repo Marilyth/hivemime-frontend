@@ -13,13 +13,13 @@ interface HiveMimeFilterConditionDateValueViewerProps {
 }
 
 
-function formatValue(subValue: SubProperty, value?: string | null): string {
+function formatValue(subValue: SubProperty, value?: string | null, ignoreTimeZone = false): string {
     if (value == null)
         return "";
 
     switch (subValue) {
         case SubProperty.Date:
-            return fromGMT(Number(value)).toLocaleString();
+            return (ignoreTimeZone ? new Date(Number(value)) : fromGMT(Number(value))).toLocaleString();
         case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
         case SubProperty.DayOfWeek:
@@ -38,7 +38,7 @@ export const HiveMimeFilterConditionDateValueViewer = observer(({ currentItem, c
 
     const subValue = currentItem.subProperty ?? SubProperty.Date;
     const operator = currentItem.valueOperator ?? ValueOperator.Equals;
-    const values = splitValues(currentItem.value).map(value => formatValue(subValue, value));
+    const values = splitValues(currentItem.value).map(value => formatValue(subValue, value, poll.ignoreTimeZone!));
 
     return (
         <HiveMimeConditionViewer

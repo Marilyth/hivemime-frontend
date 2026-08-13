@@ -45,6 +45,8 @@
     "scoreRange": "{{start}} - {{end}}"
   },
   "create": {
+    "changePollTypeTitle": "Change poll type?",
+    "changePollTypeDescription": "Changing the poll type will discard the existing candidates and poll settings.",
     "title": "Create new post",
     "polls": "Polls",
     "addPoll": "Add poll",
@@ -92,6 +94,7 @@
       "startDate": "The user can pick a date starting from <select/>.",
       "endDate": "The user can pick a date up to <select/>.",
       "precision": "The date precision is <select/>.",
+      "ignoreTimeZone": "The date <select/> time zones.",
       "minDates": "The user has to select at least <select/> dates.",
       "maxDates": "The user can select up to <select/> dates."
     },

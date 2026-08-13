@@ -37,6 +37,7 @@ export class DateSelection {
   minScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
   variant: Variant;
+  ignoreTimeZone: boolean;
   filter?: FilterQueryGroup | FilterQuery | undefined | null;
 
   private validityCache: Map<string, boolean> = new Map();
@@ -47,10 +48,12 @@ export class DateSelection {
     maxDates: number,
     filter?: FilterQueryGroup | FilterQuery | undefined | null,
     initialDates: { date: Date, value: number }[] = [],
-    variant: Variant = Variant.Edit) {
+    variant: Variant = Variant.Edit,
+    ignoreTimeZone = true) {
     this.maxDates = maxDates;
     this.minScope = minScope;
     this.variant = variant;
+    this.ignoreTimeZone = ignoreTimeZone;
     this.filter = filter;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
     this.currentScope = Math.max(this.minScope, CalendarScope.Day);
@@ -211,7 +214,7 @@ export class DateSelection {
 
       switch(subvalue) {
         case SubProperty.Date:
-          const dateValue = fromGMT(numValue);
+          const dateValue = this.ignoreTimeZone ? new Date(numValue) : fromGMT(numValue);
 
           switch(operator){
             case ValueOperator.Equals:

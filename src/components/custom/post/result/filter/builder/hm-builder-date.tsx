@@ -30,12 +30,12 @@ function getNumericOptions(subValue: SubProperty): { value: string; label: strin
     }
 }
 
-function formatValue(subValue: SubProperty, value?: string | null): string {
+function formatValue(subValue: SubProperty, value?: string | null, ignoreTimeZone = false): string {
     if (value == null)
         return "";
     switch (subValue) {
         case SubProperty.Date:
-            return fromGMT(Number(value)).toLocaleString();
+            return (ignoreTimeZone ? new Date(Number(value)) : fromGMT(Number(value))).toLocaleString();
         case SubProperty.Month:
             return new Date(2000, Number(value) - 1, 1).toLocaleString("default", { month: "long" });
         case SubProperty.DayOfWeek:
@@ -48,7 +48,7 @@ function formatValue(subValue: SubProperty, value?: string | null): string {
 export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
     const [subValue, setSubValue] = useState<SubProperty | null>(currentItem.subProperty ?? null);
-    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, poll.id ? poll.dateFilterQuery : null, [], Variant.Edit));
+    const [dateSelection] = useState(() => new DateSelection((poll.stepValue as CalendarScope) ?? CalendarScope.Day, 1, poll.id ? poll.dateFilterQuery : null, [], Variant.Edit, poll.ignoreTimeZone!));
 
     const subValueOptions = getSubValueOptions();
     const hideSubValue = subValueOptions.length <= 1;
@@ -56,7 +56,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
 
     useEffect(() => {
         if (subValue === SubProperty.Date && currentItem.value != null) {
-            const dates = currentItem.value.split(",").map(v => ({ date: fromGMT(Number(v)), value: Number(v) }));
+            const dates = currentItem.value.split(",").map(v => ({ date: poll.ignoreTimeZone! ? new Date(Number(v)) : fromGMT(Number(v)), value: Number(v) }));
             dateSelection.dates = dates;
         }
 
@@ -65,7 +65,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
             () => {
                 if (subValue !== SubProperty.Date)
                     return;
-                const times = dateSelection.dates.map(d => toGMT(d.date));
+                const times = dateSelection.dates.map(d => poll.ignoreTimeZone! ? d.date.getTime() : toGMT(d.date));
                 currentItem.value = times.length > 0 ? times.join(",") : null;
             }
         );
@@ -124,7 +124,7 @@ export const DateEditor = observer(({ currentItem, poll, onValidChange, isActive
     useReportValidity(currentItem, onValidChange);
 
     const showRest = currentItem.valueOperator != null;
-    const dateValues = currentItem.value ? currentItem.value.split(",").map(v => formatValue(subValue ?? SubProperty.Date, v)).filter(Boolean) : [];
+    const dateValues = currentItem.value ? currentItem.value.split(",").map(v => formatValue(subValue ?? SubProperty.Date, v, poll.ignoreTimeZone!)).filter(Boolean) : [];
 
     return (
         <>
