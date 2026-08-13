@@ -47,7 +47,7 @@ function serializeCandidateVote(
     case PollType.Date:
       if (!candidate.dateSelection || candidate.dateSelection.activeCount === 0) return null;
       return candidate.dateSelection.dates
-        .map(t => ({ ...base, timestamp: toGMT(t.date) }));
+        .map(t => ({ ...base, timestamp: poll.ignoreTimeZone! ? t.date.getTime() : toGMT(t.date) }));
 
     default:
       return null;

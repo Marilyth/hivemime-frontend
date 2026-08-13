@@ -68,7 +68,7 @@ export const HiveMimeCreatePost = observer(() => {
   function addPoll() {
     const draft = observable({ ...post, polls: [...post.polls!] }) as CreatePostDto;
     draft.polls!.push(observable({ title: "", description: "", candidates: [], categories: [],
-                       minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1, stepValue: 1,
+                       minValue: 0, maxValue: 100, minVotes: 1, maxVotes: 1,
                        minVotesPerCandidate: 1, maxVotesPerCandidate: 1,
                        allowedCustomCandidateCount: 0, shuffleCandidates: false,
                        pollType: undefined, dateMode: undefined }));

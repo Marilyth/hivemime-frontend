@@ -37,6 +37,7 @@ export class DateSelection {
   minScope: CalendarScope;
   animation: Animation = Animation.ZoomIn;
   variant: Variant;
+  ignoreTimeZone: boolean;
   filter?: FilterQueryGroup | FilterQuery | undefined | null;
 
   private validityCache: Map<string, boolean> = new Map();
@@ -47,10 +48,12 @@ export class DateSelection {
     maxDates: number,
     filter?: FilterQueryGroup | FilterQuery | undefined | null,
     initialDates: { date: Date, value: number }[] = [],
-    variant: Variant = Variant.Edit) {
+    variant: Variant = Variant.Edit,
+    ignoreTimeZone = true) {
     this.maxDates = maxDates;
     this.minScope = minScope;
     this.variant = variant;
+    this.ignoreTimeZone = ignoreTimeZone;
     this.filter = filter;
     this.dates = initialDates.toSorted((a, b) => a.date.getTime() - b.date.getTime());
     this.currentScope = Math.max(this.minScope, CalendarScope.Day);
@@ -211,7 +214,7 @@ export class DateSelection {
 
       switch(subvalue) {
         case SubProperty.Date:
-          const dateValue = fromGMT(numValue);
+          const dateValue = this.ignoreTimeZone ? new Date(numValue) : fromGMT(numValue);
 
           switch(operator){
             case ValueOperator.Equals:
@@ -279,18 +282,52 @@ export class DateSelection {
       return result;
     }
 
-    let runningDate = start;
+    let runningDate = this.getScopedDate(start, (scope - 1) as CalendarScope);
     while (runningDate <= end) {
-      runningDate = this.incrementDate(runningDate, scope - 1, 1);
-
       if (this.isRangeValid(runningDate, scope - 1)) {
         this.validityCache.set(key, true);
         return true;
       }
+
+      runningDate = this.incrementDate(runningDate, (scope - 1) as CalendarScope, 1);
     }
 
     this.validityCache.set(key, false);
     return false;
+  }
+
+  autoPosition() {
+    if (!this.filter || !this.hasFilterConditions(this.filter))
+      return;
+
+    const now = new Date();
+    const lower = new Date(now);
+    const upper = new Date(now);
+    lower.setFullYear(lower.getFullYear() - 25);
+    upper.setFullYear(upper.getFullYear() + 25);
+
+    const past = this.findValidPoint(lower, now, -1);
+    const future = this.findValidPoint(now, upper, 1);
+    const nearest = this.getClosestPoint(now, past, future);
+
+    if (!nearest) {
+      this.currentScope = CalendarScope.Year;
+      return;
+    }
+
+    const pageStartYear = nearest.getFullYear() - (nearest.getFullYear() % 25);
+    const pageStart = new Date(pageStartYear, 0, 1);
+    const pageEnd = new Date(pageStartYear + 25, 0, 1);
+    const searchStart = pageStart > lower ? pageStart : lower;
+    const searchEnd = pageEnd < upper ? pageEnd : upper;
+    const first = this.findValidPoint(searchStart, searchEnd, 1);
+    const last = this.findValidPoint(searchStart, searchEnd, -1);
+    const farthest = first && last
+      ? Math.abs(first.getTime() - nearest.getTime()) >= Math.abs(last.getTime() - nearest.getTime()) ? first : last
+      : nearest;
+
+    this.currentDate = new Date(nearest);
+    this.currentScope = this.getCommonScope(nearest, farthest);
   }
 
   sumScopedRange(date: Date, scope: CalendarScope): number {
@@ -343,6 +380,97 @@ export class DateSelection {
       case CalendarScope.Minute:
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes());
     }
+  }
+
+  private hasFilterConditions(filter: FilterQueryGroup | FilterQuery): boolean {
+    const children = (filter as FilterQueryGroup).children;
+
+    if (children == null)
+      return true;
+
+    return children.some(child => this.hasFilterConditions(child));
+  }
+
+  private getClosestPoint(now: Date, past?: Date, future?: Date): Date | undefined {
+    if (!past)
+      return future;
+    if (!future)
+      return past;
+
+    const pastDistance = Math.abs(past.getTime() - now.getTime());
+    const futureDistance = Math.abs(future.getTime() - now.getTime());
+
+    return pastDistance <= futureDistance ? past : future;
+  }
+
+  private findValidPoint(searchStart: Date, searchEnd: Date, direction: -1 | 1): Date | undefined {
+    if (searchStart > searchEnd)
+      return undefined;
+
+    const firstYear = this.getScopedDate(searchStart, CalendarScope.Year);
+    const lastYear = this.getScopedDate(searchEnd, CalendarScope.Year);
+    const years: Date[] = [];
+
+    for (let year = new Date(firstYear); year <= lastYear; year = this.incrementDate(year, CalendarScope.Year, 1))
+      years.push(year);
+
+    if (direction < 0)
+      years.reverse();
+
+    for (const year of years) {
+      const point = this.findValidPointInRange(year, CalendarScope.Year, searchStart, searchEnd, direction);
+
+      if (point)
+        return point;
+    }
+
+    return undefined;
+  }
+
+  private findValidPointInRange(
+    date: Date,
+    scope: CalendarScope,
+    searchStart: Date,
+    searchEnd: Date,
+    direction: -1 | 1
+  ): Date | undefined {
+    const scopedDate = this.getScopedDate(date, scope);
+    const { start, end } = this.getScopedDateRange(scopedDate, scope);
+
+    if (start > searchEnd || end < searchStart || !this.isRangeValid(scopedDate, scope))
+      return undefined;
+
+    if (scope === this.minScope)
+      return scopedDate;
+
+    const childScope = (scope - 1) as CalendarScope;
+    const childStart = this.getScopedDate(start, childScope);
+    const childEnd = this.getScopedDate(end, childScope);
+    const children: Date[] = [];
+
+    for (let child = new Date(childStart); child <= childEnd; child = this.incrementDate(child, childScope, 1))
+      children.push(child);
+
+    if (direction < 0)
+      children.reverse();
+
+    for (const child of children) {
+      const point = this.findValidPointInRange(child, childScope, searchStart, searchEnd, direction);
+
+      if (point)
+        return point;
+    }
+
+    return undefined;
+  }
+
+  private getCommonScope(first: Date, second: Date): CalendarScope {
+    for (let scope = this.minScope; scope <= CalendarScope.Year; scope++) {
+      if (this.getScopedDate(first, scope).getTime() === this.getScopedDate(second, scope).getTime())
+        return Math.max(this.minScope, scope - 1) as CalendarScope;
+    }
+
+    return CalendarScope.Year;
   }
 
   private getScopedDateRange(date: Date, scope: CalendarScope): { start: Date, end: Date } {

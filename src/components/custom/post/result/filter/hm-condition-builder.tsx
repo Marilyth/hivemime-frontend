@@ -36,6 +36,7 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
 
     function clearDraftFields() {
         draft.property = null;
+        draft.subProperty = undefined;
         draft.value = null;
         draft.valueOperator = undefined;
         setValid(false);

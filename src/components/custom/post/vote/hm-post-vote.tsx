@@ -14,7 +14,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { AsyncButton } from "../../utility/async-button";
 import { api } from "@/lib/contexts";
 import { CellSelection } from "../../utility/draw-picker";
-import { CalendarScope, DateSelection } from "../../utility/date-selection";
+import { CalendarScope, DateSelection, Variant } from "../../utility/date-selection";
 
 interface HiveMimePostVoteProps {
   post: PostDto;
@@ -31,7 +31,7 @@ export const HiveMimePostVote = observer(({ post, requestResults, footer }: Hive
       id: poll.id!,
       candidates: (poll.candidates || []).map(candidate => {
         if (poll.pollType === PollType.Date) {
-          const dateSelection = new DateSelection(poll.stepValue as CalendarScope, poll.maxVotesPerCandidate!, poll.dateFilterQuery);
+          const dateSelection = new DateSelection(poll.stepValue as CalendarScope, poll.maxVotesPerCandidate!, poll.dateFilterQuery, [], Variant.Edit, poll.ignoreTimeZone!);
           return { id: candidate.id!, name: candidate.name, dateSelection };
         }
 

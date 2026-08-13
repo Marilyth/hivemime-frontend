@@ -39,7 +39,7 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
     const newValue = Number(value);
     props.poll.minVotesPerCandidate = newValue;
 
-    if (newValue > props.poll.maxVotesPerCandidate!) {
+    if (newValue > Math.max(1, props.poll.maxVotesPerCandidate!)) {
       props.poll.maxVotesPerCandidate = newValue;
     }
   }
@@ -52,8 +52,14 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
     dateQuery.children!.push(result);
   }
 
-  const stepValue = props.poll.stepValue ?? CalendarScope.Day;
-  const effectiveMin = Math.max(1, props.poll.minVotesPerCandidate!);
+  if (props.poll.stepValue == null)
+    props.poll.stepValue = CalendarScope.Day;
+
+  if (props.poll.ignoreTimeZone == null)
+    props.poll.ignoreTimeZone = true;
+
+  const stepValue = props.poll.stepValue;
+  const effectiveMin = Math.max(0, props.poll.minVotesPerCandidate!);
 
   return (
     <div className="flex flex-col">
@@ -89,8 +95,8 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
                   <SelectValue />
                 </HiveMimeInlineSelectTrigger>
                 <SelectContent>
-                  {[...Array(MAX_DATE_OPTIONS).keys()].map(i => (
-                    <SelectItem key={i} value={(i + 1).toString()}>{(i + 1).toString()}</SelectItem>
+                  {[...Array(MAX_DATE_OPTIONS + 1).keys()].map(i => (
+                    <SelectItem key={i} value={i.toString()}>{i.toString()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -112,6 +118,28 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
                   {[...Array(MAX_DATE_OPTIONS - effectiveMin + 1).keys()].map(i => (
                     <SelectItem key={i} value={(effectiveMin + i).toString()}>{(effectiveMin + i).toString()}</SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            ),
+          }}
+        />
+      </HiveMimeBulletItem>
+
+      <HiveMimeBulletItem>
+        <Trans
+          i18nKey="posts:create.rules.ignoreTimeZone"
+          components={{
+            select: (
+              <Select
+                value={props.poll.ignoreTimeZone! ? "true" : "false"}
+                onValueChange={(value) => props.poll.ignoreTimeZone = value === "true"}
+              >
+                <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+                </HiveMimeInlineSelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">{t("enums:dateTimeZone.ignored")}</SelectItem>
+                  <SelectItem value="false">{t("enums:dateTimeZone.respected")}</SelectItem>
                 </SelectContent>
               </Select>
             ),

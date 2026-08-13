@@ -1,14 +1,15 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
-import { eachDayOfInterval, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+import { eachDayOfInterval, endOfMonth, endOfWeek, isSameDay, isSameHour, isSameMonth, isSameYear, startOfMonth, startOfWeek } from "date-fns";
 import { CalendarScope, DateSelection, Animation, Variant } from "./date-selection";
 import { GradientBar } from "./gradient-bar";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { reaction } from "mobx";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "22";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -25,11 +26,19 @@ interface PickerProps extends DatePickerProps {
   date: Date;
 }
 
-export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, className, ...props }: DatePickerProps) => {
+export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, className }: DatePickerProps) => {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState<{ value: number, date: Date, x: number, y: number } | null>(null);
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
+
+  useEffect(() => {
+    return reaction(
+      () => `${dateSelection.minScope}:${JSON.stringify(dateSelection.filter)}`,
+      () => dateSelection.autoPosition(),
+      { fireImmediately: true },
+    );
+  }, [dateSelection]);
 
   const handleHover = (value: number | null, date?: Date, x?: number, y?: number) => {
     setHovered(value != null && date && x != null && y != null ? { value, date, x, y } : null);
@@ -151,10 +160,12 @@ const YearPicker = observer(({ dateSelection, startColor, endColor, onHoverValue
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
         const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Year);
+        const isCurrent = isSameYear(mapDate, new Date());
 
         return (
           <Button variant="ghost"
             key={year}
+            className={`${isCurrent ? "border-2 border-primary text-primary" : ""}`}
             disabled={!isValid}
             onClick={() => onClick(year)}
             onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}
@@ -192,10 +203,12 @@ const MonthPicker = observer(({ dateSelection, startColor, endColor, onHoverValu
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
         const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Month);
+        const isCurrent = isSameMonth(mapDate, new Date());
 
         return (
           <Button
             variant="ghost"
+            className={`${isCurrent ? "border-2 border-primary text-primary" : ""}`}
             key={month}
             disabled={!isValid}
             onClick={() => onClick(index)}
@@ -243,11 +256,17 @@ const DayPicker = observer(({ dateSelection, startColor, endColor, onHoverValue,
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
         const isValid = dateSelection.isRangeValid(day, CalendarScope.Day);
+        const isCurrent = isSameDay(day, new Date());
+        const isSunday = day.getDay() === 0;
 
         return (
           <Button variant="ghost"
             key={day.toISOString()}
-            className={`${isOutside ? "opacity-20" : ""}`}
+            className={`
+              ${isOutside ? "opacity-20" : ""}
+              ${isSunday ? "text-muted-red" : ""}
+              ${isCurrent ? "border-2 border-primary text-primary" : ""}
+            `}
             disabled={!isValid}
             onClick={() => onClick(day)}
             onPointerEnter={(e) => onHoverValue?.(value, day, e.clientX, e.clientY)}
@@ -279,16 +298,17 @@ const HourPicker = observer(({ dateSelection, startColor, endColor, onHoverValue
     <div className="mt-3 grid grid-flow-col grid-rows-12 gap-1">
       {hourLabels().map((hour, i) => {
         const mapDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), i);
-
         const value = dateSelection.sumScopedRange(mapDate, CalendarScope.Hour);
         const bounds = dateSelection.hourBounds;
         const ratio = bounds.min == bounds.max ? 1 : (value - bounds.min) / (bounds.max - bounds.min);
         const mixedColor = value > 0 ? mixColors(startColor!, endColor!, ratio) : "transparent";
         const isValid = dateSelection.isRangeValid(mapDate, CalendarScope.Hour);
+        const isCurrent = isSameHour(mapDate, new Date());
 
         return (
           <Button key={i}
             variant="ghost"
+            className={`${isCurrent ? "border-2 border-primary text-primary" : ""}`}
             disabled={!isValid}
             onClick={() => onClick(i)}
             onPointerEnter={(e) => onHoverValue?.(value, mapDate, e.clientX, e.clientY)}

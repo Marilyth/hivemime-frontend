@@ -5,6 +5,7 @@ import { CreatePollDto, PollType } from "@/lib/Api";
 import { HiveMimeHoverCard } from "../../utility/hm-hover-card";
 import { HiveMimePollTypeIcon } from "../../utility/hm-poll-type-icon";
 import { useTranslation } from "react-i18next";
+import { confirmStore } from "@/lib/contexts";
 
 export interface HiveMimeCreatePollTypePickerProps
 {
@@ -17,6 +18,40 @@ interface HiveMimeCreatePollTypePickerOption {
 
 export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePollTypePickerProps) => {
   const { t } = useTranslation();
+
+  async function selectPollType(pollType: PollType) {
+    if (poll.pollType === pollType)
+      return;
+
+    if ((poll.candidates?.length ?? 0) > 0 && !await confirmStore.request({
+      title: t("posts:create.changePollTypeTitle"),
+      description: t("posts:create.changePollTypeDescription"),
+    }))
+      return;
+
+    Object.assign(poll, {
+      title: "",
+      description: "",
+      candidates: [],
+      categories: [],
+      minValue: 0,
+      maxValue: 100,
+      minVotes: 1,
+      maxVotes: 1,
+      minVotesPerCandidate: 1,
+      maxVotesPerCandidate: 1,
+      allowedCustomCandidateCount: 0,
+      isShuffled: false,
+      rows: null,
+      columns: null,
+      stepValue: null,
+      dateFilterQuery: null,
+      ignoreTimeZone: null,
+      conditionQuery: null,
+      media: undefined,
+      pollType,
+    });
+  }
 
   const options: HiveMimeCreatePollTypePickerOption[] = [
     { value: PollType.Choice },
@@ -35,7 +70,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
           return (
           <HiveMimeHoverCard key={index} className={`flex flex-row cursor-pointer items-center hover:text-honey-brown ${
               poll.pollType === option.value ? 'text-honey-brown border-honey-brown' : ''
-            }`} onClick={() => poll.pollType = option.value}>
+            }`} onClick={() => selectPollType(option.value)}>
             <HiveMimePollTypeIcon answerType={option.value} className={`mr-2 w-8 ${poll.pollType === option.value ? 'text-honey-brown' : 'text-informational'}`} />
             <div className="flex-1 flex flex-col">
               <span>{t(`enums:pollType.${pollTypeKey}`)}</span>
