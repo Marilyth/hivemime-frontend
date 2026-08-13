@@ -9,6 +9,9 @@ import { Trans } from "react-i18next";
 
 
 export const HiveMimeCreateScoringRules = observer((props: HiveMimeCreatePollProps) =>  {
+  if (!props.poll.stepValue)
+    props.poll.stepValue = 1;
+  
   return (
     <div>
       <HiveMimeBulletItem>

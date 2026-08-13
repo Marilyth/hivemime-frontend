@@ -39,7 +39,7 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
     const newValue = Number(value);
     props.poll.minVotesPerCandidate = newValue;
 
-    if (newValue > props.poll.maxVotesPerCandidate!) {
+    if (newValue > Math.max(1, props.poll.maxVotesPerCandidate!)) {
       props.poll.maxVotesPerCandidate = newValue;
     }
   }
@@ -59,7 +59,7 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
     props.poll.ignoreTimeZone = true;
 
   const stepValue = props.poll.stepValue;
-  const effectiveMin = Math.max(1, props.poll.minVotesPerCandidate!);
+  const effectiveMin = Math.max(0, props.poll.minVotesPerCandidate!);
 
   return (
     <div className="flex flex-col">
@@ -95,8 +95,8 @@ export const HiveMimeCreateDateRules = observer((props: HiveMimeCreateDateRulesP
                   <SelectValue />
                 </HiveMimeInlineSelectTrigger>
                 <SelectContent>
-                  {[...Array(MAX_DATE_OPTIONS).keys()].map(i => (
-                    <SelectItem key={i} value={(i + 1).toString()}>{(i + 1).toString()}</SelectItem>
+                  {[...Array(MAX_DATE_OPTIONS + 1).keys()].map(i => (
+                    <SelectItem key={i} value={i.toString()}>{i.toString()}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
