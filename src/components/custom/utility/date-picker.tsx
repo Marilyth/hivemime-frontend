@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,6 +9,7 @@ import { GradientBar } from "./gradient-bar";
 import { useTranslation } from "react-i18next";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { reaction } from "mobx";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "22";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -25,11 +26,19 @@ interface PickerProps extends DatePickerProps {
   date: Date;
 }
 
-export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, className, ...props }: DatePickerProps) => {
+export const DatePicker = observer(({ dateSelection, startColor, endColor, onHoverValue, className }: DatePickerProps) => {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState<{ value: number, date: Date, x: number, y: number } | null>(null);
   startColor ??= DEFAULT_START_COLOR;
   endColor ??= DEFAULT_END_COLOR;
+
+  useEffect(() => {
+    return reaction(
+      () => `${dateSelection.minScope}:${JSON.stringify(dateSelection.filter)}`,
+      () => dateSelection.autoPosition(),
+      { fireImmediately: true },
+    );
+  }, [dateSelection]);
 
   const handleHover = (value: number | null, date?: Date, x?: number, y?: number) => {
     setHovered(value != null && date && x != null && y != null ? { value, date, x, y } : null);
