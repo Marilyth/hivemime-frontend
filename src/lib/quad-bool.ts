@@ -13,6 +13,8 @@ export function QuadAnd(leftState: QuadBoolean, rightState: QuadBoolean){
     return QuadBoolean.Yes;
   else if (leftState == QuadBoolean.Maybe || rightState == QuadBoolean.Maybe)
     return QuadBoolean.Maybe;
+  else if (leftState == QuadBoolean.Partially && rightState == QuadBoolean.Partially)
+    return QuadBoolean.Maybe;
 
   return QuadBoolean.Partially;
 }
