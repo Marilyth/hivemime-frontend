@@ -19,18 +19,18 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
-    "drawInstruction": "Please draw between {{minCells}} and {{maxCells}} cells on the image.",
+    "drawInstruction": "Please click between {{minCells}} and {{maxCells}} cells on the image.",
     "dateInstruction": "Please select between {{minDates}} and {{maxDates}} dates.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
     "pickCandidatesDescription": "Please pick candidates to assign the category to.",
-    "draw": {
-      "draw": "Draw",
-      "erase": "Erase",
-      "undo": "Undo",
-      "cursorSize": "Cursor size"
-    }
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "showImage": "Show image",
+    "hideImage": "Hide image",
+    "showCells": "Show cells",
+    "hideCells": "Hide cells"
   },
   "result": {
     "results": "Results",
@@ -89,8 +89,8 @@
       "maxScore": "The maximum score is <select/>.",
       "rowCount": "The image has <select/> rows.",
       "columnCount": "The image has <select/> columns.",
-      "minCells": "The user has to draw at least <select/> cells.",
-      "maxCells": "The user can draw up to <select/> cells.",
+      "minCells": "The user has to pick at least <select/> cells.",
+      "maxCells": "The user can pick up to <select/> cells.",
       "startDate": "The user can pick a date starting from <select/>.",
       "endDate": "The user can pick a date up to <select/>.",
       "precision": "The date precision is <select/>.",

@@ -93,6 +93,10 @@ function validateDrawPoll(poll: CreatePollDto): string[] {
        errors.push(i18n.t("validation:poll.drawMedia"));
     }
 
+    if (poll.maxVotesPerCandidate == null || poll.maxVotesPerCandidate < 1) {
+        errors.push(i18n.t("validation:poll.drawMaxCells"));
+    }
+
     return errors;
 }
 

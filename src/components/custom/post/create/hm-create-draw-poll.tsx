@@ -6,14 +6,13 @@ import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { Trans } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
-import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
 import { mediaFiles } from "./hm-create-post";
 import { getImageDimensions, getReferenceId } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
 import { mutedColors } from "@/lib/colors";
 
+const MAX_CELLS = 20;
 
 export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps) =>  {
   const candidate = props.poll.candidates![0];
@@ -23,14 +22,35 @@ export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps)
   const [maxRows, setMaxRows] = useState<number>(64);
   const [maxColumns, setMaxColumns] = useState<number>(64);
 
+  const totalCells = Math.max(1, (props.poll.rows ?? 1) * (props.poll.columns ?? 1));
+  const maxSelectableCells = Math.min(MAX_CELLS, totalCells);
+  const effectiveMin = Math.max(0, Math.min(props.poll.minVotesPerCandidate ?? 0, maxSelectableCells));
+
+  if (props.poll.minVotesPerCandidate == null || props.poll.minVotesPerCandidate > maxSelectableCells)
+    props.poll.minVotesPerCandidate = Math.min(props.poll.minVotesPerCandidate ?? 0, maxSelectableCells);
+
+  if (props.poll.maxVotesPerCandidate == null || props.poll.maxVotesPerCandidate < 1 || props.poll.maxVotesPerCandidate > maxSelectableCells)
+    props.poll.maxVotesPerCandidate = maxSelectableCells;
+
   function updateRowCount(value: string) {
     props.poll.rows = Number(value);
-    props.poll.maxVotesPerCandidate = props.poll.rows! * props.poll.columns!;
   }
 
   function updateColumnCount(value: string) {
     props.poll.columns = Number(value);
-    props.poll.maxVotesPerCandidate = props.poll.rows! * props.poll.columns!;
+  }
+
+  function updateMinCells(value: string) {
+    const newValue = Number(value);
+    props.poll.minVotesPerCandidate = newValue;
+
+    if (newValue > props.poll.maxVotesPerCandidate!) {
+      props.poll.maxVotesPerCandidate = newValue;
+    }
+  }
+
+  function updateMaxCells(value: string) {
+    props.poll.maxVotesPerCandidate = Number(value);
   }
 
   async function initializeGridDimensions() {
@@ -60,7 +80,8 @@ export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps)
         props.poll.columns = Math.floor(props.poll.rows * aspectRatio);
       }
 
-      props.poll.maxVotesPerCandidate = props.poll.rows! * props.poll.columns!;
+      props.poll.minVotesPerCandidate = 0;
+      props.poll.maxVotesPerCandidate = Math.min(MAX_CELLS, props.poll.rows! * props.poll.columns!);
     }
   }
 
@@ -113,14 +134,58 @@ export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps)
           }}
         />
       </HiveMimeBulletItem>
+
+      <HiveMimeBulletItem>
+        <Trans
+          i18nKey="posts:create.rules.minCells"
+          components={{
+            select: (
+              <Select
+                value={props.poll.minVotesPerCandidate!.toString()}
+                onValueChange={updateMinCells}>
+                <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+                </HiveMimeInlineSelectTrigger>
+                <SelectContent>
+                  {[...Array(maxSelectableCells + 1).keys()].map(i => (
+                    <SelectItem key={i} value={i.toString()}>{i.toString()}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ),
+          }}
+        />
+      </HiveMimeBulletItem>
+
+      <HiveMimeBulletItem>
+        <Trans
+          i18nKey="posts:create.rules.maxCells"
+          components={{
+            select: (
+              <Select
+                value={props.poll.maxVotesPerCandidate!.toString()}
+                onValueChange={updateMaxCells}>
+                <HiveMimeInlineSelectTrigger>
+                  <SelectValue />
+                </HiveMimeInlineSelectTrigger>
+                <SelectContent>
+                  {[...Array(maxSelectableCells - effectiveMin + 1).keys()].map(i => (
+                    <SelectItem key={i} value={(effectiveMin + i).toString()}>{(effectiveMin + i).toString()}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ),
+          }}
+        />
+      </HiveMimeBulletItem>
+
       {candidateObjectUrl && (
         <DrawPicker
           src={candidateObjectUrl}
-          cellSelection={new CellSelection(props.poll.rows!, props.poll.columns!, 1)}
+          cellSelection={new CellSelection(props.poll.rows!, props.poll.columns!, props.poll.maxVotesPerCandidate!)}
           variant={Variant.View} 
           className="mt-2"
           canvasProps={{
-            alwaysShowGrid: true,
             gridColor: mutedColors.gray,
           }}
         />
