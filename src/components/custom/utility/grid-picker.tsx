@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
-import { Eye, EyeOff, ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut, Image, LayoutGrid } from "lucide-react";
 import { makeAutoObservable, reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { GradientBar } from "./gradient-bar";
+import { Separator } from "@/components/ui/separator";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -170,12 +171,10 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
           className="relative w-full min-h-0 flex flex-col gap-2 border bg-muted p-1 rounded-md"
         >
           {variant != Variant.View && (
-            <div className="flex w-full flex-wrap items-center justify-end gap-2 p-2 border-b">
+            <div className="flex w-full h-full flex-wrap items-center justify-end gap-2 p-2 border-b">
               <Button
                 size="icon"
                 variant="outline"
-                aria-label={t("posts:vote.zoomIn")}
-                title={t("posts:vote.zoomIn")}
                 onClick={() => zoomIn()}
               >
                 <ZoomIn className="h-4 w-4" />
@@ -184,31 +183,29 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               <Button
                 size="icon"
                 variant="outline"
-                aria-label={t("posts:vote.zoomOut")}
-                title={t("posts:vote.zoomOut")}
                 onClick={() => zoomOut()}
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
 
+              <Separator orientation="vertical" className="py-4"></Separator>
+
               <Button
                 size="icon"
                 variant="outline"
-                aria-label={showImage ? t("posts:vote.hideImage") : t("posts:vote.showImage")}
-                title={showImage ? t("posts:vote.hideImage") : t("posts:vote.showImage")}
+                className={`${showImage ? "" : "opacity-50"}`}
                 onClick={() => setShowImage(!showImage)}
               >
-                {showImage ? <Eye /> : <EyeOff />}
+                <Image />
               </Button>
 
               <Button
                 size="icon"
                 variant="outline"
-                aria-label={showCells ? t("posts:vote.hideCells") : t("posts:vote.showCells")}
-                title={showCells ? t("posts:vote.hideCells") : t("posts:vote.showCells")}
+                className={`${showCells ? "" : "opacity-50"}`}
                 onClick={() => setShowCells(!showCells)}
               >
-                {showCells ? <Eye /> : <EyeOff />}
+                <LayoutGrid />
               </Button>
             </div>
           )}
@@ -222,20 +219,17 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               ref={outerImageContainerRef}
               {...props}
             >
-              {showImage && (
-                <img
-                  ref={imgRef}
-                  src={src}
-                  alt="Grid Picker"
-                  className={cn("w-full h-full max-h-128 object-contain object-top", props.imageClassName)}
-                  onLoad={() =>
-                    setImageSize({
-                      width: imgRef.current!.naturalWidth,
-                      height: imgRef.current!.naturalHeight,
-                    })
-                  }
-                />
-              )}
+              <img
+                ref={imgRef}
+                src={src}
+                className={cn("w-full h-full max-h-128 object-contain object-top transition-opacity", props.imageClassName, showImage ? "" : "opacity-0")}
+                onLoad={() =>
+                  setImageSize({
+                    width: imgRef.current!.naturalWidth,
+                    height: imgRef.current!.naturalHeight,
+                  })
+                }
+              />
 
               {showCells && (
                 <div className="absolute inset-0 flex justify-center">
