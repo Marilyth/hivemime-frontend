@@ -1,8 +1,7 @@
 "use client";
 
 import { PollType } from "@/lib/Api";
-import { ArrowDownWideNarrow, BadgeQuestionMark, CopyCheck, Tag, Gauge, LayoutGrid, CalendarDays } from "lucide-react";
-import { FaRankingStar } from "react-icons/fa6";
+import { ArrowDownWideNarrow, BadgeQuestionMark, CopyCheck, Tag, Gauge, LayoutGrid, CalendarDays, Globe, Podium } from "lucide-react";
 import { observer } from "mobx-react-lite";
 
 type HiveMimePollTypeIconProps = React.ComponentProps<typeof ArrowDownWideNarrow> & {
@@ -16,13 +15,15 @@ export const HiveMimePollTypeIcon = observer(({ answerType, ...props }: HiveMime
       case PollType.Score:
         return <Gauge {...props} className={props.className} />;
       case PollType.Rank:
-        return <FaRankingStar {...props} className={props.className} />;
+        return <Podium {...props} className={props.className} />;
       case PollType.Category:
         return <Tag {...props} className={props.className} />;
       case PollType.Grid:
         return <LayoutGrid {...props} className={props.className} />;
       case PollType.Date:
         return <CalendarDays {...props} className={props.className} />;
+      case PollType.Geo:
+        return <Globe {...props} className={props.className} />;
       default:
         return <BadgeQuestionMark {...props} className={props.className} />;
     }

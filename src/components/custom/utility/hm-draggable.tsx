@@ -3,8 +3,7 @@
 import { Key, useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { Edge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
-import { GripVertical } from "lucide-react";
-import { FaCircle } from "react-icons/fa6";
+import { CircleDot, GripVertical } from "lucide-react";
 import { Input } from "@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types";
 
 export type OnDroppedArgs = {
@@ -193,7 +192,7 @@ export function HiveMimeDraggable({
   >
     {currentZone && currentZone !== "center" && (
       <div>
-        <FaCircle className={`absolute h-2 justify-center text-honey-brown ${
+        <CircleDot className={`absolute h-2 justify-center text-honey-brown ${
             currentZone === "top"
               ? `-top-0.5 -left-3 right-0`
               : currentZone === "bottom"

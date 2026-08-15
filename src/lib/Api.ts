@@ -49,6 +49,7 @@ export enum PollType {
   Category = "Category",
   Grid = "Grid",
   Date = "Date",
+  Geo = "Geo",
 }
 
 export enum MemberRole {

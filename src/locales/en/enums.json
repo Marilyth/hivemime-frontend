@@ -87,7 +87,8 @@
     "rank": "Rank",
     "category": "Category",
     "grid": "Grid",
-    "date": "Date"
+    "date": "Date",
+    "geo": "Geo"
   },
   "pollTypeDescription": {
     "choice": "The user has to pick candidates.",
@@ -95,7 +96,8 @@
     "rank": "The user has to rank candidates in order of preference. (E.g. top 10 lists)",
     "category": "The user has to assign categories to candidates. (E.g. tier lists)",
     "grid": "The user has to pick cells on an image.",
-    "date": "The user has to select dates."
+    "date": "The user has to select dates.",
+    "geo": "The user has to select locations on the world."
   },
   "rankFilter": {
     "nothing": "Nothing"
