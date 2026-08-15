@@ -9,12 +9,12 @@ import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
 import { mediaFiles } from "./hm-create-post";
 import { getImageDimensions, getReferenceId } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
+import { CellSelection, GridPicker, Variant } from "../../utility/grid-picker";
 import { mutedColors } from "@/lib/colors";
 
 const MAX_CELLS = 20;
 
-export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps) =>  {
+export const HiveMimeCreateGridRules = observer((props: HiveMimeCreatePollProps) =>  {
   const candidate = props.poll.candidates![0];
   const candidateMedia = mediaFiles.get(getReferenceId(candidate));
   const [candidateObjectUrl, setCandidateObjectUrl] = useState<string | null>(null);
@@ -180,7 +180,7 @@ export const HiveMimeCreateDrawRules = observer((props: HiveMimeCreatePollProps)
       </HiveMimeBulletItem>
 
       {candidateObjectUrl && (
-        <DrawPicker
+        <GridPicker
           src={candidateObjectUrl}
           cellSelection={new CellSelection(props.poll.rows!, props.poll.columns!, props.poll.maxVotesPerCandidate!)}
           variant={Variant.View} 

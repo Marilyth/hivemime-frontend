@@ -4,13 +4,13 @@ import { valueOperatorToInlineString } from "@/lib/utils";
 import { InsideOperator } from "@/lib/vote-query";
 import { HiveMimeConditionViewer, splitValues } from "../hm-condition-viewer";
 
-interface HiveMimeFilterConditionDrawValueViewerProps {
+interface HiveMimeFilterConditionGridValueViewerProps {
     currentItem: FilterQuery;
     candidate: CandidateDto;
     poll: PollDto;
 }
 
-export const HiveMimeFilterConditionDrawValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionDrawValueViewerProps) => {
+export const HiveMimeFilterConditionGridValueViewer = observer(({ currentItem, candidate, poll }: HiveMimeFilterConditionGridValueViewerProps) => {
     const operator = currentItem.valueOperator ?? InsideOperator;
 
     return (

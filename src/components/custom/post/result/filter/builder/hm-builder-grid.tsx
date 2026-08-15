@@ -1,4 +1,4 @@
-import { CellSelection, DrawPicker, Variant } from "@/components/custom/utility/draw-picker";
+import { CellSelection, GridPicker, Variant } from "@/components/custom/utility/grid-picker";
 import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { reaction } from "mobx";
@@ -9,7 +9,7 @@ import { Chip, DialogValueChip } from "./hm-builder-chip";
 import { splitValues } from "../hm-condition-viewer";
 import { HiveMimeFilterConditionEditorProps, useReportValidity } from "./hm-builder-editor";
 
-export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
+export const GridEditor = observer(({ currentItem, poll, candidate, onValidChange, isActive }: HiveMimeFilterConditionEditorProps) => {
     const { t } = useTranslation();
     const src = candidate?.mediaKeys?.find(key => !key.endsWith("thumbnail.webp"));
     const [cellSelection] = useState(() => new CellSelection(poll.rows!, poll.columns!, poll.maxVotesPerCandidate!));
@@ -63,7 +63,7 @@ export const DrawEditor = observer(({ currentItem, poll, candidate, onValidChang
                     ? values.map(value => <Chip key={value} className="text-muted-blue">{value}</Chip>)
                     : <Chip filled={false} className="text-muted-foreground">{t("posts:filter.setValue")}</Chip>}
             >
-                <DrawPicker variant={Variant.Draw} cellSelection={cellSelection} src={src!} />
+                <GridPicker variant={Variant.Grid} cellSelection={cellSelection} src={src!} />
             </DialogValueChip>
         </>
     );

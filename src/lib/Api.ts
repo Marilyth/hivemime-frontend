@@ -45,7 +45,7 @@ export enum PollType {
   Score = "Score",
   Rank = "Rank",
   Category = "Category",
-  Draw = "Draw",
+  Grid = "Grid",
   Date = "Date",
 }
 
@@ -140,28 +140,6 @@ export type CandidateDateVoteDto = CandidateVoteDto & {
   timestamp?: number;
 };
 
-export interface CandidateDrawDistributionResultDto {
-  /** @format int32 */
-  cellIndex?: number;
-  /** @format double */
-  value?: number;
-  /** @format int32 */
-  voteCount?: number;
-}
-
-export type CandidateDrawResultDto = CandidateResultDto & {
-  distribution?: CandidateDrawDistributionResultDto[] | null;
-};
-
-export interface CandidateDrawResultDtoPollResultDto {
-  candidates?: CandidateDrawResultDto[] | null;
-}
-
-export type CandidateDrawVoteDto = CandidateVoteDto & {
-  /** @format int32 */
-  cellIndex?: number;
-};
-
 export interface CandidateDto {
   /** @format uuid */
   id?: string;
@@ -170,6 +148,28 @@ export interface CandidateDto {
   isCustom?: boolean;
   mediaKeys?: string[] | null;
 }
+
+export interface CandidateGridDistributionResultDto {
+  /** @format int32 */
+  cellIndex?: number;
+  /** @format double */
+  value?: number;
+  /** @format int32 */
+  voteCount?: number;
+}
+
+export type CandidateGridResultDto = CandidateResultDto & {
+  distribution?: CandidateGridDistributionResultDto[] | null;
+};
+
+export interface CandidateGridResultDtoPollResultDto {
+  candidates?: CandidateGridResultDto[] | null;
+}
+
+export type CandidateGridVoteDto = CandidateVoteDto & {
+  /** @format int32 */
+  cellIndex?: number;
+};
 
 export interface CandidateRankDistributionResultDto {
   /** @format int32 */
@@ -480,7 +480,7 @@ export interface PollVoteDto {
         | CandidateScoreVoteDto
         | CandidateRankVoteDto
         | CandidateCategoryVoteDto
-        | CandidateDrawVoteDto
+        | CandidateGridVoteDto
         | CandidateDateVoteDto
       )[]
     | null;
@@ -1484,11 +1484,11 @@ export class Api<
      * No description
      *
      * @tags Post
-     * @name PostDrawResultCreate
-     * @request POST:/api/Post/drawResult
+     * @name PostGridResultCreate
+     * @request POST:/api/Post/gridResult
      * @secure
      */
-    postDrawResultCreate: (
+    postGridResultCreate: (
       data: FilterQuery | FilterQueryGroup,
       query?: {
         /** @format uuid */
@@ -1496,8 +1496,8 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CandidateDrawResultDtoPollResultDto, any>({
-        path: `/api/Post/drawResult`,
+      this.request<CandidateGridResultDtoPollResultDto, any>({
+        path: `/api/Post/gridResult`,
         method: "POST",
         query: query,
         body: data,

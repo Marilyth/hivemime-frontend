@@ -2,7 +2,7 @@ import {
   CandidateCategoryVoteDto,
   CandidateChoiceVoteDto,
   CandidateDateVoteDto,
-  CandidateDrawVoteDto,
+  CandidateGridVoteDto,
   CandidateRankVoteDto,
   CandidateScoreVoteDto,
   PollDto,
@@ -17,7 +17,7 @@ import { toGMT } from "./gmt";
 function serializeCandidateVote(
   poll: PollDto,
   candidate: UiCandidateVote,
-): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateDrawVoteDto[] | CandidateDateVoteDto[] | null {
+): CandidateChoiceVoteDto | CandidateScoreVoteDto | CandidateRankVoteDto | CandidateCategoryVoteDto | CandidateGridVoteDto[] | CandidateDateVoteDto[] | null {
   const base = { id: candidate.id, name: candidate.name };
 
   switch (poll.pollType) {
@@ -37,7 +37,7 @@ function serializeCandidateVote(
       if (!candidate.categoryId) return null;
       return { ...base, categoryId: candidate.categoryId };
 
-    case PollType.Draw:
+    case PollType.Grid:
       if (!candidate.cellSelection || candidate.cellSelection.cells.length === 0) return null;
       return candidate.cellSelection.cells
         .map((value, index) => ({ value: value, index }))

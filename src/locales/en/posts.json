@@ -19,7 +19,7 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
-    "drawInstruction": "Please click between {{minCells}} and {{maxCells}} cells on the image.",
+    "gridInstruction": "Please select between {{minCells}} and {{maxCells}} cells on the image.",
     "dateInstruction": "Please select between {{minDates}} and {{maxDates}} dates.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
@@ -57,7 +57,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the user to assign the candidates to.",
-    "createDrawCandidates": "Select the image for the user to draw on.",
+    "createGridCandidates": "Select the image for the user to pick cells on.",
     "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
@@ -142,7 +142,7 @@
     "dateSubHour": "hour",
     "dateSubMinute": "minute",
     "dateViewer": "{{name}} {{subValue}}{{negation}} {{operator}} {{value}}",
-    "drawCellsWere": "Candidate's drawn cells were <select/>",
-    "drawViewer": "{{name}} drew {{count}} cells {{operator}}"
+    "gridCellsWere": "Candidate's picked cells were <select/>",
+    "gridViewer": "{{name}} picked {{count}} cells {{operator}}"
   }
 }

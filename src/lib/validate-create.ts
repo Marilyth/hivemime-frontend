@@ -32,8 +32,8 @@ export function validateCreatePoll(poll: CreatePollDto): string[] {
         case PollType.Category:
             errors.push(...validateCategorizationPoll(poll));
             break;
-        case PollType.Draw:
-            errors.push(...validateDrawPoll(poll));
+        case PollType.Grid:
+            errors.push(...validateGridPoll(poll));
             break;
         case PollType.Date:
             errors.push(...validateDatePoll(poll));
@@ -86,15 +86,15 @@ function validateCategorizationPoll(poll: CreatePollDto): string[] {
     return errors;
 }
 
-function validateDrawPoll(poll: CreatePollDto): string[] {
+function validateGridPoll(poll: CreatePollDto): string[] {
     const errors: string[] = [];
 
     if (poll.candidates?.find(c => (c.media?.contentLength ?? 0) <= 0)) {
-       errors.push(i18n.t("validation:poll.drawMedia"));
+       errors.push(i18n.t("validation:poll.gridMedia"));
     }
 
     if (poll.maxVotesPerCandidate == null || poll.maxVotesPerCandidate < 1) {
-        errors.push(i18n.t("validation:poll.drawMaxCells"));
+        errors.push(i18n.t("validation:poll.gridMaxCells"));
     }
 
     return errors;

@@ -5,7 +5,7 @@ import { HiveMimeFilterConditionChoiceValueViewer } from "./viewer/hm-choice-vie
 import { HiveMimeFilterConditionScoreValueViewer } from "./viewer/hm-score-viewer";
 import { HiveMimeFilterConditionRankValueViewer } from "./viewer/hm-rank-viewer";
 import { HiveMimeFilterConditionCategoryValueViewer } from "./viewer/hm-category-viewer";
-import { HiveMimeFilterConditionDrawValueViewer } from "./viewer/hm-draw-viewer";
+import { HiveMimeFilterConditionGridValueViewer } from "./viewer/hm-grid-viewer";
 import { HiveMimeFilterConditionDateValueViewer } from "./viewer/hm-date-viewer";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -36,7 +36,7 @@ export const HiveMimeFilterQuery = observer(({ currentItem, ancestors, isFirstIt
         [PollType.Score]: <HiveMimeFilterConditionScoreValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Rank]: <HiveMimeFilterConditionRankValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Category]: <HiveMimeFilterConditionCategoryValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
-        [PollType.Draw]: <HiveMimeFilterConditionDrawValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
+        [PollType.Grid]: <HiveMimeFilterConditionGridValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
         [PollType.Date]: <HiveMimeFilterConditionDateValueViewer currentItem={currentItem} candidate={candidate!} poll={poll!} />,
     };
 
