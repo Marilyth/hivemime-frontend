@@ -14,6 +14,8 @@ import { Separator } from "@/components/ui/separator";
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
+const CLICK_DRAG_THRESHOLD = 5;
+
 export class CellSelection {
   cells: { value: number }[] = [];
   selectedCell: number | null = null;
@@ -161,7 +163,9 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
   return (
     <TransformWrapper
       smooth={false}
+      panning={{ disabled: zoomScale <= 1 }}
       wheel={{ step: wheelStep }}
+      doubleClick={{ disabled: true }}
       onPinchStop={z => setZoomScale(z.state.scale)}
       onZoomStop={z => setZoomScale(z.state.scale)}
     >
@@ -295,6 +299,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
   onHover,
   ...props }: CellCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const clickStartRef = useRef<{ x: number, y: number } | null>(null);
 
   function redrawCanvas() {
     if (!canvasRef.current)
@@ -405,13 +410,35 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       onHover(cell.index, cell.clientX, cell.clientY);
   }
 
-  function handleClick(e: React.MouseEvent<HTMLCanvasElement>) {
+  function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
+    clickStartRef.current = { x: e.clientX, y: e.clientY };
+  }
+
+  function handlePointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
+    const start = clickStartRef.current;
+    clickStartRef.current = null;
+
+    if (!start)
+      return;
+
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+
+    // A drag (e.g. panning the image) is not a click.
+    if (Math.hypot(dx, dy) > CLICK_DRAG_THRESHOLD)
+      return;
+
     if (!onCellClick)
       return;
 
     const cell = cellFromEvent(e);
     if (cell)
       onCellClick(cell.index);
+  }
+
+  function handlePointerLeave() {
+    clickStartRef.current = null;
+    onHover?.(null);
   }
 
   useEffect(() => {
@@ -446,9 +473,10 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full cursor-pointer"
-        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         onPointerMove={handleHover}
-        onPointerLeave={() => onHover?.(null)}
+        onPointerLeave={handlePointerLeave}
       />
     </div>
   );
