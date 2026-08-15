@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
-import { ZoomIn, ZoomOut, Image, LayoutGrid } from "lucide-react";
+import { Image, LayoutGrid, SlidersHorizontal, ZoomIn, ZoomOut } from "lucide-react";
 import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +13,6 @@ import { useTranslation } from "react-i18next";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { CellSelection } from "./cell-selection";
 import { GradientBar } from "./gradient-bar";
-import { Separator } from "@/components/ui/separator";
 
 const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
@@ -34,7 +36,6 @@ export type GridPickerProps = {
 export const GridPicker = observer(({ cellSelection, src, variant, className, ...props }: GridPickerProps) => {
   variant = variant ?? Variant.View;
 
-  const { t } = useTranslation();
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const outerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -50,8 +51,6 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
   const startColor = canvasStyle.startColor ?? DEFAULT_START_COLOR;
   const endColor = canvasStyle.endColor ?? DEFAULT_END_COLOR;
 
-  const { min, max } = cellSelection.bounds;
-
   function toggleCell(row: number, col: number) {
     if (variant === Variant.Grid) {
       cellSelection.toggle(row, col);
@@ -62,7 +61,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
 
   function showTooltip(row: number | null, col?: number, clientX?: number, clientY?: number) {
     const value = row != null && col != undefined
-      ? cellSelection.cells[row][col].value
+      ? cellSelection.viewCells[row][col].value
       : 0;
 
     if (row == null
@@ -133,7 +132,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
           {variant != Variant.View && (
             <div className="flex w-full h-full flex-wrap items-center justify-end gap-2 p-2 border-b">
               <Button
-                size="icon"
+                size="sm"
                 variant="outline"
                 onClick={() => zoomIn()}
               >
@@ -141,7 +140,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               </Button>
 
               <Button
-                size="icon"
+                size="sm"
                 variant="outline"
                 onClick={() => zoomOut()}
               >
@@ -151,7 +150,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               <Separator orientation="vertical" className="py-4"></Separator>
 
               <Button
-                size="icon"
+                size="sm"
                 variant="outline"
                 className={`${showImage ? "" : "opacity-50"}`}
                 onClick={() => setShowImage(!showImage)}
@@ -160,13 +159,20 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               </Button>
 
               <Button
-                size="icon"
+                size="sm"
                 variant="outline"
                 className={`${showCells ? "" : "opacity-50"}`}
                 onClick={() => setShowCells(!showCells)}
               >
                 <LayoutGrid />
               </Button>
+
+              {variant === Variant.Result && (
+                <>
+                  <Separator orientation="vertical" className="py-4"></Separator>
+                  <GridResolutionControls cellSelection={cellSelection} />
+                </>
+              )}
             </div>
           )}
 
@@ -212,8 +218,8 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
           </TransformComponent>
 
           {variant === Variant.Result && <GradientBar
-            min={min}
-            max={max}
+            min={cellSelection.bounds.min}
+            max={cellSelection.bounds.max}
             current={tooltip?.value ?? null}
             startColor={startColor}
             endColor={endColor}
@@ -224,7 +230,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
               className="fixed bg-card p-2 rounded-md border z-50 pointer-events-none whitespace-nowrap"
               style={{ left: tooltip.x, top: tooltip.y, transform: "translate(0.5rem, 0.5rem)" }}
             >
-              Score: {tooltip.value.toFixed(4)}
+              Score: {tooltip.value.toFixed(2)}
             </div>,
             document.body
           )}
@@ -239,6 +245,56 @@ type CellCanvasStyleProps = {
   startColor?: string;
   endColor?: string;
 }
+
+const GridResolutionControls = observer(({ cellSelection }: { cellSelection: CellSelection }) => {
+  const { t } = useTranslation();
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+        >
+          <span>
+            {cellSelection.viewRows}
+            <span className="text-informational"> x </span>
+            {cellSelection.viewCols}
+          </span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-64">
+        <PopoverTitle>{t("posts:result.gridResolution")}</PopoverTitle>
+        <div className="flex flex-col gap-4 mt-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">{t("posts:result.resolutionRows")}</span>
+              <span>{cellSelection.viewRows}</span>
+            </div>
+            <Slider
+              min={1}
+              max={cellSelection.rows}
+              value={[cellSelection.viewRows]}
+              onValueChange={(v) => cellSelection.viewRows = v[0]}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">{t("posts:result.resolutionColumns")}</span>
+              <span>{cellSelection.viewCols}</span>
+            </div>
+            <Slider
+              min={1}
+              max={cellSelection.cols}
+              value={[cellSelection.viewCols]}
+              onValueChange={(v) => cellSelection.viewCols = v[0]}
+            />
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+});
 
 type CellCanvasProps = {
   cellSelection: CellSelection;
@@ -279,15 +335,15 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     const ctx = canvas.getContext("2d")!;
 
-    const cellWidth = canvas.width / cellSelection.cols;
-    const cellHeight = canvas.height / cellSelection.rows;
+    const cellWidth = canvas.width / cellSelection.viewCols;
+    const cellHeight = canvas.height / cellSelection.viewRows;
 
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
 
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 1; i < cellSelection.cols; i++) {
+    for (let i = 1; i < cellSelection.viewCols; i++) {
       const x = i * cellWidth;
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -295,7 +351,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
       ctx.stroke();
     }
 
-    for (let i = 1; i < cellSelection.rows; i++) {
+    for (let i = 1; i < cellSelection.viewRows; i++) {
       const y = i * cellHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
@@ -311,14 +367,13 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     const ctx = canvas.getContext("2d")!;
 
-    const cellWidth = canvas.width / cellSelection.cols;
-    const cellHeight = canvas.height / cellSelection.rows;
-
+    const cellWidth = canvas.width / cellSelection.viewCols;
+    const cellHeight = canvas.height / cellSelection.viewRows;
     const { min, max } = cellSelection.bounds;
 
-    for (let row = 0; row < cellSelection.rows; row++) {
-      for (let col = 0; col < cellSelection.cols; col++) {
-        const value = cellSelection.cells[row][col].value;
+    for (let row = 0; row < cellSelection.viewRows; row++) {
+      for (let col = 0; col < cellSelection.viewCols; col++) {
+        const value = cellSelection.viewCells[row][col].value;
         const isSelected = cellSelection.selectedCell?.row === row && cellSelection.selectedCell?.col === col;
 
         if (value <= 0 && !isSelected)
@@ -353,8 +408,8 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     const relX = (e.clientX - rect.left) / rect.width;
     const relY = (e.clientY - rect.top) / rect.height;
 
-    const col = Math.max(0, Math.min(cellSelection.cols - 1, Math.floor(relX * cellSelection.cols)));
-    const row = Math.max(0, Math.min(cellSelection.rows - 1, Math.floor(relY * cellSelection.rows)));
+    const col = Math.max(0, Math.min(cellSelection.viewCols - 1, Math.floor(relX * cellSelection.viewCols)));
+    const row = Math.max(0, Math.min(cellSelection.viewRows - 1, Math.floor(relY * cellSelection.viewRows)));
 
     return { row, col, clientX: e.clientX, clientY: e.clientY };
   }
@@ -410,7 +465,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     redrawCanvas();
 
     const disposeCells = reaction(
-      () => cellSelection.cells.map(row => row.map(cell => cell.value)),
+      () => cellSelection.viewCells.map(row => row.map(cell => cell.value)),
       () => redrawCanvas()
     );
 

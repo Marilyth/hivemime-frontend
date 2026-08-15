@@ -34,6 +34,9 @@
   },
   "result": {
     "results": "Results",
+    "gridResolution": "Grid resolution",
+    "resolutionRows": "Rows",
+    "resolutionColumns": "Columns",
     "score": "{{score}} points",
     "score_one": "{{score}} point",
     "votes": "{{count}} votes",

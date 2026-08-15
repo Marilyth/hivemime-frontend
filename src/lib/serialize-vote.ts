@@ -45,7 +45,7 @@ function serializeCandidateVote(
 
       for (let row = 0; row < cellSelection.rows; row++) {
         for (let col = 0; col < cellSelection.cols; col++) {
-          if (cellSelection.cells[row][col].value > 0)
+          if (cellSelection.viewCells[row][col].value > 0)
             votes.push({ ...base, row, column: col });
         }
       }

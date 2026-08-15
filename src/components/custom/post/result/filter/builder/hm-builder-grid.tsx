@@ -33,7 +33,7 @@ export const GridEditor = observer(({ currentItem, poll, candidate, onValidChang
 
         for (let row = 0; row < cellSelection.rows; row++)
             for (let col = 0; col < cellSelection.cols; col++)
-                cellSelection.cells[row][col].value = 0;
+                cellSelection.viewCells[row][col].value = 0;
         cellSelection.onCellsCount = 0;
 
         for (const part of currentItem.value.split(",")) {
@@ -42,7 +42,7 @@ export const GridEditor = observer(({ currentItem, poll, candidate, onValidChang
             if (Number.isInteger(row) && Number.isInteger(col)
                 && row >= 0 && row < cellSelection.rows
                 && col >= 0 && col < cellSelection.cols) {
-                cellSelection.cells[row][col].value = 1;
+                cellSelection.viewCells[row][col].value = 1;
                 cellSelection.onCellsCount++;
             }
         }
@@ -53,13 +53,13 @@ export const GridEditor = observer(({ currentItem, poll, candidate, onValidChang
             return;
 
         const dispose = reaction(
-            () => cellSelection.cells.map(row => row.map(cell => cell.value).join(",")).join(";"),
+            () => cellSelection.viewCells.map(row => row.map(cell => cell.value).join(",")).join(";"),
             () => {
                 const selected: string[] = [];
 
                 for (let row = 0; row < cellSelection.rows; row++)
                     for (let col = 0; col < cellSelection.cols; col++)
-                        if (cellSelection.cells[row][col].value > 0)
+                        if (cellSelection.viewCells[row][col].value > 0)
                             selected.push(`${row}:${col}`);
 
                 currentItem.value = selected.length > 0 ? selected.join(",") : null;
