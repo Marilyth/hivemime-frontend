@@ -7,35 +7,35 @@ import { mediaFiles } from "./hm-create-post";
 import { ImageEditorContent } from "../../utility/image-viewer";
 
 
-interface HiveMimeCreateDrawCandidateProps {
+interface HiveMimeCreateGridCandidateProps {
   candidate: CreateCandidateDto;
   poll: CreatePollDto;
 }
 
-export interface HiveMimeCreateDrawCandidatesProps {
+export interface HiveMimeCreateGridCandidatesProps {
   poll: CreatePollDto;
 }
 
-export const HiveMimeCreateDrawCandidates = observer(({ poll }: HiveMimeCreateDrawCandidatesProps) => {
+export const HiveMimeCreateGridCandidates = observer(({ poll }: HiveMimeCreateGridCandidatesProps) => {
   if (poll.candidates!.length === 0) {
     poll.candidates!.push({ name: "Candidate", description: "" });
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <HiveMimeCreateDrawCandidate candidate={poll.candidates![0]} poll={poll} />
+      <HiveMimeCreateGridCandidate candidate={poll.candidates![0]} poll={poll} />
     </div>
   );
 });
 
 
-const HiveMimeCreateDrawCandidate = observer(({ candidate, poll }: HiveMimeCreateDrawCandidateProps) => {
+const HiveMimeCreateGridCandidate = observer(({ candidate, poll }: HiveMimeCreateGridCandidateProps) => {
   function handleFileChange(file: File | null, thumbnail: File | null) {
     if (!file || !thumbnail) {
       mediaFiles.delete(getReferenceId(candidate));
       mediaFiles.delete(getReferenceId(candidate) + "-thumb");
       candidate.media = undefined;
-      candidate.name = "Candidate";
+      candidate.name = "Grid";
 
       return;
     }
@@ -48,7 +48,7 @@ const HiveMimeCreateDrawCandidate = observer(({ candidate, poll }: HiveMimeCreat
       contentType: file.type
     };
 
-    candidate.name = file.name;
+    candidate.name = "Grid";
     poll.rows = undefined;
     poll.columns = undefined;
   }

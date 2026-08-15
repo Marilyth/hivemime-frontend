@@ -1,4 +1,4 @@
-import { CellSelection } from "@/components/custom/utility/draw-picker";
+import { CellSelection } from "@/components/custom/utility/cell-selection";
 import { DateSelection } from "@/components/custom/utility/date-selection";
 import { CandidateVoteDto } from "./Api";
 

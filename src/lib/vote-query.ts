@@ -1,5 +1,5 @@
 import { observable } from "mobx";
-import { BooleanOperator, CandidateDto, PollDto, PostDto, FilterQuery, FilterQueryGroup, FilterQueryBase, ValueOperator } from "./Api";
+import { BooleanOperator, CandidateDto, PollDto, PostDto, FilterQuery, FilterQueryGroup, FilterQueryBase, SubProperty, ValueOperator } from "./Api";
 import { QuadAnd, QuadBoolean, QuadNot, QuadOr } from "./quad-bool";
 
 
@@ -13,6 +13,82 @@ export function createFilterQueryGroup(): FilterQueryGroup {
 
 // UI-only operator used by the query builder as a shortcut for multiple "Equals" conditions
 export const InsideOperator = "Inside" as ValueOperator;
+
+// Frontend-only sub-property used by the grid condition builder to pick whole cells. It is
+// never sent to the backend: on commit it is expanded into groups of Row AND Column conditions.
+export const CellSubProperty = "Cell" as SubProperty;
+
+export function expandCellConditions(query: FilterQueryBase): FilterQueryBase {
+  if (isFilterQuery(query)) {
+    if (query.subProperty !== CellSubProperty)
+      return query;
+
+    const cells = (query.value ?? "").split(",").filter(cell => cell !== "");
+    const group = createFilterQueryGroup();
+    group.isNegated = query.isNegated;
+    group.leftOperator = query.leftOperator ?? BooleanOperator.Or;
+    group.children = cells.map((cell) => {
+      const [row, col] = cell.split(":").map(Number);
+
+      const cellGroup = createFilterQueryGroup();
+      cellGroup.leftOperator = BooleanOperator.Or;
+      cellGroup.children = [
+        {
+          isNegated: false,
+          leftOperator: BooleanOperator.And,
+          property: query.property,
+          subProperty: SubProperty.Row,
+          valueOperator: ValueOperator.Equals,
+          value: String(row),
+        },
+        {
+          isNegated: false,
+          leftOperator: BooleanOperator.And,
+          property: query.property,
+          subProperty: SubProperty.Column,
+          valueOperator: ValueOperator.Equals,
+          value: String(col),
+        },
+      ];
+      return cellGroup;
+    });
+
+    return group;
+  }
+
+  const group = query as FilterQueryGroup;
+  group.children = group.children?.map(expandCellConditions);
+  return query;
+}
+
+// Mirrors the backend's FilterQueryBase.CleanUp(): removes empty groups and collapses
+// groups with a single child in-place, transferring the group's negation onto the child.
+export function cleanUpQuery(query: FilterQueryBase | null): FilterQueryBase | null {
+  if (query == null || isFilterQuery(query))
+    return query;
+
+  const group = query as FilterQueryGroup;
+
+  for (let i = group.children!.length - 1; i >= 0; i--) {
+    const child = cleanUpQuery(group.children![i]);
+
+    if (child == null)
+      group.children!.splice(i, 1);
+    else
+      group.children![i] = child;
+  }
+
+  if (group.children!.length === 1) {
+    const child = group.children![0];
+    child.isNegated = group.isNegated !== child.isNegated;
+    return child;
+  }
+
+  if (group.children!.length === 0)
+    return null;
+
+  return group;
+}
 
 export function expandInsideOperators(query: FilterQueryBase): FilterQueryBase {
   if (isFilterQuery(query)) {

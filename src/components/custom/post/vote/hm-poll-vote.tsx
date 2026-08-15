@@ -15,7 +15,7 @@ import { reaction, toJS } from "mobx";
 import { HiveMimeBulletItem } from "../../utility/hm-bullet-item";
 import { CustomCandidateInput } from "./hm-custom-candidate-input";
 import { UiPollVoteDto } from "@/lib/vote-models";
-import { HiveMimeDrawPollVote } from "./draw/hm-draw-poll-vote";
+import { HiveMimeGridPollVote } from "./grid/hm-grid-poll-vote";
 import { HiveMimeDatePollVote } from "./date/hm-date-poll-vote";
 
 export type HiveMimeListPollProps =   {
@@ -33,7 +33,7 @@ export const HiveMimeListPoll = observer(({ poll, pollVote }: HiveMimeListPollPr
     [PollType.Score]: <HiveMimeScorePollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Rank]: <HiveMimeRankPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Category]: <HiveMimeCategoryPollVote poll={poll} pollVotes={pollVote} />,
-    [PollType.Draw]: <HiveMimeDrawPollVote poll={poll} pollVotes={pollVote} />,
+    [PollType.Grid]: <HiveMimeGridPollVote poll={poll} pollVotes={pollVote} />,
     [PollType.Date]: <HiveMimeDatePollVote poll={poll} pollVotes={pollVote} />,
   };
 

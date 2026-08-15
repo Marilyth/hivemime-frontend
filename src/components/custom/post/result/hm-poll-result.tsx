@@ -10,7 +10,7 @@ import { HiveMimeChoiceResult } from "./hm-choice-result";
 import { HiveMimeScoreResult } from "./hm-score-result";
 import { HiveMimeCategoryResult } from "./hm-category-result";
 import { HiveMimeRankResult } from "./hm-rank-result";
-import { HiveMimeDrawResult } from "./hm-draw-result";
+import { HiveMimeGridResult } from "./hm-grid-result";
 import { HiveMimeDateResult } from "./hm-date-result";
 
 export interface HiveMimePollResultProps {
@@ -25,7 +25,7 @@ export const HiveMimePollResult = observer(({ poll, filter }: HiveMimePollResult
     [PollType.Score]: <HiveMimeScoreResult poll={poll} filter={filter} />,
     [PollType.Rank]: <HiveMimeRankResult poll={poll} filter={filter} />,
     [PollType.Category]: <HiveMimeCategoryResult poll={poll} filter={filter} />,
-    [PollType.Draw]: <HiveMimeDrawResult poll={poll} filter={filter} />,
+    [PollType.Grid]: <HiveMimeGridResult poll={poll} filter={filter} />,
     [PollType.Date]: <HiveMimeDateResult poll={poll} filter={filter} />,
   };
 

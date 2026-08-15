@@ -19,21 +19,24 @@
     "scoreInstruction": "Please score the candidates between {{minValue}} and {{maxValue}}.",
     "rankInstruction": "Please rank the candidates in order of preference.",
     "categoryInstruction": "Please add categories to the candidates.",
-    "drawInstruction": "Please draw between {{minCells}} and {{maxCells}} cells on the image.",
+    "gridInstruction": "Please select between {{minCells}} and {{maxCells}} cells on the image.",
     "dateInstruction": "Please select between {{minDates}} and {{maxDates}} dates.",
     "pickCategoryFor": "Pick a category for {{name}}",
     "pickCategoryDescription": "Please pick a category to assign the candidate to.",
     "pickCandidatesFor": "Pick candidates for {{name}}",
     "pickCandidatesDescription": "Please pick candidates to assign the category to.",
-    "draw": {
-      "draw": "Draw",
-      "erase": "Erase",
-      "undo": "Undo",
-      "cursorSize": "Cursor size"
-    }
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "showImage": "Show image",
+    "hideImage": "Hide image",
+    "showCells": "Show cells",
+    "hideCells": "Hide cells"
   },
   "result": {
     "results": "Results",
+    "gridResolution": "Grid resolution",
+    "resolutionRows": "Rows",
+    "resolutionColumns": "Columns",
     "score": "{{score}} points",
     "score_one": "{{score}} point",
     "votes": "{{count}} votes",
@@ -57,7 +60,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Optionally, add a description.",
     "createCategories": "Create categories for the user to assign the candidates to.",
-    "createDrawCandidates": "Select the image for the user to draw on.",
+    "createGridCandidates": "Select the image for the user to pick cells on.",
     "createCandidates": "Create candidates for the user to vote for.",
     "customCandidateCount": "Users can create up to <count/> custom candidates.",
     "configureRules": "Configure the poll rules by adjusting the underlined values.",
@@ -87,10 +90,10 @@
       "shuffle": "The candidates <select/> shuffled for the user.",
       "minScore": "The minimum score is <select/>.",
       "maxScore": "The maximum score is <select/>.",
-      "rowCount": "The image has <select/> rows.",
-      "columnCount": "The image has <select/> columns.",
-      "minCells": "The user has to draw at least <select/> cells.",
-      "maxCells": "The user can draw up to <select/> cells.",
+      "rowCount": "The grid has <select/> rows.",
+      "columnCount": "The grid has <select/> columns.",
+      "minCells": "The user has to pick at least <select/> cells.",
+      "maxCells": "The user can pick up to <select/> cells.",
       "startDate": "The user can pick a date starting from <select/>.",
       "endDate": "The user can pick a date up to <select/>.",
       "precision": "The date precision is <select/>.",
@@ -142,7 +145,8 @@
     "dateSubHour": "hour",
     "dateSubMinute": "minute",
     "dateViewer": "{{name}} {{subValue}}{{negation}} {{operator}} {{value}}",
-    "drawCellsWere": "Candidate's drawn cells were <select/>",
-    "drawViewer": "{{name}} drew {{count}} cells {{operator}}"
+    "gridSubCell": "cell",
+    "gridSubRow": "row",
+    "gridSubColumn": "column"
   }
 }

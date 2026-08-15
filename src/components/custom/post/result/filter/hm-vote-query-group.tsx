@@ -1,5 +1,5 @@
 import { BooleanOperator, PostDto, FilterQuery, FilterQueryGroup } from "@/lib/Api";
-import { isFilterQueryGroup } from "@/lib/vote-query";
+import { cleanUpQuery, isFilterQueryGroup } from "@/lib/vote-query";
 import { observer } from "mobx-react-lite";
 import { HiveMimeFilterQuery } from "./hm-vote-query";
 import { Select, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -33,25 +33,18 @@ export const HiveMimeFilterQueryGroup = observer(({ ancestors, group, isFirstIte
      */
     function cleanUpGroup(group: FilterQueryGroup) {
         // Root will handle this. Trickle up.
-        if (!isRoot()){
+        if (!isRoot()) {
             onMoved?.();
             return;
         }
 
         for (let i = group.children!.length - 1; i >= 0; i--) {
-            const child = group.children![i];
-            
-            if (isFilterQueryGroup(child)) {
-                cleanUpGroup(child);
+            const cleaned = cleanUpQuery(group.children![i]);
 
-                // Adopt the child if there is only 1 left or it is my only child.
-                if (child.children!.length == 1 || group.children!.length == 1)
-                    group.children!.splice(i, 1, ...child.children!);
-
-                // Remove the group if it is empty.
-                else if (child.children!.length == 0)
-                    group.children!.splice(i, 1);
-            }
+            if (cleaned == null)
+                group.children!.splice(i, 1);
+            else
+                group.children![i] = cleaned;
         }
     }
 

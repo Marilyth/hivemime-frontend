@@ -2,15 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { HiveMimePollResultProps as HiveMimePollCandidateResultProps } from "./hm-poll-result";
 import { api } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
-import { CellSelection, DrawPicker, Variant } from "../../utility/draw-picker";
+import { CellSelection } from "../../utility/cell-selection";
+import { GridPicker, Variant } from "../../utility/grid-picker";
 
 
-export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
+export function HiveMimeGridResult(props: HiveMimePollCandidateResultProps) {
   const { t } = useTranslation();
   const data = useQuery({
     queryKey: ["poll-result", props.poll.id, JSON.stringify(props.filter)],
     queryFn: async () => {
-      const r = await api.api.postDrawResultCreate(props.filter!, { pollId: props.poll.id! });
+      const r = await api.api.postGridResultCreate(props.filter!, { pollId: props.poll.id! });
       return r.data;
     },
     staleTime: 0
@@ -31,12 +32,15 @@ export function HiveMimeDrawResult(props: HiveMimePollCandidateResultProps) {
 
         if (resultCandidate) {
           for (const cell of resultCandidate.distribution!) {
-            cellSelection.cells[cell.cellIndex!].value = cell.value!;
+            if (cell.row != null && cell.column != null
+              && cell.row < cellSelection.rows && cell.column < cellSelection.cols) {
+              cellSelection.cells[cell.row][cell.column].value = cell.voteCount!;
+            }
           }
         }
 
         return (
-          <DrawPicker
+          <GridPicker
             key={i}
             cellSelection={cellSelection}
             variant={Variant.Result} 

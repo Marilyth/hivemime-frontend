@@ -40,9 +40,9 @@ function countCandidateVotes(poll: PollDto, vote: UiPollVoteDto): { [key: string
                 if (candidate.categoryId != null)
                     candidatesVoteCounts[candidateKey]++;
                 break;
-            case PollType.Draw:
-                if (candidate.cellSelection != null && candidate.cellSelection.cells.length > 0)
-                    candidatesVoteCounts[candidateKey] += candidate.cellSelection.cells.filter(c => c.value > 0).length;
+            case PollType.Grid:
+                if (candidate.cellSelection != null && candidate.cellSelection.onCellsCount > 0)
+                    candidatesVoteCounts[candidateKey] += candidate.cellSelection.onCellsCount;
                 break;
             case PollType.Date:
                 if (candidate.dateSelection != null && candidate.dateSelection.activeCount > 0)
@@ -66,8 +66,8 @@ function countVotes(poll: PollDto, vote: UiPollVoteDto): number {
             return candidates.filter(c => c.rank != null).length;
         case PollType.Category:
             return candidates.filter(c => c.categoryId != null).length;
-        case PollType.Draw:
-            return candidates.filter(c => c.cellSelection != null && c.cellSelection.cells.length > 0).length;
+        case PollType.Grid:
+            return candidates.filter(c => c.cellSelection != null && c.cellSelection.onCellsCount > 0).length;
         case PollType.Date:
             return candidates.filter(c => c.dateSelection != null && c.dateSelection.activeCount > 0).length;
         default:

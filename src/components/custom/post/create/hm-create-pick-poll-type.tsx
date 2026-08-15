@@ -59,7 +59,7 @@ export const HiveMimeCreatePollTypePicker = observer(({ poll }: HiveMimeCreatePo
     { value: PollType.Date },
     { value: PollType.Rank },
     { value: PollType.Category },
-    { value: PollType.Draw },
+    { value: PollType.Grid },
   ];
 
   return (
