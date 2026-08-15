@@ -35,7 +35,7 @@ const HiveMimeCreateGridCandidate = observer(({ candidate, poll }: HiveMimeCreat
       mediaFiles.delete(getReferenceId(candidate));
       mediaFiles.delete(getReferenceId(candidate) + "-thumb");
       candidate.media = undefined;
-      candidate.name = "Candidate";
+      candidate.name = "Grid";
 
       return;
     }
@@ -48,7 +48,7 @@ const HiveMimeCreateGridCandidate = observer(({ candidate, poll }: HiveMimeCreat
       contentType: file.type
     };
 
-    candidate.name = file.name;
+    candidate.name = "Grid";
     poll.rows = undefined;
     poll.columns = undefined;
   }

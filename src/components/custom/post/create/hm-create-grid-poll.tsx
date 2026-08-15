@@ -9,7 +9,8 @@ import { HiveMimeInlineSelectTrigger } from "../../utility/hm-inline-select";
 import { mediaFiles } from "./hm-create-post";
 import { getImageDimensions, getReferenceId } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { CellSelection, GridPicker, Variant } from "../../utility/grid-picker";
+import { CellSelection } from "../../utility/cell-selection";
+import { GridPicker, Variant } from "../../utility/grid-picker";
 import { mutedColors } from "@/lib/colors";
 
 const MAX_CELLS = 20;

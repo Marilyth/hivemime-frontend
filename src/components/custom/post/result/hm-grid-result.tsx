@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { HiveMimePollResultProps as HiveMimePollCandidateResultProps } from "./hm-poll-result";
 import { api } from "@/lib/contexts";
 import { useTranslation } from "react-i18next";
-import { CellSelection, GridPicker, Variant } from "../../utility/grid-picker";
+import { CellSelection } from "../../utility/cell-selection";
+import { GridPicker, Variant } from "../../utility/grid-picker";
 
 
 export function HiveMimeGridResult(props: HiveMimePollCandidateResultProps) {
@@ -31,7 +32,10 @@ export function HiveMimeGridResult(props: HiveMimePollCandidateResultProps) {
 
         if (resultCandidate) {
           for (const cell of resultCandidate.distribution!) {
-            cellSelection.cells[cell.cellIndex!].value = cell.value!;
+            if (cell.row != null && cell.column != null
+              && cell.row < cellSelection.rows && cell.column < cellSelection.cols) {
+              cellSelection.cells[cell.row][cell.column].value = cell.voteCount!;
+            }
           }
         }
 

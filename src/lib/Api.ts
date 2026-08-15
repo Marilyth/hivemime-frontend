@@ -26,6 +26,8 @@ export enum UserOrderBy {
 }
 
 export enum SubProperty {
+  Row = "Row",
+  Column = "Column",
   Date = "Date",
   Month = "Month",
   DayOfMonth = "DayOfMonth",
@@ -151,9 +153,9 @@ export interface CandidateDto {
 
 export interface CandidateGridDistributionResultDto {
   /** @format int32 */
-  cellIndex?: number;
-  /** @format double */
-  value?: number;
+  row?: number;
+  /** @format int32 */
+  column?: number;
   /** @format int32 */
   voteCount?: number;
 }
@@ -168,7 +170,9 @@ export interface CandidateGridResultDtoPollResultDto {
 
 export type CandidateGridVoteDto = CandidateVoteDto & {
   /** @format int32 */
-  cellIndex?: number;
+  row?: number;
+  /** @format int32 */
+  column?: number;
 };
 
 export interface CandidateRankDistributionResultDto {

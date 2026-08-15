@@ -142,7 +142,8 @@
     "dateSubHour": "hour",
     "dateSubMinute": "minute",
     "dateViewer": "{{name}} {{subValue}}{{negation}} {{operator}} {{value}}",
-    "gridCellsWere": "Candidate's picked cells were <select/>",
-    "gridViewer": "{{name}} picked {{count}} cells {{operator}}"
+    "gridSubCell": "cell",
+    "gridSubRow": "row",
+    "gridSubColumn": "column"
   }
 }

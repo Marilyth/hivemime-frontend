@@ -13,7 +13,7 @@ import { HiveMimeListPoll } from "./hm-poll-vote";
 import { Accordion } from "@/components/ui/accordion";
 import { AsyncButton } from "../../utility/async-button";
 import { api } from "@/lib/contexts";
-import { CellSelection } from "../../utility/grid-picker";
+import { CellSelection } from "../../utility/cell-selection";
 import { CalendarScope, DateSelection, Variant } from "../../utility/date-selection";
 
 interface HiveMimePostVoteProps {

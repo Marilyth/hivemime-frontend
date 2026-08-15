@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BooleanOperator, CandidateDto, FilterQuery, FilterQueryBase, PollDto, PostDto } from "@/lib/Api";
-import { createFilterQuery, expandInsideOperators } from "@/lib/vote-query";
+import { cleanUpQuery, createFilterQuery, expandCellConditions, expandInsideOperators } from "@/lib/vote-query";
 import { getReferenceId } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SelectItem } from "@/components/ui/select";
@@ -84,7 +84,10 @@ export const HiveMimeFilterConditionOverflowBuilder = observer(({ post, onAddCon
         if (!valid)
             return;
 
-        onAddCondition(expandInsideOperators({ ...draft, leftOperator: BooleanOperator.And }));
+        const cleaned = cleanUpQuery(expandCellConditions(expandInsideOperators({ ...draft, leftOperator: BooleanOperator.And })));
+
+        if (cleaned != null)
+            onAddCondition(cleaned);
 
         resetBuilder();
         setResetKey(key => key + 1);

@@ -37,12 +37,21 @@ function serializeCandidateVote(
       if (!candidate.categoryId) return null;
       return { ...base, categoryId: candidate.categoryId };
 
-    case PollType.Grid:
-      if (!candidate.cellSelection || candidate.cellSelection.cells.length === 0) return null;
-      return candidate.cellSelection.cells
-        .map((value, index) => ({ value: value, index }))
-        .filter(c => c.value.value > 0)
-        .map(c => ({ ...base, cellIndex: c.index }));
+    case PollType.Grid: {
+      const cellSelection = candidate.cellSelection;
+      if (!cellSelection || cellSelection.onCellsCount === 0) return null;
+
+      const votes: CandidateGridVoteDto[] = [];
+
+      for (let row = 0; row < cellSelection.rows; row++) {
+        for (let col = 0; col < cellSelection.cols; col++) {
+          if (cellSelection.cells[row][col].value > 0)
+            votes.push({ ...base, row, column: col });
+        }
+      }
+
+      return votes;
+    }
 
     case PollType.Date:
       if (!candidate.dateSelection || candidate.dateSelection.activeCount === 0) return null;

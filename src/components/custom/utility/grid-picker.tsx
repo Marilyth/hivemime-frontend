@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { mixColors, mutedColors } from "@/lib/colors";
 import { cn } from "@/lib/utils";
 import { ZoomIn, ZoomOut, Image, LayoutGrid } from "lucide-react";
-import { makeAutoObservable, reaction } from "mobx";
+import { reaction } from "mobx";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
+import { CellSelection } from "./cell-selection";
 import { GradientBar } from "./gradient-bar";
 import { Separator } from "@/components/ui/separator";
 
@@ -15,57 +16,6 @@ const DEFAULT_START_COLOR = mutedColors.gray + "BB";
 const DEFAULT_END_COLOR = mutedColors.red + "BB";
 
 const CLICK_DRAG_THRESHOLD = 5;
-
-export class CellSelection {
-  cells: { value: number }[] = [];
-  selectedCell: number | null = null;
-  rows: number;
-  cols: number;
-  onCellsCount = 0;
-  maxOnCells: number;
-
-  constructor(rows: number, cols: number, maxOnCells: number) {
-    this.rows = rows;
-    this.cols = cols;
-    const cellCount = rows * cols;
-    for (let i = 0; i < cellCount; i++) {
-      this.cells.push({ value: 0 });
-    }
-
-    this.maxOnCells = maxOnCells;
-    makeAutoObservable(this);
-  }
-
-  select(cellIndex: number) {
-    this.selectedCell = cellIndex;
-  }
-
-  toggle(cellIndex: number) {
-    if (this.cells[cellIndex].value === 0) {
-      if (this.onCellsCount < this.maxOnCells) {
-        this.cells[cellIndex].value = 1;
-        this.onCellsCount++;
-      }
-    } else {
-      this.cells[cellIndex].value = 0;
-      this.onCellsCount--;
-    }
-  }
-
-  public get bounds() {
-    let min = Infinity;
-    let max = -Infinity;
-
-    for (const cell of this.cells) {
-      if (cell.value < min && cell.value > 0)
-        min = cell.value;
-      if (cell.value > max)
-        max = cell.value;
-    }
-
-    return { min, max };
-  }
-}
 
 export enum Variant {
   View = "view",
@@ -88,7 +38,7 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
   const cardContainerRef = useRef<HTMLDivElement>(null);
   const outerImageContainerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const [tooltip, setTooltip] = useState<{ cellIndex: number, x: number, y: number, value: number } | null>(null);
+  const [tooltip, setTooltip] = useState<{ row: number, col: number, x: number, y: number, value: number } | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [renderedSize, setRenderedSize] = useState({ width: 0, height: 0 });
   const [zoomScale, setZoomScale] = useState(1);
@@ -102,29 +52,35 @@ export const GridPicker = observer(({ cellSelection, src, variant, className, ..
 
   const { min, max } = cellSelection.bounds;
 
-  function toggleCell(cellIndex: number) {
+  function toggleCell(row: number, col: number) {
     if (variant === Variant.Grid) {
-      cellSelection.toggle(cellIndex);
+      cellSelection.toggle(row, col);
     } else if (variant === Variant.Result) {
-      cellSelection.select(cellIndex);
+      cellSelection.select(row, col);
     }
   }
 
-  function showTooltip(cellIndex: number | null, clientX?: number, clientY?: number) {
-    if (cellIndex == null
+  function showTooltip(row: number | null, col?: number, clientX?: number, clientY?: number) {
+    const value = row != null && col != undefined
+      ? cellSelection.cells[row][col].value
+      : 0;
+
+    if (row == null
+      || col == undefined
       || clientX == undefined
       || clientY == undefined
       || variant !== Variant.Result
-      || cellSelection.cells[cellIndex].value <= 0) {
+      || value <= 0) {
       setTooltip(null);
       return;
     }
 
     setTooltip({
-      cellIndex,
+      row,
+      col,
       x: clientX,
       y: clientY,
-      value: cellSelection.cells[cellIndex].value
+      value,
     });
   }
 
@@ -287,8 +243,8 @@ type CellCanvasStyleProps = {
 type CellCanvasProps = {
   cellSelection: CellSelection;
   scale: number;
-  onCellClick?: (cellIndex: number) => void;
-  onHover?: (cellIndex: number | null, clientX?: number, clientY?: number) => void;
+  onCellClick?: (row: number, col: number) => void;
+  onHover?: (row: number | null, col?: number, clientX?: number, clientY?: number) => void;
 } & React.HTMLAttributes<HTMLDivElement> & CellCanvasStyleProps;
 
 const CellCanvas = observer(({ cellSelection, scale, className,
@@ -360,31 +316,33 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     const { min, max } = cellSelection.bounds;
 
-    cellSelection.cells.forEach((cell, cellIndex) => {
-      if (cell.value <= 0 && cellSelection.selectedCell !== cellIndex)
-        return;
+    for (let row = 0; row < cellSelection.rows; row++) {
+      for (let col = 0; col < cellSelection.cols; col++) {
+        const value = cellSelection.cells[row][col].value;
+        const isSelected = cellSelection.selectedCell?.row === row && cellSelection.selectedCell?.col === col;
 
-      const row = Math.floor(cellIndex / cellSelection.cols);
-      const col = cellIndex % cellSelection.cols;
+        if (value <= 0 && !isSelected)
+          continue;
 
-      const x = Math.floor(col * cellWidth);
-      const y = Math.floor(row * cellHeight);
+        const x = Math.floor(col * cellWidth);
+        const y = Math.floor(row * cellHeight);
 
-      if (cell.value > 0) {
-        const ratio = min == max ? 1 : (cell.value - min) / (max - min);
-        ctx.fillStyle = mixColors(startColor, endColor, ratio);
-        ctx.fillRect(x, y, Math.ceil(cellWidth), Math.ceil(cellHeight));
+        if (value > 0) {
+          const ratio = min == max ? 1 : (value - min) / (max - min);
+          ctx.fillStyle = mixColors(startColor, endColor, ratio);
+          ctx.fillRect(x, y, Math.ceil(cellWidth), Math.ceil(cellHeight));
+        }
+
+        if (isSelected) {
+          const lineWidth = 2;
+          const inset = lineWidth / 2;
+
+          ctx.strokeStyle = mutedColors.gold;
+          ctx.lineWidth = lineWidth;
+          ctx.strokeRect(x + inset, y + inset, Math.ceil(cellWidth) - lineWidth, Math.ceil(cellHeight) - lineWidth);
+        }
       }
-
-      if (cellSelection.selectedCell === cellIndex) {
-        const lineWidth = 2;
-        const inset = lineWidth / 2;
-
-        ctx.strokeStyle = mutedColors.gold;
-        ctx.lineWidth = lineWidth;
-        ctx.strokeRect(x + inset, y + inset, Math.ceil(cellWidth) - lineWidth, Math.ceil(cellHeight) - lineWidth);
-      }
-    });
+    }
   }
 
   function cellFromEvent(e: { clientX: number, clientY: number }) {
@@ -398,7 +356,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     const col = Math.max(0, Math.min(cellSelection.cols - 1, Math.floor(relX * cellSelection.cols)));
     const row = Math.max(0, Math.min(cellSelection.rows - 1, Math.floor(relY * cellSelection.rows)));
 
-    return { index: row * cellSelection.cols + col, clientX: e.clientX, clientY: e.clientY };
+    return { row, col, clientX: e.clientX, clientY: e.clientY };
   }
 
   function handleHover(e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) {
@@ -407,7 +365,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     const cell = cellFromEvent(e);
     if (cell)
-      onHover(cell.index, cell.clientX, cell.clientY);
+      onHover(cell.row, cell.col, cell.clientX, cell.clientY);
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -433,7 +391,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
 
     const cell = cellFromEvent(e);
     if (cell)
-      onCellClick(cell.index);
+      onCellClick(cell.row, cell.col);
   }
 
   function handlePointerLeave() {
@@ -452,7 +410,7 @@ const CellCanvas = observer(({ cellSelection, scale, className,
     redrawCanvas();
 
     const disposeCells = reaction(
-      () => cellSelection.cells.map(cell => cell.value),
+      () => cellSelection.cells.map(row => row.map(cell => cell.value)),
       () => redrawCanvas()
     );
 
